@@ -495,7 +495,7 @@ fn tweak_infos(store: &RollbackStore) -> Result<Vec<TweakInfo>, String> {
         applied:applied_ids.contains(everyday::DISABLE_FILTER_KEYS_SHORTCUT_ID),
         changes:vec![technical::TechnicalChange::Command{program:"SystemParametersInfoW",arguments:"Read FILTERKEYS; clear FKF_HOTKEYACTIVE only; preserve remaining flags and timings; restore the saved state.".into()}], ..Default::default() });
     for (id,name,description,category,admin) in [
-        ("ecoqos_rules","Background app efficiency","Choose apps for EcoQoS while PC Tweaker is running. Foreground apps are restored; global power-throttling policy may block this feature.","performance",false),
+        ("ecoqos_rules","Background app efficiency","Choose apps for EcoQoS while WinCraft is running. Foreground apps are restored; global power-throttling policy may block this feature.","performance",false),
         ("limit_do_background_download","Windows background download limit","Configure a Delivery Optimization limit in KB/s. Does not limit other applications or disable Windows Update.","performance",true),
         ("monitor_refresh_profile","Game display refresh profiles","Choose supported refresh rates per game. Preview and restore keep the original resolution and desktop layout.","gaming",false),
     ] {
@@ -558,7 +558,7 @@ fn tweak_infos(store: &RollbackStore) -> Result<Vec<TweakInfo>, String> {
         }
     }
 
-    // PC Tweaker is now free for everyone — no tweak requires a paid license.
+    // WinCraft is now free for everyone — no tweak requires a paid license.
     for entry in &mut list {
         entry.requires_pro = false;
     }
@@ -744,7 +744,7 @@ pub(crate) fn apply_or_undo(
 /// checked by the frontend to show the paywall instead of a generic toast.
 pub const PRO_REQUIRED_PREFIX: &str = "PRO_REQUIRED: ";
 
-/// PC Tweaker is now free for everyone — no tweak requires a paid license.
+/// WinCraft is now free for everyone — no tweak requires a paid license.
 /// The function signature is preserved so callers compile without changes.
 #[cfg(windows)]
 fn requires_pro_for(_id: &str) -> bool {
@@ -793,7 +793,7 @@ fn apply_by_id(
 
     // What a re-apply is about to overwrite (after a Windows update put a
     // value back, say): read now, because the snapshot keeps the value from
-    // before PC Tweaker first touched it. Empty for a first apply.
+    // before WinCraft first touched it. Empty for a first apply.
     let overwritten: Vec<(String, Option<String>)> = registry_parts_of(store, id)
         .iter()
         .map(|part| (format!("{}\\{}", part.path, part.name), live_value(part)))
@@ -1558,7 +1558,7 @@ fn task_xml_text(bytes: &[u8]) -> String {
 
 /// The update watch task stores the path of the program that registered it.
 /// Up to 1.16.1 that was `pc-tweaker-app	auri-app.exe`; since the move to the
-/// PC Tweaker name it would start a file that no longer exists. When the task
+/// WinCraft name it would start a file that no longer exists. When the task
 /// is registered and points anywhere but this program, register it again with
 /// the same schedule. Nothing happens when the watch is off.
 #[cfg(windows)]
@@ -1654,7 +1654,7 @@ fn set_drift_watch(_enabled: bool) -> Result<bool, String> {
 
 /// The scheduled temporary-file cleanup: a logon task, at most one pass a
 /// week, limited rights, and only files untouched for a day.
-pub(crate) const TEMP_CLEANUP_TASK: &str = "PC Tweaker Temp Cleanup";
+pub(crate) const TEMP_CLEANUP_TASK: &str = "WinCraft Temp Cleanup";
 const TEMP_CLEANUP_STATE: &str = "temp-cleanup-schedule.json";
 const TEMP_CLEANUP_EVERY: std::time::Duration = std::time::Duration::from_secs(7 * 24 * 3600);
 const TEMP_CLEANUP_MIN_AGE: std::time::Duration = std::time::Duration::from_secs(24 * 3600);
@@ -2118,15 +2118,15 @@ pub(crate) fn dirs_app_data_dir() -> std::path::PathBuf {
     std::path::PathBuf::from(base).join(env!("PCT_APP_IDENTIFIER"))
 }
 
-/// One change PC Tweaker is keeping in effect: each registry value as it was
-/// before PC Tweaker first touched it, and as it is now.
+/// One change WinCraft is keeping in effect: each registry value as it was
+/// before WinCraft first touched it, and as it is now.
 #[derive(Serialize)]
 struct ActiveChange {
     id: String,
     changes: Vec<audit::ValueChange>,
 }
 
-/// "Now compared with before PC Tweaker": every change still in effect.
+/// "Now compared with before WinCraft": every change still in effect.
 #[cfg(windows)]
 #[tauri::command(async)]
 fn active_changes(app: tauri::AppHandle) -> Result<Vec<ActiveChange>, String> {
@@ -2491,7 +2491,7 @@ mod tests {
 
     #[test]
     fn task_xml_is_read_in_either_encoding() {
-        let text = r"<Command>C:\Apps\PC Tweaker\PC Tweaker.exe</Command>";
+        let text = r"<Command>C:\Apps\WinCraft\WinCraft.exe</Command>";
         let utf16: Vec<u8> = text.encode_utf16().flat_map(u16::to_le_bytes).collect();
         assert_eq!(task_xml_text(text.as_bytes()), text);
         assert_eq!(task_xml_text(&utf16), text);
@@ -2550,7 +2550,7 @@ mod tests {
     #[test]
     fn expansion_entitlement_and_elevation_routing() {
         let dir = std::env::temp_dir().join(format!("pct-expansion-unlicensed-{}", std::process::id()));
-        // PC Tweaker is now free for everyone — every tweak is accessible
+        // WinCraft is now free for everyone — every tweak is accessible
         // regardless of license state.
         for id in ["ecoqos_rules", "limit_do_background_download", "monitor_refresh_profile"] {
             assert!(require_tweak_entitlement(&dir,id).is_ok());
@@ -2626,7 +2626,7 @@ mod tests {
     /// Exercise the production entitlement policy without invoking a Windows
     /// adapter. A temporary journal does not isolate actual registry writes.
     #[test]
-    /// PC Tweaker is now free for everyone — every tweak is accessible
+    /// WinCraft is now free for everyone — every tweak is accessible
     /// without any cached license, even those that were previously Pro-only.
     #[test]
     fn every_tweak_is_accessible_without_a_license() {
@@ -2685,7 +2685,7 @@ mod tests {
 
     /// The source data still carries `requires_pro` flags for historical
     /// bookkeeping, but `tweak_infos()` overrides them all to `false` and
-    /// `require_pro()` always succeeds — PC Tweaker is free for everyone.
+    /// `require_pro()` always succeeds — WinCraft is free for everyone.
     /// This test pins the source-level counts so a refactor notices drift.
     #[test]
     fn the_catalogue_is_eighty_one_tweaks_all_free_in_output() {
@@ -2863,7 +2863,7 @@ mod tests {
  * reachable from anything that can talk to the IPC channel.
  * ================================================================== */
 
-/// Shared Pro gate. PC Tweaker is now free for everyone — this always
+/// Shared Pro gate. WinCraft is now free for everyone — this always
 /// succeeds. The function signature is preserved so the rest of the
 /// enforcement plumbing compiles without churn and can be removed in a
 /// later cleanup pass.
@@ -3262,7 +3262,7 @@ fn open_hud_overlay(app: tauri::AppHandle) -> Result<(), String> {
     let placement = hud_window::read_placement(&dir);
 
     let window = WebviewWindowBuilder::new(&app, "hud", WebviewUrl::App("overlay.html".into()))
-        .title("PC Tweaker HUD")
+        .title("WinCraft HUD")
         .inner_size(
             hud_window::size_for(placement.compact).0,
             hud_window::size_for(placement.compact).1,

@@ -26,10 +26,10 @@
 // Prerequisites for the ORIGINAL Page-linking route below (kept for
 // reference / in case Meta fixes the link issue later - see the
 // getcertsprint bot's SETUP.md for the detailed click-by-click version):
-// 1. Convert the PC Tweaker Instagram account to a Business account.
+// 1. Convert the WinCraft Instagram account to a Business account.
 // 2. Create (or reuse an existing) Facebook Page and link it to that
 //    Instagram account (Meta Business Suite -> Impostazioni -> Account
-//    Instagram -> Aggiungi -> collega alla Pagina PC Tweaker).
+//    Instagram -> Aggiungi -> collega alla Pagina WinCraft).
 // 3. Reuse the SAME Meta developer app already created for CertSprint
 //    (developers.facebook.com/apps) if it's already been through the
 //    "API Setup with Facebook login" wizard for permissions

@@ -237,7 +237,7 @@ export function recommendedTweaks(report: ScanReport, _isPro: boolean): TweakInf
   const advised = new Set(
     (report.advice ?? []).filter((a) => a.verdict === "recommended").map((a) => a.id),
   );
-  // PC Tweaker is free for everyone — no tweak is gated by license.
+  // WinCraft is free for everyone — no tweak is gated by license.
   return (report.tweaks ?? []).filter(
     (t) =>
       allowed.has(t.id) &&

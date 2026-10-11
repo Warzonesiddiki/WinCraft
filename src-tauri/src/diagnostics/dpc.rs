@@ -22,7 +22,7 @@
 //! rather than guessed.
 //!
 //! Starting any kernel session requires administrator rights. The command
-//! runs the capture in-process when PC Tweaker is already elevated, and
+//! runs the capture in-process when WinCraft is already elevated, and
 //! otherwise through one UAC prompt to the headless helper, which writes the
 //! report to a file and exits. It changes nothing on the system, so the helper
 //! skips the restore point every other elevated action creates.
@@ -361,7 +361,7 @@ fn capture_via_helper(app_data_dir: &Path, seconds: u32) -> Result<DpcReport, St
     }
 }
 
-/// One capture per PC Tweaker process, whichever path it takes: a panel that
+/// One capture per WinCraft process, whichever path it takes: a panel that
 /// was closed and reopened must not start a second one beside the first.
 static CAPTURING: std::sync::atomic::AtomicBool = std::sync::atomic::AtomicBool::new(false);
 

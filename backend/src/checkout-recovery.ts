@@ -16,7 +16,7 @@ export type ReminderRecipient = { email: string; firstName: string | null; unsub
 const COOLDOWN_MS = 30 * 24 * 60 * 60 * 1000;
 
 /**
- * One reminder for an abandoned PC Tweaker Lifetime checkout, and only to an
+ * One reminder for an abandoned WinCraft Lifetime checkout, and only to an
  * account holder who verified their email, still isn't Pro and never opted
  * out. At most one per person every 30 days, claimed in the database before
  * sending so two instances can't both mail. A failed send is not retried:
@@ -31,7 +31,7 @@ export async function remindAbandonedLifetime(
   const cutoff = new Date(now.getTime() - COOLDOWN_MS);
   let sent = 0;
   for (const session of sessions) {
-    if (session.mode !== "payment" || session.plan !== "lifetime" || session.product !== "pctweaker") continue;
+    if (session.mode !== "payment" || session.plan !== "lifetime" || session.product !== "wincraft") continue;
     if (!session.userId || !/^\d+$/.test(session.userId)) continue;
     const { rows } = await db.query(
       "SELECT email, first_name FROM users WHERE id = $1 AND email_verified AND NOT is_pro",
@@ -74,8 +74,8 @@ export async function remindAbandonedLifetime(
 export function lifetimeReminderEmail(to: ReminderRecipient) {
   const greeting = to.firstName ? `Hi ${to.firstName.trim()},` : "Hi,";
   const lines = [
-    "Your PC Tweaker Lifetime checkout closed before payment, so nothing was charged.",
-    "If you still want it, open PC Tweaker, go to Plans and choose Lifetime: one payment, Pro for good, no renewals.",
+    "Your WinCraft Lifetime checkout closed before payment, so nothing was charged.",
+    "If you still want it, open WinCraft, go to Plans and choose Lifetime: one payment, Pro for good, no renewals.",
     "If something got in the way, such as a payment method or a question about what Pro includes, just reply to this email.",
   ];
   const footer = "This is the only reminder about this checkout.";
@@ -91,14 +91,14 @@ export function lifetimeReminderEmail(to: ReminderRecipient) {
     : "";
   return {
     to: to.email,
-    subject: "Your PC Tweaker Lifetime checkout",
+    subject: "Your WinCraft Lifetime checkout",
     ...(to.unsubscribeUrl ? { headers: listUnsubscribeHeaders(to.unsubscribeUrl) } : {}),
     html: emailShell({
       preheader: "Your Lifetime checkout closed before payment, so nothing was charged.",
       eyebrow: "Checkout not completed",
       headline: to.firstName?.trim() ? `Still want Lifetime, ${to.firstName.trim()}?` : "Still want Lifetime?",
       intro: `${lines[0]} ${lines[1]}`,
-      action: { label: "Open PC Tweaker", url: "https://pctweaker.app" },
+      action: { label: "Open WinCraft", url: "https://wincraft.app" },
       note: lines[2],
       afterActionHtml: unsubscribe,
       footerNote: footer,

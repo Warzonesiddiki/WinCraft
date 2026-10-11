@@ -25,7 +25,7 @@ import "./workspace-panels.css";
 import "./change-history.css";
 
 /**
- * Change history: every change PC Tweaker made on this PC, grouped by day and
+ * Change history: every change WinCraft made on this PC, grouped by day and
  * by session, with where it came from, its result, the registry values before
  * and after (from 1.18.1), filters, search, exports, and safe undo of one
  * change, a whole session or everything still in effect, always after a

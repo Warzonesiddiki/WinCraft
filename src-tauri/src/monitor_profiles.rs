@@ -605,7 +605,7 @@ mod native {
         }
         Ok(())
     }
-    /// When the owning PC Tweaker started, from the kernel's process table:
+    /// When the owning WinCraft started, from the kernel's process table:
     /// checking that it is still alive opens nothing.
     pub fn process_start(pid: u32) -> Option<u64> {
         crate::process_guard::processes()

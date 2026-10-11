@@ -3,15 +3,15 @@
   Verifies the 1.18 controls on a test machine: apply -> verify -> revert.
 
 .DESCRIPTION
-  Read-only. It never writes the registry or touches a service: PC Tweaker
-  applies and restores, this script only checks what PC Tweaker did against
+  Read-only. It never writes the registry or touches a service: WinCraft
+  applies and restores, this script only checks what WinCraft did against
   tweak-matrix.json, which is generated from the app's own catalogue.
 
-  Run it as the same Windows user who uses PC Tweaker (the HKCU values belong
+  Run it as the same Windows user who uses WinCraft (the HKCU values belong
   to that user), in a normal, non-elevated PowerShell:
 
     1. .\verify-tweaks.ps1 -Phase Baseline   # before touching anything
-    2. Apply every control in PC Tweaker (see README.md)
+    2. Apply every control in WinCraft (see README.md)
     3. .\verify-tweaks.ps1 -Phase Applied
     4. Change history > Restore active tweaks
     5. .\verify-tweaks.ps1 -Phase Reverted
@@ -31,7 +31,7 @@ $matrix = Get-Content -Raw -Path (Join-Path $PSScriptRoot 'tweak-matrix.json') |
 New-Item -ItemType Directory -Force -Path $Results | Out-Null
 $baselineFile = Join-Path $Results "$env:COMPUTERNAME-baseline.json"
 
-# --- This machine, read the way PC Tweaker reads it --------------------------
+# --- This machine, read the way WinCraft reads it --------------------------
 $cv = Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion'
 $build = [int]$cv.CurrentBuild
 $editionId = [string]$cv.EditionID

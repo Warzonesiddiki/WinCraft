@@ -24,7 +24,7 @@ const en = {
   finish: "End scan",
   paused: "Paused",
   pausedLine: "Paused: {done} of {total} checks done",
-  pausedHint: "Resume reads only what is still missing. Closing PC Tweaker discards a paused scan.",
+  pausedHint: "Resume reads only what is still missing. Closing WinCraft discards a paused scan.",
   partialTitle: "Partial scan",
   partialBody: "{done} of {total} checks completed. Not checked: {missing}.",
   olderNote: "Some of these results were read at {time}, before the pause.",
@@ -111,7 +111,7 @@ const en = {
     ],
     restart: [
       "Windows reports a pending restart",
-      "Save your work and restart when convenient. PC Tweaker will not restart the computer for you.",
+      "Save your work and restart when convenient. WinCraft will not restart the computer for you.",
     ],
     security: [
       "A Windows protection appears disabled",
@@ -152,7 +152,7 @@ export const SCAN_COPY: Record<Lang, Copy> = {
     paused: "In pausa",
     pausedLine: "In pausa: {done} di {total} controlli completati",
     pausedHint:
-      "Riprendi legge solo ciò che manca. Chiudendo PC Tweaker la scansione in pausa viene scartata.",
+      "Riprendi legge solo ciò che manca. Chiudendo WinCraft la scansione in pausa viene scartata.",
     partialTitle: "Scansione parziale",
     partialBody: "{done} di {total} controlli completati. Non controllati: {missing}.",
     olderNote: "Alcuni di questi risultati sono stati letti alle {time}, prima della pausa.",
@@ -239,7 +239,7 @@ export const SCAN_COPY: Record<Lang, Copy> = {
       ],
       restart: [
         "Windows segnala un riavvio pendente",
-        "Salva il lavoro e riavvia quando preferisci. PC Tweaker non riavvierà il computer.",
+        "Salva il lavoro e riavvia quando preferisci. WinCraft non riavvierà il computer.",
       ],
       security: [
         "Una protezione Windows sembra disattivata",
@@ -277,7 +277,7 @@ export const SCAN_COPY: Record<Lang, Copy> = {
     paused: "En pause",
     pausedLine: "En pause : {done} contrôles sur {total} terminés",
     pausedHint:
-      "Reprendre ne lit que ce qui manque encore. Fermer PC Tweaker abandonne une analyse en pause.",
+      "Reprendre ne lit que ce qui manque encore. Fermer WinCraft abandonne une analyse en pause.",
     partialTitle: "Analyse partielle",
     partialBody: "{done} contrôles sur {total} terminés. Non vérifiés : {missing}.",
     olderNote: "Certains de ces résultats ont été lus à {time}, avant la pause.",
@@ -364,7 +364,7 @@ export const SCAN_COPY: Record<Lang, Copy> = {
       ],
       restart: [
         "Windows demande un redémarrage",
-        "Enregistrez votre travail et redémarrez quand cela vous convient. PC Tweaker ne redémarre pas le PC.",
+        "Enregistrez votre travail et redémarrez quand cela vous convient. WinCraft ne redémarre pas le PC.",
       ],
       security: [
         "Une protection Windows semble désactivée",
@@ -402,7 +402,7 @@ export const SCAN_COPY: Record<Lang, Copy> = {
     paused: "En pausa",
     pausedLine: "En pausa: {done} de {total} comprobaciones hechas",
     pausedHint:
-      "Al reanudar solo se lee lo que falta. Si cierras PC Tweaker, el análisis en pausa se descarta.",
+      "Al reanudar solo se lee lo que falta. Si cierras WinCraft, el análisis en pausa se descarta.",
     partialTitle: "Análisis parcial",
     partialBody: "{done} de {total} comprobaciones completadas. Sin comprobar: {missing}.",
     olderNote: "Algunos de estos resultados se leyeron a las {time}, antes de la pausa.",
@@ -489,7 +489,7 @@ export const SCAN_COPY: Record<Lang, Copy> = {
       ],
       restart: [
         "Windows indica un reinicio pendiente",
-        "Guarda tu trabajo y reinicia cuando te convenga. PC Tweaker no reiniciará el equipo.",
+        "Guarda tu trabajo y reinicia cuando te convenga. WinCraft no reiniciará el equipo.",
       ],
       security: [
         "Una protección de Windows parece desactivada",
@@ -527,7 +527,7 @@ export const SCAN_COPY: Record<Lang, Copy> = {
     paused: "Pausiert",
     pausedLine: "Pausiert: {done} von {total} Prüfungen erledigt",
     pausedHint:
-      "Beim Fortsetzen wird nur gelesen, was noch fehlt. Wenn du PC Tweaker schließt, wird eine pausierte Prüfung verworfen.",
+      "Beim Fortsetzen wird nur gelesen, was noch fehlt. Wenn du WinCraft schließt, wird eine pausierte Prüfung verworfen.",
     partialTitle: "Unvollständige Prüfung",
     partialBody: "{done} von {total} Prüfungen abgeschlossen. Nicht geprüft: {missing}.",
     olderNote: "Einige dieser Ergebnisse wurden um {time} gelesen, vor der Pause.",
@@ -614,7 +614,7 @@ export const SCAN_COPY: Record<Lang, Copy> = {
       ],
       restart: [
         "Windows meldet einen ausstehenden Neustart",
-        "Speichere deine Arbeit und starte bei Gelegenheit neu. PC Tweaker startet den PC nicht selbst neu.",
+        "Speichere deine Arbeit und starte bei Gelegenheit neu. WinCraft startet den PC nicht selbst neu.",
       ],
       security: [
         "Ein Windows-Schutz scheint deaktiviert",
@@ -651,7 +651,7 @@ export const SCAN_COPY: Record<Lang, Copy> = {
     finish: "Terminar",
     paused: "Em pausa",
     pausedLine: "Em pausa: {done} de {total} verificações concluídas",
-    pausedHint: "Retomar lê apenas o que falta. Fechar o PC Tweaker descarta uma análise em pausa.",
+    pausedHint: "Retomar lê apenas o que falta. Fechar o WinCraft descarta uma análise em pausa.",
     partialTitle: "Análise parcial",
     partialBody: "{done} de {total} verificações concluídas. Por verificar: {missing}.",
     olderNote: "Alguns destes resultados foram lidos às {time}, antes da pausa.",
@@ -738,7 +738,7 @@ export const SCAN_COPY: Record<Lang, Copy> = {
       ],
       restart: [
         "O Windows indica um reinício pendente",
-        "Guarde o seu trabalho e reinicie quando lhe for conveniente. O PC Tweaker não reiniciará o computador.",
+        "Guarde o seu trabalho e reinicie quando lhe for conveniente. O WinCraft não reiniciará o computador.",
       ],
       security: [
         "Uma proteção do Windows parece desativada",

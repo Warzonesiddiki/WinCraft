@@ -1,4 +1,4 @@
-//! Before & After — repeatable measurements of things PC Tweaker can actually
+//! Before & After — repeatable measurements of things WinCraft can actually
 //! influence, compared only against another run on the SAME machine.
 //!
 //! What is measured and why it is fair game:
@@ -281,7 +281,7 @@ fn readings() -> Vec<Metric> {
     out
 }
 
-/// Benchmark files an earlier run could not delete because PC Tweaker was
+/// Benchmark files an earlier run could not delete because WinCraft was
 /// closed mid-test. Only this app's own names, only plain files (never a link
 /// someone planted under that name), and never the files of this process.
 fn remove_stale_files() {

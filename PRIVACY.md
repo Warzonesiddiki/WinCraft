@@ -2,9 +2,9 @@
 
 Last updated: 2026-10-06
 
-PC Tweaker is a desktop application. Windows tweaks, snapshots, rollback data,
+WinCraft is a desktop application. Windows tweaks, snapshots, rollback data,
 hardware readings and file scans are processed locally on your device. They are
-not uploaded to PC Tweaker.
+not uploaded to WinCraft.
 
 ## Connection check
 
@@ -28,7 +28,7 @@ such as a Pro subscription. When you register, our backend stores:
   maintain or cancel the entitlement
 - A session-revocation version used to invalidate existing sign-ins
 
-The same account signs you in to PC Tweaker, PC Tweaker Uninstaller and Tweaky
+The same account signs you in to WinCraft, WinCraft Uninstaller and Tweaky
 Driver. Each app keeps its own sign-in sessions and its own paid plan; a
 subscription to one app does not unlock another. Changing or resetting your
 password applies to all three and signs you out of each.
@@ -50,12 +50,12 @@ password applies to all three and signs you out of each.
   context label and the error message already shown to you. It does not include
   your account id or email address.
 
-PC Tweaker does not use advertising trackers or behavioral analytics on the
+WinCraft does not use advertising trackers or behavioral analytics on the
 website or inside the desktop application.
 
 ## Payments
 
-Payments are processed by **Stripe Checkout**. PC Tweaker never receives or
+Payments are processed by **Stripe Checkout**. WinCraft never receives or
 stores your full card number. Stripe sends our backend the customer,
 subscription and payment status required to grant or revoke an entitlement.
 
@@ -110,7 +110,7 @@ to handle the request, protect the service or improve reliability.
 
 Passwords are hashed, sensitive action tokens are stored as hashes, transport is
 encrypted with HTTPS/TLS, and access to operational systems is restricted. No
-online service can guarantee absolute security, but PC Tweaker minimizes the
+online service can guarantee absolute security, but WinCraft minimizes the
 data it collects and treats failures as closed rather than granting access.
 
 ## Your choices and rights

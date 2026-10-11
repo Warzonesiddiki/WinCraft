@@ -70,8 +70,8 @@ const firstPartyOrigins = [
   "tauri://localhost",
   "http://localhost:1420",
   "http://localhost:5173",
-  "https://pctweaker.app",
-  "https://www.pctweaker.app",
+  "https://wincraft.app",
+  "https://www.wincraft.app",
 ];
 
 // CORS_ORIGINS *adds* to that list rather than replacing it. It used to
@@ -129,7 +129,7 @@ app.use(express.static(path.join(__dirname, "..", "public")));
 // only GET/HEAD /; callbacks, legal pages and API routes stay on this service.
 // Do not forward query parameters: they may contain OAuth or other secrets.
 app.get("/", (_req: Request, res: Response) => {
-  res.redirect(301, "https://pctweaker.app/");
+  res.redirect(301, "https://wincraft.app/");
 });
 
 // Callback page for TikTok's OAuth login (used once, locally, by
@@ -175,8 +175,8 @@ function serveMarkdownAsHtml(routePath: string, mdFilePath: string, title: strin
 // sync with the root TERMS.md/PRIVACY.md if those are ever edited. Needed as
 // real, our-own-domain URLs for the TikTok developer app review (github.com
 // URLs can't be domain-verified since we don't control that domain).
-serveMarkdownAsHtml("/terms", path.join(__dirname, "..", "legal", "TERMS.md"), "PC Tweaker - Terms of Service");
-serveMarkdownAsHtml("/privacy", path.join(__dirname, "..", "legal", "PRIVACY.md"), "PC Tweaker - Privacy Policy");
+serveMarkdownAsHtml("/terms", path.join(__dirname, "..", "legal", "TERMS.md"), "WinCraft - Terms of Service");
+serveMarkdownAsHtml("/privacy", path.join(__dirname, "..", "legal", "PRIVACY.md"), "WinCraft - Privacy Policy");
 
 /**
  * Stripe Checkout's success_url/cancel_url — the desktop app opens Checkout
@@ -197,7 +197,7 @@ function checkoutResultPage(kind: "success" | "cancel" | "tip" | "noted", sessio
   // storage is involved. Shown only when Stripe filled in the session id.
   const question = kind === "success" && sessionId && /^cs_(test|live)_[A-Za-z0-9]{10,200}$/.test(sessionId)
     ? `<form class="ask" method="post" action="/checkout-success">
-  <p class="q">Optional: how did you find PC Tweaker?</p>
+  <p class="q">Optional: how did you find WinCraft?</p>
   <input type="hidden" name="session_id" value="${sessionId}">
   <div class="opts">${Object.entries(SELF_REPORTED_SOURCES)
     .map(([value, label]) => `<button type="submit" name="source" value="${value}">${label}</button>`).join("")}</div>
@@ -207,7 +207,7 @@ function checkoutResultPage(kind: "success" | "cancel" | "tip" | "noted", sessio
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>${isTip ? "Thank you" : isSuccess ? "You're Pro" : "Checkout cancelled"} — PC Tweaker</title>
+<title>${isTip ? "Thank you" : isSuccess ? "You're Pro" : "Checkout cancelled"} — WinCraft</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex">
 <style>
@@ -235,11 +235,11 @@ function checkoutResultPage(kind: "success" | "cancel" | "tip" | "noted", sessio
   <h1>${kind === "noted" ? "Thanks for telling us" : isTip ? "Thank you for your support" : isSuccess ? "Payment successful" : "Checkout cancelled"}</h1>
   <p>${
     kind === "noted"
-      ? "It helps us know where to keep posting. Switch back to PC Tweaker: your new plan is picked up automatically."
+      ? "It helps us know where to keep posting. Switch back to WinCraft: your new plan is picked up automatically."
       : isTip
-      ? "Your tip goes straight into new features and daily updates for PC Tweaker. Stripe will email your receipt."
+      ? "Your tip goes straight into new features and daily updates for WinCraft. Stripe will email your receipt."
       : isSuccess
-      ? "Your Pro tweaks and presets are unlocked. Switch back to PC Tweaker — the app picks up your new plan automatically the next time it checks your license."
+      ? "Your Pro tweaks and presets are unlocked. Switch back to WinCraft — the app picks up your new plan automatically the next time it checks your license."
       : "No charge was made. You can restart checkout from the app whenever you're ready."
   }</p>
   ${question}

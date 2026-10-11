@@ -64,7 +64,7 @@ const stripe = stripeSecretKey
   ? new Stripe(stripeSecretKey, { apiVersion: "2025-03-31.basil" as Stripe.LatestApiVersion })
   : null;
 
-/** Answers offered by the post-payment "How did you find PC Tweaker?" question. */
+/** Answers offered by the post-payment "How did you find WinCraft?" question. */
 export const SELF_REPORTED_SOURCES: Record<string, string> = {
   youtube: "YouTube", tiktok: "TikTok", instagram: "Instagram", facebook: "Facebook",
   search: "Search engine", friend: "A friend", other: "Somewhere else",
@@ -139,7 +139,7 @@ const PLANS: Record<PlanKey, PlanDef> = {
  * Resolves the Stripe Price and mode for a checkout request, server-side.
  *
  * The client names a product and a plan; it never names a price. For the
- * Uninstaller the price depends on loyalty — an active PC Tweaker
+ * Uninstaller the price depends on loyalty — an active WinCraft
  * subscription earns the discounted yearly price — and that check runs HERE,
  * against the database, because an entitlement claimed by the client is
  * exactly the kind of input a paying-less attacker would forge.
@@ -149,7 +149,7 @@ async function resolveCheckoutPrice(
   product: Product,
   planKey: PlanKey,
 ): Promise<{ envName: string; mode: "subscription" | "payment" } | { error: string; status: number }> {
-  if (product === "pctweaker") {
+  if (product === "wincraft") {
     const plan = Object.prototype.hasOwnProperty.call(PLANS, planKey) ? PLANS[planKey] : undefined;
     if (!plan) return { error: `unknown plan: ${planKey}`, status: 400 };
     return { envName: plan.env, mode: plan.mode };
@@ -157,9 +157,9 @@ async function resolveCheckoutPrice(
   // Uninstaller sells one plan: a yearly subscription. Loyalty pricing is a
   // different Stripe Price, not a coupon, so the invoice states it plainly.
   if (planKey !== "annual") return { error: "the Uninstaller is sold as an annual plan", status: 400 };
-  const pctweaker = await productEntitlement(userId, "pctweaker");
+  const wincraft = await productEntitlement(userId, "wincraft");
   return {
-    envName: pctweaker.active ? "STRIPE_PRICE_UNINSTALLER_LOYALTY" : "STRIPE_PRICE_UNINSTALLER_ANNUAL",
+    envName: wincraft.active ? "STRIPE_PRICE_UNINSTALLER_LOYALTY" : "STRIPE_PRICE_UNINSTALLER_ANNUAL",
     mode: "subscription",
   };
 }
@@ -180,7 +180,7 @@ export function createCheckoutHandler(effects: CheckoutCreationEffects = {
 }) {
   return async (req: Request, res: Response) => {
     const planKey = String(req.body?.plan || "annual") as PlanKey;
-    const product = req.body?.product ?? "pctweaker";
+    const product = req.body?.product ?? "wincraft";
     // `PLANS[planKey]` alone would resolve a key like "__proto__" or
     // "constructor" to Object.prototype instead of undefined, since PLANS is a
     // plain object literal — resolveCheckoutPrice guards it with hasOwnProperty
@@ -241,7 +241,7 @@ export function createCheckoutHandler(effects: CheckoutCreationEffects = {
         cancelUrl: effects.environment.CHECKOUT_CANCEL_URL || "https://example.com/checkout-cancel",
         utm: req.body?.utm,
       });
-      if (product === "pctweaker" && (planKey === "lifetime" || alreadyOwnsLifetime)) {
+      if (product === "wincraft" && (planKey === "lifetime" || alreadyOwnsLifetime)) {
         // Read server time after database work, immediately before the Stripe
         // request. A stale browser countdown or submitted deadline is irrelevant.
         const decision = lifetimeCheckoutDecision(lifetimeOffer(effects.environment, effects.now()), alreadyOwnsLifetime);
@@ -296,7 +296,7 @@ router.post("/tip", checkoutLimiter, tipLimiter, requireStripe, async (req: Requ
   }
   try {
     const session = await stripe!.checkout.sessions.create(
-      tipSessionParams(priceId, process.env.APP_URL || "https://pctweaker.app", req.body?.quantity, req.body?.utm),
+      tipSessionParams(priceId, process.env.APP_URL || "https://wincraft.app", req.body?.quantity, req.body?.utm),
     );
     res.json({ url: session.url });
   } catch (err) {
@@ -334,7 +334,7 @@ router.post("/portal", requireAuth, requireStripe, async (req: Request, res: Res
   try {
     const session = await stripe!.billingPortal.sessions.create({
       customer: customerId,
-      return_url: process.env.APP_URL || "https://pctweaker.app",
+      return_url: process.env.APP_URL || "https://wincraft.app",
     });
     res.json({ url: session.url });
   } catch (err) {
@@ -392,7 +392,7 @@ async function webhookHandler(req: Request, res: Response): Promise<void> {
 }
 
 /**
- * Current PC Tweaker webhooks load the real subscription before granting.
+ * Current WinCraft webhooks load the real subscription before granting.
  * The older provisional-call contract remains monotonic: a holding window
  * may extend an expiry but cannot shorten it. Source identity and generation
  * are checked in the same UPDATE as the grant, alongside lifetime protection.
@@ -460,11 +460,11 @@ function lifetimePriceIds(): string[] {
 
 function priceProducts(): Record<string, Product> {
   const pairs: [string | undefined, Product][] = [
-    [process.env.STRIPE_PRICE_MONTHLY, "pctweaker"],
-    [process.env.STRIPE_PRICE_ANNUAL, "pctweaker"],
-    [process.env.STRIPE_PRICE_LIFETIME, "pctweaker"],
-    [process.env.STRIPE_PRICE_LIFETIME_PROMO, "pctweaker"],
-    [process.env.STRIPE_PRICE_ID, "pctweaker"],
+    [process.env.STRIPE_PRICE_MONTHLY, "wincraft"],
+    [process.env.STRIPE_PRICE_ANNUAL, "wincraft"],
+    [process.env.STRIPE_PRICE_LIFETIME, "wincraft"],
+    [process.env.STRIPE_PRICE_LIFETIME_PROMO, "wincraft"],
+    [process.env.STRIPE_PRICE_ID, "wincraft"],
     [process.env.STRIPE_PRICE_UNINSTALLER_ANNUAL, "uninstaller"],
     [process.env.STRIPE_PRICE_UNINSTALLER_LOYALTY, "uninstaller"],
   ];
@@ -516,7 +516,7 @@ async function holdsLifetime(userId: string): Promise<boolean> {
 }
 
 /**
- * Stops this user's identified PC Tweaker subscriptions from renewing after
+ * Stops this user's identified WinCraft subscriptions from renewing after
  * a lifetime purchase. Other products sharing the customer stay untouched.
  *
  * Cancellation is at the end of the period they have already paid for, not
@@ -551,7 +551,7 @@ async function stopSubscriptionsAfterLifetime(
       ...(startingAfter ? { starting_after: startingAfter } : {}),
     });
     for (const subscription of subscriptions.data) {
-      if (subscriptionProduct(subscription) !== "pctweaker") continue;
+      if (subscriptionProduct(subscription) !== "wincraft") continue;
       if (subscription.metadata?.userId && subscription.metadata.userId !== String(userId)) continue;
       if (!["active", "trialing", "past_due", "unpaid"].includes(subscription.status)) continue;
       if (subscription.cancel_at_period_end) continue;
@@ -613,9 +613,9 @@ async function sendProWelcomeEmail(
   userId: string,
   plan: string | null | undefined,
   expiresAt: Date | null,
-  product: string = "pctweaker",
+  product: string = "wincraft",
   /** What Stripe actually charged. Falls back to the per-plan table, which
-   *  only describes PC Tweaker's own prices. */
+   *  only describes WinCraft's own prices. */
   chargedLabel: string | null = null,
   receiptKey?: string,
 ): Promise<void> {
@@ -710,7 +710,7 @@ function notifyOwnerOfSale(
   userId: string,
   plan: string | null | undefined,
   mode: string | null,
-  product: string = "pctweaker",
+  product: string = "wincraft",
 ): void {
   void (async () => {
     const { rows } = await getPool().query("SELECT email FROM users WHERE id = $1", [userId]);
@@ -844,7 +844,7 @@ async function handleCheckoutSession(session: Stripe.Checkout.Session, effects: 
   if (!product) return;
 
   const customerId = typeof session.customer === "string" ? session.customer : null;
-  if (session.mode === "subscription" && product === "pctweaker" && await holdsLifetime(userId)) {
+  if (session.mode === "subscription" && product === "wincraft" && await holdsLifetime(userId)) {
     await effects.stopSubscriptions(userId, customerId);
     return;
   }
@@ -853,10 +853,10 @@ async function handleCheckoutSession(session: Stripe.Checkout.Session, effects: 
     annual: process.env.STRIPE_PRICE_ANNUAL,
     lifetime: process.env.STRIPE_PRICE_LIFETIME,
   })).find(Boolean);
-  const legacyLifetime = session.mode === "payment" && product === "pctweaker" &&
+  const legacyLifetime = session.mode === "payment" && product === "wincraft" &&
     priceIds.some((id) => Boolean(process.env.STRIPE_PRICE_ID) && id === process.env.STRIPE_PRICE_ID);
   let plan = pricePlan ?? (legacyLifetime ? "lifetime" : session.metadata?.plan);
-  if (session.mode === "payment" && (product !== "pctweaker" || plan !== "lifetime")) {
+  if (session.mode === "payment" && (product !== "wincraft" || plan !== "lifetime")) {
     throw new Error(`Checkout ${session.id} has no recognized one-time entitlement`);
   }
   if (session.mode === "subscription" && plan !== "monthly" && plan !== "annual") {
@@ -869,7 +869,7 @@ async function handleCheckoutSession(session: Stripe.Checkout.Session, effects: 
   if (expiresAt && !Number.isFinite(expiresAt.getTime())) {
     throw new Error(`Checkout ${session.id} has an invalid creation time`);
   }
-  if (product !== "pctweaker") {
+  if (product !== "wincraft") {
     await upsertEntitlement(userId, product, { plan: plan!, expiresAt, provisional: true });
     effects.notifySale(userId, plan, session.mode, product);
     return;
@@ -880,7 +880,7 @@ async function handleCheckoutSession(session: Stripe.Checkout.Session, effects: 
     const subscriptionId = typeof session.subscription === "string" ? session.subscription : session.subscription?.id;
     if (!subscriptionId) throw new Error(`Checkout ${session.id} has no subscription ID`);
     const current = await effects.loadSubscription(subscriptionId);
-    if (current.id !== subscriptionId || subscriptionProduct(current) !== "pctweaker" ||
+    if (current.id !== subscriptionId || subscriptionProduct(current) !== "wincraft" ||
         (current.metadata?.userId && current.metadata.userId !== String(userId)) ||
         (customerId && typeof current.customer === "string" && current.customer !== customerId)) {
       throw new Error(`Checkout ${session.id} does not match its subscription`);
@@ -917,9 +917,9 @@ async function findPurchase(paymentIntentId: string, effects: BillingEffects): P
     const userId = session.client_reference_id || session.metadata?.userId;
     // Our own Lifetime checkouts also carry product/plan metadata, so a
     // refund is still matched if a promo Price variable is ever removed.
-    const lifetimeCheckout = session.metadata?.product === "pctweaker" && session.metadata?.plan === "lifetime";
+    const lifetimeCheckout = session.metadata?.product === "wincraft" && session.metadata?.plan === "lifetime";
     if (!userId || !(lifetimeCheckout || priceIds.some((id) => lifetimePrices.includes(id)))) return null;
-    return { userId, product: "pctweaker", plan: "lifetime", subscriptionId: null };
+    return { userId, product: "wincraft", plan: "lifetime", subscriptionId: null };
   }
   if (session) return null;
   const subscription = await effects.loadSubscriptionForPayment(paymentIntentId);
@@ -943,7 +943,7 @@ async function revokePurchase({ userId, product, plan, subscriptionId }: Reverse
     );
     return Boolean(rowCount);
   }
-  if (product === "pctweaker") {
+  if (product === "wincraft") {
     const { rowCount } = await getPool().query(
       `UPDATE users SET is_pro = FALSE, pro_expires_at = NULL, legacy_pro_grant = FALSE
         WHERE id = $1 AND is_pro = TRUE AND COALESCE(plan, '') <> 'lifetime'
@@ -1040,7 +1040,7 @@ async function handleEvent(event: Stripe.Event, effects: BillingEffects = billin
       const userId = await resolveUserId(subscription);
       if (!userId) break;
       const active = ["active", "trialing", "past_due"].includes(subscription.status);
-      if (product !== "pctweaker") {
+      if (product !== "wincraft") {
         if (active) {
           const expiresAt = periodEndFromSubscription(subscription);
           if (!expiresAt) throw new Error(`Subscription ${subscription.id} has an invalid period end`);
@@ -1086,7 +1086,7 @@ async function handleEvent(event: Stripe.Event, effects: BillingEffects = billin
             userId,
             subscriptionPlan(subscription),
             expiresAt,
-            "pctweaker",
+            "wincraft",
             subscriptionCharge(subscription),
             `subscription:${subscription.id}`,
           );
@@ -1110,7 +1110,7 @@ async function handleEvent(event: Stripe.Event, effects: BillingEffects = billin
       if (!product) break;
       const userId = await resolveUserId(subscription);
       if (!userId) break;
-      if (product !== "pctweaker") {
+      if (product !== "wincraft") {
         await revokeEntitlement(userId, product, subscription.id);
         break;
       }

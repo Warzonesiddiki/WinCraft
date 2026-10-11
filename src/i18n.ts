@@ -1133,7 +1133,7 @@ const it: Strings = {
     fewer: "Un caffè in meno",
     more: "Un caffè in più",
   },
-  appName: "PC Tweaker",
+  appName: "WinCraft",
   appliedCount: "{applied} di {total} tweak attivi",
   headerNote:
     "Esamina ogni modifica prima di applicarla. Gli strumenti di ripristino coprono le impostazioni supportate; pulizia e riparazione hanno limiti di recupero diversi.",
@@ -1359,7 +1359,7 @@ const it: Strings = {
       "Rimuove dalla cartella WinSxS le versioni dei componenti ormai sostituite. Gli aggiornamenti installati di recente restano disinstallabili.",
     runningNote: "Non spegnere né riavviare il PC mentre è in corso.",
     cannotStop:
-      "Una volta avviato non si può interrompere: Windows sta controllando e riparando i propri file di sistema, e fermarlo a metà potrebbe lasciarli riparati solo in parte. Nel frattempo puoi continuare a usare il PC e PC Tweaker.",
+      "Una volta avviato non si può interrompere: Windows sta controllando e riparando i propri file di sistema, e fermarlo a metà potrebbe lasciarli riparati solo in parte. Nel frattempo puoi continuare a usare il PC e WinCraft.",
     stepQuick: "Lettura rapida dello stato",
     stepScan: "Controllo dell'archivio componenti",
     stepRestore: "Riparazione dell'archivio componenti",
@@ -1553,7 +1553,7 @@ const it: Strings = {
       "Aperte {opened} pagine su {total}: le altre restano selezionate, riprova per aprirle.",
     allCurrent: "Nessun driver risulta datato.",
     nothingActionable: "Nessun driver datato con una pagina del produttore disponibile.",
-    note: "PC Tweaker non scarica pacchetti driver da solo: non esiste un’API dei produttori che dica qual è la versione giusta per il tuo esatto dispositivo, e installare il driver video sbagliato è uno dei pochi errori che può lasciarti senza schermo. Qui si automatizza la parte noiosa — trovare le pagine — non la scelta. Per i driver che Windows Update conosce davvero, usa il pulsante qui sopra.",
+    note: "WinCraft non scarica pacchetti driver da solo: non esiste un’API dei produttori che dica qual è la versione giusta per il tuo esatto dispositivo, e installare il driver video sbagliato è uno dei pochi errori che può lasciarti senza schermo. Qui si automatizza la parte noiosa — trovare le pagine — non la scelta. Per i driver che Windows Update conosce davvero, usa il pulsante qui sopra.",
   },
   secureDefrag: {
     title: "Deframmentazione sicura",
@@ -1603,7 +1603,7 @@ const it: Strings = {
       "Accanto agli FPS medi c’è DROP: la velocità dell’1% di fotogrammi peggiori, quello che altrove trovi chiamato «1% low». È il numero che si muove quando il gioco scatta, mentre la media resta alta e non te lo dice. Più DROP è vicino alla media, più il gioco è fluido.",
     fpsStart: "Misura FPS",
     fpsStop: "Ferma misura",
-    fpsNeedsAdmin: "Per misurare gli FPS serve avviare PC Tweaker come amministratore.",
+    fpsNeedsAdmin: "Per misurare gli FPS serve avviare WinCraft come amministratore.",
     fpsRunning:
       "Misurazione attiva: gli FPS compaiono nell’overlay appena un gioco inizia a disegnare.",
     show: "Mostra",
@@ -1717,7 +1717,7 @@ const it: Strings = {
     inactive: "Turbo non attivo",
     loadLabel: "CARICO CPU",
     loadCadence: "Misurato ogni secondo, smussato su circa 3 secondi",
-    ownLoad: "Negli ultimi secondi: PC Tweaker stesso {own}% · tutto il resto {rest}%",
+    ownLoad: "Negli ultimi secondi: WinCraft stesso {own}% · tutto il resto {rest}%",
     stageReading: "Lettura del piano energetico",
     stageRaising: "Aumento del limite di boost",
     stageApplying: "Applicazione al sistema",
@@ -1859,7 +1859,7 @@ const it: Strings = {
   },
   ram: {
     autoNeedsAdmin:
-      "La pulizia automatica funziona solo quando PC Tweaker ha i diritti di amministratore.",
+      "La pulizia automatica funziona solo quando WinCraft ha i diritti di amministratore.",
     title: "Libera RAM",
     subtitle:
       "Chiede a Windows di rilasciare la memoria che i programmi tengono occupata senza usarla. Windows chiede ogni volta il permesso di amministratore, e la pulizia aspetta se è in corso un gioco.",
@@ -1872,9 +1872,9 @@ const it: Strings = {
     autoOff: "Disattivata",
     autoEvery: "Ogni {interval}",
     autoHint:
-      "Con la pulizia automatica attiva, PC Tweaker libera la RAM da solo a intervalli regolari. Può farlo solo quando è in esecuzione come amministratore: Windows chiede il permesso per ogni pulizia e una pulizia programmata non può chiederlo.",
+      "Con la pulizia automatica attiva, WinCraft libera la RAM da solo a intervalli regolari. Può farlo solo quando è in esecuzione come amministratore: Windows chiede il permesso per ogni pulizia e una pulizia programmata non può chiederlo.",
     autoPausedNotAdmin:
-      "In pausa: PC Tweaker non è in esecuzione come amministratore, quindi la pulizia automatica non può partire. Per usarla, chiudi PC Tweaker e riaprilo con «Esegui come amministratore». La pulizia manuale funziona comunque: Windows chiede il permesso ogni volta.",
+      "In pausa: WinCraft non è in esecuzione come amministratore, quindi la pulizia automatica non può partire. Per usarla, chiudi WinCraft e riaprilo con «Esegui come amministratore». La pulizia manuale funziona comunque: Windows chiede il permesso ogni volta.",
     autoNext: "Prossima pulizia alle {time}",
     autoDue: "Pulizia in corso...",
     autoLast: "Ultima alle {time}: {amount} liberati",
@@ -1904,7 +1904,7 @@ const it: Strings = {
   },
   paywall: {
     title: "Funzione Pro",
-    body: "Questo strumento è disponibile con PC Tweaker Pro. Confronta i piani e scopri cosa includono prima di scegliere.",
+    body: "Questo strumento è disponibile con WinCraft Pro. Confronta i piani e scopri cosa includono prima di scegliere.",
     unlock: "Vedi piani e prezzi",
     notNow: "Non ora",
     priceLine:
@@ -1972,15 +1972,15 @@ const it: Strings = {
     button: "Prova sul web",
   },
   uninstallerPromo: {
-    title: "PC Tweaker Uninstaller",
+    title: "WinCraft Uninstaller",
     description:
-      "Rimuovi interi programmi in sicurezza: punto di ripristino automatico, comando verificato e report onesto. Della stessa famiglia di PC Tweaker.",
+      "Rimuovi interi programmi in sicurezza: punto di ripristino automatico, comando verificato e report onesto. Della stessa famiglia di WinCraft.",
     button: "Scarica",
     confirmTitle: "Scaricare il disinstallatore?",
     confirmBody:
-      "PC Tweaker Uninstaller è un'app separata della stessa suite e accede con lo stesso account di questa. Il download prende l'installer (circa 4 MB) direttamente dalla sua release su GitHub, per Windows 10 e 11 a 64 bit.",
+      "WinCraft Uninstaller è un'app separata della stessa suite e accede con lo stesso account di questa. Il download prende l'installer (circa 4 MB) direttamente dalla sua release su GitHub, per Windows 10 e 11 a 64 bit.",
     confirmUnsigned:
-      "PC Tweaker Uninstaller è firmato digitalmente da Aurelio Avila. Verifica autore e firma nelle proprietà del file. SmartScreen può comunque mostrare avvisi.",
+      "WinCraft Uninstaller è firmato digitalmente da Aurelio Avila. Verifica autore e firma nelle proprietà del file. SmartScreen può comunque mostrare avvisi.",
     confirmDownload: "Scarica",
     confirmOpenPage: "Apri invece la pagina",
     cancel: "Annulla",
@@ -1988,9 +1988,9 @@ const it: Strings = {
   live: {
     title: "In questo momento",
     subtitle:
-      "Aggiornato ogni secondo mentre questa pagina è aperta e PC Tweaker è in primo piano. In background non viene misurato nulla.",
+      "Aggiornato ogni secondo mentre questa pagina è aperta e WinCraft è in primo piano. In background non viene misurato nulla.",
     paused: "In pausa",
-    pausedHint: "In pausa mentre PC Tweaker è in background. Riprende quando torni.",
+    pausedHint: "In pausa mentre WinCraft è in background. Riprende quando torni.",
     measuring: "Misurazione…",
     smooth: "Tutto fluido",
     busy: "Impegnato",
@@ -2049,12 +2049,12 @@ const it: Strings = {
   },
   pageError: {
     title: "Questa pagina ha avuto un problema",
-    body: "Il resto di PC Tweaker funziona ancora e questo errore non ha modificato nulla sul PC. Ricarica la pagina per riprovare.",
+    body: "Il resto di WinCraft funziona ancora e questo errore non ha modificato nulla sul PC. Ricarica la pagina per riprovare.",
     reload: "Ricarica la pagina",
-    reloadApp: "Ricarica PC Tweaker",
+    reloadApp: "Ricarica WinCraft",
     details: "Dettagli tecnici",
-    appTitle: "PC Tweaker ha avuto un problema",
-    appBody: "Questo errore non ha modificato nulla sul PC. Ricarica PC Tweaker per continuare.",
+    appTitle: "WinCraft ha avuto un problema",
+    appBody: "Questo errore non ha modificato nulla sul PC. Ricarica WinCraft per continuare.",
   },
   folderScan: {
     stop: "Interrompi ricerca",
@@ -2175,7 +2175,7 @@ const it: Strings = {
     noTempSensor: "Questa scheda non espone un sensore di temperatura.",
     cpuAcpiSource: "letta dalla zona termica ACPI",
     cpuNoSensor:
-      "Temperatura CPU non disponibile: il firmware non espone una zona termica ACPI. PC Tweaker mostra solo le letture rese disponibili da Windows.",
+      "Temperatura CPU non disponibile: il firmware non espone una zona termica ACPI. WinCraft mostra solo le letture rese disponibili da Windows.",
     noGpuTool:
       "Nessuna scheda NVIDIA rilevata. AMD e Intel non forniscono uno strumento di interrogazione equivalente, quindi le loro temperature non sono leggibili senza software del produttore.",
     thermalsUnavailable: "Non riusciamo a leggere i sensori su questo sistema.",
@@ -2250,7 +2250,7 @@ const it: Strings = {
     winUpdateLabel: "Windows Update",
     winUpdateButton: "Cerca su Windows Update",
     winUpdateNote:
-      "Questo controlla solo il catalogo di Windows Update, non i driver specifici elencati sopra: molti produttori (soprattutto per audio e chipset integrati) non pubblicano mai i loro aggiornamenti lì, solo sul proprio sito. PC Tweaker non scarica pacchetti driver per conto suo: non esiste un'API dei produttori per sapere qual è la versione giusta per il tuo esatto dispositivo, e installare il driver video sbagliato è uno dei pochi errori che può lasciarti senza schermo.",
+      "Questo controlla solo il catalogo di Windows Update, non i driver specifici elencati sopra: molti produttori (soprattutto per audio e chipset integrati) non pubblicano mai i loro aggiornamenti lì, solo sul proprio sito. WinCraft non scarica pacchetti driver per conto suo: non esiste un'API dei produttori per sapere qual è la versione giusta per il tuo esatto dispositivo, e installare il driver video sbagliato è uno dei pochi errori che può lasciarti senza schermo.",
     winUpdateOpened: "Windows Update aperto.",
     winUpdateSearching: "Ricerca in corso...",
     winUpdateTakesAWhile: "Può richiedere un minuto: interroga il catalogo Microsoft.",
@@ -2284,7 +2284,7 @@ const it: Strings = {
     photoFailed: "Impossibile usare questa immagine come foto profilo.",
     support: "Supporto",
     reportIssue: "Segnala un problema",
-    aboutBody: "PC Tweaker — tweak di sistema con backup e ripristino automatico.",
+    aboutBody: "WinCraft — tweak di sistema con backup e ripristino automatico.",
     close: "Chiudi",
   },
   auth: {
@@ -2330,13 +2330,13 @@ const it: Strings = {
   guard: {
     settingTitle: "Lascia stare i giochi che si gestiscono da soli",
     settingBody:
-      "Alcuni giochi gestiscono da soli le proprie prestazioni. Mentre uno di questi è in esecuzione, PC Tweaker sospende le regolazioni sulle app e lascia il gioco esattamente com'è.",
-    selfManaged: "Questo gioco gestisce da solo le sue prestazioni: PC Tweaker lo lascia com'è.",
+      "Alcuni giochi gestiscono da soli le proprie prestazioni. Mentre uno di questi è in esecuzione, WinCraft sospende le regolazioni sulle app e lascia il gioco esattamente com'è.",
+    selfManaged: "Questo gioco gestisce da solo le sue prestazioni: WinCraft lo lascia com'è.",
     gameRunning:
-      "È in esecuzione un gioco che gestisce da solo le sue prestazioni: PC Tweaker lascia le app come sono finché non lo chiudi.",
+      "È in esecuzione un gioco che gestisce da solo le sue prestazioni: WinCraft lascia le app come sono finché non lo chiudi.",
     paused: "In pausa mentre è in esecuzione un gioco che gestisce da solo le sue prestazioni.",
     selfManagedBadge: "Gestisce da solo le prestazioni",
-    registeredGameRunning: "È in esecuzione uno dei tuoi giochi: PC Tweaker aspetta che si chiuda.",
+    registeredGameRunning: "È in esecuzione uno dei tuoi giochi: WinCraft aspetta che si chiuda.",
   },
   preview: {
     title: "Anteprima",
@@ -2368,7 +2368,7 @@ const it: Strings = {
   priorityRules: {
     title: "Regole di priorità per le app",
     subtitle:
-      "Scegli un'app e una priorità. PC Tweaker la imposta ogni volta che l'app si avvia mentre PC Tweaker è aperto, e rimette la priorità di prima quando rimuovi la regola o chiudi PC Tweaker. Mai oltre Alta.",
+      "Scegli un'app e una priorità. WinCraft la imposta ogni volta che l'app si avvia mentre WinCraft è aperto, e rimette la priorità di prima quando rimuovi la regola o chiudi WinCraft. Mai oltre Alta.",
     remove: "Rimuovi",
     empty: "Nessuna app per ora.",
     active: "App in esecuzione regolate: {count}",
@@ -2473,7 +2473,7 @@ const it: Strings = {
     ecoqos_rules: {
       name: "Regole di efficienza per le app in background",
       description:
-        "Assegna una priorità energetica ridotta a eseguibili scelti mentre PC Tweaker è aperto. Le regole si sospendono quando l'app è interattiva; non sono un limite percentuale della CPU.",
+        "Assegna una priorità energetica ridotta a eseguibili scelti mentre WinCraft è aperto. Le regole si sospendono quando l'app è interattiva; non sono un limite percentuale della CPU.",
     },
     limit_do_background_download: {
       name: "Limite ai download Windows in background",
@@ -2807,7 +2807,7 @@ const en: Strings = {
     fewer: "One coffee fewer",
     more: "One coffee more",
   },
-  appName: "PC Tweaker",
+  appName: "WinCraft",
   appliedCount: "{applied} of {total} tweaks active",
   headerNote:
     "Review each change before applying it. Restore tools cover supported settings; cleanup and repair operations have different recovery limits.",
@@ -3031,7 +3031,7 @@ const en: Strings = {
       "Removes superseded component versions from WinSxS. Recently installed updates stay uninstallable.",
     runningNote: "Don't shut down or restart while this is running.",
     cannotStop:
-      "Once started it can't be stopped: Windows is checking and repairing its own system files, and cutting that off halfway could leave them half repaired. You can keep using your PC and PC Tweaker meanwhile.",
+      "Once started it can't be stopped: Windows is checking and repairing its own system files, and cutting that off halfway could leave them half repaired. You can keep using your PC and WinCraft meanwhile.",
     stepQuick: "Quick status read",
     stepScan: "Checking the component store",
     stepRestore: "Repairing the component store",
@@ -3222,7 +3222,7 @@ const en: Strings = {
       "Opened {opened} of {total} pages: the rest stay selected, run it again to open them.",
     allCurrent: "No driver is showing its age.",
     nothingActionable: "No ageing driver has a vendor page to open.",
-    note: "PC Tweaker does not download driver packages on its own: there is no vendor API that says which version is right for your exact device, and installing the wrong display driver is one of the few mistakes that can leave you with no screen. This automates the tedious part — finding the pages — not the choice. For drivers Windows Update genuinely knows about, use the button above.",
+    note: "WinCraft does not download driver packages on its own: there is no vendor API that says which version is right for your exact device, and installing the wrong display driver is one of the few mistakes that can leave you with no screen. This automates the tedious part — finding the pages — not the choice. For drivers Windows Update genuinely knows about, use the button above.",
   },
   secureDefrag: {
     title: "Secure Defragmentation",
@@ -3272,7 +3272,7 @@ const en: Strings = {
       "Beside the average there is DROP: the rate of the worst one percent of frames, the figure elsewhere called the 1% low. It is the number that moves when a game stutters, while the average stays high and says nothing. The closer DROP sits to the average, the smoother the game.",
     fpsStart: "Measure FPS",
     fpsStop: "Stop measuring",
-    fpsNeedsAdmin: "Measuring frame rate needs PC Tweaker started as administrator.",
+    fpsNeedsAdmin: "Measuring frame rate needs WinCraft started as administrator.",
     fpsRunning:
       "Measuring: the frame rate appears in the overlay as soon as a game starts drawing.",
     show: "Show",
@@ -3380,7 +3380,7 @@ const en: Strings = {
     inactive: "Turbo not active",
     loadLabel: "CPU LOAD",
     loadCadence: "Measured every second, smoothed over about 3 seconds",
-    ownLoad: "Over the last few seconds: PC Tweaker itself {own}% · everything else {rest}%",
+    ownLoad: "Over the last few seconds: WinCraft itself {own}% · everything else {rest}%",
     stageReading: "Reading the power plan",
     stageRaising: "Raising the boost ceiling",
     stageApplying: "Applying to the system",
@@ -3517,7 +3517,7 @@ const en: Strings = {
     fixHeading: "Ready to apply",
   },
   ram: {
-    autoNeedsAdmin: "Automatic cleanup runs only while PC Tweaker has administrator rights.",
+    autoNeedsAdmin: "Automatic cleanup runs only while WinCraft has administrator rights.",
     title: "Free up RAM",
     subtitle:
       "Asks Windows to release memory that programs are holding but not using. Windows asks for administrator permission each time, and it waits while a game is running.",
@@ -3530,9 +3530,9 @@ const en: Strings = {
     autoOff: "Off",
     autoEvery: "Every {interval}",
     autoHint:
-      "With automatic cleanup on, PC Tweaker frees RAM by itself at a regular interval. It can do this only while it runs as administrator: Windows asks for permission for every cleanup, and a scheduled one cannot ask.",
+      "With automatic cleanup on, WinCraft frees RAM by itself at a regular interval. It can do this only while it runs as administrator: Windows asks for permission for every cleanup, and a scheduled one cannot ask.",
     autoPausedNotAdmin:
-      "Paused: PC Tweaker is not running as administrator, so automatic cleanup cannot run. To use it, close PC Tweaker and open it with “Run as administrator”. Manual cleanup still works: Windows asks for permission each time.",
+      "Paused: WinCraft is not running as administrator, so automatic cleanup cannot run. To use it, close WinCraft and open it with “Run as administrator”. Manual cleanup still works: Windows asks for permission each time.",
     autoNext: "Next cleanup at {time}",
     autoDue: "Cleanup due now...",
     autoLast: "Last at {time}: {amount} freed",
@@ -3562,7 +3562,7 @@ const en: Strings = {
   },
   paywall: {
     title: "Pro feature",
-    body: "This tool is available with PC Tweaker Pro. Compare plans and see what is included before choosing.",
+    body: "This tool is available with WinCraft Pro. Compare plans and see what is included before choosing.",
     unlock: "See plans & pricing",
     notNow: "Not now",
     priceLine:
@@ -3630,15 +3630,15 @@ const en: Strings = {
     button: "Try it on the web",
   },
   uninstallerPromo: {
-    title: "PC Tweaker Uninstaller",
+    title: "WinCraft Uninstaller",
     description:
-      "Remove entire programs safely: automatic restore point, verified command, honest report. From the same family as PC Tweaker.",
+      "Remove entire programs safely: automatic restore point, verified command, honest report. From the same family as WinCraft.",
     button: "Download",
     confirmTitle: "Download the Uninstaller?",
     confirmBody:
-      "PC Tweaker Uninstaller is a separate app in the same suite, and it signs in with the same account as this one. This downloads the installer (about 4 MB) straight from its GitHub release, for 64-bit Windows 10 and 11.",
+      "WinCraft Uninstaller is a separate app in the same suite, and it signs in with the same account as this one. This downloads the installer (about 4 MB) straight from its GitHub release, for 64-bit Windows 10 and 11.",
     confirmUnsigned:
-      "PC Tweaker Uninstaller is digitally signed by Aurelio Avila. Check the publisher and signature in the file properties. SmartScreen warnings can still appear.",
+      "WinCraft Uninstaller is digitally signed by Aurelio Avila. Check the publisher and signature in the file properties. SmartScreen warnings can still appear.",
     confirmDownload: "Download",
     confirmOpenPage: "Open the page instead",
     cancel: "Cancel",
@@ -3646,10 +3646,10 @@ const en: Strings = {
   live: {
     title: "Right now",
     subtitle:
-      "Updated every second while this page is open and PC Tweaker is in front. Nothing is measured in the background.",
+      "Updated every second while this page is open and WinCraft is in front. Nothing is measured in the background.",
     paused: "Paused",
     pausedHint:
-      "Paused while PC Tweaker is in the background. It picks up again when you come back.",
+      "Paused while WinCraft is in the background. It picks up again when you come back.",
     measuring: "Measuring…",
     smooth: "Running smoothly",
     busy: "Busy",
@@ -3708,12 +3708,12 @@ const en: Strings = {
   },
   pageError: {
     title: "This page ran into a problem",
-    body: "The rest of PC Tweaker is still working, and nothing on your PC was changed by this error. Reload the page to try again.",
+    body: "The rest of WinCraft is still working, and nothing on your PC was changed by this error. Reload the page to try again.",
     reload: "Reload this page",
-    reloadApp: "Reload PC Tweaker",
+    reloadApp: "Reload WinCraft",
     details: "Technical details",
-    appTitle: "PC Tweaker ran into a problem",
-    appBody: "Nothing on your PC was changed by this error. Reload PC Tweaker to carry on.",
+    appTitle: "WinCraft ran into a problem",
+    appBody: "Nothing on your PC was changed by this error. Reload WinCraft to carry on.",
   },
   folderScan: {
     stop: "Stop search",
@@ -3833,7 +3833,7 @@ const en: Strings = {
     noTempSensor: "This card exposes no temperature sensor.",
     cpuAcpiSource: "read from the ACPI thermal zone",
     cpuNoSensor:
-      "CPU temperature is unavailable: this firmware exposes no ACPI thermal zone. PC Tweaker only displays readings that Windows makes available.",
+      "CPU temperature is unavailable: this firmware exposes no ACPI thermal zone. WinCraft only displays readings that Windows makes available.",
     noGpuTool:
       "No NVIDIA card detected. AMD and Intel ship no equivalent query tool, so their temperatures can't be read without the vendor's own software.",
     thermalsUnavailable: "We can't read the sensors on this system.",
@@ -3906,7 +3906,7 @@ const en: Strings = {
     winUpdateLabel: "Windows Update",
     winUpdateButton: "Check Windows Update",
     winUpdateNote:
-      "This only checks Windows Update's own catalogue, not the specific drivers listed above: many vendors - onboard audio and chipset ones especially - never publish updates there, only on their own site. PC Tweaker does not download driver packages itself: there is no vendor API for what is current for your exact device, and installing the wrong display driver is one of the few mistakes that can leave you without a screen.",
+      "This only checks Windows Update's own catalogue, not the specific drivers listed above: many vendors - onboard audio and chipset ones especially - never publish updates there, only on their own site. WinCraft does not download driver packages itself: there is no vendor API for what is current for your exact device, and installing the wrong display driver is one of the few mistakes that can leave you without a screen.",
     winUpdateOpened: "Windows Update opened.",
     winUpdateSearching: "Searching...",
     winUpdateTakesAWhile: "This can take a minute - it queries Microsoft's catalogue.",
@@ -3940,7 +3940,7 @@ const en: Strings = {
     photoFailed: "Could not use that image as a profile photo.",
     support: "Support",
     reportIssue: "Report an issue",
-    aboutBody: "PC Tweaker — system tweaks with automatic backup and rollback.",
+    aboutBody: "WinCraft — system tweaks with automatic backup and rollback.",
     close: "Close",
   },
   auth: {
@@ -3985,13 +3985,13 @@ const en: Strings = {
   guard: {
     settingTitle: "Leave self-managed games alone",
     settingBody:
-      "Some games manage their own performance. While one is running, PC Tweaker pauses its per-app adjustments and leaves the game exactly as it is.",
-    selfManaged: "This game manages its own performance, so PC Tweaker leaves it as it is.",
+      "Some games manage their own performance. While one is running, WinCraft pauses its per-app adjustments and leaves the game exactly as it is.",
+    selfManaged: "This game manages its own performance, so WinCraft leaves it as it is.",
     gameRunning:
-      "A game that manages its own performance is running, so PC Tweaker leaves apps as they are until it closes.",
+      "A game that manages its own performance is running, so WinCraft leaves apps as they are until it closes.",
     paused: "Paused while a game that manages its own performance is running.",
     selfManagedBadge: "Manages its own performance",
-    registeredGameRunning: "One of your games is running, so PC Tweaker waits until it closes.",
+    registeredGameRunning: "One of your games is running, so WinCraft waits until it closes.",
   },
   preview: {
     title: "Preview",
@@ -4022,7 +4022,7 @@ const en: Strings = {
   priorityRules: {
     title: "App priority rules",
     subtitle:
-      "Pick an app and a priority. PC Tweaker sets it each time the app starts while PC Tweaker is open, and puts the old priority back when you remove the rule or close PC Tweaker. Never above High.",
+      "Pick an app and a priority. WinCraft sets it each time the app starts while WinCraft is open, and puts the old priority back when you remove the rule or close WinCraft. Never above High.",
     remove: "Remove",
     empty: "No apps yet.",
     active: "Running apps adjusted: {count}",
@@ -4127,7 +4127,7 @@ const en: Strings = {
     ecoqos_rules: {
       name: "Background app efficiency rules",
       description:
-        "Assign lower energy priority to chosen executables while PC Tweaker is open. Rules pause when the app is interactive; this is not a CPU percentage cap.",
+        "Assign lower energy priority to chosen executables while WinCraft is open. Rules pause when the app is interactive; this is not a CPU percentage cap.",
     },
     limit_do_background_download: {
       name: "Windows background download limit",
@@ -4459,7 +4459,7 @@ const fr: Strings = {
     fewer: "Un café en moins",
     more: "Un café en plus",
   },
-  appName: "PC Tweaker",
+  appName: "WinCraft",
   appliedCount: "{applied} sur {total} optimisations actives",
   headerNote:
     "Examinez chaque modification avant de l'appliquer. Les outils de restauration couvrent les paramètres pris en charge ; les opérations de nettoyage et de réparation ont des limites de récupération différentes.",
@@ -4684,7 +4684,7 @@ const fr: Strings = {
       "Supprime du dossier WinSxS les versions de composants remplacées. Les mises à jour récentes restent désinstallables.",
     runningNote: "N'éteignez pas et ne redémarrez pas le PC pendant l'opération.",
     cannotStop:
-      "Une fois lancée, l'opération ne peut pas être arrêtée : Windows vérifie et répare ses propres fichiers système, et l'interrompre en cours de route pourrait les laisser à moitié réparés. Vous pouvez continuer à utiliser votre PC et PC Tweaker en attendant.",
+      "Une fois lancée, l'opération ne peut pas être arrêtée : Windows vérifie et répare ses propres fichiers système, et l'interrompre en cours de route pourrait les laisser à moitié réparés. Vous pouvez continuer à utiliser votre PC et WinCraft en attendant.",
     stepQuick: "Lecture rapide de l'état",
     stepScan: "Analyse du magasin de composants",
     stepRestore: "Réparation du magasin de composants",
@@ -4878,7 +4878,7 @@ const fr: Strings = {
       "{opened} pages ouvertes sur {total} : les autres restent sélectionnées, relancez pour les ouvrir.",
     allCurrent: "Aucun pilote ne montre son âge.",
     nothingActionable: "Aucun pilote vieillissant n’a de page constructeur à ouvrir.",
-    note: "PC Tweaker ne télécharge pas les pilotes lui-même : aucune API constructeur ne dit quelle version convient à votre appareil exact, et installer le mauvais pilote graphique est l’une des rares erreurs qui peut vous laisser sans écran. Ceci automatise la partie fastidieuse — trouver les pages — pas le choix. Pour les pilotes que Windows Update connaît vraiment, utilisez le bouton ci-dessus.",
+    note: "WinCraft ne télécharge pas les pilotes lui-même : aucune API constructeur ne dit quelle version convient à votre appareil exact, et installer le mauvais pilote graphique est l’une des rares erreurs qui peut vous laisser sans écran. Ceci automatise la partie fastidieuse — trouver les pages — pas le choix. Pour les pilotes que Windows Update connaît vraiment, utilisez le bouton ci-dessus.",
   },
   secureDefrag: {
     title: "Défragmentation sécurisée",
@@ -4928,7 +4928,7 @@ const fr: Strings = {
       "À côté de la moyenne s’affiche DROP : la vitesse du pire pour cent des images, ce qu’ailleurs on appelle le « 1% low ». C’est le chiffre qui bouge quand le jeu saccade, alors que la moyenne reste haute et n’en dit rien. Plus DROP est proche de la moyenne, plus le jeu est fluide.",
     fpsStart: "Mesurer les FPS",
     fpsStop: "Arrêter la mesure",
-    fpsNeedsAdmin: "Mesurer les FPS demande de lancer PC Tweaker en tant qu’administrateur.",
+    fpsNeedsAdmin: "Mesurer les FPS demande de lancer WinCraft en tant qu’administrateur.",
     fpsRunning:
       "Mesure en cours : les FPS apparaissent dans l’overlay dès qu’un jeu commence à dessiner.",
     show: "Afficher",
@@ -5043,7 +5043,7 @@ const fr: Strings = {
     inactive: "Turbo inactif",
     loadLabel: "CHARGE CPU",
     loadCadence: "Mesurée chaque seconde, lissée sur environ 3 secondes",
-    ownLoad: "Ces dernières secondes : PC Tweaker lui-même {own} % · tout le reste {rest} %",
+    ownLoad: "Ces dernières secondes : WinCraft lui-même {own} % · tout le reste {rest} %",
     stageReading: "Lecture du mode d'alimentation",
     stageRaising: "Augmentation de la limite de boost",
     stageApplying: "Application au système",
@@ -5187,7 +5187,7 @@ const fr: Strings = {
   },
   ram: {
     autoNeedsAdmin:
-      "Le nettoyage automatique ne fonctionne que lorsque PC Tweaker dispose des droits d'administrateur.",
+      "Le nettoyage automatique ne fonctionne que lorsque WinCraft dispose des droits d'administrateur.",
     title: "Libérer la RAM",
     subtitle:
       "Demande à Windows de libérer la mémoire que les programmes occupent sans l'utiliser. Windows demande chaque fois l'autorisation d'administrateur, et le nettoyage attend si un jeu est en cours.",
@@ -5200,9 +5200,9 @@ const fr: Strings = {
     autoOff: "Désactivé",
     autoEvery: "Toutes les {interval}",
     autoHint:
-      "Avec le nettoyage automatique, PC Tweaker libère la RAM tout seul à intervalle régulier. Il ne peut le faire que lorsqu'il s'exécute en tant qu'administrateur : Windows demande l'autorisation pour chaque nettoyage, et un nettoyage programmé ne peut pas la demander.",
+      "Avec le nettoyage automatique, WinCraft libère la RAM tout seul à intervalle régulier. Il ne peut le faire que lorsqu'il s'exécute en tant qu'administrateur : Windows demande l'autorisation pour chaque nettoyage, et un nettoyage programmé ne peut pas la demander.",
     autoPausedNotAdmin:
-      "En pause : PC Tweaker ne s'exécute pas en tant qu'administrateur, le nettoyage automatique ne peut donc pas se lancer. Pour l'utiliser, fermez PC Tweaker et rouvrez-le avec « Exécuter en tant qu'administrateur ». Le nettoyage manuel fonctionne toujours : Windows demande l'autorisation à chaque fois.",
+      "En pause : WinCraft ne s'exécute pas en tant qu'administrateur, le nettoyage automatique ne peut donc pas se lancer. Pour l'utiliser, fermez WinCraft et rouvrez-le avec « Exécuter en tant qu'administrateur ». Le nettoyage manuel fonctionne toujours : Windows demande l'autorisation à chaque fois.",
     autoNext: "Prochain nettoyage à {time}",
     autoDue: "Nettoyage imminent...",
     autoLast: "Dernier à {time} : {amount} libérés",
@@ -5233,7 +5233,7 @@ const fr: Strings = {
   },
   paywall: {
     title: "Fonction Pro",
-    body: "Cet outil est disponible avec PC Tweaker Pro. Comparez les offres et découvrez ce qu’elles incluent avant de choisir.",
+    body: "Cet outil est disponible avec WinCraft Pro. Comparez les offres et découvrez ce qu’elles incluent avant de choisir.",
     unlock: "Voir les offres et tarifs",
     notNow: "Pas maintenant",
     priceLine:
@@ -5302,15 +5302,15 @@ const fr: Strings = {
     button: "Essayer sur le web",
   },
   uninstallerPromo: {
-    title: "PC Tweaker Uninstaller",
+    title: "WinCraft Uninstaller",
     description:
-      "Supprimez des programmes entiers en toute sécurité : point de restauration automatique, commande vérifiée, rapport honnête. De la même famille que PC Tweaker.",
+      "Supprimez des programmes entiers en toute sécurité : point de restauration automatique, commande vérifiée, rapport honnête. De la même famille que WinCraft.",
     button: "Télécharger",
     confirmTitle: "Télécharger le désinstalleur ?",
     confirmBody:
-      "PC Tweaker Uninstaller est une application distincte de la même suite, et elle se connecte avec le même compte que celle-ci. Le téléchargement récupère l'installeur (environ 4 Mo) directement depuis sa version GitHub, pour Windows 10 et 11 en 64 bits.",
+      "WinCraft Uninstaller est une application distincte de la même suite, et elle se connecte avec le même compte que celle-ci. Le téléchargement récupère l'installeur (environ 4 Mo) directement depuis sa version GitHub, pour Windows 10 et 11 en 64 bits.",
     confirmUnsigned:
-      "PC Tweaker Uninstaller est signé numériquement par Aurelio Avila. Vérifiez l'éditeur et la signature dans les propriétés du fichier. SmartScreen peut encore afficher un avertissement.",
+      "WinCraft Uninstaller est signé numériquement par Aurelio Avila. Vérifiez l'éditeur et la signature dans les propriétés du fichier. SmartScreen peut encore afficher un avertissement.",
     confirmDownload: "Télécharger",
     confirmOpenPage: "Ouvrir plutôt la page",
     cancel: "Annuler",
@@ -5318,9 +5318,9 @@ const fr: Strings = {
   live: {
     title: "En ce moment",
     subtitle:
-      "Mis à jour chaque seconde tant que cette page est ouverte et que PC Tweaker est au premier plan. Rien n'est mesuré en arrière-plan.",
+      "Mis à jour chaque seconde tant que cette page est ouverte et que WinCraft est au premier plan. Rien n'est mesuré en arrière-plan.",
     paused: "En pause",
-    pausedHint: "En pause tant que PC Tweaker est en arrière-plan. Reprise dès votre retour.",
+    pausedHint: "En pause tant que WinCraft est en arrière-plan. Reprise dès votre retour.",
     measuring: "Mesure…",
     smooth: "Tout est fluide",
     busy: "Occupé",
@@ -5380,12 +5380,12 @@ const fr: Strings = {
   },
   pageError: {
     title: "Cette page a rencontré un problème",
-    body: "Le reste de PC Tweaker fonctionne toujours, et cette erreur n'a rien modifié sur votre PC. Rechargez la page pour réessayer.",
+    body: "Le reste de WinCraft fonctionne toujours, et cette erreur n'a rien modifié sur votre PC. Rechargez la page pour réessayer.",
     reload: "Recharger la page",
-    reloadApp: "Recharger PC Tweaker",
+    reloadApp: "Recharger WinCraft",
     details: "Détails techniques",
-    appTitle: "PC Tweaker a rencontré un problème",
-    appBody: "Cette erreur n'a rien modifié sur votre PC. Rechargez PC Tweaker pour continuer.",
+    appTitle: "WinCraft a rencontré un problème",
+    appBody: "Cette erreur n'a rien modifié sur votre PC. Rechargez WinCraft pour continuer.",
   },
   folderScan: {
     stop: "Arrêter la recherche",
@@ -5507,7 +5507,7 @@ const fr: Strings = {
     noTempSensor: "Cette carte n'expose aucun capteur de température.",
     cpuAcpiSource: "lue depuis la zone thermique ACPI",
     cpuNoSensor:
-      "Température du processeur indisponible : le firmware ne fournit aucune zone thermique ACPI. PC Tweaker affiche uniquement les mesures disponibles via Windows.",
+      "Température du processeur indisponible : le firmware ne fournit aucune zone thermique ACPI. WinCraft affiche uniquement les mesures disponibles via Windows.",
     noGpuTool:
       "Aucune carte NVIDIA détectée. AMD et Intel ne fournissent pas d'outil équivalent, leurs températures sont donc illisibles sans le logiciel du fabricant.",
     thermalsUnavailable: "Impossible de lire les capteurs de ce système.",
@@ -5581,7 +5581,7 @@ const fr: Strings = {
     winUpdateLabel: "Windows Update",
     winUpdateButton: "Rechercher sur Windows Update",
     winUpdateNote:
-      "Ceci vérifie uniquement le catalogue de Windows Update, pas les pilotes précis listés ci-dessus : de nombreux fabricants - surtout pour l'audio et le chipset intégrés - ne publient jamais leurs mises à jour là, seulement sur leur propre site. PC Tweaker ne télécharge pas de paquets de pilotes lui-même : il n'existe aucune API constructeur indiquant la version correcte pour votre appareil précis, et installer le mauvais pilote graphique est l'une des rares erreurs qui peut vous laisser sans écran.",
+      "Ceci vérifie uniquement le catalogue de Windows Update, pas les pilotes précis listés ci-dessus : de nombreux fabricants - surtout pour l'audio et le chipset intégrés - ne publient jamais leurs mises à jour là, seulement sur leur propre site. WinCraft ne télécharge pas de paquets de pilotes lui-même : il n'existe aucune API constructeur indiquant la version correcte pour votre appareil précis, et installer le mauvais pilote graphique est l'une des rares erreurs qui peut vous laisser sans écran.",
     winUpdateOpened: "Windows Update ouvert.",
     winUpdateSearching: "Recherche...",
     winUpdateTakesAWhile: "Cela peut prendre une minute : interrogation du catalogue Microsoft.",
@@ -5615,7 +5615,7 @@ const fr: Strings = {
     photoFailed: "Impossible d'utiliser cette image comme photo de profil.",
     support: "Assistance",
     reportIssue: "Signaler un problème",
-    aboutBody: "PC Tweaker — optimisations système avec sauvegarde et restauration automatiques.",
+    aboutBody: "WinCraft — optimisations système avec sauvegarde et restauration automatiques.",
     close: "Fermer",
   },
   auth: {
@@ -5661,13 +5661,13 @@ const fr: Strings = {
   guard: {
     settingTitle: "Laisser tranquilles les jeux qui se gèrent seuls",
     settingBody:
-      "Certains jeux gèrent eux-mêmes leurs performances. Pendant que l'un d'eux tourne, PC Tweaker met en pause ses réglages par application et laisse le jeu exactement tel qu'il est.",
-    selfManaged: "Ce jeu gère lui-même ses performances : PC Tweaker le laisse tel quel.",
+      "Certains jeux gèrent eux-mêmes leurs performances. Pendant que l'un d'eux tourne, WinCraft met en pause ses réglages par application et laisse le jeu exactement tel qu'il est.",
+    selfManaged: "Ce jeu gère lui-même ses performances : WinCraft le laisse tel quel.",
     gameRunning:
-      "Un jeu qui gère lui-même ses performances est en cours : PC Tweaker laisse les applications telles quelles jusqu'à sa fermeture.",
+      "Un jeu qui gère lui-même ses performances est en cours : WinCraft laisse les applications telles quelles jusqu'à sa fermeture.",
     paused: "En pause pendant qu'un jeu qui gère lui-même ses performances est en cours.",
     selfManagedBadge: "Gère lui-même ses performances",
-    registeredGameRunning: "L'un de vos jeux est en cours : PC Tweaker attend qu'il se ferme.",
+    registeredGameRunning: "L'un de vos jeux est en cours : WinCraft attend qu'il se ferme.",
   },
   preview: {
     title: "Aperçu",
@@ -5698,7 +5698,7 @@ const fr: Strings = {
   priorityRules: {
     title: "Règles de priorité des applications",
     subtitle:
-      "Choisissez une application et une priorité. PC Tweaker l'applique à chaque lancement de l'application tant qu'il est ouvert, et rétablit l'ancienne priorité quand vous supprimez la règle ou fermez PC Tweaker. Jamais au-dessus de Haute.",
+      "Choisissez une application et une priorité. WinCraft l'applique à chaque lancement de l'application tant qu'il est ouvert, et rétablit l'ancienne priorité quand vous supprimez la règle ou fermez WinCraft. Jamais au-dessus de Haute.",
     remove: "Supprimer",
     empty: "Aucune application pour l'instant.",
     active: "Applications en cours ajustées : {count}",
@@ -5803,7 +5803,7 @@ const fr: Strings = {
     ecoqos_rules: {
       name: "Règles d'efficacité des apps en arrière-plan",
       description:
-        "Réduit la priorité énergétique des exécutables choisis tant que PC Tweaker est ouvert. Les règles se suspendent lorsque l'app devient interactive ; ce n'est pas un plafond CPU.",
+        "Réduit la priorité énergétique des exécutables choisis tant que WinCraft est ouvert. Les règles se suspendent lorsque l'app devient interactive ; ce n'est pas un plafond CPU.",
     },
     limit_do_background_download: {
       name: "Limite des téléchargements Windows en arrière-plan",
@@ -6138,7 +6138,7 @@ const es: Strings = {
     fewer: "Un café menos",
     more: "Un café más",
   },
-  appName: "PC Tweaker",
+  appName: "WinCraft",
   appliedCount: "{applied} de {total} ajustes activos",
   headerNote:
     "Revisa cada cambio antes de aplicarlo. Las herramientas de restauración cubren los ajustes compatibles; las operaciones de limpieza y reparación tienen distintos límites de recuperación.",
@@ -6363,7 +6363,7 @@ const es: Strings = {
       "Elimina de WinSxS las versiones de componentes ya sustituidas. Las actualizaciones instaladas hace poco se pueden seguir desinstalando.",
     runningNote: "No apagues ni reinicies el PC mientras se ejecuta.",
     cannotStop:
-      "Una vez iniciado no se puede detener: Windows está comprobando y reparando sus propios archivos del sistema, y cortarlo a mitad podría dejarlos reparados solo en parte. Mientras tanto puedes seguir usando el PC y PC Tweaker.",
+      "Una vez iniciado no se puede detener: Windows está comprobando y reparando sus propios archivos del sistema, y cortarlo a mitad podría dejarlos reparados solo en parte. Mientras tanto puedes seguir usando el PC y WinCraft.",
     stepQuick: "Lectura rápida del estado",
     stepScan: "Comprobando el almacén de componentes",
     stepRestore: "Reparando el almacén de componentes",
@@ -6556,7 +6556,7 @@ const es: Strings = {
       "Abiertas {opened} de {total} páginas: las demás siguen seleccionadas, vuelve a ejecutarlo.",
     allCurrent: "Ningún controlador aparenta su edad.",
     nothingActionable: "Ningún controlador antiguo tiene una página del fabricante que abrir.",
-    note: "PC Tweaker no descarga paquetes de controladores por su cuenta: no existe una API del fabricante que diga cuál es la versión correcta para tu dispositivo exacto, e instalar el controlador de vídeo equivocado es uno de los pocos errores que puede dejarte sin pantalla. Esto automatiza la parte tediosa — encontrar las páginas — no la elección. Para los controladores que Windows Update sí conoce, usa el botón de arriba.",
+    note: "WinCraft no descarga paquetes de controladores por su cuenta: no existe una API del fabricante que diga cuál es la versión correcta para tu dispositivo exacto, e instalar el controlador de vídeo equivocado es uno de los pocos errores que puede dejarte sin pantalla. Esto automatiza la parte tediosa — encontrar las páginas — no la elección. Para los controladores que Windows Update sí conoce, usa el botón de arriba.",
   },
   secureDefrag: {
     title: "Desfragmentación segura",
@@ -6606,7 +6606,7 @@ const es: Strings = {
       "Junto al promedio aparece DROP: la velocidad del uno por ciento peor de fotogramas, lo que en otros sitios llaman «1% low». Es la cifra que se mueve cuando el juego tironea, mientras el promedio sigue alto y no lo cuenta. Cuanto más cerca esté DROP del promedio, más fluido va el juego.",
     fpsStart: "Medir FPS",
     fpsStop: "Detener medición",
-    fpsNeedsAdmin: "Para medir los FPS hay que iniciar PC Tweaker como administrador.",
+    fpsNeedsAdmin: "Para medir los FPS hay que iniciar WinCraft como administrador.",
     fpsRunning: "Midiendo: los FPS aparecen en el overlay en cuanto un juego empieza a dibujar.",
     show: "Mostrar",
     hide: "Ocultar",
@@ -6718,7 +6718,7 @@ const es: Strings = {
     inactive: "Turbo no activo",
     loadLabel: "CARGA CPU",
     loadCadence: "Medida cada segundo, suavizada en unos 3 segundos",
-    ownLoad: "En los últimos segundos: el propio PC Tweaker {own} % · todo lo demás {rest} %",
+    ownLoad: "En los últimos segundos: el propio WinCraft {own} % · todo lo demás {rest} %",
     stageReading: "Leyendo el plan de energía",
     stageRaising: "Elevando el limite de boost",
     stageApplying: "Aplicando al sistema",
@@ -6860,7 +6860,7 @@ const es: Strings = {
   },
   ram: {
     autoNeedsAdmin:
-      "La limpieza automática solo funciona cuando PC Tweaker tiene permisos de administrador.",
+      "La limpieza automática solo funciona cuando WinCraft tiene permisos de administrador.",
     title: "Liberar RAM",
     subtitle:
       "Pide a Windows que libere la memoria que los programas ocupan sin usarla. Windows pide permiso de administrador cada vez, y la limpieza espera si hay un juego abierto.",
@@ -6873,9 +6873,9 @@ const es: Strings = {
     autoOff: "Desactivada",
     autoEvery: "Cada {interval}",
     autoHint:
-      "Con la limpieza automática activada, PC Tweaker libera la RAM por sí solo a intervalos regulares. Solo puede hacerlo mientras se ejecuta como administrador: Windows pide permiso para cada limpieza y una limpieza programada no puede pedirlo.",
+      "Con la limpieza automática activada, WinCraft libera la RAM por sí solo a intervalos regulares. Solo puede hacerlo mientras se ejecuta como administrador: Windows pide permiso para cada limpieza y una limpieza programada no puede pedirlo.",
     autoPausedNotAdmin:
-      "En pausa: PC Tweaker no se está ejecutando como administrador, así que la limpieza automática no puede ejecutarse. Para usarla, cierra PC Tweaker y vuelve a abrirlo con «Ejecutar como administrador». La limpieza manual sigue funcionando: Windows pide permiso cada vez.",
+      "En pausa: WinCraft no se está ejecutando como administrador, así que la limpieza automática no puede ejecutarse. Para usarla, cierra WinCraft y vuelve a abrirlo con «Ejecutar como administrador». La limpieza manual sigue funcionando: Windows pide permiso cada vez.",
     autoNext: "Próxima limpieza a las {time}",
     autoDue: "Limpieza inminente...",
     autoLast: "Última a las {time}: {amount} liberados",
@@ -6906,7 +6906,7 @@ const es: Strings = {
   },
   paywall: {
     title: "Función Pro",
-    body: "Esta herramienta está disponible con PC Tweaker Pro. Compara los planes y consulta qué incluyen antes de elegir.",
+    body: "Esta herramienta está disponible con WinCraft Pro. Compara los planes y consulta qué incluyen antes de elegir.",
     unlock: "Ver planes y precios",
     notNow: "Ahora no",
     priceLine:
@@ -6974,15 +6974,15 @@ const es: Strings = {
     button: "Pruébalo en la web",
   },
   uninstallerPromo: {
-    title: "PC Tweaker Uninstaller",
+    title: "WinCraft Uninstaller",
     description:
-      "Elimina programas enteros de forma segura: punto de restauracion automatico, comando verificado, informe honesto. De la misma familia que PC Tweaker.",
+      "Elimina programas enteros de forma segura: punto de restauracion automatico, comando verificado, informe honesto. De la misma familia que WinCraft.",
     button: "Descargar",
     confirmTitle: "¿Descargar el desinstalador?",
     confirmBody:
-      "PC Tweaker Uninstaller es una aplicación aparte de la misma suite y entra con la misma cuenta que esta. La descarga toma el instalador (unos 4 MB) directamente de su versión en GitHub, para Windows 10 y 11 de 64 bits.",
+      "WinCraft Uninstaller es una aplicación aparte de la misma suite y entra con la misma cuenta que esta. La descarga toma el instalador (unos 4 MB) directamente de su versión en GitHub, para Windows 10 y 11 de 64 bits.",
     confirmUnsigned:
-      "PC Tweaker Uninstaller está firmado digitalmente por Aurelio Avila. Comprueba el editor y la firma en las propiedades del archivo. SmartScreen aún puede mostrar avisos.",
+      "WinCraft Uninstaller está firmado digitalmente por Aurelio Avila. Comprueba el editor y la firma en las propiedades del archivo. SmartScreen aún puede mostrar avisos.",
     confirmDownload: "Descargar",
     confirmOpenPage: "Abrir la página en su lugar",
     cancel: "Cancelar",
@@ -6990,9 +6990,9 @@ const es: Strings = {
   live: {
     title: "Ahora mismo",
     subtitle:
-      "Se actualiza cada segundo mientras esta página está abierta y PC Tweaker está en primer plano. No se mide nada en segundo plano.",
+      "Se actualiza cada segundo mientras esta página está abierta y WinCraft está en primer plano. No se mide nada en segundo plano.",
     paused: "En pausa",
-    pausedHint: "En pausa mientras PC Tweaker está en segundo plano. Se reanuda cuando vuelves.",
+    pausedHint: "En pausa mientras WinCraft está en segundo plano. Se reanuda cuando vuelves.",
     measuring: "Midiendo…",
     smooth: "Funciona con fluidez",
     busy: "Ocupado",
@@ -7051,12 +7051,12 @@ const es: Strings = {
   },
   pageError: {
     title: "Esta página ha tenido un problema",
-    body: "El resto de PC Tweaker sigue funcionando y este error no ha cambiado nada en tu PC. Recarga la página para volver a intentarlo.",
+    body: "El resto de WinCraft sigue funcionando y este error no ha cambiado nada en tu PC. Recarga la página para volver a intentarlo.",
     reload: "Recargar la página",
-    reloadApp: "Recargar PC Tweaker",
+    reloadApp: "Recargar WinCraft",
     details: "Detalles técnicos",
-    appTitle: "PC Tweaker ha tenido un problema",
-    appBody: "Este error no ha cambiado nada en tu PC. Recarga PC Tweaker para continuar.",
+    appTitle: "WinCraft ha tenido un problema",
+    appBody: "Este error no ha cambiado nada en tu PC. Recarga WinCraft para continuar.",
   },
   folderScan: {
     stop: "Detener búsqueda",
@@ -7176,7 +7176,7 @@ const es: Strings = {
     noTempSensor: "Esta tarjeta no expone ningún sensor de temperatura.",
     cpuAcpiSource: "leída de la zona térmica ACPI",
     cpuNoSensor:
-      "Temperatura de la CPU no disponible: el firmware no expone ninguna zona térmica ACPI. PC Tweaker solo muestra las lecturas disponibles a través de Windows.",
+      "Temperatura de la CPU no disponible: el firmware no expone ninguna zona térmica ACPI. WinCraft solo muestra las lecturas disponibles a través de Windows.",
     noGpuTool:
       "No se detectó ninguna tarjeta NVIDIA. AMD e Intel no ofrecen una herramienta equivalente, por lo que sus temperaturas no se pueden leer sin el software del fabricante.",
     thermalsUnavailable: "No podemos leer los sensores de este sistema.",
@@ -7250,7 +7250,7 @@ const es: Strings = {
     winUpdateLabel: "Windows Update",
     winUpdateButton: "Buscar en Windows Update",
     winUpdateNote:
-      "Esto solo revisa el catálogo propio de Windows Update, no los controladores concretos listados arriba: muchos fabricantes -sobre todo de audio y chipset integrados- nunca publican sus actualizaciones ahí, solo en su propio sitio. PC Tweaker no descarga paquetes de controladores por su cuenta: no existe una API del fabricante que diga cuál es la versión correcta para tu dispositivo exacto, e instalar el controlador de vídeo equivocado es uno de los pocos errores que puede dejarte sin pantalla.",
+      "Esto solo revisa el catálogo propio de Windows Update, no los controladores concretos listados arriba: muchos fabricantes -sobre todo de audio y chipset integrados- nunca publican sus actualizaciones ahí, solo en su propio sitio. WinCraft no descarga paquetes de controladores por su cuenta: no existe una API del fabricante que diga cuál es la versión correcta para tu dispositivo exacto, e instalar el controlador de vídeo equivocado es uno de los pocos errores que puede dejarte sin pantalla.",
     winUpdateOpened: "Windows Update abierto.",
     winUpdateSearching: "Buscando...",
     winUpdateTakesAWhile: "Puede tardar un minuto: consulta el catálogo de Microsoft.",
@@ -7285,7 +7285,7 @@ const es: Strings = {
     support: "Soporte",
     reportIssue: "Notificar un problema",
     aboutBody:
-      "PC Tweaker — ajustes del sistema con copia de seguridad y restauración automáticas.",
+      "WinCraft — ajustes del sistema con copia de seguridad y restauración automáticas.",
     close: "Cerrar",
   },
   auth: {
@@ -7332,14 +7332,14 @@ const es: Strings = {
   guard: {
     settingTitle: "No tocar los juegos que se gestionan solos",
     settingBody:
-      "Algunos juegos gestionan su propio rendimiento. Mientras uno de ellos está abierto, PC Tweaker pausa sus ajustes por aplicación y deja el juego exactamente como está.",
-    selfManaged: "Este juego gestiona su propio rendimiento, así que PC Tweaker lo deja como está.",
+      "Algunos juegos gestionan su propio rendimiento. Mientras uno de ellos está abierto, WinCraft pausa sus ajustes por aplicación y deja el juego exactamente como está.",
+    selfManaged: "Este juego gestiona su propio rendimiento, así que WinCraft lo deja como está.",
     gameRunning:
-      "Hay un juego abierto que gestiona su propio rendimiento, así que PC Tweaker deja las aplicaciones como están hasta que lo cierres.",
+      "Hay un juego abierto que gestiona su propio rendimiento, así que WinCraft deja las aplicaciones como están hasta que lo cierres.",
     paused: "En pausa mientras haya abierto un juego que gestiona su propio rendimiento.",
     selfManagedBadge: "Gestiona su propio rendimiento",
     registeredGameRunning:
-      "Uno de tus juegos está abierto, así que PC Tweaker espera a que se cierre.",
+      "Uno de tus juegos está abierto, así que WinCraft espera a que se cierre.",
   },
   preview: {
     title: "Vista previa",
@@ -7370,7 +7370,7 @@ const es: Strings = {
   priorityRules: {
     title: "Reglas de prioridad de aplicaciones",
     subtitle:
-      "Elige una aplicación y una prioridad. PC Tweaker la aplica cada vez que la aplicación se inicia mientras PC Tweaker está abierto, y devuelve la prioridad anterior cuando quitas la regla o cierras PC Tweaker. Nunca por encima de Alta.",
+      "Elige una aplicación y una prioridad. WinCraft la aplica cada vez que la aplicación se inicia mientras WinCraft está abierto, y devuelve la prioridad anterior cuando quitas la regla o cierras WinCraft. Nunca por encima de Alta.",
     remove: "Quitar",
     empty: "Todavía no hay aplicaciones.",
     active: "Aplicaciones abiertas ajustadas: {count}",
@@ -7475,7 +7475,7 @@ const es: Strings = {
     ecoqos_rules: {
       name: "Reglas de eficiencia para apps en segundo plano",
       description:
-        "Asigna menor prioridad energética a ejecutables elegidos mientras PC Tweaker está abierto. Las reglas se pausan cuando la app es interactiva; no es un límite porcentual de CPU.",
+        "Asigna menor prioridad energética a ejecutables elegidos mientras WinCraft está abierto. Las reglas se pausan cuando la app es interactiva; no es un límite porcentual de CPU.",
     },
     limit_do_background_download: {
       name: "Límite de descargas de Windows en segundo plano",
@@ -7809,7 +7809,7 @@ const de: Strings = {
     fewer: "Ein Kaffee weniger",
     more: "Ein Kaffee mehr",
   },
-  appName: "PC Tweaker",
+  appName: "WinCraft",
   appliedCount: "{applied} von {total} Optimierungen aktiv",
   headerNote:
     "Prüfe jede Änderung vor dem Anwenden. Die Wiederherstellung unterstützt bestimmte Einstellungen; für Bereinigungs- und Reparaturvorgänge gelten andere Grenzen.",
@@ -8036,7 +8036,7 @@ const de: Strings = {
       "Entfernt überholte Komponentenversionen aus WinSxS. Kürzlich installierte Updates lassen sich weiterhin deinstallieren.",
     runningNote: "Den PC währenddessen nicht herunterfahren oder neu starten.",
     cannotStop:
-      "Einmal gestartet, lässt sich der Vorgang nicht abbrechen: Windows prüft und repariert gerade seine eigenen Systemdateien, und ein Abbruch mittendrin könnte sie halb repariert zurücklassen. Du kannst den PC und PC Tweaker in der Zwischenzeit weiter nutzen.",
+      "Einmal gestartet, lässt sich der Vorgang nicht abbrechen: Windows prüft und repariert gerade seine eigenen Systemdateien, und ein Abbruch mittendrin könnte sie halb repariert zurücklassen. Du kannst den PC und WinCraft in der Zwischenzeit weiter nutzen.",
     stepQuick: "Schnelle Statusabfrage",
     stepScan: "Komponentenspeicher wird geprüft",
     stepRestore: "Komponentenspeicher wird repariert",
@@ -8230,7 +8230,7 @@ const de: Strings = {
       "{opened} von {total} Seiten geöffnet: der Rest bleibt ausgewählt, einfach erneut ausführen.",
     allCurrent: "Kein Treiber zeigt sein Alter.",
     nothingActionable: "Kein alternder Treiber hat eine Herstellerseite zum Öffnen.",
-    note: "PC Tweaker lädt Treiberpakete nicht selbst herunter: es gibt keine Hersteller-API, die sagt, welche Version für genau dein Gerät richtig ist, und den falschen Grafiktreiber zu installieren ist einer der wenigen Fehler, der dich ohne Bildschirm zurücklassen kann. Das hier automatisiert den mühsamen Teil — die Seiten zu finden — nicht die Entscheidung. Für Treiber, die Windows Update wirklich kennt, nimm die Schaltfläche oben.",
+    note: "WinCraft lädt Treiberpakete nicht selbst herunter: es gibt keine Hersteller-API, die sagt, welche Version für genau dein Gerät richtig ist, und den falschen Grafiktreiber zu installieren ist einer der wenigen Fehler, der dich ohne Bildschirm zurücklassen kann. Das hier automatisiert den mühsamen Teil — die Seiten zu finden — nicht die Entscheidung. Für Treiber, die Windows Update wirklich kennt, nimm die Schaltfläche oben.",
   },
   secureDefrag: {
     title: "Sichere Defragmentierung",
@@ -8280,7 +8280,7 @@ const de: Strings = {
       "Neben dem Durchschnitt steht DROP: die Rate des schlechtesten Prozents der Bilder, andernorts 1% Low genannt. Das ist die Zahl, die sich bewegt, wenn ein Spiel stockt, während der Durchschnitt hoch bleibt und nichts davon verrät. Je näher DROP am Durchschnitt liegt, desto flüssiger läuft es.",
     fpsStart: "FPS messen",
     fpsStop: "Messung beenden",
-    fpsNeedsAdmin: "Zum Messen der Bildrate muss PC Tweaker als Administrator gestartet werden.",
+    fpsNeedsAdmin: "Zum Messen der Bildrate muss WinCraft als Administrator gestartet werden.",
     fpsRunning:
       "Messung läuft: Die Bildrate erscheint im Overlay, sobald ein Spiel zu zeichnen beginnt.",
     show: "Anzeigen",
@@ -8393,7 +8393,7 @@ const de: Strings = {
     inactive: "Turbo nicht aktiv",
     loadLabel: "CPU-LAST",
     loadCadence: "Jede Sekunde gemessen, über etwa 3 Sekunden geglättet",
-    ownLoad: "In den letzten Sekunden: PC Tweaker selbst {own} % · alles andere {rest} %",
+    ownLoad: "In den letzten Sekunden: WinCraft selbst {own} % · alles andere {rest} %",
     stageReading: "Energieplan wird gelesen",
     stageRaising: "Boost-Grenze wird angehoben",
     stageApplying: "Wird auf das System angewendet",
@@ -8536,7 +8536,7 @@ const de: Strings = {
   },
   ram: {
     autoNeedsAdmin:
-      "Die automatische Bereinigung läuft nur, solange PC Tweaker Administratorrechte hat.",
+      "Die automatische Bereinigung läuft nur, solange WinCraft Administratorrechte hat.",
     title: "RAM freigeben",
     subtitle:
       "Fordert Windows auf, Speicher freizugeben, den Programme belegen, aber nicht nutzen. Windows fragt jedes Mal nach Administratorrechten, und läuft gerade ein Spiel, wartet die Bereinigung.",
@@ -8549,9 +8549,9 @@ const de: Strings = {
     autoOff: "Aus",
     autoEvery: "Alle {interval}",
     autoHint:
-      "Bei aktiver automatischer Bereinigung gibt PC Tweaker den RAM selbstständig in regelmäßigen Abständen frei. Das geht nur, solange es als Administrator läuft: Windows fragt bei jeder Bereinigung nach der Berechtigung, und eine geplante Bereinigung kann nicht fragen.",
+      "Bei aktiver automatischer Bereinigung gibt WinCraft den RAM selbstständig in regelmäßigen Abständen frei. Das geht nur, solange es als Administrator läuft: Windows fragt bei jeder Bereinigung nach der Berechtigung, und eine geplante Bereinigung kann nicht fragen.",
     autoPausedNotAdmin:
-      "Pausiert: PC Tweaker läuft nicht als Administrator, daher kann die automatische Bereinigung nicht starten. Um sie zu nutzen, schließe PC Tweaker und öffne es mit „Als Administrator ausführen“. Die manuelle Bereinigung funktioniert weiterhin: Windows fragt jedes Mal nach der Berechtigung.",
+      "Pausiert: WinCraft läuft nicht als Administrator, daher kann die automatische Bereinigung nicht starten. Um sie zu nutzen, schließe WinCraft und öffne es mit „Als Administrator ausführen“. Die manuelle Bereinigung funktioniert weiterhin: Windows fragt jedes Mal nach der Berechtigung.",
     autoNext: "Nächste Bereinigung um {time}",
     autoDue: "Bereinigung steht an...",
     autoLast: "Zuletzt um {time}: {amount} freigegeben",
@@ -8582,7 +8582,7 @@ const de: Strings = {
   },
   paywall: {
     title: "Pro-Funktion",
-    body: "Dieses Tool ist mit PC Tweaker Pro verfügbar. Vergleiche die Tarife und ihre Leistungen, bevor du dich entscheidest.",
+    body: "Dieses Tool ist mit WinCraft Pro verfügbar. Vergleiche die Tarife und ihre Leistungen, bevor du dich entscheidest.",
     unlock: "Tarife & Preise ansehen",
     notNow: "Nicht jetzt",
     priceLine:
@@ -8650,15 +8650,15 @@ const de: Strings = {
     button: "Im Web ausprobieren",
   },
   uninstallerPromo: {
-    title: "PC Tweaker Uninstaller",
+    title: "WinCraft Uninstaller",
     description:
-      "Entferne ganze Programme sicher: automatischer Wiederherstellungspunkt, gepruefter Befehl, ehrlicher Bericht. Aus derselben Familie wie PC Tweaker.",
+      "Entferne ganze Programme sicher: automatischer Wiederherstellungspunkt, gepruefter Befehl, ehrlicher Bericht. Aus derselben Familie wie WinCraft.",
     button: "Herunterladen",
     confirmTitle: "Uninstaller herunterladen?",
     confirmBody:
-      "PC Tweaker Uninstaller ist eine eigene App derselben Suite und meldet sich mit demselben Konto an wie diese. Der Download holt das Installationsprogramm (rund 4 MB) direkt aus seinem GitHub-Release, für Windows 10 und 11 in 64 Bit.",
+      "WinCraft Uninstaller ist eine eigene App derselben Suite und meldet sich mit demselben Konto an wie diese. Der Download holt das Installationsprogramm (rund 4 MB) direkt aus seinem GitHub-Release, für Windows 10 und 11 in 64 Bit.",
     confirmUnsigned:
-      "PC Tweaker Uninstaller ist von Aurelio Avila digital signiert. Prüfe Herausgeber und Signatur in den Dateieigenschaften. SmartScreen kann weiterhin warnen.",
+      "WinCraft Uninstaller ist von Aurelio Avila digital signiert. Prüfe Herausgeber und Signatur in den Dateieigenschaften. SmartScreen kann weiterhin warnen.",
     confirmDownload: "Herunterladen",
     confirmOpenPage: "Stattdessen die Seite öffnen",
     cancel: "Abbrechen",
@@ -8666,10 +8666,10 @@ const de: Strings = {
   live: {
     title: "Gerade jetzt",
     subtitle:
-      "Wird jede Sekunde aktualisiert, solange diese Seite offen und PC Tweaker im Vordergrund ist. Im Hintergrund wird nichts gemessen.",
+      "Wird jede Sekunde aktualisiert, solange diese Seite offen und WinCraft im Vordergrund ist. Im Hintergrund wird nichts gemessen.",
     paused: "Pausiert",
     pausedHint:
-      "Pausiert, solange PC Tweaker im Hintergrund ist. Geht weiter, sobald du zurückkommst.",
+      "Pausiert, solange WinCraft im Hintergrund ist. Geht weiter, sobald du zurückkommst.",
     measuring: "Wird gemessen…",
     smooth: "Läuft flüssig",
     busy: "Ausgelastet",
@@ -8728,13 +8728,13 @@ const de: Strings = {
   },
   pageError: {
     title: "Auf dieser Seite ist ein Problem aufgetreten",
-    body: "Der Rest von PC Tweaker funktioniert weiter, und dieser Fehler hat nichts an deinem PC geändert. Lade die Seite neu, um es noch einmal zu versuchen.",
+    body: "Der Rest von WinCraft funktioniert weiter, und dieser Fehler hat nichts an deinem PC geändert. Lade die Seite neu, um es noch einmal zu versuchen.",
     reload: "Seite neu laden",
-    reloadApp: "PC Tweaker neu laden",
+    reloadApp: "WinCraft neu laden",
     details: "Technische Details",
-    appTitle: "In PC Tweaker ist ein Problem aufgetreten",
+    appTitle: "In WinCraft ist ein Problem aufgetreten",
     appBody:
-      "Dieser Fehler hat nichts an deinem PC geändert. Lade PC Tweaker neu, um weiterzumachen.",
+      "Dieser Fehler hat nichts an deinem PC geändert. Lade WinCraft neu, um weiterzumachen.",
   },
   folderScan: {
     stop: "Suche abbrechen",
@@ -8856,7 +8856,7 @@ const de: Strings = {
     noTempSensor: "Diese Karte stellt keinen Temperatursensor bereit.",
     cpuAcpiSource: "aus der ACPI-Thermalzone gelesen",
     cpuNoSensor:
-      "CPU-Temperatur nicht verfügbar: Die Firmware stellt keine ACPI-Thermalzone bereit. PC Tweaker zeigt nur Messwerte an, die Windows bereitstellt.",
+      "CPU-Temperatur nicht verfügbar: Die Firmware stellt keine ACPI-Thermalzone bereit. WinCraft zeigt nur Messwerte an, die Windows bereitstellt.",
     noGpuTool:
       "Keine NVIDIA-Karte erkannt. AMD und Intel liefern kein vergleichbares Abfragewerkzeug, ihre Temperaturen sind daher ohne Herstellersoftware nicht auslesbar.",
     thermalsUnavailable: "Wir können die Sensoren dieses Systems nicht auslesen.",
@@ -8931,7 +8931,7 @@ const de: Strings = {
     winUpdateLabel: "Windows Update",
     winUpdateButton: "In Windows Update suchen",
     winUpdateNote:
-      "Dies prüft nur den eigenen Katalog von Windows Update, nicht die oben aufgeführten einzelnen Treiber: Viele Hersteller - besonders bei Onboard-Audio und Chipsatz - veröffentlichen ihre Updates dort nie, nur auf der eigenen Website. PC Tweaker lädt keine Treiberpakete selbst herunter: Es gibt keine Hersteller-API dafür, was für genau Ihr Gerät aktuell ist, und den falschen Grafiktreiber zu installieren ist einer der wenigen Fehler, die Sie ohne Bild zurücklassen können.",
+      "Dies prüft nur den eigenen Katalog von Windows Update, nicht die oben aufgeführten einzelnen Treiber: Viele Hersteller - besonders bei Onboard-Audio und Chipsatz - veröffentlichen ihre Updates dort nie, nur auf der eigenen Website. WinCraft lädt keine Treiberpakete selbst herunter: Es gibt keine Hersteller-API dafür, was für genau Ihr Gerät aktuell ist, und den falschen Grafiktreiber zu installieren ist einer der wenigen Fehler, die Sie ohne Bild zurücklassen können.",
     winUpdateOpened: "Windows Update geöffnet.",
     winUpdateSearching: "Wird gesucht...",
     winUpdateTakesAWhile: "Das kann eine Minute dauern - der Microsoft-Katalog wird abgefragt.",
@@ -8966,7 +8966,7 @@ const de: Strings = {
     support: "Support",
     reportIssue: "Ein Problem melden",
     aboutBody:
-      "PC Tweaker — Systemoptimierungen mit automatischer Sicherung und Wiederherstellung.",
+      "WinCraft — Systemoptimierungen mit automatischer Sicherung und Wiederherstellung.",
     close: "Schließen",
   },
   auth: {
@@ -9013,15 +9013,15 @@ const de: Strings = {
   guard: {
     settingTitle: "Spiele mit eigener Leistungssteuerung in Ruhe lassen",
     settingBody:
-      "Manche Spiele steuern ihre Leistung selbst. Solange eines davon läuft, pausiert PC Tweaker seine Anpassungen an Apps und lässt das Spiel genau so, wie es ist.",
+      "Manche Spiele steuern ihre Leistung selbst. Solange eines davon läuft, pausiert WinCraft seine Anpassungen an Apps und lässt das Spiel genau so, wie es ist.",
     selfManaged:
-      "Dieses Spiel steuert seine Leistung selbst, deshalb lässt PC Tweaker es, wie es ist.",
+      "Dieses Spiel steuert seine Leistung selbst, deshalb lässt WinCraft es, wie es ist.",
     gameRunning:
-      "Ein Spiel, das seine Leistung selbst steuert, läuft gerade. PC Tweaker lässt die Apps, wie sie sind, bis es geschlossen ist.",
+      "Ein Spiel, das seine Leistung selbst steuert, läuft gerade. WinCraft lässt die Apps, wie sie sind, bis es geschlossen ist.",
     paused: "Pausiert, solange ein Spiel läuft, das seine Leistung selbst steuert.",
     selfManagedBadge: "Steuert seine Leistung selbst",
     registeredGameRunning:
-      "Eines deiner Spiele läuft gerade, deshalb wartet PC Tweaker, bis es geschlossen ist.",
+      "Eines deiner Spiele läuft gerade, deshalb wartet WinCraft, bis es geschlossen ist.",
   },
   preview: {
     title: "Vorschau",
@@ -9053,7 +9053,7 @@ const de: Strings = {
   priorityRules: {
     title: "Prioritätsregeln für Apps",
     subtitle:
-      "Wähle eine App und eine Priorität. PC Tweaker setzt sie bei jedem Start der App, solange PC Tweaker geöffnet ist, und stellt die vorherige Priorität wieder her, wenn du die Regel entfernst oder PC Tweaker schließt. Nie über Hoch.",
+      "Wähle eine App und eine Priorität. WinCraft setzt sie bei jedem Start der App, solange WinCraft geöffnet ist, und stellt die vorherige Priorität wieder her, wenn du die Regel entfernst oder WinCraft schließt. Nie über Hoch.",
     remove: "Entfernen",
     empty: "Noch keine Apps.",
     active: "Angepasste laufende Apps: {count}",
@@ -9158,7 +9158,7 @@ const de: Strings = {
     ecoqos_rules: {
       name: "Effizienzregeln für Hintergrund-Apps",
       description:
-        "Gibt ausgewählten Programmen eine niedrigere Energiepriorität, solange PC Tweaker geöffnet ist. Bei interaktiver Nutzung pausieren die Regeln; sie sind keine CPU-Prozentgrenze.",
+        "Gibt ausgewählten Programmen eine niedrigere Energiepriorität, solange WinCraft geöffnet ist. Bei interaktiver Nutzung pausieren die Regeln; sie sind keine CPU-Prozentgrenze.",
     },
     limit_do_background_download: {
       name: "Limit für Windows-Hintergrunddownloads",
@@ -9491,7 +9491,7 @@ const pt: Strings = {
     fewer: "Um café menos",
     more: "Um café mais",
   },
-  appName: "PC Tweaker",
+  appName: "WinCraft",
   appliedCount: "{applied} de {total} ajustes ativos",
   headerNote:
     "Reveja cada alteração antes de a aplicar. As ferramentas de restauro abrangem as definições compatíveis; as operações de limpeza e reparação têm limites de recuperação diferentes.",
@@ -9718,7 +9718,7 @@ const pt: Strings = {
       "Remove do WinSxS as versões de componentes já substituídas. As atualizações instaladas há pouco continuam a poder ser desinstaladas.",
     runningNote: "Não desligue nem reinicie o PC enquanto isto decorre.",
     cannotStop:
-      "Depois de iniciado, não pode ser interrompido: o Windows está a verificar e a reparar os próprios ficheiros de sistema, e pará-lo a meio pode deixá-los reparados só em parte. Entretanto, pode continuar a usar o PC e o PC Tweaker.",
+      "Depois de iniciado, não pode ser interrompido: o Windows está a verificar e a reparar os próprios ficheiros de sistema, e pará-lo a meio pode deixá-los reparados só em parte. Entretanto, pode continuar a usar o PC e o WinCraft.",
     stepQuick: "Leitura rápida do estado",
     stepScan: "A verificar o arquivo de componentes",
     stepRestore: "A reparar o arquivo de componentes",
@@ -9912,7 +9912,7 @@ const pt: Strings = {
       "Abertas {opened} de {total} páginas: as restantes ficam selecionadas, execute de novo.",
     allCurrent: "Nenhum driver parece desatualizado.",
     nothingActionable: "Nenhum driver antigo tem uma página do fabricante para abrir.",
-    note: "O PC Tweaker não transfere pacotes de drivers sozinho: não existe uma API do fabricante que indique a versão certa para o seu dispositivo exato, e instalar o driver de vídeo errado é um dos poucos erros capazes de o deixar sem imagem. Isto automatiza a parte aborrecida — encontrar as páginas — e não a escolha. Para os drivers que o Windows Update conhece de facto, use o botão acima.",
+    note: "O WinCraft não transfere pacotes de drivers sozinho: não existe uma API do fabricante que indique a versão certa para o seu dispositivo exato, e instalar o driver de vídeo errado é um dos poucos erros capazes de o deixar sem imagem. Isto automatiza a parte aborrecida — encontrar as páginas — e não a escolha. Para os drivers que o Windows Update conhece de facto, use o botão acima.",
   },
   secureDefrag: {
     title: "Desfragmentação segura",
@@ -9962,7 +9962,7 @@ const pt: Strings = {
       "Ao lado da média aparece DROP: a velocidade do um por cento de fotogramas piores, aquilo a que noutros sítios chamam «1% low». É o número que se mexe quando o jogo engasga, enquanto a média fica alta e não o diz. Quanto mais perto DROP estiver da média, mais fluido está o jogo.",
     fpsStart: "Medir FPS",
     fpsStop: "Parar medição",
-    fpsNeedsAdmin: "Para medir os FPS é preciso iniciar o PC Tweaker como administrador.",
+    fpsNeedsAdmin: "Para medir os FPS é preciso iniciar o WinCraft como administrador.",
     fpsRunning: "A medir: os FPS aparecem no overlay assim que um jogo começar a desenhar.",
     show: "Mostrar",
     hide: "Ocultar",
@@ -10074,7 +10074,7 @@ const pt: Strings = {
     inactive: "Turbo inativo",
     loadLabel: "CARGA DA CPU",
     loadCadence: "Medida a cada segundo, suavizada em cerca de 3 segundos",
-    ownLoad: "Nos últimos segundos: o próprio PC Tweaker {own}% · tudo o resto {rest}%",
+    ownLoad: "Nos últimos segundos: o próprio WinCraft {own}% · tudo o resto {rest}%",
     stageReading: "A ler o plano de energia",
     stageRaising: "A elevar o limite de boost",
     stageApplying: "A aplicar ao sistema",
@@ -10217,7 +10217,7 @@ const pt: Strings = {
   },
   ram: {
     autoNeedsAdmin:
-      "A limpeza automática só funciona quando o PC Tweaker tem direitos de administrador.",
+      "A limpeza automática só funciona quando o WinCraft tem direitos de administrador.",
     title: "Libertar RAM",
     subtitle:
       "Pede ao Windows que liberte a memória que os programas retêm sem a usar. O Windows pede permissão de administrador de cada vez, e a limpeza espera se houver um jogo aberto.",
@@ -10230,9 +10230,9 @@ const pt: Strings = {
     autoOff: "Desativada",
     autoEvery: "A cada {interval}",
     autoHint:
-      "Com a limpeza automática ativada, o PC Tweaker liberta RAM sozinho a intervalos regulares. Só o consegue fazer enquanto é executado como administrador: o Windows pede permissão para cada limpeza, e uma limpeza agendada não pode pedi-la.",
+      "Com a limpeza automática ativada, o WinCraft liberta RAM sozinho a intervalos regulares. Só o consegue fazer enquanto é executado como administrador: o Windows pede permissão para cada limpeza, e uma limpeza agendada não pode pedi-la.",
     autoPausedNotAdmin:
-      "Em pausa: o PC Tweaker não está a ser executado como administrador, por isso a limpeza automática não pode ser executada. Para a usar, feche o PC Tweaker e volte a abri-lo com «Executar como administrador». A limpeza manual continua a funcionar: o Windows pede permissão de cada vez.",
+      "Em pausa: o WinCraft não está a ser executado como administrador, por isso a limpeza automática não pode ser executada. Para a usar, feche o WinCraft e volte a abri-lo com «Executar como administrador». A limpeza manual continua a funcionar: o Windows pede permissão de cada vez.",
     autoNext: "Próxima limpeza às {time}",
     autoDue: "Limpeza prestes a decorrer...",
     autoLast: "Última às {time}: {amount} libertados",
@@ -10263,7 +10263,7 @@ const pt: Strings = {
   },
   paywall: {
     title: "Funcionalidade Pro",
-    body: "Esta ferramenta está disponível com o PC Tweaker Pro. Compare os planos e veja o que incluem antes de escolher.",
+    body: "Esta ferramenta está disponível com o WinCraft Pro. Compare os planos e veja o que incluem antes de escolher.",
     unlock: "Ver planos e preços",
     notNow: "Agora não",
     priceLine:
@@ -10332,15 +10332,15 @@ const pt: Strings = {
     button: "Experimentar na web",
   },
   uninstallerPromo: {
-    title: "PC Tweaker Uninstaller",
+    title: "WinCraft Uninstaller",
     description:
-      "Remova programas inteiros em segurança: ponto de restauro automático, comando verificado, relatório honesto. Da mesma família do PC Tweaker.",
+      "Remova programas inteiros em segurança: ponto de restauro automático, comando verificado, relatório honesto. Da mesma família do WinCraft.",
     button: "Transferir",
     confirmTitle: "Transferir o desinstalador?",
     confirmBody:
-      "O PC Tweaker Uninstaller é uma aplicação separada do mesmo conjunto e inicia sessão com a mesma conta que esta. A transferência obtém o instalador (cerca de 4 MB) diretamente da versão no GitHub, para o Windows 10 e 11 de 64 bits.",
+      "O WinCraft Uninstaller é uma aplicação separada do mesmo conjunto e inicia sessão com a mesma conta que esta. A transferência obtém o instalador (cerca de 4 MB) diretamente da versão no GitHub, para o Windows 10 e 11 de 64 bits.",
     confirmUnsigned:
-      "O PC Tweaker Uninstaller é assinado digitalmente por Aurelio Avila. Verifique o editor e a assinatura nas propriedades do ficheiro. O SmartScreen ainda pode apresentar avisos.",
+      "O WinCraft Uninstaller é assinado digitalmente por Aurelio Avila. Verifique o editor e a assinatura nas propriedades do ficheiro. O SmartScreen ainda pode apresentar avisos.",
     confirmDownload: "Transferir",
     confirmOpenPage: "Abrir a página",
     cancel: "Cancelar",
@@ -10348,9 +10348,9 @@ const pt: Strings = {
   live: {
     title: "Neste momento",
     subtitle:
-      "Atualizado a cada segundo enquanto esta página está aberta e o PC Tweaker está em primeiro plano. Nada é medido em segundo plano.",
+      "Atualizado a cada segundo enquanto esta página está aberta e o WinCraft está em primeiro plano. Nada é medido em segundo plano.",
     paused: "Em pausa",
-    pausedHint: "Em pausa enquanto o PC Tweaker está em segundo plano. Retoma quando voltar.",
+    pausedHint: "Em pausa enquanto o WinCraft está em segundo plano. Retoma quando voltar.",
     measuring: "A medir…",
     smooth: "Tudo fluido",
     busy: "Ocupado",
@@ -10409,12 +10409,12 @@ const pt: Strings = {
   },
   pageError: {
     title: "Esta página teve um problema",
-    body: "O resto do PC Tweaker continua a funcionar e este erro não alterou nada no seu PC. Recarregue a página para tentar novamente.",
+    body: "O resto do WinCraft continua a funcionar e este erro não alterou nada no seu PC. Recarregue a página para tentar novamente.",
     reload: "Recarregar a página",
-    reloadApp: "Recarregar o PC Tweaker",
+    reloadApp: "Recarregar o WinCraft",
     details: "Detalhes técnicos",
-    appTitle: "O PC Tweaker teve um problema",
-    appBody: "Este erro não alterou nada no seu PC. Recarregue o PC Tweaker para continuar.",
+    appTitle: "O WinCraft teve um problema",
+    appBody: "Este erro não alterou nada no seu PC. Recarregue o WinCraft para continuar.",
   },
   folderScan: {
     stop: "Parar pesquisa",
@@ -10535,7 +10535,7 @@ const pt: Strings = {
     noTempSensor: "Esta placa não expõe um sensor de temperatura.",
     cpuAcpiSource: "lido da zona térmica ACPI",
     cpuNoSensor:
-      "Temperatura da CPU indisponível: o firmware não expõe nenhuma zona térmica ACPI. O PC Tweaker mostra apenas as leituras disponibilizadas pelo Windows.",
+      "Temperatura da CPU indisponível: o firmware não expõe nenhuma zona térmica ACPI. O WinCraft mostra apenas as leituras disponibilizadas pelo Windows.",
     noGpuTool:
       "Nenhuma placa NVIDIA detetada. A AMD e a Intel não oferecem uma ferramenta de consulta equivalente, por isso as respetivas temperaturas não podem ser lidas sem o software do próprio fabricante.",
     thermalsUnavailable: "Não foi possível ler os sensores neste sistema.",
@@ -10609,7 +10609,7 @@ const pt: Strings = {
     winUpdateLabel: "Windows Update",
     winUpdateButton: "Verificar no Windows Update",
     winUpdateNote:
-      "Isto verifica apenas o próprio catálogo do Windows Update, não os drivers específicos listados acima: muitos fabricantes - sobretudo de áudio e chipset integrados - nunca publicam ali as suas atualizações, só no próprio site. O PC Tweaker não transfere pacotes de drivers sozinho: não existe uma API do fabricante que indique o que é atual para o seu dispositivo exato, e instalar o driver de vídeo errado é um dos poucos erros capazes de o deixar sem imagem.",
+      "Isto verifica apenas o próprio catálogo do Windows Update, não os drivers específicos listados acima: muitos fabricantes - sobretudo de áudio e chipset integrados - nunca publicam ali as suas atualizações, só no próprio site. O WinCraft não transfere pacotes de drivers sozinho: não existe uma API do fabricante que indique o que é atual para o seu dispositivo exato, e instalar o driver de vídeo errado é um dos poucos erros capazes de o deixar sem imagem.",
     winUpdateOpened: "Windows Update aberto.",
     winUpdateSearching: "A procurar...",
     winUpdateTakesAWhile: "Pode demorar um minuto: consulta o catálogo da Microsoft.",
@@ -10643,7 +10643,7 @@ const pt: Strings = {
     photoFailed: "Não foi possível usar essa imagem como foto de perfil.",
     support: "Suporte",
     reportIssue: "Comunicar um problema",
-    aboutBody: "PC Tweaker — ajustes de sistema com cópia de segurança e reversão automáticas.",
+    aboutBody: "WinCraft — ajustes de sistema com cópia de segurança e reversão automáticas.",
     close: "Fechar",
   },
   auth: {
@@ -10690,14 +10690,14 @@ const pt: Strings = {
   guard: {
     settingTitle: "Deixar em paz os jogos que se gerem sozinhos",
     settingBody:
-      "Alguns jogos gerem o próprio desempenho. Enquanto um deles está aberto, o PC Tweaker suspende os ajustes por aplicação e deixa o jogo exatamente como está.",
-    selfManaged: "Este jogo gere o próprio desempenho, por isso o PC Tweaker deixa-o como está.",
+      "Alguns jogos gerem o próprio desempenho. Enquanto um deles está aberto, o WinCraft suspende os ajustes por aplicação e deixa o jogo exatamente como está.",
+    selfManaged: "Este jogo gere o próprio desempenho, por isso o WinCraft deixa-o como está.",
     gameRunning:
-      "Há um jogo aberto que gere o próprio desempenho, por isso o PC Tweaker deixa as aplicações como estão até o fechar.",
+      "Há um jogo aberto que gere o próprio desempenho, por isso o WinCraft deixa as aplicações como estão até o fechar.",
     paused: "Em pausa enquanto houver um jogo aberto que gere o próprio desempenho.",
     selfManagedBadge: "Gere o próprio desempenho",
     registeredGameRunning:
-      "Um dos seus jogos está aberto, por isso o PC Tweaker espera até que feche.",
+      "Um dos seus jogos está aberto, por isso o WinCraft espera até que feche.",
   },
   preview: {
     title: "Pré-visualização",
@@ -10727,7 +10727,7 @@ const pt: Strings = {
   priorityRules: {
     title: "Regras de prioridade de aplicações",
     subtitle:
-      "Escolha uma aplicação e uma prioridade. O PC Tweaker aplica-a sempre que a aplicação inicia enquanto o PC Tweaker está aberto, e repõe a prioridade anterior quando remove a regra ou fecha o PC Tweaker. Nunca acima de Alta.",
+      "Escolha uma aplicação e uma prioridade. O WinCraft aplica-a sempre que a aplicação inicia enquanto o WinCraft está aberto, e repõe a prioridade anterior quando remove a regra ou fecha o WinCraft. Nunca acima de Alta.",
     remove: "Remover",
     empty: "Ainda nenhuma aplicação.",
     active: "Aplicações abertas ajustadas: {count}",
@@ -10832,7 +10832,7 @@ const pt: Strings = {
     ecoqos_rules: {
       name: "Regras de eficiência para apps em segundo plano",
       description:
-        "Atribui menor prioridade energética aos executáveis escolhidos enquanto o PC Tweaker está aberto. As regras pausam quando a app fica interativa; não são um limite percentual da CPU.",
+        "Atribui menor prioridade energética aos executáveis escolhidos enquanto o WinCraft está aberto. As regras pausam quando a app fica interativa; não são um limite percentual da CPU.",
     },
     limit_do_background_download: {
       name: "Limite das transferências do Windows em segundo plano",

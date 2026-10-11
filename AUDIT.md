@@ -1,8 +1,8 @@
-# PC Tweaker — Comprehensive Audit & Improvement Report
+# WinCraft — Comprehensive Audit & Improvement Report
 
 ## Executive Summary
 
-PC Tweaker is a well-engineered ~44,000-line Tauri application (Rust + React/TypeScript) with strong architectural decisions. The codebase has excellent documentation, careful error handling, and a well-designed rollback system. This audit identified **7 bugs**, **5 security concerns**, **4 performance issues**, and **8 architectural improvements** — categorized by severity.
+WinCraft is a well-engineered ~44,000-line Tauri application (Rust + React/TypeScript) with strong architectural decisions. The codebase has excellent documentation, careful error handling, and a well-designed rollback system. This audit identified **7 bugs**, **5 security concerns**, **4 performance issues**, and **8 architectural improvements** — categorized by severity.
 
 ---
 

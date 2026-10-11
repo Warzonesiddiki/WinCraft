@@ -742,14 +742,14 @@ fn unit_tests_cannot_write_the_real_registry() {
     let error = WinRegistry
         .write(
             Hive::Hkcu,
-            r"Software\PC Tweaker Unit Test",
+            r"Software\WinCraft Unit Test",
             "Refused",
             &RegValue::Dword(1),
         )
         .unwrap_err();
     assert_eq!(error.kind(), std::io::ErrorKind::PermissionDenied);
     assert!(WinRegistry
-        .delete(Hive::Hkcu, r"Software\PC Tweaker Unit Test", "Refused")
+        .delete(Hive::Hkcu, r"Software\WinCraft Unit Test", "Refused")
         .is_err());
 }
 

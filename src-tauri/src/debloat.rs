@@ -624,7 +624,7 @@ pub fn read_debloat_list(path: String) -> Result<Vec<String>, String> {
         .ok_or("the list can only be read from a .json file on a local drive")?;
     let file = std::fs::File::open(&target).map_err(|e| format!("could not read the file: {e}"))?;
     if !file.metadata().map_err(|e| e.to_string())?.is_file() {
-        return Err("this file isn't a PC Tweaker Debloat list".into());
+        return Err("this file isn't a WinCraft Debloat list".into());
     }
     let mut bytes = Vec::new();
     file.take(64 * 1024 + 1)
@@ -635,7 +635,7 @@ pub fn read_debloat_list(path: String) -> Result<Vec<String>, String> {
 
 fn parse_list(bytes: &[u8]) -> Result<Vec<String>, String> {
     const MAX_BYTES: usize = 64 * 1024;
-    let not_a_list = || "this file isn't a PC Tweaker Debloat list".to_string();
+    let not_a_list = || "this file isn't a WinCraft Debloat list".to_string();
     if bytes.len() > MAX_BYTES {
         return Err(not_a_list());
     }

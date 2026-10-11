@@ -54,7 +54,7 @@ router.use(authLimiter);
 
 const APP_URL =
   process.env.APP_URL ||
-  (process.env.NODE_ENV === "production" ? "https://api.pctweaker.app" : "http://localhost:3000");
+  (process.env.NODE_ENV === "production" ? "https://api.wincraft.app" : "http://localhost:3000");
 const DAY_MS = 24 * 60 * 60 * 1000;
 
 /** Resolves to false when no email provider is configured, so callers can
@@ -275,7 +275,7 @@ function escapeHtml(value: unknown): string {
 export function htmlPage(title: string, bodyHtml: string): string {
   return `<!doctype html><html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>${title} — PC Tweaker</title>
+<title>${title} — WinCraft</title>
 <style>
 :root{color-scheme:dark}
 *{box-sizing:border-box}
@@ -310,7 +310,7 @@ button:hover{filter:brightness(1.07)}
   color:#a7f3d0;background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.28)}
 </style></head>
 <body><div class="card">
-<div class="brand"><div class="mark">P</div><span>PC Tweaker</span></div>
+<div class="brand"><div class="mark">P</div><span>WinCraft</span></div>
 <h2>${title}</h2>${bodyHtml}</div></body></html>`;
 }
 
@@ -322,7 +322,7 @@ router.get("/verify-email", async (req: Request, res: Response) => {
   try {
     const userId = await consumeActionToken(token, "email_verify");
     if (!userId && (await confirmsVerifiedAddress(token))) {
-      return res.send(htmlPage("Email verified", "<p class=success>Your email is already verified. You can close this window and return to PC Tweaker.</p>"));
+      return res.send(htmlPage("Email verified", "<p class=success>Your email is already verified. You can close this window and return to WinCraft.</p>"));
     }
     if (!userId) {
       return res
@@ -338,7 +338,7 @@ router.get("/verify-email", async (req: Request, res: Response) => {
     void sendAccountWelcome(userId).catch((err) =>
       console.error("failed to send the account welcome:", err),
     );
-    res.send(htmlPage("Email verified", "<p class=success>Your email is verified. You can close this window and return to PC Tweaker.</p>"));
+    res.send(htmlPage("Email verified", "<p class=success>Your email is verified. You can close this window and return to WinCraft.</p>"));
   } catch (err) {
     console.error("verify-email failed:", err);
     res.status(500).send(htmlPage("Error", "<p class=error>Something went wrong. Try again later.</p>"));
@@ -472,7 +472,7 @@ router.post("/reset-password", async (req: Request, res: Response) => {
       return res.send(
         htmlPage(
           "Password updated",
-          `<p class="success">Done. Go back to PC Tweaker and sign in with your new password.</p>
+          `<p class="success">Done. Go back to WinCraft and sign in with your new password.</p>
            <p class="hint">You can close this window.</p>`,
         ),
       );

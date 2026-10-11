@@ -10,7 +10,7 @@ import { HistoryIcon } from "./icons";
 import "./workspace-panels.css";
 
 /**
- * PC Tweaker Intelligence — vertical slice 1: Personal Advisor + Change
+ * WinCraft Intelligence — vertical slice 1: Personal Advisor + Change
  * Ledger.
  *
  * Both are read-first surfaces over machinery that already exists and is

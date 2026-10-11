@@ -160,7 +160,7 @@ fn conflict(
     }
     if applied {
         if configured != written {
-            return Some("The Delivery Optimization policy changed outside PC Tweaker; the saved original is retained".into());
+            return Some("The Delivery Optimization policy changed outside WinCraft; the saved original is retained".into());
         }
         if !["DefaultProvider", "GroupPolicyProvider", "MdmProvider"]
             .contains(&config.down_back_limit_bps_provider.as_str())
@@ -269,7 +269,7 @@ pub fn rollback(store: &RollbackStore) -> Result<DownloadLimitState, String> {
             return Ok(());
         }
         if current != Some(written_kbps) {
-            return Err("Delivery Optimization policy changed outside PC Tweaker; original snapshot retained".into());
+            return Err("Delivery Optimization policy changed outside WinCraft; original snapshot retained".into());
         }
         let live = with_environment(|e| e.read())?;
         let changed = match &live.config {
@@ -277,7 +277,7 @@ pub fn rollback(store: &RollbackStore) -> Result<DownloadLimitState, String> {
                 conflict(config, true, current, Some(written_kbps), live.managed).is_some()
             }
             // An edition that ignores the policy has no provider to compare:
-            // only the value PC Tweaker wrote, checked above, is removed.
+            // only the value WinCraft wrote, checked above, is removed.
             None => live.managed,
         };
         if changed {
@@ -532,7 +532,7 @@ mod tests {
     fn a_restore_refuses_a_policy_that_changed_under_it() {
         type Drift = fn(&Machine);
         let cases: [(&str, Drift); 3] = [
-            ("changed outside PC Tweaker", |m| {
+            ("changed outside WinCraft", |m| {
                 m.registry.set(Hive::Hklm, PATH, VALUE, Stored::Value(RegValue::Dword(700)))
             }),
             ("provider changed", |m| {

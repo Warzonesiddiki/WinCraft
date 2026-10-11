@@ -40,7 +40,7 @@ const SAME_ON_PURPOSE = new Set([
   "RAM",
   "Pro",
   "Free",
-  "PC Tweaker",
+  "WinCraft",
   "UI",
   "Gaming",
   "Privacy",
@@ -288,7 +288,7 @@ const REVIEWED_AS_CORRECT = new Set([
   "fr:promptshieldPromo.title",
   "es:promptshieldPromo.title",
   "de:promptshieldPromo.title",
-  // "PC Tweaker Uninstaller" is the product's name in every language.
+  // "WinCraft Uninstaller" is the product's name in every language.
   "it:uninstallerPromo.title",
   "fr:uninstallerPromo.title",
   "es:uninstallerPromo.title",

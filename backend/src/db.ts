@@ -191,11 +191,11 @@ async function initSchema(): Promise<void> {
   `);
 
   // Per-product entitlements for the ecosystem's newer products (Uninstaller,
-  // and whatever comes after). Deliberately NOT a migration of PC Tweaker Pro:
+  // and whatever comes after). Deliberately NOT a migration of WinCraft Pro:
   // the `users.is_pro`/`pro_expires_at` columns remain the single source of
-  // truth for product "pctweaker", so the live billing path is untouched by
+  // truth for product "wincraft", so the live billing path is untouched by
   // this table's existence. Rows here are written only by the Stripe webhook
-  // for checkouts whose metadata names a non-pctweaker product.
+  // for checkouts whose metadata names a non-wincraft product.
   await pool.query(`
     CREATE TABLE IF NOT EXISTS entitlements (
       user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,

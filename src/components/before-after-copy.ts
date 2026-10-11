@@ -79,7 +79,7 @@ const en: Copy = {
   nextHint:
     "Now apply the tweaks you want. If one asks for a restart, restart first. Then measure after.",
   changesBetween: "Changed between the two measurements",
-  changesNone: "Nothing was changed with PC Tweaker between the two measurements.",
+  changesNone: "Nothing was changed with WinCraft between the two measurements.",
   changesMore: "+{count} more",
   undone: "undone",
   impactTitle: "Measured impact",
@@ -118,7 +118,7 @@ const en: Copy = {
     "Processes, startup apps, memory in use and free space are read once. A change counts only above a floor: 3 processes or 3%, 250 MB or 5% of memory in use (whichever is larger), 100 MB of free space; any change in startup apps counts.",
     "Results are compared only with this PC and stay on it. Nothing is uploaded.",
   ],
-  reportTitle: "PC Tweaker · Before & After",
+  reportTitle: "WinCraft · Before & After",
   reportFooter:
     "Median of at least 7 runs per timed test; a change is reported only when p < 0.01 and at least 5%. Measured on this PC; nothing was uploaded.",
   bootTitle: "Startup time",
@@ -201,7 +201,7 @@ const it: Copy = {
   nextHint:
     "Ora applica i tweak che vuoi. Se uno richiede il riavvio, riavvia prima. Poi misura il dopo.",
   changesBetween: "Modifiche tra le due misurazioni",
-  changesNone: "Tra le due misurazioni non è stato modificato nulla con PC Tweaker.",
+  changesNone: "Tra le due misurazioni non è stato modificato nulla con WinCraft.",
   changesMore: "+{count} altre",
   undone: "annullato",
   impactTitle: "Impatto misurato",
@@ -240,7 +240,7 @@ const it: Copy = {
     "Processi, app all'avvio, memoria in uso e spazio libero vengono letti una volta. Una variazione conta solo oltre una soglia: 3 processi o il 3%, 250 MB o il 5% della memoria in uso (il valore più alto), 100 MB di spazio libero; per le app all'avvio conta ogni variazione.",
     "I risultati si confrontano solo con questo PC e restano qui. Non viene caricato nulla.",
   ],
-  reportTitle: "PC Tweaker · Prima e dopo",
+  reportTitle: "WinCraft · Prima e dopo",
   reportFooter:
     "Mediana di almeno 7 esecuzioni per test a tempo; una variazione è indicata solo con p < 0,01 e almeno il 5%. Misurato su questo PC; non è stato caricato nulla.",
   bootTitle: "Tempo di avvio",
@@ -323,7 +323,7 @@ const fr: Copy = {
   nextHint:
     "Appliquez maintenant les réglages voulus. Si l'un d'eux demande un redémarrage, redémarrez d'abord. Puis mesurez l'après.",
   changesBetween: "Modifié entre les deux mesures",
-  changesNone: "Rien n'a été modifié avec PC Tweaker entre les deux mesures.",
+  changesNone: "Rien n'a été modifié avec WinCraft entre les deux mesures.",
   changesMore: "+{count} autres",
   undone: "annulé",
   impactTitle: "Impact mesuré",
@@ -363,7 +363,7 @@ const fr: Copy = {
     "Les processus, les applications au démarrage, la mémoire utilisée et l'espace libre sont lus une fois. Un changement ne compte qu'au-delà d'un seuil : 3 processus ou 3 %, 250 Mo ou 5 % de la mémoire utilisée (la valeur la plus élevée), 100 Mo d'espace libre ; pour les applications au démarrage, tout changement compte.",
     "Les résultats ne sont comparés qu'avec ce PC et y restent. Rien n'est envoyé.",
   ],
-  reportTitle: "PC Tweaker · Avant / après",
+  reportTitle: "WinCraft · Avant / après",
   reportFooter:
     "Médiane d'au moins 7 exécutions par test chronométré ; un changement n'est signalé qu'avec p < 0,01 et au moins 5 %. Mesuré sur ce PC ; rien n'a été envoyé.",
   bootTitle: "Temps de démarrage",
@@ -447,7 +447,7 @@ const es: Copy = {
   nextHint:
     "Ahora aplica los ajustes que quieras. Si alguno pide reiniciar, reinicia primero. Después mide el después.",
   changesBetween: "Cambios entre las dos mediciones",
-  changesNone: "No se cambió nada con PC Tweaker entre las dos mediciones.",
+  changesNone: "No se cambió nada con WinCraft entre las dos mediciones.",
   changesMore: "+{count} más",
   undone: "deshecho",
   impactTitle: "Impacto medido",
@@ -486,7 +486,7 @@ const es: Copy = {
     "Los procesos, las aplicaciones de inicio, la memoria en uso y el espacio libre se leen una vez. Un cambio solo cuenta por encima de un umbral: 3 procesos o el 3 %, 250 MB o el 5 % de la memoria en uso (el valor mayor), 100 MB de espacio libre; en las aplicaciones de inicio cuenta cualquier cambio.",
     "Los resultados solo se comparan con este PC y se quedan en él. No se envía nada.",
   ],
-  reportTitle: "PC Tweaker · Antes y después",
+  reportTitle: "WinCraft · Antes y después",
   reportFooter:
     "Mediana de al menos 7 ejecuciones por prueba cronometrada; solo se indica un cambio con p < 0,01 y al menos un 5 %. Medido en este PC; no se envió nada.",
   bootTitle: "Tiempo de arranque",
@@ -570,7 +570,7 @@ const de: Copy = {
   nextHint:
     "Wende jetzt die gewünschten Tweaks an. Verlangt einer einen Neustart, starte zuerst neu. Miss danach erneut.",
   changesBetween: "Zwischen den beiden Messungen geändert",
-  changesNone: "Zwischen den beiden Messungen wurde mit PC Tweaker nichts geändert.",
+  changesNone: "Zwischen den beiden Messungen wurde mit WinCraft nichts geändert.",
   changesMore: "+{count} weitere",
   undone: "rückgängig gemacht",
   impactTitle: "Gemessene Wirkung",
@@ -611,7 +611,7 @@ const de: Copy = {
     "Prozesse, Autostart-Apps, belegter Arbeitsspeicher und freier Speicherplatz werden einmal gelesen. Eine Änderung zählt erst ab einer Schwelle: 3 Prozesse oder 3 %, 250 MB oder 5 % des belegten Arbeitsspeichers (der höhere Wert), 100 MB freier Speicherplatz; bei Autostart-Apps zählt jede Änderung.",
     "Die Ergebnisse werden nur mit diesem PC verglichen und bleiben auf ihm. Es wird nichts hochgeladen.",
   ],
-  reportTitle: "PC Tweaker · Vorher und nachher",
+  reportTitle: "WinCraft · Vorher und nachher",
   reportFooter:
     "Median aus mindestens 7 Durchläufen je Zeittest; eine Änderung wird nur bei p < 0,01 und mindestens 5 % gemeldet. Auf diesem PC gemessen; es wurde nichts hochgeladen.",
   bootTitle: "Startzeit",
@@ -695,7 +695,7 @@ const pt: Copy = {
   nextHint:
     "Agora aplique os ajustes que pretende. Se algum pedir um reinício, reinicie primeiro. Depois meça o depois.",
   changesBetween: "Alterado entre as duas medições",
-  changesNone: "Nada foi alterado com o PC Tweaker entre as duas medições.",
+  changesNone: "Nada foi alterado com o WinCraft entre as duas medições.",
   changesMore: "+{count} mais",
   undone: "anulado",
   impactTitle: "Impacto medido",
@@ -734,7 +734,7 @@ const pt: Copy = {
     "Os processos, as aplicações de arranque, a memória em utilização e o espaço livre são lidos uma vez. Uma alteração só conta acima de um limite: 3 processos ou 3%, 250 MB ou 5% da memória em utilização (o valor mais alto), 100 MB de espaço livre; nas aplicações de arranque conta qualquer alteração.",
     "Os resultados só são comparados com este PC e ficam nele. Nada é enviado.",
   ],
-  reportTitle: "PC Tweaker · Antes e depois",
+  reportTitle: "WinCraft · Antes e depois",
   reportFooter:
     "Mediana de pelo menos 7 execuções por teste cronometrado; uma alteração só é indicada com p < 0,01 e pelo menos 5%. Medido neste PC; nada foi enviado.",
   bootTitle: "Tempo de arranque",

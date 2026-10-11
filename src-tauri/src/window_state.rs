@@ -279,7 +279,7 @@ mod tests {
     #[test]
     fn a_maximized_size_saved_as_normal_is_not_reused() {
         // The placement found on a 1920x1080 desktop that kept reopening
-        // PC Tweaker full-screen with no way back to its normal size.
+        // WinCraft full-screen with no way back to its normal size.
         let full = Placement { w: 1920.0, h: 1030.0, x: -7.0, y: 0.0 };
         assert!(!fits(&full, 1920.0, 1032.0));
         let large = Placement { w: 1600.0, h: 900.0, x: 100.0, y: 50.0 };

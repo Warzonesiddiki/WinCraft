@@ -493,7 +493,7 @@ fn tick(
         let mine = record.owner_pid == owner_pid && record.owner_creation == owner_creation;
         if !mine && alive(record.owner_pid, record.owner_creation) {
             status.last_error =
-                Some("Another PC Tweaker process owns these priority changes".into());
+                Some("Another WinCraft process owns these priority changes".into());
             continue;
         }
         let still_wanted = mine

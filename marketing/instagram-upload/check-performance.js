@@ -2,7 +2,7 @@
 // most recently published Instagram Reels and reports every REGRESSION
 // against the last saved check.
 //
-// Added 2026-08-15: before this script PC Tweaker had NO visibility at all
+// Added 2026-08-15: before this script WinCraft had NO visibility at all
 // into Instagram performance. Same shape as
 // solofounded-bot/check_ig_performance.py (Python), written in JS here to stay
 // consistent with the rest of this folder. Same credential priority as lib.js:

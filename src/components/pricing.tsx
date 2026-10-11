@@ -23,7 +23,7 @@ export function PricingPanel({
         <p className="pricing-eyebrow">{s.tabs.pricing}</p>
         <h1 id="pricing-heading">Free for Everyone</h1>
         <p>
-          PC Tweaker is now completely free and open source. All features, all
+          WinCraft is now completely free and open source. All features, all
           tools, no subscriptions, no paywalls. Just download and start
           optimizing.
         </p>
@@ -77,7 +77,7 @@ export function PricingPanel({
       <section className="pricing-comparison" aria-labelledby="pricing-commitment-heading">
         <h2 id="pricing-commitment-heading">Our Commitment</h2>
         <p style={{ maxWidth: "600px", margin: "1rem auto", lineHeight: 1.6, color: "var(--ink-3, #9ca3af)" }}>
-          PC Tweaker is and will remain free. We believe everyone should have
+          WinCraft is and will remain free. We believe everyone should have
           access to tools that help them understand and optimize their PC. No
           hidden costs, no feature gates, no subscriptions. Just powerful tools
           for everyone.

@@ -13,7 +13,7 @@ export type LifetimeOffer = {
   endsAt: string | null;
   status: LifetimeOfferStatus;
   available: boolean;
-  product: "pctweaker";
+  product: "wincraft";
   plan: "lifetime";
   checkoutGraceSeconds: number;
 };
@@ -43,7 +43,7 @@ export function lifetimeOffer(
     endsAt: null,
     status: "disabled",
     available: checkoutConfigured,
-    product: "pctweaker",
+    product: "wincraft",
     plan: "lifetime",
     checkoutGraceSeconds: LIFETIME_CHECKOUT_GRACE_SECONDS,
   };

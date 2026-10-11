@@ -8,7 +8,7 @@
   tests (see README.md); a release build has no such option. Run it in the
   VM, in an elevated PowerShell, as the user being tested:
 
-    .\run-auto.ps1 -TestBuild 'C:\test\PC Tweaker.exe'
+    .\run-auto.ps1 -TestBuild 'C:\test\WinCraft.exe'
 
   The build applies and restores every control itself and, on restore, reads
   back every registry value it recorded before applying. verify-tweaks.ps1

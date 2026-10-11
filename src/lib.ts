@@ -366,7 +366,7 @@ export function fileToAvatarDataUrl(file: File): Promise<string> {
 }
 
 /**
- * Feature flag for the PC Tweaker Intelligence slice (Advisor + Change
+ * Feature flag for the WinCraft Intelligence slice (Advisor + Change
  * Ledger). Compile-time on purpose: flipping it to false removes the nav
  * entry and both surfaces in one place, with no dead UI left behind.
  */

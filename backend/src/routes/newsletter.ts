@@ -30,7 +30,7 @@ const SOURCES = new Set(["site-footer", "site-hero", "site-mobile", "app"]);
  * ponytail: someone already subscribed gets no link; add a per-address
  * cooldown column if that case shows up.
  */
-const DOWNLOAD_PAGE = "https://pctweaker.app/?utm_source=email&utm_medium=send-to-pc";
+const DOWNLOAD_PAGE = "https://wincraft.app/?utm_source=email&utm_medium=send-to-pc";
 
 /**
  * Keyed on req.ip — spoofable (see routes/auth.ts), but the failure mode here
@@ -60,7 +60,7 @@ function unsubscribeSignature(email: string): string | null {
 export function unsubscribeUrl(email: string): string | null {
   const sig = unsubscribeSignature(email);
   if (!sig) return null;
-  return `${process.env.PUBLIC_API_URL || "https://api.pctweaker.app"}/api/newsletter/unsubscribe?email=${encodeURIComponent(email)}&sig=${sig}`;
+  return `${process.env.PUBLIC_API_URL || "https://api.wincraft.app"}/api/newsletter/unsubscribe?email=${encodeURIComponent(email)}&sig=${sig}`;
 }
 
 /** RFC 8058 headers: Gmail and Yahoo show their own Unsubscribe button and
@@ -120,15 +120,15 @@ router.post("/", newsletterLimiter, asyncRoute(async (req: Request, res: Respons
   if (isNew && mailIsConfigured && link && source === "site-mobile") {
     void sendMail({
       to: email,
-      subject: "Your PC Tweaker download link",
+      subject: "Your WinCraft download link",
       headers: listUnsubscribeHeaders(link),
       html: emailShell({
-        preheader: "Open this on your Windows 10 or 11 PC to download PC Tweaker.",
+        preheader: "Open this on your Windows 10 or 11 PC to download WinCraft.",
         eyebrow: "For your PC",
         headline: "Open this on your Windows PC.",
         intro:
-          "Here's the link you asked for. Open it on the Windows 10 or 11 PC you want to tune and download PC Tweaker from there. You'll also get occasional emails about new releases. No spam and no daily drip.",
-        action: { label: "Download PC Tweaker", url: DOWNLOAD_PAGE },
+          "Here's the link you asked for. Open it on the Windows 10 or 11 PC you want to tune and download WinCraft from there. You'll also get occasional emails about new releases. No spam and no daily drip.",
+        action: { label: "Download WinCraft", url: DOWNLOAD_PAGE },
         afterActionHtml: `
         <tr>
           <td style="padding:24px 40px 0; text-align:center;">
@@ -140,7 +140,7 @@ router.post("/", newsletterLimiter, asyncRoute(async (req: Request, res: Respons
       }),
       text: `Open this on your Windows PC.
 
-Here's the link you asked for. Open it on the Windows 10 or 11 PC you want to tune and download PC Tweaker from there:
+Here's the link you asked for. Open it on the Windows 10 or 11 PC you want to tune and download WinCraft from there:
 ${DOWNLOAD_PAGE}
 
 You'll also get occasional emails about new releases. No spam and no daily drip.
@@ -148,20 +148,20 @@ You'll also get occasional emails about new releases. No spam and no daily drip.
 Didn't ask for this? Unsubscribe with one click, no sign-in needed:
 ${link}
 
-PC Tweaker - https://pctweaker.app`,
+WinCraft - https://wincraft.app`,
     }).catch((err: Error) => console.error("send-to-pc email failed:", err.message));
   } else if (isNew && mailIsConfigured && link) {
     void sendMail({
       to: email,
-      subject: "You're on the PC Tweaker list",
+      subject: "You're on the WinCraft list",
       headers: listUnsubscribeHeaders(link),
       html: emailShell({
         preheader: "Occasional news about releases and new tools. No daily emails, and you can leave in one click.",
         eyebrow: "Subscribed",
         headline: "You're on the list.",
         intro:
-          "You'll get occasional emails about new PC Tweaker releases, new tweaks and new tools from the same developer. No spam and no daily drip.",
-        action: { label: "Open PC Tweaker", url: "https://pctweaker.app" },
+          "You'll get occasional emails about new WinCraft releases, new tweaks and new tools from the same developer. No spam and no daily drip.",
+        action: { label: "Open WinCraft", url: "https://wincraft.app" },
         afterActionHtml: `
         <tr>
           <td style="padding:24px 40px 0; text-align:center;">
@@ -171,14 +171,14 @@ PC Tweaker - https://pctweaker.app`,
           </td>
         </tr>`,
       }),
-      text: `You're on the PC Tweaker list.
+      text: `You're on the WinCraft list.
 
-You'll get occasional emails about new PC Tweaker releases, new tweaks and new tools from the same developer. No spam and no daily drip.
+You'll get occasional emails about new WinCraft releases, new tweaks and new tools from the same developer. No spam and no daily drip.
 
 Didn't sign up, or changed your mind? Unsubscribe with one click, no sign-in needed:
 ${link}
 
-PC Tweaker - https://pctweaker.app`,
+WinCraft - https://wincraft.app`,
     }).catch((err: Error) => console.error("newsletter welcome email failed:", err.message));
   }
 
@@ -224,7 +224,7 @@ router.get("/unsubscribe", (req: Request, res: Response) => {
   }
   res.type("html").send(htmlPage(
     "Unsubscribe",
-    `<p class="lead">Stop PC Tweaker news and reminder emails to ${escapeHtml(email)}? ${STILL_SENT}</p>
+    `<p class="lead">Stop WinCraft news and reminder emails to ${escapeHtml(email)}? ${STILL_SENT}</p>
      <form method="post" action="${escapeHtml(req.originalUrl)}"><button type="submit">Unsubscribe</button></form>`,
   ));
 });
@@ -248,7 +248,7 @@ router.post("/unsubscribe", asyncRoute(async (req: Request, res: Response) => {
   );
   res.type("html").send(htmlPage(
     "You're unsubscribed",
-    `<p class="success">No more PC Tweaker news or reminder emails will be sent to this address. ${STILL_SENT}</p>`,
+    `<p class="success">No more WinCraft news or reminder emails will be sent to this address. ${STILL_SENT}</p>`,
   ));
 }));
 

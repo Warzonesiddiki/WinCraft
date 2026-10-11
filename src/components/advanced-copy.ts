@@ -3,7 +3,7 @@ import type { Lang } from "../i18n";
 const en = {
   ecoTitle: "Background app efficiency rules",
   ecoDescription:
-    "Choose non-critical apps for lower energy priority while PC Tweaker is open. Rules pause when an app becomes interactive; this is not a CPU percentage cap.",
+    "Choose non-critical apps for lower energy priority while WinCraft is open. Rules pause when an app becomes interactive; this is not a CPU percentage cap.",
   ecoAdd: "Choose executable",
   ecoEmpty: "No app rules yet.",
   ecoOn: "Rules enabled",
@@ -56,7 +56,7 @@ export const ADVANCED_COPY: Record<Lang, AdvancedCopy> = {
   it: {
     ecoTitle: "Regole di efficienza per le app in background",
     ecoDescription:
-      "Scegli app non critiche a priorità energetica ridotta mentre PC Tweaker è aperto. Le regole si sospendono quando l'app è interattiva; non sono un limite percentuale della CPU.",
+      "Scegli app non critiche a priorità energetica ridotta mentre WinCraft è aperto. Le regole si sospendono quando l'app è interattiva; non sono un limite percentuale della CPU.",
     ecoAdd: "Scegli eseguibile",
     ecoEmpty: "Nessuna regola per le app.",
     ecoOn: "Regole attive",
@@ -105,7 +105,7 @@ export const ADVANCED_COPY: Record<Lang, AdvancedCopy> = {
   fr: {
     ecoTitle: "Règles d'efficacité des applications en arrière-plan",
     ecoDescription:
-      "Choisissez des applications non critiques à priorité énergétique réduite tant que PC Tweaker est ouvert. Les règles se suspendent lorsque l'application devient interactive ; ce n'est pas un plafond CPU.",
+      "Choisissez des applications non critiques à priorité énergétique réduite tant que WinCraft est ouvert. Les règles se suspendent lorsque l'application devient interactive ; ce n'est pas un plafond CPU.",
     ecoAdd: "Choisir un exécutable",
     ecoEmpty: "Aucune règle d'application.",
     ecoOn: "Règles actives",
@@ -155,7 +155,7 @@ export const ADVANCED_COPY: Record<Lang, AdvancedCopy> = {
   es: {
     ecoTitle: "Reglas de eficiencia para apps en segundo plano",
     ecoDescription:
-      "Elige apps no críticas con menor prioridad energética mientras PC Tweaker está abierto. Las reglas se pausan cuando la app pasa a ser interactiva; no son un límite porcentual de CPU.",
+      "Elige apps no críticas con menor prioridad energética mientras WinCraft está abierto. Las reglas se pausan cuando la app pasa a ser interactiva; no son un límite porcentual de CPU.",
     ecoAdd: "Elegir ejecutable",
     ecoEmpty: "Aún no hay reglas de apps.",
     ecoOn: "Reglas activas",
@@ -204,7 +204,7 @@ export const ADVANCED_COPY: Record<Lang, AdvancedCopy> = {
   de: {
     ecoTitle: "Effizienzregeln für Hintergrund-Apps",
     ecoDescription:
-      "Wählen Sie unkritische Apps für eine niedrigere Energiepriorität, solange PC Tweaker geöffnet ist. Bei interaktiver Nutzung pausieren die Regeln; sie sind keine CPU-Prozentgrenze.",
+      "Wählen Sie unkritische Apps für eine niedrigere Energiepriorität, solange WinCraft geöffnet ist. Bei interaktiver Nutzung pausieren die Regeln; sie sind keine CPU-Prozentgrenze.",
     ecoAdd: "Programmdatei wählen",
     ecoEmpty: "Noch keine App-Regeln.",
     ecoOn: "Regeln aktiv",
@@ -254,7 +254,7 @@ export const ADVANCED_COPY: Record<Lang, AdvancedCopy> = {
   pt: {
     ecoTitle: "Regras de eficiência para apps em segundo plano",
     ecoDescription:
-      "Escolha apps não críticas com menor prioridade energética enquanto o PC Tweaker está aberto. As regras pausam quando a app fica interativa; não são um limite percentual da CPU.",
+      "Escolha apps não críticas com menor prioridade energética enquanto o WinCraft está aberto. As regras pausam quando a app fica interativa; não são um limite percentual da CPU.",
     ecoAdd: "Escolher executável",
     ecoEmpty: "Ainda não há regras de apps.",
     ecoOn: "Regras ativas",

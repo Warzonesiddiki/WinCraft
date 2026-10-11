@@ -200,7 +200,7 @@ export function PaywallModal({
     >
       <header className="pro-feature-header">
         <span className="pro-feature-brand">
-          <CrownIcon className="h-4 w-4" /> PC Tweaker Pro
+          <CrownIcon className="h-4 w-4" /> WinCraft Pro
         </span>
         <button className="pro-feature-close" onClick={onClose} aria-label={s.paywall.notNow}>
           <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">

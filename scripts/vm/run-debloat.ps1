@@ -6,7 +6,7 @@
   administrator session. Take a VM snapshot first; reinstalling is a Store
   action and is not automated.
 
-    .\run-debloat.ps1 -TestBuild 'C:\test\PC Tweaker.exe'
+    .\run-debloat.ps1 -TestBuild 'C:\test\WinCraft.exe'
 #>
 param(
     [Parameter(Mandatory)][string]$TestBuild,

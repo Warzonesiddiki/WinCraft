@@ -7,9 +7,9 @@ import { euro, PromoFine, PromoPrice, promoTerms, usePromo } from "../promo";
 export function AccessPricing() {
   const { free, pro, lifetime } = text.pricing;
   const promo = usePromo();
-  const annualOffer = promo.offer("pctweaker", "annual");
-  const monthlyOffer = promo.offer("pctweaker", "monthly");
-  const lifetimeOffer = promo.offer("pctweaker", "lifetime");
+  const annualOffer = promo.offer("wincraft", "annual");
+  const monthlyOffer = promo.offer("wincraft", "monthly");
+  const lifetimeOffer = promo.offer("wincraft", "lifetime");
 
   return (
     <section id="access" className="border-t border-white/5 px-5 py-24 md:px-12">

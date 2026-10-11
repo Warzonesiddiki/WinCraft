@@ -40,9 +40,9 @@ export type LicensePayload = {
   userId: string;
   isPro: boolean;
   plan: string | null;
-  /** Which ecosystem product this license speaks for ("pctweaker",
+  /** Which ecosystem product this license speaks for ("wincraft",
    *  "uninstaller", ...). Added for the multi-product ecosystem: deployed
-   *  PC Tweaker clients (<= 0.5.0) parse the payload with serde's default
+   *  WinCraft clients (<= 0.5.0) parse the payload with serde's default
    *  behaviour of ignoring unknown fields, and they verify the signature
    *  over the exact bytes before parsing — so adding this field is
    *  backward compatible with every license check already in the wild.

@@ -153,9 +153,9 @@ router.post("/", supportLimiter, async (req: Request, res: Response) => {
   try {
     await sendMail({
       to: SUPPORT_INBOX,
-      subject: singleLine(`[PC Tweaker support] ${subject}`),
+      subject: singleLine(`[WinCraft support] ${subject}`),
       html,
-      text: `New PC Tweaker support request\n\nName: ${name}\nEmail: ${email}\nCategory: ${CATEGORY_LABELS[category]}\nSubject: ${subject}\nSystem: ${systemInfo || "Not provided"}\n\n${message}`,
+      text: `New WinCraft support request\n\nName: ${name}\nEmail: ${email}\nCategory: ${CATEGORY_LABELS[category]}\nSubject: ${subject}\nSystem: ${systemInfo || "Not provided"}\n\n${message}`,
       replyTo: email,
     });
   } catch (err) {
@@ -178,17 +178,17 @@ router.post("/", supportLimiter, async (req: Request, res: Response) => {
   // recognise their own request.
   void sendMail({
     to: email,
-    subject: "We received your PC Tweaker support request",
+    subject: "We received your WinCraft support request",
     replyTo: SUPPORT_REPLY_TO,
     html: emailShell({
-      preheader: "Your message reached the PC Tweaker support team. We'll reply to this address.",
+      preheader: "Your message reached the WinCraft support team. We'll reply to this address.",
       eyebrow: "Support request received",
       headline: "We're on it.",
-      intro: `Hi ${name}, your message has reached the PC Tweaker support team. We'll reply to this email address.`,
+      intro: `Hi ${name}, your message has reached the WinCraft support team. We'll reply to this email address.`,
       note: "If you did not contact us, you can ignore this message.",
       footerNote: "Need to add a detail? Reply to this email. Never send your password or payment card details.",
     }),
-    text: `Hi ${name},\n\nYour message has reached the PC Tweaker support team. We'll reply to this email address.\n\nNeed to add a detail? Reply to this email. Never send your password or payment card details.\n\nIf you did not contact us, you can ignore this message.\n\nPC Tweaker`,
+    text: `Hi ${name},\n\nYour message has reached the WinCraft support team. We'll reply to this email address.\n\nNeed to add a detail? Reply to this email. Never send your password or payment card details.\n\nIf you did not contact us, you can ignore this message.\n\nWinCraft`,
   }).catch((err: Error) => console.error("support acknowledgement failed:", err.message));
 
   res.status(200).json({ ok: true });

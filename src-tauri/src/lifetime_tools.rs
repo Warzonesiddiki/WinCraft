@@ -48,7 +48,7 @@ fn require_lifetime(app_data: &Path) -> Result<(), String> {
     if allowed {
         Ok(())
     } else {
-        Err("These tools require a verified PC Tweaker Lifetime license. Connect to the internet and refresh your license in Account.".into())
+        Err("These tools require a verified WinCraft Lifetime license. Connect to the internet and refresh your license in Account.".into())
     }
 }
 
@@ -138,9 +138,9 @@ fn read_saved_profile(app_data: &Path, name: &str) -> Result<TweakProfile, Strin
         return Err("A selected profile exceeds the 256 KB size limit.".into());
     }
     let profile: TweakProfile = serde_json::from_slice(&bytes)
-        .map_err(|_| "A selected file is not a valid PC Tweaker profile.".to_string())?;
+        .map_err(|_| "A selected file is not a valid WinCraft profile.".to_string())?;
     if profile.format != 1 {
-        return Err("A selected profile uses an unsupported format. Save it again with this version of PC Tweaker.".into());
+        return Err("A selected profile uses an unsupported format. Save it again with this version of WinCraft.".into());
     }
     if profile.name != name {
         return Err(
@@ -256,7 +256,7 @@ fn build_report(catalog: &[TweakInfo], comparison: Option<&ProfileComparison>) -
     let mut recorded: Vec<&TweakInfo> = catalog.iter().filter(|tweak| tweak.applied).collect();
     recorded.sort_by(|a, b| a.id.cmp(&b.id));
     let mut report = format!(
-        "# PC Tweaker tuning report\n\nApp version: {}\n\nRecorded tweak entries: {} of {} in this version's catalog.\n\n## Scope\n\nThis is a point-in-time summary of PC Tweaker's saved configuration records. A recorded entry means a recovery snapshot exists; it can also represent an incomplete change awaiting recovery. It does not prove that a change completed, remains active in Windows, or improved performance. This report contains no FPS, frame-time, DPC latency, or before-and-after measurements.\n\n## Recorded settings\n\n",
+        "# WinCraft tuning report\n\nApp version: {}\n\nRecorded tweak entries: {} of {} in this version's catalog.\n\n## Scope\n\nThis is a point-in-time summary of WinCraft's saved configuration records. A recorded entry means a recovery snapshot exists; it can also represent an incomplete change awaiting recovery. It does not prove that a change completed, remains active in Windows, or improved performance. This report contains no FPS, frame-time, DPC latency, or before-and-after measurements.\n\n## Recorded settings\n\n",
         env!("CARGO_PKG_VERSION"), recorded.len(), catalog.len()
     );
     append_tweak_rows(&mut report, &recorded);
@@ -352,7 +352,7 @@ pub fn save_lifetime_report(
     let mut dialog = app
         .dialog()
         .file()
-        .set_title("Save PC Tweaker tuning report")
+        .set_title("Save WinCraft tuning report")
         .add_filter("Markdown", &["md"])
         .set_file_name("pc-tweaker-tuning-report.md");
     if let Some(window) = app.get_webview_window("main") {

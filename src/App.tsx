@@ -130,7 +130,7 @@ function App() {
       : { status: "anonymous" };
   });
 
-  // PC Tweaker is now free for everyone — every feature is unlocked
+  // WinCraft is now free for everyone — every feature is unlocked
   // regardless of account or subscription state.
   const isProUnlocked = true;
 
@@ -191,7 +191,7 @@ function App() {
   }
 
   /**
-   * PC Tweaker is now free for everyone — no license check is needed.
+   * WinCraft is now free for everyone — no license check is needed.
    * Kept as a no-op stub so call sites compile without changes and the
    * function can be removed in a future cleanup pass.
    */

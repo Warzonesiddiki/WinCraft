@@ -11,8 +11,8 @@ const router = express.Router();
  * Issues a freshly signed, short-lived entitlement for a desktop app.
  *
  * `?product=` names which ecosystem product is asking; it defaults to
- * "pctweaker" so every deployed PC Tweaker client keeps working unchanged.
- * Resolution goes through `productEntitlement`, which for pctweaker applies
+ * "wincraft" so every deployed WinCraft client keeps working unchanged.
+ * Resolution goes through `productEntitlement`, which for wincraft applies
  * the same lapsed-period logic as before (a missed cancellation webhook must
  * not keep granting access) and for newer products reads the entitlements
  * table with fail-closed semantics.
@@ -33,7 +33,7 @@ router.get(
       return;
     }
 
-    const product = req.query.product ?? "pctweaker";
+    const product = req.query.product ?? "wincraft";
     if (!isKnownProduct(product)) {
       res.status(400).json({ error: "unknown product" });
       return;

@@ -438,7 +438,7 @@ pub struct ResourceUser {
 pub struct ResourceUsers {
     pub cpu: Vec<ResourceUser>,
     pub memory: Vec<ResourceUser>,
-    /// PC Tweaker's own share of the machine (this process and the WebView2
+    /// WinCraft's own share of the machine (this process and the WebView2
     /// processes it started), and everything else's, over the same interval.
     pub own_cpu: Option<f32>,
     pub others_cpu: Option<f32>,

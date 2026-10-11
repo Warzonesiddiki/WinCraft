@@ -15,7 +15,7 @@ pub struct RamCleanResult {
     pub ram_total: u64,
 }
 
-/// Prefix of the error a scheduled pass returns when PC Tweaker is not running
+/// Prefix of the error a scheduled pass returns when WinCraft is not running
 /// as administrator: the schedule cannot ask for permission on its own.
 pub const NEEDS_ADMIN_PREFIX: &str = "NEEDS_ADMIN_SCHEDULE: ";
 
@@ -34,7 +34,7 @@ pub(crate) fn refusal(dir: &std::path::Path) -> Option<String> {
 /// The trim itself, for an elevated process.
 ///
 /// Earlier versions opened every process with `PROCESS_SET_QUOTA` and called
-/// `EmptyWorkingSet` on each. That right is outside what PC Tweaker requests
+/// `EmptyWorkingSet` on each. That right is outside what WinCraft requests
 /// from any process now, so the memory manager is asked to do the same work
 /// for the whole system in one call, without a single process handle.
 #[cfg(windows)]
@@ -114,7 +114,7 @@ pub fn clean_ram(
     }
     if scheduled == Some(true) {
         return Err(format!(
-            "{NEEDS_ADMIN_PREFIX}Automatic cleanup runs only while PC Tweaker has administrator rights."
+            "{NEEDS_ADMIN_PREFIX}Automatic cleanup runs only while WinCraft has administrator rights."
         ));
     }
     let path = dir.join(RESULT_FILE);

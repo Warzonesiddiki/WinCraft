@@ -1,8 +1,8 @@
 <p align="center">
-  <img src="src-tauri/icons/128x128@2x.png" width="112" alt="PC Tweaker logo">
+  <img src="src-tauri/icons/128x128@2x.png" width="112" alt="WinCraft logo">
 </p>
 
-<h1 align="center">PC Tweaker — Windows Tuning, Privacy and Maintenance</h1>
+<h1 align="center">WinCraft — Windows Tuning, Privacy and Maintenance</h1>
 
 <p align="center"><strong>Tune Windows with the changes in plain sight.</strong><br>Gaming, privacy and maintenance controls, with restore tools for supported settings.</p>
 
@@ -25,13 +25,13 @@
 
 <p align="center"><a href="#whats-new-in-115">What's new</a> · <a href="#what-you-can-do">Features</a> · <a href="#what-changes-on-your-system">What changes</a> · <a href="#free-for-everyone">Free for Everyone</a> · <a href="#download-integrity-and-code-signing">Code signing</a> · <a href="#build-from-source">Build from source</a></p>
 
-<p align="center"><img src="docs/screenshots/pc-tweaker-1.16-overview.png" alt="PC Tweaker 1.16 Overview in the default Graphite Ember theme, showing live CPU, memory and applied settings" width="85%"></p>
+<p align="center"><img src="docs/screenshots/pc-tweaker-1.16-overview.png" alt="WinCraft 1.16 Overview in the default Graphite Ember theme, showing live CPU, memory and applied settings" width="85%"></p>
 
-**Start with one task:** review a setting, read its trade-offs, apply it if appropriate, and use its restore control when supported. PC Tweaker is free and open source — all features included, no account required. See [what changes on your system](#what-changes-on-your-system) before tuning.
+**Start with one task:** review a setting, read its trade-offs, apply it if appropriate, and use its restore control when supported. WinCraft is free and open source — all features included, no account required. See [what changes on your system](#what-changes-on-your-system) before tuning.
 
 <p align="center">
   <a href="#safe-download-via-winget"><img src="https://img.shields.io/badge/Safe_download-via_Winget-1793D1?style=for-the-badge" alt="Safe download via Winget"></a>
-  <a href="https://pctweaker.app/#tip"><img src="https://img.shields.io/badge/%E2%98%95_Buy_me_a_coffee-Support_development-FF5500?style=for-the-badge&labelColor=1c1c1c" alt="Buy me a coffee — support PC Tweaker development"></a>
+  <a href="https://pctweaker.app/#tip"><img src="https://img.shields.io/badge/%E2%98%95_Buy_me_a_coffee-Support_development-FF5500?style=for-the-badge&labelColor=1c1c1c" alt="Buy me a coffee — support WinCraft development"></a>
 </p>
 
 <p align="center">Help fund the next release with a <a href="https://pctweaker.app/#tip"><strong>one-off coffee tip</strong></a>. No account required, no subscription.</p>
@@ -52,9 +52,9 @@ winget upgrade --id AurelioAvila.PCTweaker --exact
 
 Package catalogs can lag behind a release. Check the release version before installing. Windows 10/11 x64 is the current binary target; individual features depend on the Windows build, edition, drivers and available hardware. App compatibility does not extend Microsoft's support lifecycle for your operating system.
 
-## Closing and reopening PC Tweaker
+## Closing and reopening WinCraft
 
-Closing the window keeps PC Tweaker running in the Windows notification area. Click its icon to reopen it, or right-click and choose **Exit PC Tweaker** to quit. To make closing the window quit instead, clear **Keep running in the background** in the icon's menu. Windows may place the icon in its hidden-icons panel.
+Closing the window keeps WinCraft running in the Windows notification area. Click its icon to reopen it, or right-click and choose **Exit WinCraft** to quit. To make closing the window quit instead, clear **Keep running in the background** in the icon's menu. Windows may place the icon in its hidden-icons panel.
 
 ## What's new in 1.15
 
@@ -98,11 +98,11 @@ The catalog contains **81 controls: 46 Free and 35 Pro**. The five power-policy 
 
 These controls use Windows power APIs. Unsupported hybrid settings are refused before a system write. No FPS, DPC-latency or micro-stutter improvement is claimed without a workload-specific measurement.
 
-Restoration writes the previous effective AC value back to the original plan. If that value was inherited, it becomes an explicit plan value after restoration; later changes to Windows defaults will not automatically replace it. PC Tweaker does not change protected registry permissions or reset unrelated plan settings to remove that override.
+Restoration writes the previous effective AC value back to the original plan. If that value was inherited, it becomes an explicit plan value after restoration; later changes to Windows defaults will not automatically replace it. WinCraft does not change protected registry permissions or reset unrelated plan settings to remove that override.
 
 ## What changes on your system
 
-PC Tweaker can change registry values, power settings, services, startup entries and selected network settings. Other tools interact with files, Windows repair utilities, drivers or supported hardware controls. Administrator access is requested for operations that require it.
+WinCraft can change registry values, power settings, services, startup entries and selected network settings. Other tools interact with files, Windows repair utilities, drivers or supported hardware controls. Administrator access is requested for operations that require it.
 
 | Operation | Recovery scope |
 | --- | --- |
@@ -134,7 +134,7 @@ For useful comparisons, keep the game build, scene, settings, drivers, power sou
 
 ## Free for Everyone
 
-PC Tweaker is now completely free and open source under the MIT license. All features, all tweaks, all tools — no subscriptions, no paywalls, no accounts required. Just download and start optimizing.
+WinCraft is now completely free and open source under the MIT license. All features, all tweaks, all tools — no subscriptions, no paywalls, no accounts required. Just download and start optimizing.
 
 Every feature that was previously part of the Pro and Lifetime tiers is now available to everyone at no cost:
 
@@ -237,11 +237,11 @@ Use [support](https://pctweaker.app/support/) or email [support@pctweaker.app](m
 
 Tauri 2 and Rust · React and TypeScript · Express, PostgreSQL and Stripe.
 
-PC Tweaker is source-available under a **proprietary license**. Public source access does not make it an OSI-approved open-source project or grant unrestricted redistribution rights. See [LICENSE](LICENSE), [PRIVACY.md](PRIVACY.md) and [TERMS.md](TERMS.md).
+WinCraft is source-available under a **proprietary license**. Public source access does not make it an OSI-approved open-source project or grant unrestricted redistribution rights. See [LICENSE](LICENSE), [PRIVACY.md](PRIVACY.md) and [TERMS.md](TERMS.md).
 
 Created and maintained by **Aurelio Avila**.
 
 Lifetime includes everything in Pro, plus exclusive access to selected future tweaks, priority support, saved-profile comparison and portable tuning reports. Future exclusive tweaks will arrive in upcoming releases.
 
-PC Tweaker Lifetime includes Uninstaller Pro for 12 months from the first sign-in to Uninstaller with the same account, including existing Lifetime owners. No automatic renewal. Standalone Uninstaller licenses remain separate.
+WinCraft Lifetime includes Uninstaller Pro for 12 months from the first sign-in to Uninstaller with the same account, including existing Lifetime owners. No automatic renewal. Standalone Uninstaller licenses remain separate.
 

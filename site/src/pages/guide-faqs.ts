@@ -25,7 +25,7 @@ export const GUIDE_FAQS: Record<string, readonly GuideFaq[]> = {
       a: "Files and folders are moved to the Recycle Bin, so yes, from Windows itself. Per-user registry keys are deleted outright and are flagged as the one irreversible step before you confirm. Machine-wide registry keys are reported but never removed.",
     },
     {
-      q: "Is PC Tweaker Uninstaller free?",
+      q: "Is WinCraft Uninstaller free?",
       a: "Single uninstalls, the safety score, the removal brief, the restore-point attempt, the leftover scan and the Removal Ledger are free with no account. Cleaning the leftovers the scan finds and batch removal are Pro, at 9.99 euro per year.",
     },
   ],
@@ -35,7 +35,7 @@ export const GUIDE_FAQS: Record<string, readonly GuideFaq[]> = {
       a: "No. Microsoft documents that saving snapshots is off until you opt in, and Recall only exists on Copilot+ PCs that meet its hardware requirements. If Settings has no Recall & snapshots page, Recall is not installed on your PC.",
     },
     {
-      q: "Does the PC Tweaker control delete my existing snapshots?",
+      q: "Does the WinCraft control delete my existing snapshots?",
       a: "Microsoft states that snapshots previously saved on the device are deleted when the Turn off saving snapshots policy is applied, and that policy is what the Disable Recall control writes. If you want to keep them, export or review them before applying it.",
     },
     {
@@ -50,7 +50,7 @@ export const GUIDE_FAQS: Record<string, readonly GuideFaq[]> = {
   "/windows-11-optimizer": [
     {
       q: "Is it safe to use a Windows 11 optimizer?",
-      a: "It depends entirely on what the tool does and whether you can see it. A tool that applies documented settings one at a time, records the previous value and restores it on request is as safe as changing the setting yourself. A tool that runs a bundle of undisclosed changes behind one button, removes system packages or disables services in bulk is not, because nothing records what it did. PC Tweaker is built the first way; every control names the setting it writes.",
+      a: "It depends entirely on what the tool does and whether you can see it. A tool that applies documented settings one at a time, records the previous value and restores it on request is as safe as changing the setting yourself. A tool that runs a bundle of undisclosed changes behind one button, removes system packages or disables services in bulk is not, because nothing records what it did. WinCraft is built the first way; every control names the setting it writes.",
     },
     {
       q: "Will an optimizer make my games run faster?",
@@ -58,10 +58,10 @@ export const GUIDE_FAQS: Record<string, readonly GuideFaq[]> = {
     },
     {
       q: "Do I need to reinstall Windows to get the changes back?",
-      a: "No. Every setting PC Tweaker applies records the value it replaced, and the restore control writes that value back. Some changes, such as hardware-accelerated GPU scheduling, keeping the kernel in memory or the long-path limit, take effect after a restart in both directions. Cleanup, uninstall and driver actions are separate operations with their own recovery limits and are not settings.",
+      a: "No. Every setting WinCraft applies records the value it replaced, and the restore control writes that value back. Some changes, such as hardware-accelerated GPU scheduling, keeping the kernel in memory or the long-path limit, take effect after a restart in both directions. Cleanup, uninstall and driver actions are separate operations with their own recovery limits and are not settings.",
     },
     {
-      q: "Is PC Tweaker free?",
+      q: "Is WinCraft free?",
       a: "Yes. The Free plan needs no account and includes the controls listed on the home page as free; Pro adds the remaining controls and tools. The optimizations described on this page apply the same settings on either plan.",
     },
     {
@@ -71,12 +71,12 @@ export const GUIDE_FAQS: Record<string, readonly GuideFaq[]> = {
   ],
   "/how-to-undo-windows-tweaks": [
     {
-      q: "How do I undo a tweak I applied in PC Tweaker?",
+      q: "How do I undo a tweak I applied in WinCraft?",
       a: "Open the category it belongs to or the Change history, find the tweak and use its restore control. The app writes back the value it recorded when you applied the change, not a generic Windows default. If the description said a restart was needed to apply, a restart is needed to undo as well.",
     },
     {
-      q: "I changed the setting myself or with a script. Can PC Tweaker undo it?",
-      a: "Only if it recorded the previous value, which it can only have done for changes made through it. For a manual or scripted change, go back to the Windows setting or registry value and put back the value you had, from your own notes or a backup. PC Tweaker cannot reconstruct an unknown original value, and copying a value from another PC is a guess.",
+      q: "I changed the setting myself or with a script. Can WinCraft undo it?",
+      a: "Only if it recorded the previous value, which it can only have done for changes made through it. For a manual or scripted change, go back to the Windows setting or registry value and put back the value you had, from your own notes or a backup. WinCraft cannot reconstruct an unknown original value, and copying a value from another PC is a guess.",
     },
     {
       q: "I restored the setting and the problem is still there. What now?",

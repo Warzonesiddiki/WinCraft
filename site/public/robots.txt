@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://pctweaker.app/sitemap.xml
+Sitemap: https://wincraft.app/sitemap.xml

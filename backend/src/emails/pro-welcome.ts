@@ -13,7 +13,7 @@
 import { bulletRow, detailRow, emailShell, EMAIL_MUTED_TEXT } from "./layout";
 
 export type ProductBrand = {
-  /** Shown in the subject line and the footer, e.g. "PC Tweaker Pro". */
+  /** Shown in the subject line and the footer, e.g. "WinCraft Pro". */
   name: string;
   accent: string;
   siteUrl: string;
@@ -34,30 +34,30 @@ export type ProductBrand = {
 };
 
 export const PRODUCT_BRANDS: Record<string, ProductBrand> = {
-  pctweaker: {
-    name: "PC Tweaker Pro",
+  wincraft: {
+    name: "WinCraft Pro",
     accent: "#ff5500",
-    siteUrl: "https://pctweaker.app",
-    logoUrl: "https://pctweaker.app/logo.png",
+    siteUrl: "https://wincraft.app",
+    logoUrl: "https://wincraft.app/logo.png",
     eyebrow: "Pro activated",
     headline: "You're Pro now",
     intro:
-      "Thanks for subscribing to PC Tweaker Pro. Your account is upgraded and every Pro tweak is unlocked — no extra setup needed.",
+      "Thanks for subscribing to WinCraft Pro. Your account is upgraded and every Pro tweak is unlocked — no extra setup needed.",
     introOneOff:
-      "Thanks for buying PC Tweaker Pro. Your account is upgraded for good and every Pro tweak is unlocked — no extra setup needed.",
+      "Thanks for buying WinCraft Pro. Your account is upgraded for good and every Pro tweak is unlocked — no extra setup needed.",
     highlights: [
       "All 66 controls (39 Free, 27 Pro), including Turbo Gaming &amp; Game Sessions",
       "Duplicate &amp; large file finders, drive optimization",
       "Disable Recall &amp; Memory Integrity, classic right-click menu",
     ],
-    ctaLabel: "Open PC Tweaker",
+    ctaLabel: "Open WinCraft",
     signInHint: "Sign in with {email} to see your Pro tweaks.",
   },
   uninstaller: {
-    name: "PC Tweaker Uninstaller Pro",
+    name: "WinCraft Uninstaller Pro",
     accent: "#ff5500",
-    siteUrl: "https://pctweaker.app/uninstaller",
-    logoUrl: "https://pctweaker.app/logo.png",
+    siteUrl: "https://wincraft.app/uninstaller",
+    logoUrl: "https://wincraft.app/logo.png",
     eyebrow: "Pro activated",
     headline: "Uninstaller Pro is yours",
     intro:
@@ -75,7 +75,7 @@ export const PRODUCT_BRANDS: Record<string, ProductBrand> = {
 };
 
 export type ProWelcomeEmailInput = {
-  /** Which product was bought. Unknown values fall back to PC Tweaker rather
+  /** Which product was bought. Unknown values fall back to WinCraft rather
    *  than sending an email with holes in it. */
   product?: string;
   firstName: string;
@@ -97,14 +97,14 @@ function escapeHtml(value: string): string {
 }
 
 export function brandFor(product: string | null | undefined): ProductBrand {
-  return PRODUCT_BRANDS[product ?? ""] ?? PRODUCT_BRANDS.pctweaker;
+  return PRODUCT_BRANDS[product ?? ""] ?? PRODUCT_BRANDS.wincraft;
 }
 
 export function proWelcomeSubject(product?: string | null): string {
   const brand = brandFor(product);
   return product === "uninstaller"
     ? `Your ${brand.name} purchase is confirmed`
-    : "You're Pro now — welcome to PC Tweaker Pro";
+    : "You're Pro now — welcome to WinCraft Pro";
 }
 
 export function proWelcomeText({ product, firstName, email, plan, priceLabel, renewsOn }: ProWelcomeEmailInput): string {

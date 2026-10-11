@@ -434,7 +434,7 @@ function BeforeAfterContent({ s, lang, tweaks, pushToast }: PanelProps) {
     (ch) => TIMED.has(ch.id) && Math.max(ch.beforeSpreadPct ?? 0, ch.afterSpreadPct ?? 0) > 20,
   );
 
-  // What PC Tweaker changed between the two measurements, from its own log.
+  // What WinCraft changed between the two measurements, from its own log.
   const between = useMemo(() => {
     if (!data?.before) return [];
     const from = data.before.ts;

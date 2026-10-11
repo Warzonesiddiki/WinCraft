@@ -1,6 +1,6 @@
-# pc-tweaker-backend
+# wincraft-backend
 
-Node/Express API for PC Tweaker, written in TypeScript: email/password
+Node/Express API for WinCraft, written in TypeScript: email/password
 accounts (bcrypt + JWT) and Stripe Checkout for the Pro subscription. Boots
 cleanly even without a database or Stripe configured — routes that need them
 return a clear 503 instead of crashing, so you can deploy incrementally.
@@ -118,7 +118,7 @@ Never use `pgmem` outside of local testing — data doesn't persist across resta
 ## Setting up Stripe
 
 1. Dashboard → Product catalog → create a product with a **one-time** price
-   (not recurring) — e.g. "PC Tweaker Pro — €9.99". Copy its `price_...` ID
+   (not recurring) — e.g. "WinCraft Pro — €9.99". Copy its `price_...` ID
    into `STRIPE_PRICE_ID`.
 2. Dashboard → Developers → API keys → copy the **secret** key (`sk_...`)
    into `STRIPE_SECRET_KEY`. Never put this in the desktop app — it only
@@ -133,7 +133,7 @@ Never use `pgmem` outside of local testing — data doesn't persist across resta
 5. `CHECKOUT_SUCCESS_URL`/`CHECKOUT_CANCEL_URL` just need to be pages you
    control (can be a single static "thanks, go back to the app" page) —
    Stripe Checkout opens in the user's system browser, not inside the
-   desktop app, so these don't need to be inside PC Tweaker itself.
+   desktop app, so these don't need to be inside WinCraft itself.
 
 ## What's intentionally not here
 

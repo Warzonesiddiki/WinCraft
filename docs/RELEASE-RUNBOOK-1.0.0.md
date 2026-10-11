@@ -3,7 +3,7 @@
 Prepared 2026-08-21, executed on the owner's explicit "rilascia".
 Everything below is already built, signed, and verified locally; the run
 is push + publish only. Order matters: the Uninstaller goes first so the
-PC Tweaker release notes' link to it lands on a live release.
+WinCraft release notes' link to it lands on a live release.
 
 ## Pre-flight (already done)
 
@@ -22,7 +22,7 @@ PC Tweaker release notes' link to it lands on a live release.
       `RELEASE-NOTES-0.2.0.md` (uninstaller). Announcement copy in
       `docs/ANNOUNCEMENT-1.0.0.md`.
 
-## Execution — PC Tweaker Uninstaller 0.2.0 (first)
+## Execution — WinCraft Uninstaller 0.2.0 (first)
 
 ```bash
 cd ~/Desktop/pc-tweaker-uninstaller
@@ -30,16 +30,16 @@ git push origin master
 git tag v0.2.0 && git push origin v0.2.0
 node scripts/make-latest-json.mjs RELEASE-NOTES-0.2.0.md
 gh release create v0.2.0 \
-  --title "PC Tweaker Uninstaller 0.2.0 — Removal Intelligence" \
+  --title "WinCraft Uninstaller 0.2.0 — Removal Intelligence" \
   --notes-file RELEASE-NOTES-0.2.0.md \
-  "src-tauri/target/release/bundle/nsis/PC Tweaker Uninstaller_0.2.0_x64-setup.exe" \
-  "src-tauri/target/release/bundle/nsis/PC Tweaker Uninstaller_0.2.0_x64-setup.exe.sig" \
-  "src-tauri/target/release/bundle/msi/PC Tweaker Uninstaller_0.2.0_x64_en-US.msi" \
-  "src-tauri/target/release/bundle/msi/PC Tweaker Uninstaller_0.2.0_x64_en-US.msi.sig" \
+  "src-tauri/target/release/bundle/nsis/WinCraft Uninstaller_0.2.0_x64-setup.exe" \
+  "src-tauri/target/release/bundle/nsis/WinCraft Uninstaller_0.2.0_x64-setup.exe.sig" \
+  "src-tauri/target/release/bundle/msi/WinCraft Uninstaller_0.2.0_x64_en-US.msi" \
+  "src-tauri/target/release/bundle/msi/WinCraft Uninstaller_0.2.0_x64_en-US.msi.sig" \
   "src-tauri/target/release/bundle/nsis/latest.json"
 ```
 
-## Execution — PC Tweaker 1.0.0
+## Execution — WinCraft 1.0.0
 
 ```bash
 cd ~/Desktop/pc-tweaker-app
@@ -50,7 +50,7 @@ cd src-tauri/target/release/bundle/nsis
 cp pc-tweaker-app_1.0.0_x64-setup.exe PCTweaker-Setup.exe   # stable-URL alias, as in 0.5.0
 cd ../msi && cp pc-tweaker-app_1.0.0_x64_en-US.msi PCTweaker-Setup.msi && cd ../../../..
 gh release create v1.0.0 \
-  --title "PC Tweaker 1.0.0 — Control Room" \
+  --title "WinCraft 1.0.0 — Control Room" \
   --notes-file RELEASE-NOTES-1.0.0.md \
   src-tauri/target/release/bundle/nsis/pc-tweaker-app_1.0.0_x64-setup.exe \
   src-tauri/target/release/bundle/nsis/pc-tweaker-app_1.0.0_x64-setup.exe.sig \
@@ -75,10 +75,10 @@ gh release create v0.1.8 \
 ## Post-release verification (all three)
 
 1. `gh release view v1.0.0 --json assets` — latest.json + setup.exe + .sig present.
-2. Open the installed PC Tweaker 0.5.0 → the update banner must offer
+2. Open the installed WinCraft 0.5.0 → the update banner must offer
    1.0.0; install through it end-to-end (this is the real updater test).
 3. Install Uninstaller 0.2.0 from its setup.exe; confirm it runs and the
-   suite pill opens PC Tweaker.
+   suite pill opens WinCraft.
 4. Check `https://github.com/.../releases/latest/download/latest.json`
    resolves for both repos.
 

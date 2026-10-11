@@ -1,4 +1,4 @@
-//! Opt-in, process-local EcoQoS rules. The watcher exists only while PC Tweaker is open.
+//! Opt-in, process-local EcoQoS rules. The watcher exists only while WinCraft is open.
 use serde::{Deserialize, Serialize};
 use std::collections::{HashMap, HashSet};
 use std::path::{Path, PathBuf};
@@ -641,7 +641,7 @@ fn tick(
         let owner_is_self =
             record.owner_pid == owner_pid && record.owner_creation == owner_creation;
         if !owner_is_self {
-            // Another live PC Tweaker instance retains ownership. Avoid two
+            // Another live WinCraft instance retains ownership. Avoid two
             // watchers racing. Answered from the process table, not a handle.
             let old_owner_alive = table
                 .iter()
@@ -649,7 +649,7 @@ fn tick(
             if old_owner_alive {
                 recovery_failed = true;
                 status.last_error =
-                    Some("Another PC Tweaker process owns EcoQoS recovery".to_string());
+                    Some("Another WinCraft process owns EcoQoS recovery".to_string());
                 continue;
             }
         }
