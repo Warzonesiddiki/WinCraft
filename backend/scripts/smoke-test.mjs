@@ -1,5 +1,5 @@
 /**
- * End-to-end smoke test against a running PC Tweaker backend.
+ * End-to-end smoke test against a running WinCraft backend.
  *
  * Exercises the whole path a real customer takes — register, verify, log in,
  * read the account, reset a password, start a Stripe checkout — plus the

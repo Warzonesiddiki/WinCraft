@@ -2634,7 +2634,7 @@ mod tests {
         assert!(!ids.is_empty(), "catalogue must not be empty");
 
         let dir = std::env::temp_dir().join(format!(
-            "pc-tweaker-free-for-all-test-{}-{}",
+            "wincraft-free-for-all-test-{}-{}",
             std::process::id(),
             std::time::SystemTime::now()
                 .duration_since(std::time::UNIX_EPOCH)
@@ -2655,7 +2655,7 @@ mod tests {
     #[test]
     fn cleanup_gates_hold_without_a_license() {
         let dir = std::env::temp_dir().join(format!(
-            "pc-tweaker-cleanup-gate-test-{}",
+            "wincraft-cleanup-gate-test-{}",
             std::process::id()
         ));
         assert_eq!(authorize_cleanup(&dir, "temp_cleanup"), Ok(false));
@@ -2746,7 +2746,7 @@ mod tests {
             .expect("test is meaningless without at least one free tweak");
 
         let dir = std::env::temp_dir().join(format!(
-            "pc-tweaker-license-wiring-test-free-{}-{}",
+            "wincraft-license-wiring-test-free-{}-{}",
             std::process::id(),
             std::time::SystemTime::now()
                 .duration_since(std::time::UNIX_EPOCH)

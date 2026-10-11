@@ -33,7 +33,7 @@
     </Support_Info>
   </Company_Info>
   <Program_Info>
-    <Program_Name>PC Tweaker</Program_Name>
+    <Program_Name>WinCraft</Program_Name>
     <Program_Version>1.16.1</Program_Version>
     <Program_Release_Month>10</Program_Release_Month>
     <Program_Release_Day>07</Program_Release_Day>
@@ -60,19 +60,19 @@
       <Expire_Day></Expire_Day>
       <Expire_Year></Expire_Year>
     </Expire_Info>
-    <Program_Change_Info>PC Tweaker 1.16.1 is a routine maintenance update.</Program_Change_Info>
+    <Program_Change_Info>WinCraft 1.16.1 is a routine maintenance update.</Program_Change_Info>
     <Program_Category_Class>System Utilities::System Maintenance</Program_Category_Class>
     <Program_Specific_Category></Program_Specific_Category>
     <Program_System_Requirements>Windows 10/11 x64; internet for accounts, updates and supported online features.</Program_System_Requirements>
   </Program_Info>
   <Program_Descriptions>
     <English>
-      <Keywords>Windows tuning,Windows privacy,PC maintenance,gaming settings,restore settings,PC Tweaker,Aurelio Avila</Keywords>
+      <Keywords>Windows tuning,Windows privacy,PC maintenance,gaming settings,restore settings,WinCraft,Aurelio Avila</Keywords>
       <Char_Desc_45>Windows tuning, privacy and maintenance.</Char_Desc_45>
       <Char_Desc_80>Review Windows tuning, privacy and maintenance settings before applying changes.</Char_Desc_80>
       <Char_Desc_250>Review Windows tuning, privacy and maintenance settings before applying changes. By Aurelio Avila. Current signed Windows download; free and paid access are documented officially.</Char_Desc_250>
       <Char_Desc_450>Review Windows tuning, privacy and maintenance settings before applying changes. By Aurelio Avila. Review limitations and access requirements on the official product page. Windows downloads are publisher-signed and timestamped; signing is not a safety guarantee. Screenshots show the app and may reflect an earlier release.</Char_Desc_450>
-      <Char_Desc_2000>PC Tweaker by Aurelio Avila brings Windows tuning, privacy settings and maintenance tools into one desktop app. Review the effect and trade-offs before applying a setting. Restore controls cover supported settings; cleanup, repair and driver operations have different recovery limits. Core tools are free without an account; advanced Pro tools are paid. No universal FPS or performance gain is promised. Official Windows binaries are signed and timestamped. Code signing identifies the publisher and detects changes; it does not guarantee security or eliminate SmartScreen warnings.</Char_Desc_2000>
+      <Char_Desc_2000>WinCraft by Aurelio Avila brings Windows tuning, privacy settings and maintenance tools into one desktop app. Review the effect and trade-offs before applying a setting. Restore controls cover supported settings; cleanup, repair and driver operations have different recovery limits. Core tools are free without an account; advanced Pro tools are paid. No universal FPS or performance gain is promised. Official Windows binaries are signed and timestamped. Code signing identifies the publisher and detects changes; it does not guarantee security or eliminate SmartScreen warnings.</Char_Desc_2000>
     </English>
   </Program_Descriptions>
   <Web_Info>

@@ -9,8 +9,8 @@ Example `video-name.json`:
 
 ```json
 {
-  "title": "PC Tweaker - real tweaks for Windows",
-  "description": "Every tweak has automatic rollback.\n\nSearch 'PC Tweaker' - link in bio.\n\n#Shorts #Windows #PCOptimization",
+  "title": "WinCraft - real tweaks for Windows",
+  "description": "Every tweak has automatic rollback.\n\nSearch 'WinCraft' - link in bio.\n\n#Shorts #Windows #PCOptimization",
   "tags": ["windows tweak", "pc optimizer", "windows optimization", "gaming performance"]
 }
 ```

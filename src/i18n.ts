@@ -11176,7 +11176,7 @@ export function localeOf(lang?: string): string | undefined {
 }
 
 export function detectInitialLang(): Lang {
-  const stored = localStorage.getItem("pc-tweaker-lang");
+  const stored = localStorage.getItem("wincraft-lang");
   if (stored && Object.prototype.hasOwnProperty.call(STRINGS, stored)) return stored as Lang;
   return "en";
 }

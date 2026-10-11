@@ -76,7 +76,7 @@ async function main() {
   const unresolved = [];
   const claimed = new Set();
 
-  console.log(`\n=== PC Tweaker Pro — ${users.length} accounts with a Pro signal ===\n`);
+  console.log(`\n=== WinCraft Pro — ${users.length} accounts with a Pro signal ===\n`);
   for (const user of users) {
     const billing = live.find(
       (s) =>

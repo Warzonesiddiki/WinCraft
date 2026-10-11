@@ -103,7 +103,7 @@ const uninstallerApp = [...uninstaller.matchAll(/<script type="application\/ld\+
   .map((match) => JSON.parse(match[1]))
   .find((item) => item["@type"] === "SoftwareApplication");
 assert.ok(uninstallerApp, "Uninstaller page must carry its own SoftwareApplication");
-assert.equal(uninstallerApp.name, "PC Tweaker Uninstaller");
+assert.equal(uninstallerApp.name, "WinCraft Uninstaller");
 assert.deepEqual(
   uninstallerApp.offers.map((offer) => offer.price).sort(),
   ["0", "9.99"],

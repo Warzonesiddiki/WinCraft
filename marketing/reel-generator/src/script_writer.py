@@ -1,9 +1,9 @@
 """
-Turns curated PC Tweaker content into a voiced Reels script. Free local
+Turns curated WinCraft content into a voiced Reels script. Free local
 templates only (no Claude/paid API - matches the getcertsprint bot's
 "free templates only" configuration). Every script ends with the exact
 CTA convention already used in this project's hand-made videos: "Search
-'PC Tweaker', link in bio" - never a spoken URL, Reels/TikTok can't carry
+'WinCraft', link in bio" - never a spoken URL, Reels/TikTok can't carry
 a clickable link in the video itself.
 
 Every builder returns (script, item_word_starts): item_word_starts is the
@@ -127,11 +127,11 @@ REACTIONS = {
 # offers nothing). The save/share variants stay because those are the actions
 # ranking weighs most, but they too now say WHAT you get by opening the link.
 CTA = [
-    "PC Tweaker fixes everything you just saw in one click, and it's free to try. Link in bio.",
-    "You could change all of this by hand, or let PC Tweaker do it in one click. Free, link in bio.",
-    "Every tweak you just saw is one click in PC Tweaker, and one click to undo. Link in bio.",
-    "PC Tweaker shows you exactly what it changes before it touches anything. Free to try, link in bio.",
-    "Save this before you forget, then let PC Tweaker do it for you in one click. Link in bio.",
+    "WinCraft fixes everything you just saw in one click, and it's free to try. Link in bio.",
+    "You could change all of this by hand, or let WinCraft do it in one click. Free, link in bio.",
+    "Every tweak you just saw is one click in WinCraft, and one click to undo. Link in bio.",
+    "WinCraft shows you exactly what it changes before it touches anything. Free to try, link in bio.",
+    "Save this before you forget, then let WinCraft do it for you in one click. Link in bio.",
     "Send this to whoever's PC is a mess right now, the one-click fix is in the bio.",
     # Added 2026-08-19: the one CTA that points explicitly at verifiability
     # (source-available and independently listed) rather than repeating "free,

@@ -410,7 +410,7 @@ pub fn notify(reverted_count: usize) -> Result<(), String> {
     // The AppID has to be one Windows already knows, or the toast is dropped
     // with no error at all - which is how this nearly shipped broken. It
     // looked for a Start Menu shortcut named "WinCraft.lnk" while the
-    // installer writes "pc-tweaker-app.lnk", so every notification would have
+    // installer writes "wincraft.lnk", so every notification would have
     // borrowed Windows PowerShell's identity and arrived as PowerShell
     // talking about tweaks.
     //

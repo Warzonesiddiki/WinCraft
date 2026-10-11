@@ -1,5 +1,5 @@
 """
-Curated content pools for PC Tweaker Reels. Grounded entirely in
+Curated content pools for WinCraft Reels. Grounded entirely in
 marketing/video-scripts.md (real 2026 research already done for this
 niche: hook formulas, direct competitors, posting notes, KB5121003 -
 Windows 11's August 2026 update) and README.md (real app features) -
@@ -222,9 +222,9 @@ FALLBACK = {
     ],
     "contrarian": [
         "Most PC optimizer tools change registry values with no real way to undo them if something breaks.",
-        "PC Tweaker shows you exactly what each tweak modifies before you apply it, not a vague optimize now button.",
-        "Every tweak in PC Tweaker saves the original value first, so you can roll it back with one click.",
-        "PC Tweaker installs through winget, the official Windows package manager, not a random exe from a website.",
+        "WinCraft shows you exactly what each tweak modifies before you apply it, not a vague optimize now button.",
+        "Every tweak in WinCraft saves the original value first, so you can roll it back with one click.",
+        "WinCraft installs through winget, the official Windows package manager, not a random exe from a website.",
         "The app itself never runs with admin rights, it only asks for a one time permission for the specific tweak you approve.",
         # Added 2026-08-19 (feedback: these tools "get criticised a lot...
         # they need to be less stupid and more genuinely useful", plus a real
@@ -236,8 +236,8 @@ FALLBACK = {
         # not one more line of self-reassurance. Facts verifiable from
         # README.md, nothing invented: it is NOT open source (source-available
         # licence, not MIT/GPL), so it must never be called "open source".
-        "PC Tweaker isn't open source, but the code is source-available for anyone to review, and it's listed independently on MajorGeeks and Softpedia, not just self-hosted.",
-        "The Windows package manager only lists PC Tweaker because a Microsoft-reviewed pull request approved it into winget-pkgs, the same community repo every legit app goes through.",
+        "WinCraft isn't open source, but the code is source-available for anyone to review, and it's listed independently on MajorGeeks and Softpedia, not just self-hosted.",
+        "The Windows package manager only lists WinCraft because a Microsoft-reviewed pull request approved it into winget-pkgs, the same community repo every legit app goes through.",
         "78 automated tests run on every single code change before it ships, covering the exact rollback logic that undoes a tweak.",
     ],
     "beforeafter": [

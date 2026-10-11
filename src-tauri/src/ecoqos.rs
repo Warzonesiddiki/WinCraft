@@ -919,7 +919,7 @@ mod tests {
     #[test]
     fn recovery_is_durable_and_rejects_ambiguous_ownership() {
         let dir = std::env::temp_dir().join(format!(
-            "pc-tweaker-ecoqos-test-{}-{:?}",
+            "wincraft-ecoqos-test-{}-{:?}",
             std::process::id(),
             std::thread::current().id()
         ));

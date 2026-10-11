@@ -1,4 +1,4 @@
-# TikTok/Reels video scripts — PC Tweaker
+# TikTok/Reels video scripts — WinCraft
 
 Format: 15-30s, vertical 9:16, screen recording of the app + optional webcam/voice.
 Recording: Win+Alt+R (Xbox Game Bar) or OBS at 1080x1920/60fps on the app in a
@@ -40,13 +40,13 @@ templates).
 **Shot list:**
 1. (0-3s) Hook as above — visual pattern interrupt (jerky mouse) + audio + text
 2. (3-7s) Text: "It's called 'Enhance Pointer Precision' — on by default on EVERY Windows"
-3. (7-14s) Screen recording: open PC Tweaker -> Gaming category -> "Reduce input
+3. (7-14s) Screen recording: open WinCraft -> Gaming category -> "Reduce input
    lag" toggle -> show the automatic rollback (hover over it, show that it saves
    the previous state before applying)
 4. (14-20s) The same mouse movement as before, now linear and precise -
    before/after split screen in CapCut if possible
 5. (20-24s) Text: "Free, one click, 100% reversible — unlike other tools, you don't touch anything you can't undo"
-6. (24-28s) Spoken CTA + text: "Search for 'PC Tweaker' — link in bio"
+6. (24-28s) Spoken CTA + text: "Search for 'WinCraft' — link in bio"
 
 **Caption:**
 "Windows turns this setting on by default and nobody ever turns it off 🎯 #pcgaming #windowstips #pctweaks #gamingsetup #fps"
@@ -61,9 +61,9 @@ templates).
 
 **Shot list:**
 1. (3-9s) **#1 Xbox Game Bar** — show Task Manager with the overlay running, then
-   the toggle in PC Tweaker that disables it
+   the toggle in WinCraft that disables it
 2. (9-15s) **#2 Balanced power plan** — show Windows' powercfg, then the "High
-   Performance" toggle in PC Tweaker
+   Performance" toggle in WinCraft
 3. (15-21s) **#3 HAGS disabled** — explain in two words (GPU scheduling), show
    the toggle
 4. (21-26s) Text: "All 3 in one click with the 'Turbo Gaming' preset"
@@ -113,7 +113,7 @@ highest reach potential, because it hooks into existing communities.
 **Shot list:**
 1. (3-10s) Honesty: "They're great tools, but almost none of them has a real
    rollback — if something goes wrong you have to reinstall Windows"
-2. (10-18s) Show PC Tweaker's one-click rollback in action
+2. (10-18s) Show WinCraft's one-click rollback in action
 3. (18-24s) Show the UI (a clear list of categories) against a terminal script
 4. (24-28s) CTA
 
@@ -140,7 +140,7 @@ is no longer accurate:
   upgrade anyway over bugs, AI intrusiveness and a perception of worse
   performance — Microsoft has effectively admitted that a huge slice of users
   will stay on Windows 10 for a long time yet. ([windowslatest.com](https://www.windowslatest.com/2026/06/25/windows-10-support-quietly-extended-until-oct-2027-as-users-reject-windows-11/), [cybernews.com](https://cybernews.com/tech/microsoft-windows-10-update-program-extended/))
-- **Why it is a useful angle for PC Tweaker**: it is not "buy a new PC", it is the
+- **Why it is a useful angle for WinCraft**: it is not "buy a new PC", it is the
   opposite — a huge audience (still on Windows 10, often on older hardware that
   cannot be upgraded to Windows 11) needs more performance out of the hardware
   they already have, not a replacement for it. That is the perfect target for an
@@ -174,11 +174,11 @@ potential for catching people currently searching "Windows 10 end of support" /
 3. (9-15s) Text: "Why? Millions of PCs can't upgrade to Windows 11 (it needs TPM
    2.0) and plenty of others don't want to"
 4. (15-21s) Pivot to the product: "If your PC is staying on Windows 10 for a
-   while, keep it fast anyway" -> screen recording: open PC Tweaker, show a
+   while, keep it fast anyway" -> screen recording: open WinCraft, show a
    performance preset (e.g. "Turbo Gaming" or a dedicated category)
 5. (21-26s) Show the one-click rollback (consistent with the rest of the channel
    — the "safe, reversible" message)
-6. (26-28s) Spoken CTA + text: "Search for 'PC Tweaker' — link in bio"
+6. (26-28s) Spoken CTA + text: "Search for 'WinCraft' — link in bio"
 
 **Caption:**
 "Windows 10 does NOT end in October 2026 like you think (Microsoft quietly extended it to October 2027) — but it's still worth keeping it fast 💻 #windows10 #windowsupdate #pctips #pcoptimization #tech"
@@ -239,10 +239,10 @@ performance.
 3. (9-15s) Text: "No new GPUs this year to go with it (RTX 60 pushed to 2028) —
    so no excuse to buy new hardware"
 4. (15-21s) Pivot to the product: "Whatever version you're on, your PC can be
-   faster today" -> screen recording: open PC Tweaker, show the categories
+   faster today" -> screen recording: open WinCraft, show the categories
    (Performance/Gaming/Privacy/UI)
 5. (21-26s) Show the one-click rollback (consistent with the rest of the channel)
-6. (26-28s) Spoken CTA + text: "Search for 'PC Tweaker' — link in bio"
+6. (26-28s) Spoken CTA + text: "Search for 'WinCraft' — link in bio"
 
 **Caption:**
 "Windows 11 26H2 lands late September/October — it's not the revolution you're seeing everywhere, but it's still worth keeping your PC fast 🖥️ #windows11 #windowsupdate #pctips #pcoptimization #tech"
@@ -306,10 +306,10 @@ Profile" right now.
    Windows 11 24H2/25H2 — there's no switch to look for"
 4. (14-21s) Pivot to the product: "But everything else that slows the PC down —
    a startup list full of programs, Game DVR, the balanced power plan — Windows
-   doesn't touch on its own" -> screen recording: open PC Tweaker, show the
+   doesn't touch on its own" -> screen recording: open WinCraft, show the
    startup program list or the "Turbo Gaming" preset
 5. (21-26s) Show the one-click rollback (consistent with the rest of the channel)
-6. (26-28s) Spoken CTA + text: "Search for 'PC Tweaker' — link in bio"
+6. (26-28s) Spoken CTA + text: "Search for 'WinCraft' — link in bio"
 
 **Caption:**
 "Windows 11 just got faster on its own (Low Latency Profile, August 2026) — but the rest is still on you 🚀 #windows11 #windowsupdate #pcoptimization #pctips #tech"
@@ -344,7 +344,7 @@ which still needs a verifiable fact here, not just the trend).
   explain what the feature actually does before an alarmist clickbait headline
   does — consistent with Video 4 (honesty about Microsoft features, not
   contempt). ([techradar.com](https://www.techradar.com/computing/windows/hate-copilot-in-windows-11-free-privacy-tools-can-now-get-rid-of-the-ai))
-- **Careful**: PC Tweaker does NOT have (and this script must not promise) a tweak
+- **Careful**: WinCraft does NOT have (and this script must not promise) a tweak
   to disable Copilot Actions — the feature is already disabled by a single native
   Windows toggle, so a dedicated tweak in the app is unnecessary. The honest
   pivot is towards the **Privacy** category the app already has today (see
@@ -375,11 +375,11 @@ headlines like "your AI already controls everything".
 3. (9-15s) Text: "It's off by default — you turn it on by hand in Settings, one
    switch, and it needs administrator permissions"
 4. (15-21s) Pivot to the product: "If instead you want to cut down what Windows
-   collects about you TODAY (not in a year)" -> screen recording: open PC Tweaker
+   collects about you TODAY (not in a year)" -> screen recording: open WinCraft
    -> Privacy category -> show the real toggles (diagnostic data, advertising ID,
    location)
 5. (21-26s) Show the one-click rollback (consistent with the rest of the channel)
-6. (26-28s) Spoken CTA + text: "Search for 'PC Tweaker' — link in bio"
+6. (26-28s) Spoken CTA + text: "Search for 'WinCraft' — link in bio"
 
 **Caption:**
 "Microsoft is testing an AI that uses your PC for you (preview only for now, off by default) — meanwhile, you stay in control of what Windows collects 🤖 #windows11 #ai #copilot #privacy #pctips"
@@ -446,8 +446,8 @@ is among the best-performing formulas in 2026).
    instead of everything in KB"
 5. (19-24s) Pivot to the product: "But the settings that really slow the PC down
    — startup programs, power plan, Game DVR — are still yours to fix"
-   -> screen recording: open PC Tweaker
-6. (24-27s) Spoken CTA + text: "Search for 'PC Tweaker' — link in bio"
+   -> screen recording: open WinCraft
+6. (24-27s) Spoken CTA + text: "Search for 'WinCraft' — link in bio"
 
 **Caption:**
 "Windows 11's August 2026 update (KB5121003) changed more than it looks — external fingerprint readers, uninstallable AI on Copilot+, File Explorer finally readable 📋 #windows11 #windowsupdate #pctips #techtok #windows11tips"

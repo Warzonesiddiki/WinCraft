@@ -1,4 +1,4 @@
-# PC Tweaker — Product Hunt & AlternativeTo submission kit
+# WinCraft — Product Hunt & AlternativeTo submission kit
 
 Everything below is copy-paste ready. Screenshots for the gallery are in this
 same folder (`01-scan.png` … `05-maintenance.png`), plus `app_icon_1024.png`
@@ -19,7 +19,7 @@ same folder (`01-scan.png` … `05-maintenance.png`), plus `app_icon_1024.png`
 
 **Description** (main body):
 
-> PC Tweaker applies real Windows tweaks — registry, power plan, network DNS,
+> WinCraft applies real Windows tweaks — registry, power plan, network DNS,
 > services, files — across five categories: Performance, Gaming, Privacy,
 > Maintenance, and Interface. Nothing is simulated.
 >
@@ -46,7 +46,7 @@ same folder (`01-scan.png` … `05-maintenance.png`), plus `app_icon_1024.png`
 
 > Hey Product Hunt 👋
 >
-> I built PC Tweaker because every "PC optimizer" I'd used either did
+> I built WinCraft because every "PC optimizer" I'd used either did
 > nothing measurable or changed things I couldn't easily undo. So the one
 > rule I held myself to: every tweak snapshots the previous value first,
 > full stop — that's the whole premise of the app.
@@ -66,7 +66,7 @@ same folder (`01-scan.png` … `05-maintenance.png`), plus `app_icon_1024.png`
 
 ## AlternativeTo
 
-**App name:** PC Tweaker
+**App name:** WinCraft
 
 **Short description** (1-2 sentences, shown in search results):
 > Windows performance, privacy, gaming and maintenance tweaks with automatic

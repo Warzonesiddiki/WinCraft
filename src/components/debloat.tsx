@@ -248,7 +248,7 @@ export function DebloatPanel({
   /** Saves the chosen apps as a list (catalogue ids only). */
   async function saveList() {
     const path = await saveFileDialog({
-      defaultPath: "pc-tweaker-debloat-list.json",
+      defaultPath: "wincraft-debloat-list.json",
       filters: [{ name: "JSON", extensions: ["json"] }],
     }).catch(() => null);
     if (!path) return;

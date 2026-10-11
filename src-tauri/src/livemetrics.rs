@@ -653,7 +653,7 @@ mod tests {
         };
         let before = [
             p(0, "Idle", 0, 0, 0),
-            p(100, "pc-tweaker.exe", 10, 0, 0),
+            p(100, "wincraft.exe", 10, 0, 0),
             child(101, 100, "msedgewebview2.exe", 11, 0),
             child(102, 101, "msedgewebview2.exe", 12, 0),
             p(200, "vboxheadless.exe", 5, 0, 0),
@@ -661,7 +661,7 @@ mod tests {
         // One second on 4 cores: 4e7 ticks is the whole machine.
         let now = [
             p(0, "Idle", 0, 30_000_000, 0),
-            p(100, "pc-tweaker.exe", 10, 400_000, 0),
+            p(100, "wincraft.exe", 10, 400_000, 0),
             child(101, 100, "msedgewebview2.exe", 11, 200_000),
             child(102, 101, "msedgewebview2.exe", 12, 200_000),
             p(200, "vboxheadless.exe", 5, 8_000_000, 0),

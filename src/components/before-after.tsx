@@ -462,7 +462,7 @@ function BeforeAfterContent({ s, lang, tweaks, pushToast }: PanelProps) {
     if (!data) return;
     try {
       const path = await saveFileDialog({
-        defaultPath: "pc-tweaker-before-after.png",
+        defaultPath: "wincraft-before-after.png",
         filters: [{ name: "PNG", extensions: ["png"] }],
       });
       if (!path) return;

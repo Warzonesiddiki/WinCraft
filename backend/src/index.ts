@@ -383,7 +383,7 @@ initSchema()
     }
     const server = app.listen(port, () => {
       console.log(
-        `pc-tweaker-backend listening on :${port} (database ${isConfigured ? "configured" : "NOT configured"}, email ${mailIsConfigured ? "configured" : "NOT configured"})`,
+        `wincraft-backend listening on :${port} (database ${isConfigured ? "configured" : "NOT configured"}, email ${mailIsConfigured ? "configured" : "NOT configured"})`,
       );
       if (!mailIsConfigured) {
         // Worth shouting about: without a provider, nobody can verify an

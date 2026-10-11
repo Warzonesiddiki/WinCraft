@@ -90,14 +90,14 @@ function App() {
 
   function setLang(l: Lang) {
     setLangState(l);
-    localStorage.setItem("pc-tweaker-lang", l);
+    localStorage.setItem("wincraft-lang", l);
   }
 
   const [theme, setThemeState] = useState<ThemeName>(() => detectInitialTheme());
 
   function setTheme(t: ThemeName) {
     setThemeState(t);
-    localStorage.setItem("pc-tweaker-theme", t);
+    localStorage.setItem("wincraft-theme", t);
   }
 
   useEffect(() => {

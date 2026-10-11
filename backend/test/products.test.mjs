@@ -61,7 +61,7 @@ test("pctweaker entitlement still reads the legacy users columns", async () => {
   });
   assert.equal((await productEntitlement(activeId, "pctweaker")).active, true);
   assert.equal((await productEntitlement(lapsedId, "pctweaker")).active, false);
-  // ...and PC Tweaker Pro alone does NOT unlock the Uninstaller.
+  // ...and WinCraft Pro alone does NOT unlock the Uninstaller.
   assert.equal((await productEntitlement(activeId, "uninstaller")).active, false);
 });
 

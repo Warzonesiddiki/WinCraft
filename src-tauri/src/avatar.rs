@@ -2,7 +2,7 @@
 //!
 //! ## Why this is not localStorage any more
 //!
-//! It used to live under the `pc-tweaker-avatar` key in the WebView2
+//! It used to live under the `wincraft-avatar` key in the WebView2
 //! localStorage, which lost people's photos in three separate ways:
 //!
 //! - **Quota eviction.** The origin shares one 5 MB budget with the driver

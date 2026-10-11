@@ -1,18 +1,18 @@
 # YouTube upload — copy-paste kit
 
-Video file: `pc-tweaker-youtube.mp4` (1920x1080, 1:26, 27.6 MB)
+Video file: `wincraft-youtube.mp4` (1920x1080, 1:26, 27.6 MB)
 
 ---
 
 ## Title (pick one)
 
-- PC Tweaker — 36 real Windows tweaks, all undoable in one click
+- WinCraft — 36 real Windows tweaks, all undoable in one click
 - I built a Windows tweaker where every change can be undone
 
 ## Description
 
 ```
-PC Tweaker applies real Windows tweaks — registry, power plan, network DNS,
+WinCraft applies real Windows tweaks — registry, power plan, network DNS,
 services and files — across Performance, Gaming, Privacy, Maintenance and
 Interface. Nothing here is simulated.
 

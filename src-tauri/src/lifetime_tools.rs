@@ -354,7 +354,7 @@ pub fn save_lifetime_report(
         .file()
         .set_title("Save WinCraft tuning report")
         .add_filter("Markdown", &["md"])
-        .set_file_name("pc-tweaker-tuning-report.md");
+        .set_file_name("wincraft-tuning-report.md");
     if let Some(window) = app.get_webview_window("main") {
         dialog = dialog.set_parent(&window);
     }
@@ -384,7 +384,7 @@ mod tests {
         fn new() -> Self {
             static NEXT: AtomicUsize = AtomicUsize::new(0);
             let path = std::env::temp_dir().join(format!(
-                "pc-tweaker-lifetime-test-{}-{}-{}",
+                "wincraft-lifetime-test-{}-{}-{}",
                 std::process::id(),
                 std::time::SystemTime::now()
                     .duration_since(std::time::UNIX_EPOCH)

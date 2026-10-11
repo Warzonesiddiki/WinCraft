@@ -45,20 +45,20 @@ export const THEMES: { code: ThemeName; label: string; swatch: string }[] = [
 
 /** Bumped when a new default should reach everyone once, including people
  *  who had picked a theme before it existed. They can switch back after. */
-const THEME_RESET = "pc-tweaker-theme-reset";
+const THEME_RESET = "wincraft-theme-reset";
 const THEME_RESET_VERSION = "graphite_ember";
 
 export function detectInitialTheme(): ThemeName {
   try {
     if (localStorage.getItem(THEME_RESET) !== THEME_RESET_VERSION) {
       localStorage.setItem(THEME_RESET, THEME_RESET_VERSION);
-      localStorage.removeItem("pc-tweaker-theme");
+      localStorage.removeItem("wincraft-theme");
       return "graphite_ember";
     }
   } catch {
     // Storage blocked: the default still applies, it just will not persist.
   }
-  const stored = localStorage.getItem("pc-tweaker-theme");
+  const stored = localStorage.getItem("wincraft-theme");
   // Coral Sunset was folded into the new default, which it closely resembled.
   return THEMES.some((t) => t.code === stored) ? (stored as ThemeName) : "graphite_ember";
 }

@@ -84,7 +84,7 @@ test("checkout access requires a settled payment state", () => {
   assert.equal(isSettledCheckout(null), false);
 });
 
-test("unknown product metadata fails closed while missing legacy metadata remains PC Tweaker", () => {
+test("unknown product metadata fails closed while missing legacy metadata remains WinCraft", () => {
   assert.equal(productFromMetadata(undefined), "pctweaker");
   assert.equal(productFromMetadata({}), "pctweaker");
   assert.equal(productFromMetadata({ product: "pctweaker" }), "pctweaker");

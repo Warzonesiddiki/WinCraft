@@ -591,7 +591,7 @@ struct ListFile {
     apps: Vec<String>,
 }
 
-const LIST_KIND: &str = "pc-tweaker-debloat-list";
+const LIST_KIND: &str = "wincraft-debloat-list";
 
 fn known_ids(ids: Vec<String>) -> Vec<String> {
     let mut out: Vec<String> = Vec::new();
@@ -1346,7 +1346,7 @@ mod live_tests {
 
     fn mock_journal() -> Journal {
         let dir = std::env::temp_dir().join(format!(
-            "pc-tweaker-debloat-failure-test-{}-{}",
+            "wincraft-debloat-failure-test-{}-{}",
             std::process::id(),
             TEMP_SEQUENCE.fetch_add(1, Ordering::Relaxed)
         ));
@@ -1415,11 +1415,11 @@ mod tests {
 
     #[test]
     fn a_list_file_keeps_known_apps_once_and_refuses_anything_else() {
-        let ok = br#"{"format":1,"kind":"pc-tweaker-debloat-list","apps":["solitaire","news","solitaire","C:\\x.exe","nope"]}"#;
+        let ok = br#"{"format":1,"kind":"wincraft-debloat-list","apps":["solitaire","news","solitaire","C:\\x.exe","nope"]}"#;
         assert_eq!(parse_list(ok).unwrap(), ["solitaire", "news"]);
         for bad in [
-            &br#"{"format":1,"kind":"pc-tweaker-profile","apps":["solitaire"]}"#[..],
-            br#"{"format":2,"kind":"pc-tweaker-debloat-list","apps":[]}"#,
+            &br#"{"format":1,"kind":"wincraft-profile","apps":["solitaire"]}"#[..],
+            br#"{"format":2,"kind":"wincraft-debloat-list","apps":[]}"#,
             b"not json",
         ] {
             assert!(parse_list(bad).is_err());
@@ -1481,7 +1481,7 @@ mod tests {
     fn temp_journal() -> Journal {
         static TEST_SEQ: AtomicU64 = AtomicU64::new(0);
         let dir = std::env::temp_dir().join(format!(
-            "pc-tweaker-debloat-test-{}-{}",
+            "wincraft-debloat-test-{}-{}",
             std::process::id(),
             TEST_SEQ.fetch_add(1, Ordering::Relaxed)
         ));

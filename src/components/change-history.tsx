@@ -240,7 +240,7 @@ export function ChangeHistory({
   async function exportAs(kind: "csv" | "json") {
     const stamp = new Date().toISOString().slice(0, 10);
     const path = await saveFileDialog({
-      defaultPath: `pc-tweaker-history-${stamp}.${kind}`,
+      defaultPath: `wincraft-history-${stamp}.${kind}`,
       filters: [{ name: kind.toUpperCase(), extensions: [kind] }],
     }).catch(() => null);
     if (!path) return;

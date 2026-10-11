@@ -111,7 +111,7 @@ test("SQL guards protect lifetime even if the handler's earlier read was stale",
   assert.equal((await productEntitlement(id, "pctweaker")).active, true);
 });
 
-test("lifetime conversion cancels only this user's PC Tweaker subscriptions across pages", async () => {
+test("lifetime conversion cancels only this user's WinCraft subscriptions across pages", async () => {
   const id = await user();
   const pc = (name, extra = {}) => subscription(id, { id: name, ...extra });
   const otherPrice = { data: [{ price: { id: process.env.STRIPE_PRICE_UNINSTALLER_ANNUAL } }] };
@@ -165,7 +165,7 @@ test("cancellation helper propagates update errors instead of acknowledging succ
   }), /Fixture cancellation failure/);
 });
 
-test("uninstaller and unknown legacy events never grant or revoke PC Tweaker", async () => {
+test("uninstaller and unknown legacy events never grant or revoke WinCraft", async () => {
   const id = await user();
   const uninstaller = subscription(id, {
     metadata: { userId: id, plan: "annual" },

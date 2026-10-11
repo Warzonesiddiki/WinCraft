@@ -4,7 +4,7 @@ Checks, on clean virtual machines, that each of the 15 controls added in 1.18
 writes exactly what it declares where it is supported, leaves the PC untouched
 where it is not, and restores the exact original values.
 
-`verify-tweaks.ps1` is read-only: PC Tweaker applies and restores, the script
+`verify-tweaks.ps1` is read-only: WinCraft applies and restores, the script
 only compares the registry and the service configuration with
 `tweak-matrix.json`. That file is generated from the app's catalogue by
 `cargo test settings_tweaks::tests::the_vm_matrix_matches_the_catalogue`
@@ -35,11 +35,11 @@ binary that carries it):
 
     npm run tauri build -- --debug --no-bundle --features test-pro
 
-Copy `src-tauri\target\debug\PC Tweaker.exe`, this folder and
+Copy `src-tauri\target\debug\WinCraft.exe`, this folder and
 `src\components\starter-presets.mjs` (next to `run-auto.ps1`) into the VM,
 then in an elevated PowerShell as the user being tested:
 
-    .\run-auto.ps1 -TestBuild 'C:\test\PC Tweaker.exe'
+    .\run-auto.ps1 -TestBuild 'C:\test\WinCraft.exe'
 
 It records the baseline, applies all 15 controls through the app's own apply
 funnel, checks them, restores them and checks the restore. Unsupported
@@ -50,11 +50,11 @@ on any difference (`results\*-profile-*.log`).
 
 ## Manual procedure (each VM, about 15 minutes)
 
-1. Take a VM checkpoint. Install the PC Tweaker build under test and sign in
+1. Take a VM checkpoint. Install the WinCraft build under test and sign in
    with a Pro licence (11 of the 15 controls are Pro).
 2. In a normal, non-elevated PowerShell as the same user:
    `.\verify-tweaks.ps1 -Phase Baseline`
-3. In PC Tweaker, search each control by name and apply it. Unsupported ones
+3. In WinCraft, search each control by name and apply it. Unsupported ones
    must show "Not available on this PC" and must not be applied.
 4. `.\verify-tweaks.ps1 -Phase Applied`: every supported control PASS,
    every unsupported one "N/A (…, untouched)".
@@ -97,7 +97,7 @@ control (it now sets Manual rather than Disabled for this reason), and that
 
 In a normal PowerShell as the test user, from a clean snapshot:
 
-    .\run-debloat.ps1 -TestBuild 'C:\test\PC Tweaker.exe'
+    .\run-debloat.ps1 -TestBuild 'C:\test\WinCraft.exe'
 
 It removes Solitaire, Microsoft News and Feedback Hub through the app's own
 removal path (identity checks, journal, verification) and checks with

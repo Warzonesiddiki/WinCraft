@@ -22,7 +22,7 @@ if (([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::
 New-Item -ItemType Directory -Force -Path $Results | Out-Null
 $before = Get-AppxPackage | Select-Object -ExpandProperty Name
 $p = Start-Process -FilePath $TestBuild -ArgumentList '--test-debloat', $Apps -Wait -PassThru
-$log = Join-Path $env:APPDATA 'com.aurel.pc-tweaker-app\test-pro-debloat.log'
+$log = Join-Path $env:APPDATA 'com.wincraft.app\test-pro-debloat.log'
 if (Test-Path $log) { Copy-Item $log (Join-Path $Results "$env:COMPUTERNAME-debloat.log") -Force }
 $after = Get-AppxPackage | Select-Object -ExpandProperty Name
 $gone = $before | Where-Object { $_ -notin $after }

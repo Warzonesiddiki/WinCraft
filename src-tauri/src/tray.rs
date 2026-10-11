@@ -42,7 +42,7 @@ pub fn setup(app: &tauri::App) -> tauri::Result<()> {
     )?;
     let exit = MenuItem::with_id(app, "tray-exit", "Exit WinCraft", true, None::<&str>)?;
     let menu = Menu::with_items(app, &[&open, &background, &exit])?;
-    let mut builder = TrayIconBuilder::with_id("pc-tweaker")
+    let mut builder = TrayIconBuilder::with_id("wincraft")
         .tooltip("WinCraft")
         .menu(&menu)
         .show_menu_on_left_click(false)

@@ -318,7 +318,7 @@ mod tests {
 
     fn temp_dir(tag: &str) -> PathBuf {
         let dir = std::env::temp_dir().join(format!(
-            "pc-tweaker-license-test-{}-{}-{}",
+            "wincraft-license-test-{}-{}-{}",
             tag,
             std::process::id(),
             std::time::SystemTime::now()

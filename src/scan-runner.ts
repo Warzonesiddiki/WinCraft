@@ -399,7 +399,7 @@ export function scanObservations(r: ScanReport): ScanObservation[] {
   return rows;
 }
 
-export const LAST_SCAN_KEY = "pc-tweaker-last-scan-v1";
+export const LAST_SCAN_KEY = "wincraft-last-scan-v1";
 export type LastScan = { at: number; partial: boolean };
 export function readLastScan(raw: string | null): LastScan | null {
   try {

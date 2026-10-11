@@ -5,10 +5,10 @@
 // dedicated PUBLIC repo, hands Instagram that public URL, then deletes the
 // release once publishing succeeds.
 //
-// Needs its own public repo (e.g. "pc-tweaker-marketing-assets", created
+// Needs its own public repo (e.g. "wincraft-marketing-assets", created
 // once with at least one commit - an empty repo makes GitHub's Releases
 // API 422 with "Repository is empty") and a PAT with `repo` scope, via:
-//   ASSETS_REPO=owner/pc-tweaker-marketing-assets
+//   ASSETS_REPO=owner/wincraft-marketing-assets
 //   ASSETS_REPO_TOKEN=...
 
 const fs = require("fs");
