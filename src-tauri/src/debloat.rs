@@ -435,6 +435,7 @@ fn replace_file(from: &Path, to: &Path) -> io::Result<()> {
     }
     let from: Vec<u16> = from.as_os_str().encode_wide().chain(Some(0)).collect();
     let to: Vec<u16> = to.as_os_str().encode_wide().chain(Some(0)).collect();
+    // SAFETY: from and to are null-terminated UTF-16 strings; flags are MOVEFILE_COPY_ALLOWED | MOVEFILE_REPLACE_EXISTING.
     if unsafe { MoveFileExW(from.as_ptr(), to.as_ptr(), 0x1 | 0x8) } == 0 {
         Err(io::Error::last_os_error())
     } else {

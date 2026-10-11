@@ -617,7 +617,7 @@ export function ThermalsPanel({
 
     tick();
     loadPower();
-    const id = window.setInterval(tick, POLL_MS);
+    const id = window.setInterval(() => { if (!document.hidden) tick(); }, POLL_MS);
     return () => {
       alive = false;
       window.clearInterval(id);

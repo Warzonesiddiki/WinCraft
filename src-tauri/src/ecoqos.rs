@@ -337,6 +337,7 @@ mod native {
         let mut exit = created;
         let mut kernel = created;
         let mut user = created;
+        // SAFETY: handle is a valid process handle from OpenProcess; output pointers are valid stack memory.
         if unsafe { GetProcessTimes(handle, &mut created, &mut exit, &mut kernel, &mut user) } == 0
         {
             return Err(format!(
@@ -431,14 +432,17 @@ mod native {
     }
 
     pub(super) fn own_creation() -> Result<u64, String> {
+    // SAFETY: GetCurrentProcess returns a pseudo-handle that is always valid.
         creation(unsafe { GetCurrentProcess() })
     }
 
     pub(super) fn foreground_pid() -> Option<u32> {
+    // SAFETY: GetForegroundWindow is a simple Win32 call with no invariants; returns NULL if no foreground window.
         let window = unsafe { GetForegroundWindow() };
         if window.is_null() {
             return None;
         }
+    // SAFETY: window is from GetForegroundWindow above; pid is a valid mutable pointer.
         let mut pid = 0;
         unsafe { GetWindowThreadProcessId(window, &mut pid) };
         (pid != 0).then_some(pid)

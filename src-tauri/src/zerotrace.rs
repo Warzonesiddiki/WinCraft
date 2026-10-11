@@ -277,6 +277,7 @@ mod imp {
     fn enable_profile_privilege() -> Result<(), String> {
         // SAFETY: all three calls take pointers to locals that outlive them,
         // and the token handle is closed on both the success and failure path.
+        // SAFETY: NtSetSystemInformation with SystemMemoryListInformation is called with a valid command value and correct size.
         unsafe {
             let mut token: isize = 0;
             if OpenProcessToken(
@@ -333,6 +334,7 @@ mod imp {
         let mut command = command;
         // SAFETY: the pointer is to a live local of exactly the declared size.
         let status = unsafe {
+        // SAFETY: NtSetSystemInformation called with valid pointers and correct struct size for MemoryPurgeLowPriorityStandbyList.
             NtSetSystemInformation(
                 SYSTEM_MEMORY_LIST_INFORMATION,
                 &mut command as *mut u32 as *mut core::ffi::c_void,

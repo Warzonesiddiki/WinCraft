@@ -52,6 +52,44 @@ const authLimiter = rateLimit({
 });
 router.use(authLimiter);
 
+// Stricter per-endpoint limiters for the most sensitive operations.
+// These stack on top of authLimiter — a request must pass both.
+
+/** Mass account creation: 5 new accounts per hour per IP. */
+const registerLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  limit: 5,
+  standardHeaders: true,
+  legacyHeaders: false,
+  keyGenerator: (req) => `register:${req.ip}`,
+  message: { error: "Too many accounts created from this IP. Try again later." },
+});
+
+/** Password reset email: 3 per hour per target email (prevents email bombing). */
+const forgotPasswordLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  limit: 3,
+  standardHeaders: true,
+  legacyHeaders: false,
+  keyGenerator: (req) => {
+    const email = req.body?.email;
+    return typeof email === "string" && email
+      ? `forgot:${email.toLowerCase()}`
+      : `forgot:${req.ip}`;
+  },
+  message: { error: "Too many reset requests. Try again later." },
+});
+
+/** Password reset submission: 5 per hour per IP (prevents token brute-force). */
+const resetPasswordLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  limit: 5,
+  standardHeaders: true,
+  legacyHeaders: false,
+  keyGenerator: (req) => `reset:${req.ip}`,
+  message: { error: "Too many password reset attempts. Try again later." },
+});
+
 const APP_URL =
   process.env.APP_URL ||
   (process.env.NODE_ENV === "production" ? "https://api.wincraft.app" : "http://localhost:3000");
@@ -134,7 +172,7 @@ export function isValidDateOfBirth(value: unknown): value is string {
     && date.getTime() <= Date.now();
 }
 
-router.post("/register", async (req: Request, res: Response) => {
+router.post("/register", registerLimiter, async (req: Request, res: Response) => {
   const { email, password, firstName, lastName, dateOfBirth } = req.body || {};
   if (!isValidEmail(email)) return res.status(400).json({ error: "invalid email" });
   if (!isValidPassword(password)) return res.status(400).json({ error: "Password must be at least 8 characters and no more than 72 UTF-8 bytes." });
@@ -345,7 +383,7 @@ router.get("/verify-email", async (req: Request, res: Response) => {
   }
 });
 
-router.post("/forgot-password", async (req: Request, res: Response) => {
+router.post("/forgot-password", forgotPasswordLimiter, async (req: Request, res: Response) => {
   const { email } = req.body || {};
   if (!isValidEmail(email)) return res.status(400).json({ error: "invalid email" });
 
@@ -422,7 +460,7 @@ router.get("/reset-password", (req: Request, res: Response) => {
   res.send(resetForm(token));
 });
 
-router.post("/reset-password", async (req: Request, res: Response) => {
+router.post("/reset-password", resetPasswordLimiter, async (req: Request, res: Response) => {
   const { token, newPassword, confirmPassword } = req.body || {};
 
   // The browser form posts url-encoded and expects HTML back; the desktop app

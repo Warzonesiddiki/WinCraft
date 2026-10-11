@@ -564,8 +564,10 @@ mod native {
             use windows_sys::Win32::Foundation::FILETIME;
             use windows_sys::Win32::System::Threading::GetProcessTimes;
             // SAFETY: four live FILETIME out-parameters; the handle is open.
+            // SAFETY: zeroed() creates a valid zero-initialized FILETIME array.
             let mut t: [FILETIME; 4] = unsafe { std::mem::zeroed() };
             let [a, b, c, d] = &mut t;
+            // SAFETY: self.0 is a valid process handle; a,b,c,d are valid pointers to FILETIME.
             let ok = unsafe { GetProcessTimes(self.0, a, b, c, d) } != 0;
             let value = (u64::from(t[0].dwHighDateTime) << 32) | u64::from(t[0].dwLowDateTime);
             (ok && value != 0).then_some(value)
@@ -575,6 +577,7 @@ mod native {
     impl Drop for ProcessHandle {
         fn drop(&mut self) {
             // SAFETY: opened by OpenProcess below and closed exactly once.
+            // SAFETY: self.0 is a valid handle from OpenProcess; CloseHandle is the correct cleanup.
             unsafe { CloseHandle(self.0) };
         }
     }

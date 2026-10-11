@@ -743,6 +743,7 @@ fn is_network_drive(letter: u8) -> bool {
     const DRIVE_REMOTE: u32 = 4;
     let root: Vec<u16> = format!("{}:\\", letter as char).encode_utf16().chain(Some(0)).collect();
     // SAFETY: a NUL-terminated root path that lives for the call.
+    // SAFETY: root is a null-terminated UTF-16 string; GetDriveTypeW only reads it.
     unsafe { GetDriveTypeW(root.as_ptr()) == DRIVE_REMOTE }
 }
 

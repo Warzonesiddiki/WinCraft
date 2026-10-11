@@ -45,7 +45,7 @@ export async function runRamClean(scheduled = false): Promise<RamCleanResult | n
 function useNow(everyMs: number): number {
   const [now, setNow] = useState(() => Date.now());
   useEffect(() => {
-    const id = window.setInterval(() => setNow(Date.now()), everyMs);
+    const id = window.setInterval(() => { if (!document.hidden) setNow(Date.now()); }, everyMs);
     return () => window.clearInterval(id);
   }, [everyMs]);
   return now;
@@ -125,7 +125,7 @@ export function SystemMonitor({ s }: { s: Strings }) {
         .catch(() => {});
     };
     tick();
-    const id = window.setInterval(tick, 2500);
+    const id = window.setInterval(() => { if (!document.hidden) tick(); }, 2500);
     return () => {
       alive = false;
       window.clearInterval(id);

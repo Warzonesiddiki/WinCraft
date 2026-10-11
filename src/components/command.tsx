@@ -50,7 +50,7 @@ export function usePulseSamples(): PulseSample[] {
         });
     };
     tick();
-    const id = window.setInterval(tick, SAMPLE_EVERY_MS);
+    const id = window.setInterval(() => { if (!document.hidden) tick(); }, SAMPLE_EVERY_MS);
     return () => {
       alive = false;
       window.clearInterval(id);
