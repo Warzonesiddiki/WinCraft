@@ -52,9 +52,47 @@ const authLimiter = rateLimit({
 });
 router.use(authLimiter);
 
+// Stricter per-endpoint limiters for the most sensitive operations.
+// These stack on top of authLimiter — a request must pass both.
+
+/** Mass account creation: 5 new accounts per hour per IP. */
+const registerLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  limit: 5,
+  standardHeaders: true,
+  legacyHeaders: false,
+  keyGenerator: (req) => `register:${req.ip}`,
+  message: { error: "Too many accounts created from this IP. Try again later." },
+});
+
+/** Password reset email: 3 per hour per target email (prevents email bombing). */
+const forgotPasswordLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  limit: 3,
+  standardHeaders: true,
+  legacyHeaders: false,
+  keyGenerator: (req) => {
+    const email = req.body?.email;
+    return typeof email === "string" && email
+      ? `forgot:${email.toLowerCase()}`
+      : `forgot:${req.ip}`;
+  },
+  message: { error: "Too many reset requests. Try again later." },
+});
+
+/** Password reset submission: 5 per hour per IP (prevents token brute-force). */
+const resetPasswordLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  limit: 5,
+  standardHeaders: true,
+  legacyHeaders: false,
+  keyGenerator: (req) => `reset:${req.ip}`,
+  message: { error: "Too many password reset attempts. Try again later." },
+});
+
 const APP_URL =
   process.env.APP_URL ||
-  (process.env.NODE_ENV === "production" ? "https://api.pctweaker.app" : "http://localhost:3000");
+  (process.env.NODE_ENV === "production" ? "https://api.wincraft.app" : "http://localhost:3000");
 const DAY_MS = 24 * 60 * 60 * 1000;
 
 /** Resolves to false when no email provider is configured, so callers can
@@ -134,7 +172,7 @@ export function isValidDateOfBirth(value: unknown): value is string {
     && date.getTime() <= Date.now();
 }
 
-router.post("/register", async (req: Request, res: Response) => {
+router.post("/register", registerLimiter, async (req: Request, res: Response) => {
   const { email, password, firstName, lastName, dateOfBirth } = req.body || {};
   if (!isValidEmail(email)) return res.status(400).json({ error: "invalid email" });
   if (!isValidPassword(password)) return res.status(400).json({ error: "Password must be at least 8 characters and no more than 72 UTF-8 bytes." });
@@ -275,7 +313,7 @@ function escapeHtml(value: unknown): string {
 export function htmlPage(title: string, bodyHtml: string): string {
   return `<!doctype html><html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>${title} — PC Tweaker</title>
+<title>${title} — WinCraft</title>
 <style>
 :root{color-scheme:dark}
 *{box-sizing:border-box}
@@ -310,7 +348,7 @@ button:hover{filter:brightness(1.07)}
   color:#a7f3d0;background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.28)}
 </style></head>
 <body><div class="card">
-<div class="brand"><div class="mark">P</div><span>PC Tweaker</span></div>
+<div class="brand"><div class="mark">P</div><span>WinCraft</span></div>
 <h2>${title}</h2>${bodyHtml}</div></body></html>`;
 }
 
@@ -322,7 +360,7 @@ router.get("/verify-email", async (req: Request, res: Response) => {
   try {
     const userId = await consumeActionToken(token, "email_verify");
     if (!userId && (await confirmsVerifiedAddress(token))) {
-      return res.send(htmlPage("Email verified", "<p class=success>Your email is already verified. You can close this window and return to PC Tweaker.</p>"));
+      return res.send(htmlPage("Email verified", "<p class=success>Your email is already verified. You can close this window and return to WinCraft.</p>"));
     }
     if (!userId) {
       return res
@@ -338,14 +376,14 @@ router.get("/verify-email", async (req: Request, res: Response) => {
     void sendAccountWelcome(userId).catch((err) =>
       console.error("failed to send the account welcome:", err),
     );
-    res.send(htmlPage("Email verified", "<p class=success>Your email is verified. You can close this window and return to PC Tweaker.</p>"));
+    res.send(htmlPage("Email verified", "<p class=success>Your email is verified. You can close this window and return to WinCraft.</p>"));
   } catch (err) {
     console.error("verify-email failed:", err);
     res.status(500).send(htmlPage("Error", "<p class=error>Something went wrong. Try again later.</p>"));
   }
 });
 
-router.post("/forgot-password", async (req: Request, res: Response) => {
+router.post("/forgot-password", forgotPasswordLimiter, async (req: Request, res: Response) => {
   const { email } = req.body || {};
   if (!isValidEmail(email)) return res.status(400).json({ error: "invalid email" });
 
@@ -422,7 +460,7 @@ router.get("/reset-password", (req: Request, res: Response) => {
   res.send(resetForm(token));
 });
 
-router.post("/reset-password", async (req: Request, res: Response) => {
+router.post("/reset-password", resetPasswordLimiter, async (req: Request, res: Response) => {
   const { token, newPassword, confirmPassword } = req.body || {};
 
   // The browser form posts url-encoded and expects HTML back; the desktop app
@@ -472,7 +510,7 @@ router.post("/reset-password", async (req: Request, res: Response) => {
       return res.send(
         htmlPage(
           "Password updated",
-          `<p class="success">Done. Go back to PC Tweaker and sign in with your new password.</p>
+          `<p class="success">Done. Go back to WinCraft and sign in with your new password.</p>
            <p class="hint">You can close this window.</p>`,
         ),
       );

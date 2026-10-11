@@ -21,7 +21,7 @@ const TITLE_MAX_LEN = 2200; // real limit of the Content Posting API "title" fie
 
 const COUNTER_PATH = path.join(__dirname, "telegram_notify_counter.json");
 
-// Sequential counter so the Telegram label (e.g. "PC Tweaker #7") can be
+// Sequential counter so the Telegram label (e.g. "WinCraft #7") can be
 // matched in order to the notifications arriving in TikTok's Inbox.
 function nextCounter() {
   let n = 0;
@@ -49,7 +49,7 @@ async function notifyTelegram(videoPath, caption) {
     await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
       method: "POST",
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      body: new URLSearchParams({ chat_id: chatId, text: `🎬 PC Tweaker #${n} — ${videoName}` }),
+      body: new URLSearchParams({ chat_id: chatId, text: `🎬 WinCraft #${n} — ${videoName}` }),
     });
     await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
       method: "POST",

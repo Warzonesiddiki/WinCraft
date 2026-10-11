@@ -1,4 +1,4 @@
-//! A small, honest description of the machine PC Tweaker is running on.
+//! A small, honest description of the machine WinCraft is running on.
 //!
 //! This exists so the Scan can move from "is this tweak applied?" to "is this
 //! tweak worth applying *on this PC*?" — recommending SSD-safe optimization on

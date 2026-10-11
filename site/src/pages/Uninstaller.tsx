@@ -40,7 +40,7 @@ export function UninstallerPage() {
         See what an uninstall will do, before it does it
       </h1>
       <p className="mb-8 text-lg leading-relaxed text-[var(--fg-dim)]">
-        PC Tweaker Uninstaller is a Windows application that reads every installed program,
+        WinCraft Uninstaller is a Windows application that reads every installed program,
         scores how risky removing it is and shows you the exact command and permissions it
         will use. Before elevated removals, it attempts to create a Windows restore point,
         then records the outcome and what actually happened. Single uninstalls are free, for good.
@@ -111,8 +111,8 @@ export function UninstallerPage() {
           ))}
         </ul>
         <p className="mb-4 leading-relaxed text-[var(--fg-dim)]">
-          Already on a PC Tweaker plan? Uninstaller Pro is <strong>€4.99 per year</strong> on the
-          same account. PC Tweaker Lifetime includes 12 months of Uninstaller Pro from your first
+          Already on a WinCraft plan? Uninstaller Pro is <strong>€4.99 per year</strong> on the
+          same account. WinCraft Lifetime includes 12 months of Uninstaller Pro from your first
           sign-in, existing Lifetime owners included; that bonus does not renew automatically.
         </p>
         <p className="leading-relaxed text-[var(--fg-dim)]">
@@ -152,7 +152,7 @@ export function UninstallerPage() {
           Check the recorded outcome before relying on it. Recovery applies only
           to supported operations and is not a guarantee that a removed application, its
           settings or its data can be restored. This is a separate application with its own
-          Pro entitlement: a PC Tweaker subscription qualifies for the reduced price, while
+          Pro entitlement: a WinCraft subscription qualifies for the reduced price, while
           Lifetime includes the 12-month bonus described above.
         </p>
       </section>

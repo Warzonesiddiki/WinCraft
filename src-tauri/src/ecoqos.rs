@@ -1,4 +1,4 @@
-//! Opt-in, process-local EcoQoS rules. The watcher exists only while PC Tweaker is open.
+//! Opt-in, process-local EcoQoS rules. The watcher exists only while WinCraft is open.
 use serde::{Deserialize, Serialize};
 use std::collections::{HashMap, HashSet};
 use std::path::{Path, PathBuf};
@@ -337,6 +337,7 @@ mod native {
         let mut exit = created;
         let mut kernel = created;
         let mut user = created;
+        // SAFETY: handle is a valid process handle from OpenProcess; output pointers are valid stack memory.
         if unsafe { GetProcessTimes(handle, &mut created, &mut exit, &mut kernel, &mut user) } == 0
         {
             return Err(format!(
@@ -431,14 +432,17 @@ mod native {
     }
 
     pub(super) fn own_creation() -> Result<u64, String> {
+    // SAFETY: GetCurrentProcess returns a pseudo-handle that is always valid.
         creation(unsafe { GetCurrentProcess() })
     }
 
     pub(super) fn foreground_pid() -> Option<u32> {
+    // SAFETY: GetForegroundWindow is a simple Win32 call with no invariants; returns NULL if no foreground window.
         let window = unsafe { GetForegroundWindow() };
         if window.is_null() {
             return None;
         }
+    // SAFETY: window is from GetForegroundWindow above; pid is a valid mutable pointer.
         let mut pid = 0;
         unsafe { GetWindowThreadProcessId(window, &mut pid) };
         (pid != 0).then_some(pid)
@@ -641,7 +645,7 @@ fn tick(
         let owner_is_self =
             record.owner_pid == owner_pid && record.owner_creation == owner_creation;
         if !owner_is_self {
-            // Another live PC Tweaker instance retains ownership. Avoid two
+            // Another live WinCraft instance retains ownership. Avoid two
             // watchers racing. Answered from the process table, not a handle.
             let old_owner_alive = table
                 .iter()
@@ -649,7 +653,7 @@ fn tick(
             if old_owner_alive {
                 recovery_failed = true;
                 status.last_error =
-                    Some("Another PC Tweaker process owns EcoQoS recovery".to_string());
+                    Some("Another WinCraft process owns EcoQoS recovery".to_string());
                 continue;
             }
         }
@@ -919,7 +923,7 @@ mod tests {
     #[test]
     fn recovery_is_durable_and_rejects_ambiguous_ownership() {
         let dir = std::env::temp_dir().join(format!(
-            "pc-tweaker-ecoqos-test-{}-{:?}",
+            "wincraft-ecoqos-test-{}-{:?}",
             std::process::id(),
             std::thread::current().id()
         ));

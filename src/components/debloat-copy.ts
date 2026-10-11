@@ -26,7 +26,7 @@ const en = {
   nonRemovable: "Windows marks this package as non-removable.",
   unverifiedRemovability: "Windows could not verify whether this package can be removed.",
   requiresStandardUser:
-    "Reopen PC Tweaker normally, without Run as administrator, to remove apps for your account.",
+    "Reopen WinCraft normally, without Run as administrator, to remove apps for your account.",
   currentUser: "Current Windows user only",
   scope:
     "Only this account is affected. Apps installed for other users and packages provisioned for new users stay as they are.",
@@ -170,7 +170,7 @@ export const DEBLOAT_COPY: Record<Lang, Copy> = {
     nonRemovable: "Windows indica che questo pacchetto non è rimovibile.",
     unverifiedRemovability: "Windows non ha potuto verificare se il pacchetto è rimovibile.",
     requiresStandardUser:
-      "Riapri PC Tweaker normalmente, senza Esegui come amministratore, per rimuovere app dal tuo account.",
+      "Riapri WinCraft normalmente, senza Esegui come amministratore, per rimuovere app dal tuo account.",
     currentUser: "Solo utente Windows corrente",
     scope:
       "Cambia solo questo account. Le app degli altri utenti e i pacchetti predisposti per nuovi account restano invariati.",
@@ -315,7 +315,7 @@ export const DEBLOAT_COPY: Record<Lang, Copy> = {
     nonRemovable: "Windows indique que ce package ne peut pas être supprimé.",
     unverifiedRemovability: "Windows n’a pas pu vérifier si ce package peut être supprimé.",
     requiresStandardUser:
-      "Rouvrez PC Tweaker normalement, sans Exécuter en tant qu’administrateur, pour supprimer des applications de votre compte.",
+      "Rouvrez WinCraft normalement, sans Exécuter en tant qu’administrateur, pour supprimer des applications de votre compte.",
     currentUser: "Utilisateur Windows actuel uniquement",
     scope:
       "Seul ce compte est concerné. Les applications des autres utilisateurs et les packages prévus pour les nouveaux comptes restent inchangés.",
@@ -462,7 +462,7 @@ export const DEBLOAT_COPY: Record<Lang, Copy> = {
     nonRemovable: "Windows indica que este paquete no se puede eliminar.",
     unverifiedRemovability: "Windows no pudo verificar si se puede eliminar este paquete.",
     requiresStandardUser:
-      "Vuelve a abrir PC Tweaker normalmente, sin Ejecutar como administrador, para eliminar aplicaciones de tu cuenta.",
+      "Vuelve a abrir WinCraft normalmente, sin Ejecutar como administrador, para eliminar aplicaciones de tu cuenta.",
     currentUser: "Solo el usuario actual de Windows",
     scope:
       "Solo afecta a esta cuenta. Las aplicaciones de otros usuarios y los paquetes preparados para cuentas nuevas siguen igual.",
@@ -610,7 +610,7 @@ export const DEBLOAT_COPY: Record<Lang, Copy> = {
     nonRemovable: "Windows kennzeichnet dieses Paket als nicht entfernbar.",
     unverifiedRemovability: "Windows konnte nicht prüfen, ob dieses Paket entfernt werden kann.",
     requiresStandardUser:
-      "Starten Sie PC Tweaker normal, ohne Als Administrator ausführen, um Apps für Ihr Konto zu entfernen.",
+      "Starten Sie WinCraft normal, ohne Als Administrator ausführen, um Apps für Ihr Konto zu entfernen.",
     currentUser: "Nur aktueller Windows-Benutzer",
     scope:
       "Nur dieses Konto ist betroffen. Apps anderer Benutzer und für neue Konten bereitgestellte Pakete bleiben unverändert.",
@@ -757,7 +757,7 @@ export const DEBLOAT_COPY: Record<Lang, Copy> = {
     nonRemovable: "O Windows marca este pacote como não removível.",
     unverifiedRemovability: "O Windows não conseguiu verificar se este pacote pode ser removido.",
     requiresStandardUser:
-      "Reabra o PC Tweaker normalmente, sem Executar como administrador, para remover aplicações da sua conta.",
+      "Reabra o WinCraft normalmente, sem Executar como administrador, para remover aplicações da sua conta.",
     currentUser: "Apenas o utilizador atual do Windows",
     scope:
       "Só esta conta é afetada. As aplicações de outros utilizadores e os pacotes preparados para novas contas permanecem iguais.",

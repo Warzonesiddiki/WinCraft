@@ -1,6 +1,6 @@
 """
 Renders the final Reel: vertical (1080x1920) background video, voice audio,
-timed captions, and a persistent "PC Tweaker" watermark (no plain website
+timed captions, and a persistent "WinCraft" watermark (no plain website
 domain to show - the app is distributed via winget/GitHub Releases, so the
 watermark reinforces the name to search instead of a URL).
 """
@@ -290,7 +290,7 @@ CAPTION_POP_SECONDS = 0.12  # quick scale-up on each chunk's entrance, not a sta
 # they stay readable without covering the demo.
 CAPTION_Y_PRODUCT_DEMO = int(TARGET_H * 0.74)
 
-WATERMARK_TEXT = "PC Tweaker"
+WATERMARK_TEXT = "WinCraft"
 WATERMARK_FONTSIZE = 52  # was 34 - too small to read at a glance (user feedback 2026-08-02)
 WATERMARK_Y = int(TARGET_H * 0.10)  # was 0.06 - too close to the very top edge/status bar; still clear of the Reels/TikTok bottom UI overlay
 

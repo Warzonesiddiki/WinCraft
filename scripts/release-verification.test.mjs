@@ -70,7 +70,7 @@ test(
       fs.mkdirSync(msi, { recursive: true });
       fs.writeFileSync(path.join(dir, "src-tauri/tauri.conf.json"), JSON.stringify(conf));
       fs.writeFileSync(path.join(dir, "notes.md"), "Verification fixture.");
-      fs.writeFileSync(path.join(release, "PC Tweaker.exe"), "unsigned");
+      fs.writeFileSync(path.join(release, "WinCraft.exe"), "unsigned");
       fs.writeFileSync(path.join(nsis, `Test_${conf.version}_x64-setup.exe`), "unsigned");
       fs.writeFileSync(
         path.join(nsis, `Test_${conf.version}_x64-setup.exe.sig`),
@@ -85,7 +85,7 @@ test(
       assert.notEqual(result.status, 0);
       assert.match(result.stdout + result.stderr, /Authenticode verification failed/);
       assert.equal(fs.existsSync(path.join(nsis, "latest.json")), false);
-      assert.equal(fs.existsSync(path.join(nsis, "PCTweaker-Setup.exe")), false);
+      assert.equal(fs.existsSync(path.join(nsis, "WinCraft-Setup.exe")), false);
     } finally {
       removeVerificationDirectory(dir, fs.realpathSync(os.tmpdir()));
     }

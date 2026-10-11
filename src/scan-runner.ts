@@ -232,17 +232,18 @@ export function unknownSecuritySignals(report: ScanReport): string[] {
 }
 
 /** Optional toggles are not defects: bulk fixes require current hardware advice. */
-export function recommendedTweaks(report: ScanReport, isPro: boolean): TweakInfo[] {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export function recommendedTweaks(report: ScanReport, _isPro: boolean): TweakInfo[] {
   const allowed = new Set(report.ids ?? []);
   const advised = new Set(
     (report.advice ?? []).filter((a) => a.verdict === "recommended").map((a) => a.id),
   );
+  // WinCraft is free for everyone — no tweak is gated by license.
   return (report.tweaks ?? []).filter(
     (t) =>
       allowed.has(t.id) &&
       advised.has(t.id) &&
       !t.applied &&
-      (isPro || !t.requires_pro) &&
       t.id !== "turbo_boost" &&
       !CONFIGURABLE_TWEAK_IDS.has(t.id),
   );
@@ -267,7 +268,7 @@ export function optionalScanTweaks(report: ScanReport): TweakInfo[] {
 export async function applyScanSelection(
   call: Call,
   report: ScanReport,
-  isPro: boolean,
+  _isPro: boolean,
   selected: string[],
 ) {
   // Re-read eligibility before any write. A failed read aborts the batch.
@@ -277,9 +278,9 @@ export async function applyScanSelection(
   ]);
   const advice = await call<TweakAdvice[]>("advise_tweaks", { ids });
   const eligible = new Set(
-    recommendedTweaks({ ...report, tweaks, ids, advice }, isPro).map((t) => t.id),
+    recommendedTweaks({ ...report, tweaks, ids, advice }, _isPro).map((t) => t.id),
   );
-  const originallyOffered = new Set(recommendedTweaks(report, isPro).map((t) => t.id));
+  const originallyOffered = new Set(recommendedTweaks(report, _isPro).map((t) => t.id));
   const requested = [...new Set(selected)].filter((id) => originallyOffered.has(id));
   const apply = requested.filter((id) => eligible.has(id));
   const skipped = requested.filter((id) => !eligible.has(id));
@@ -399,7 +400,7 @@ export function scanObservations(r: ScanReport): ScanObservation[] {
   return rows;
 }
 
-export const LAST_SCAN_KEY = "pc-tweaker-last-scan-v1";
+export const LAST_SCAN_KEY = "wincraft-last-scan-v1";
 export type LastScan = { at: number; partial: boolean };
 export function readLastScan(raw: string | null): LastScan | null {
   try {

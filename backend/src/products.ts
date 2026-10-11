@@ -5,7 +5,7 @@ import { isEntitled, PERPETUAL_PLANS } from "./entitlement";
  * The ecosystem's product catalogue, and the data access for the per-product
  * `entitlements` table.
  *
- * Product "pctweaker" is special: its entitlement predates this module and
+ * Product "wincraft" is special: its entitlement predates this module and
  * lives on the `users` row itself (`is_pro` + `pro_expires_at`), so reads for
  * it go through the original columns and the original `isEntitled` logic.
  * Every other product reads and writes `entitlements` rows. Callers never
@@ -15,7 +15,7 @@ import { isEntitled, PERPETUAL_PLANS } from "./entitlement";
 
 /** Every product the backend will sign licenses or sell checkouts for.
  *  A request naming anything else is rejected before touching the database. */
-export const PRODUCTS = ["pctweaker", "uninstaller"] as const;
+export const PRODUCTS = ["wincraft", "uninstaller"] as const;
 export type Product = (typeof PRODUCTS)[number];
 
 export function isKnownProduct(value: unknown): value is Product {
@@ -51,7 +51,7 @@ export function isProductRowEntitled(row: EntitlementTableRow | null | undefined
 
 /** Resolves one product's entitlement for a user, whichever store backs it. */
 export async function productEntitlement(userId: number | string, product: Product, activateBonus = false): Promise<ProductEntitlement> {
-  if (product === "pctweaker") {
+  if (product === "wincraft") {
     const { rows } = await getPool().query(
       "SELECT is_pro, plan, pro_expires_at, legacy_pro_grant FROM users WHERE id = $1",
       [userId],
@@ -101,7 +101,7 @@ export async function hasAnyActiveEntitlement(userId: number | string): Promise<
   return all.some((entitlement) => entitlement.active);
 }
 
-/** Grants or refreshes a non-pctweaker product entitlement (webhook path).
+/** Grants or refreshes a non-wincraft product entitlement (webhook path).
  *
  *  `provisional` marks the holding window written by
  *  `checkout.session.completed` before the real period end is known. Stripe
@@ -131,7 +131,7 @@ export async function upsertEntitlement(
   );
 }
 
-/** Ends a non-pctweaker entitlement immediately (cancellation/refund path).
+/** Ends a non-wincraft entitlement immediately (cancellation/refund path).
  *  The row is kept — history matters for support — but the expiry is now.
  *  Given a subscription, only that subscription's grant ends: a late event
  *  for an old subscription must not cut off the one that replaced it. */

@@ -4,7 +4,7 @@ process.env.DATABASE_URL='pgmem';
 const {initSchema,getPool}=await import('../dist/db.js');
 const {productEntitlement}=await import('../dist/products.js');
 await initSchema();
-test('PC Tweaker annual entitlement carries its paid expiry and lapses without a webhook',async()=>{
+test('WinCraft annual entitlement carries its paid expiry and lapses without a webhook',async()=>{
  const expires=new Date(Date.now()+365*86400000);
  const {rows}=await getPool().query("INSERT INTO users(email,password_hash,is_pro,plan,pro_expires_at) VALUES('annual-expiry@example.invalid','x',TRUE,'annual',$1) RETURNING id",[expires]);
  const id=rows[0].id;

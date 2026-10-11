@@ -25,7 +25,7 @@ import "./workspace-panels.css";
 import "./change-history.css";
 
 /**
- * Change history: every change PC Tweaker made on this PC, grouped by day and
+ * Change history: every change WinCraft made on this PC, grouped by day and
  * by session, with where it came from, its result, the registry values before
  * and after (from 1.18.1), filters, search, exports, and safe undo of one
  * change, a whole session or everything still in effect, always after a
@@ -240,7 +240,7 @@ export function ChangeHistory({
   async function exportAs(kind: "csv" | "json") {
     const stamp = new Date().toISOString().slice(0, 10);
     const path = await saveFileDialog({
-      defaultPath: `pc-tweaker-history-${stamp}.${kind}`,
+      defaultPath: `wincraft-history-${stamp}.${kind}`,
       filters: [{ name: kind.toUpperCase(), extensions: [kind] }],
     }).catch(() => null);
     if (!path) return;

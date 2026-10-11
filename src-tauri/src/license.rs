@@ -45,8 +45,8 @@ const PUBLIC_KEY_B64: &str = "QisYr46g3mqEeiz1BDyEcPbRO1xO4z0lR3d5/ODppIU=";
 
 /// A signed entitlement is valid only for the product that requested it.
 /// Keeping this check in the Rust enforcement path prevents an entitlement
-/// for another ecosystem app from unlocking PC Tweaker.
-const PRODUCT_ID: &str = "pctweaker";
+/// for another ecosystem app from unlocking WinCraft.
+const PRODUCT_ID: &str = "wincraft";
 
 /// How long a signed license is trusted without a fresh fetch. Long enough
 /// to cover a weekend or a short trip without connectivity; short enough
@@ -67,9 +67,9 @@ pub struct LicensePayload {
     pub user_id: String,
     pub is_pro: bool,
     pub plan: Option<String>,
-    /// Older PC Tweaker builds were issued signed payloads before the
+    /// Older WinCraft builds were issued signed payloads before the
     /// multi-product backend added this field. A missing product is therefore
-    /// accepted only as the legacy PC Tweaker format. New payloads always
+    /// accepted only as the legacy WinCraft format. New payloads always
     /// carry a product, and a signed value for any other product is rejected.
     #[serde(default)]
     pub product: Option<String>,
@@ -318,7 +318,7 @@ mod tests {
 
     fn temp_dir(tag: &str) -> PathBuf {
         let dir = std::env::temp_dir().join(format!(
-            "pc-tweaker-license-test-{}-{}-{}",
+            "wincraft-license-test-{}-{}-{}",
             tag,
             std::process::id(),
             std::time::SystemTime::now()

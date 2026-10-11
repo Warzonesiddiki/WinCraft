@@ -500,7 +500,7 @@ impl Steering {
         watcher_start: u64,
     ) {
         if !self.recovery_checked {
-            // A journal left by a PC Tweaker that is no longer running is put
+            // A journal left by a WinCraft that is no longer running is put
             // back first, Pro or not.
             match dynamic_session::session_owner(store) {
                 Ok(Some(owner)) if originating_watcher_may_be_alive(&owner, processes) => return,
@@ -1048,7 +1048,7 @@ mod tests {
         }
     }
 
-    /// A journal left by a PC Tweaker that crashed mid-game is put back on
+    /// A journal left by a WinCraft that crashed mid-game is put back on
     /// the next launch's first pass, with steering disabled and no Pro.
     #[cfg(windows)]
     #[test]

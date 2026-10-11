@@ -22,7 +22,7 @@ const require = createRequire(import.meta.url);
  */
 async function sendWithProviderStatus(status, body = "") {
   process.env.RESEND_API_KEY = "test-key";
-  process.env.MAIL_FROM = "PC Tweaker <mail@example.com>";
+  process.env.MAIL_FROM = "WinCraft <mail@example.com>";
   const originalFetch = globalThis.fetch;
   globalThis.fetch = async () => ({
     ok: status >= 200 && status < 300,
@@ -85,7 +85,7 @@ test("a successful send reports delivery", async () => {
 
 test("customer replies use the branded alias without replacing support-form replies", async () => {
   process.env.RESEND_API_KEY = "test-key";
-  process.env.MAIL_FROM = "PC Tweaker <mail@example.com>";
+  process.env.MAIL_FROM = "WinCraft <mail@example.com>";
   const originalFetch = globalThis.fetch;
   const payloads = [];
   globalThis.fetch = async (_url, init) => {

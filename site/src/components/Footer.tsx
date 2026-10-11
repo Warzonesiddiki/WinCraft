@@ -51,7 +51,7 @@ export function Footer({ navigate }: { navigate: (to: string) => void }) {
         <div className="flex flex-wrap justify-between gap-10">
           <div>
             <div className="font-display mb-2.5 text-[17px] font-bold text-[var(--fg)]">
-              PC Tweaker
+              WinCraft
             </div>
             <p className="max-w-xs text-[13px] text-[var(--fg-dim)]">{text.footer.tagline}</p>
             <NewsletterSignup />
@@ -64,8 +64,8 @@ export function Footer({ navigate }: { navigate: (to: string) => void }) {
                 { label: text.footer.download, href: DOWNLOAD_EXE },
                 { label: text.footer.changelog, href: `${GH}/blob/master/CHANGELOG.md` },
                 { label: text.footer.source, href: GH },
-                { label: "PC Tweaker Uninstaller", href: "/uninstaller/" },
-                { label: "Tweaky Driver", href: "https://pctweaker.app/tweaky-driver/" },
+                { label: "WinCraft Uninstaller", href: "/uninstaller/" },
+                { label: "Tweaky Driver", href: "https://wincraft.app/tweaky-driver/" },
                 { label: text.support.navLabel, href: "/support/" },
                 { label: text.footer.contact, href: "/support/" },
                 { label: "Facebook", href: "https://www.facebook.com/Pctweaker10" },

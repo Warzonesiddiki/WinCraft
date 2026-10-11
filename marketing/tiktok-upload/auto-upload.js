@@ -71,7 +71,7 @@ const SHARE_PROMPTS = [
   "Send this to a friend who needs it.",
   "Share this before you forget it exists.",
 ];
-const BIO_CTA = "PC Tweaker has the full one-click setup. Link in bio.";
+const BIO_CTA = "WinCraft has the full one-click setup. Link in bio.";
 
 // These always came out in the SAME order while meta.tags held only 5 fixed
 // entries per category: normaliseTags deduplicated and cut to 5, so the

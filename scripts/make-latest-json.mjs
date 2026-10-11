@@ -54,7 +54,7 @@ const notes = fs
 
 // GitHub does not serve a release asset under the name it was uploaded
 // with: every character outside [A-Za-z0-9.-_] becomes a dot, so
-// "PC Tweaker Uninstaller_0.8.2_x64-setup.exe" is downloadable only as
+// "WinCraft Uninstaller_0.8.2_x64-setup.exe" is downloadable only as
 // "PC.Tweaker.Uninstaller_0.8.2_x64-setup.exe". Percent-encoding the
 // spaces instead produces a URL that 404s, which is how 0.8.0's winget
 // manifest shipped pointing at an asset that was never there — and an
@@ -74,7 +74,7 @@ const releaseDir = path.join(root, "src-tauri", "target", "release");
 /**
  * The application binary that actually ships, taken out of the MSI.
  *
- * Verifying `target/release/PC Tweaker.exe` looks right and is wrong. Tauri
+ * Verifying `target/release/WinCraft.exe` looks right and is wrong. Tauri
  * patches that file with bundle-type information, signs it, packages it, and
  * then restores the pre-patch bytes when it is finished - so after a correct
  * signed build the leftover in `target/release` is unsigned while the copy
@@ -106,12 +106,12 @@ function shippedApplication(msiPath) {
     // Copied out before the staging directory goes away, and left in place:
     // the verification below reads it, and a human comparing hashes after the
     // fact needs it to still be there.
-    const destination = path.join(releaseDir, "PC Tweaker.shipped.exe");
+    const destination = path.join(releaseDir, "WinCraft.shipped.exe");
     fs.copyFileSync(found[0], destination);
     return destination;
   } catch (error) {
     console.warn(`Could not unpack the MSI payload (${error.message}); verifying the build output instead.`);
-    return path.join(releaseDir, "PC Tweaker.exe");
+    return path.join(releaseDir, "WinCraft.exe");
   } finally {
     fs.rmSync(staging, { recursive: true, force: true });
   }

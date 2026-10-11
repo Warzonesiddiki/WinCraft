@@ -3,7 +3,7 @@
  *
  * Usage:  node scripts/legacy-artifact-names.mjs      (after `tauri build`, before `tauri signer sign`)
  *
- * Tauri names the bundles after productName ("PC Tweaker_<v>_x64-setup.exe"), but every client
+ * Tauri names the bundles after productName ("WinCraft_<v>_x64-setup.exe"), but every client
  * from 1.14.7 binds an update to the signed file name "pc-tweaker-app_<v>_x64-setup.exe" / ".msi"
  * (src-tauri/src/update_identity.rs) and ignores anything else. Renaming must happen before the
  * updater signature is made, because that signature carries the file name. The .sig files the
@@ -17,8 +17,8 @@ const root = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
 const { version } = JSON.parse(fs.readFileSync(path.join(root, "src-tauri", "tauri.conf.json"), "utf8"));
 const bundle = path.join(root, "src-tauri", "target", "release", "bundle");
 const targets = [
-  ["nsis", `PC Tweaker_${version}_x64-setup.exe`, `pc-tweaker-app_${version}_x64-setup.exe`],
-  ["msi", `PC Tweaker_${version}_x64_en-US.msi`, `pc-tweaker-app_${version}_x64_en-US.msi`],
+  ["nsis", `WinCraft_${version}_x64-setup.exe`, `pc-tweaker-app_${version}_x64-setup.exe`],
+  ["msi", `WinCraft_${version}_x64_en-US.msi`, `pc-tweaker-app_${version}_x64_en-US.msi`],
 ];
 for (const [dir, built, legacy] of targets) {
   const from = path.join(bundle, dir, built);

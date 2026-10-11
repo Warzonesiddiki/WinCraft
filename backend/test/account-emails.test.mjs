@@ -70,7 +70,7 @@ test("every subject names the product", () => {
     accountWelcomeSubject(),
     passwordChangedSubject(),
   ]) {
-    assert.match(subject, /PC Tweaker/);
+    assert.match(subject, /WinCraft/);
   }
 });
 

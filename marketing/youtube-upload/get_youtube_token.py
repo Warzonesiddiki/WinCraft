@@ -1,5 +1,5 @@
 """
-Regenerates token.json for the PC Tweaker channel after the refresh token has
+Regenerates token.json for the WinCraft channel after the refresh token has
 expired or been revoked. Reuses the same client_secret already present in this
 folder. TO BE RUN ONCE, LOCALLY.
 

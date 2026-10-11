@@ -215,8 +215,8 @@ router.post("/", writeLimiter, asyncRoute(async (req: Request, res: Response) =>
   const who = name || "Someone";
   void sendMail({
     to: SUPPORT_INBOX,
-    subject: singleLine(`New ${rating}★ PC Tweaker rating from ${who}`),
-    html: `<p><strong>${escapeHtml(who)}</strong> rated PC Tweaker ${rating}/5.</p>
+    subject: singleLine(`New ${rating}★ WinCraft rating from ${who}`),
+    html: `<p><strong>${escapeHtml(who)}</strong> rated WinCraft ${rating}/5.</p>
            ${body ? `<p>They wrote:</p><blockquote style="white-space:pre-wrap">${escapeHtml(body)}</blockquote>` : "<p>They left no written feedback.</p>"}
            <p>Rating id: ${saved.id}${contact ? ` · ${escapeHtml(contact)}` : " · no address given"}</p>
            <p>${sameIpNote}</p>

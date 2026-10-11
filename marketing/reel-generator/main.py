@@ -1,5 +1,5 @@
 """
-Orchestrator: generates N PC Tweaker Reels and drops each one straight into
+Orchestrator: generates N WinCraft Reels and drops each one straight into
 marketing/to-publish/ as a <name>.mp4 + <name>.json pair - the SAME queue
 the existing YouTube/TikTok/Instagram uploaders already watch (see
 marketing/youtube-upload, tiktok-upload, instagram-upload). This script

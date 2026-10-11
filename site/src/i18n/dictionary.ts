@@ -203,11 +203,11 @@ export interface Dictionary {
 
 export const engDictionary: Dictionary = {
   "coffee": {
-    "pill": "Support PC Tweaker",
+    "pill": "Support WinCraft",
     "caption": "Optional one-time tip. Your download is free.",
     "fewer": "One fewer coffee",
     "more": "One more coffee",
-    "unavailable": "Tipping is temporarily unavailable. You can still download PC Tweaker."
+    "unavailable": "Tipping is temporarily unavailable. You can still download WinCraft."
   },
   "nav": {
     "results": "Evidence",
@@ -225,12 +225,12 @@ export const engDictionary: Dictionary = {
     "subBold": "Make deliberate changes. Keep what works.",
     "sub": " Review Windows settings for gaming, privacy and everyday use. See what each tweak changes, save its previous state and restore supported settings when you need to. Start free. No account required.",
     "cta": "Download Free for Windows",
-    "safetyNote": "PC Tweaker installers are code-signed. Our signed Windows installers identify Aurelio Avila as the publisher. Older downloads may be unsigned; check the file's Digital Signatures tab. SmartScreen may still show a warning for a new release.",
-    "screenshotAlt": "PC Tweaker Overview screen with processor and memory usage, the number of applied settings and a suggested next step.",
+    "safetyNote": "WinCraft installers are code-signed. Our signed Windows installers identify Aurelio Avila as the publisher. Older downloads may be unsigned; check the file's Digital Signatures tab. SmartScreen may still show a warning for a new release.",
+    "screenshotAlt": "WinCraft Overview screen with processor and memory usage, the number of applied settings and a suggested next step.",
     "screenshotCaption": "The Overview screen, as it appears in the app.",
     "terminalTitle": "Install with Windows Package Manager",
-    "terminalCmd": "winget install --id AurelioAvila.PCTweaker --exact",
-    "terminalHint": "# install the official PC Tweaker package",
+    "terminalCmd": "winget install --id AurelioAvila.WinCraft --exact",
+    "terminalHint": "# install the official WinCraft package",
     "copy": "COPY",
     "copied": "COPIED",
     "badges": [
@@ -517,8 +517,8 @@ export const engDictionary: Dictionary = {
     "title": "Clear answers before your first change.",
     "items": [
       {
-        "q": "Will PC Tweaker improve FPS or remove micro-stutter?",
-        "a": "There is no universal FPS gain. Results depend on the game, hardware, drivers and starting configuration. Compare repeated runs and check frame-time consistency. Shader compilation, thermal limits and driver problems may need a different fix. PC Tweaker does not promise to eliminate micro-stutter or reduce DPC latency on every system."
+        "q": "Will WinCraft improve FPS or remove micro-stutter?",
+        "a": "There is no universal FPS gain. Results depend on the game, hardware, drivers and starting configuration. Compare repeated runs and check frame-time consistency. Shader compilation, thermal limits and driver problems may need a different fix. WinCraft does not promise to eliminate micro-stutter or reduce DPC latency on every system."
       },
       {
         "q": "Are the sensor readings real, and where do drivers come from?",
@@ -530,7 +530,7 @@ export const engDictionary: Dictionary = {
       },
       {
         "q": "Can I use it with competitive games?",
-        "a": "PC Tweaker tunes Windows itself and reads performance data through standard Windows interfaces. It never changes a game's files or gameplay, and a game that manages its own performance is left exactly as it is while it runs."
+        "a": "WinCraft tunes Windows itself and reads performance data through standard Windows interfaces. It never changes a game's files or gameplay, and a game that manages its own performance is left exactly as it is while it runs."
       },
       {
         "q": "What is free, and how does Pro work?",
@@ -541,8 +541,8 @@ export const engDictionary: Dictionary = {
         "a": "Applying local settings is separate from online services. Account, license, update, payment, support and optional breach-check requests contact their respective services. The app also reads one on/off service setting once an hour; that request carries no account or PC details. The breach check sends a hash prefix, not your complete password. Read the Privacy Policy for details. Private feedback is not reused as a public testimonial without permission."
       },
       {
-        "q": "Is PC Tweaker code-signed?",
-        "a": "PC Tweaker ships with Windows application and installer signatures from Aurelio Avila and a trusted timestamp. Older releases may be unsigned. A valid signature identifies the publisher and helps detect changed files. The separate update signature verifies update packages. Neither guarantees performance gains or prevents every SmartScreen prompt."
+        "q": "Is WinCraft code-signed?",
+        "a": "WinCraft ships with Windows application and installer signatures from Aurelio Avila and a trusted timestamp. Older releases may be unsigned. A valid signature identifies the publisher and helps detect changed files. The separate update signature verifies update packages. Neither guarantees performance gains or prevents every SmartScreen prompt."
       }
     ]
   },
@@ -551,9 +551,9 @@ export const engDictionary: Dictionary = {
     "title": "See what other users found.",
     "outOf": "out of 5",
     "basedOn": "based on {count} site ratings",
-    "note": "Rated 5/5 by users on Softpedia (79 votes) and MajorGeeks (110 votes). Softpedia also awarded PC Tweaker 4.5/5 in its editorial review. Checked September 9, 2026. These external scores are separate from the site ratings above. Written feedback submitted here goes privately to support.",
+    "note": "Rated 5/5 by users on Softpedia (79 votes) and MajorGeeks (110 votes). Softpedia also awarded WinCraft 4.5/5 in its editorial review. Checked September 9, 2026. These external scores are separate from the site ratings above. Written feedback submitted here goes privately to support.",
     "writeCta": "Share Your Experience",
-    "formTitle": "How did PC Tweaker work for you?",
+    "formTitle": "How did WinCraft work for you?",
     "formName": "Name",
     "formNameHint": "Optional; not displayed publicly.",
     "formEmail": "Email",
@@ -584,7 +584,7 @@ export const engDictionary: Dictionary = {
       },
       {
         "q": "Pro features are still locked after paying",
-        "a": "Return to PC Tweaker while connected to the internet so it can refresh your account and license. If access is still locked, contact support with the email used for the purchase and the payment time. Do not post your license file or payment details publicly."
+        "a": "Return to WinCraft while connected to the internet so it can refresh your account and license. If access is still locked, contact support with the email used for the purchase and the payment time. Do not post your license file or payment details publicly."
       },
       {
         "q": "The app won't start at all",
@@ -655,10 +655,10 @@ export const engDictionary: Dictionary = {
     "genericError": "We could not save your subscription. Please try again."
   },
   "sendToPc": {
-    "pitch": "On your phone? PC Tweaker runs on Windows. We'll email you the download link so you can open it on your PC.",
+    "pitch": "On your phone? WinCraft runs on Windows. We'll email you the download link so you can open it on your PC.",
     "placeholder": "Your email address",
     "button": "Send link",
-    "thanks": "Sent. Open the email on your Windows PC to download PC Tweaker.",
+    "thanks": "Sent. Open the email on your Windows PC to download WinCraft.",
     "genericError": "We could not send the link. Please try again."
   },
   "footer": {
@@ -677,7 +677,7 @@ export const engDictionary: Dictionary = {
     "license": "Source-Available License",
     "copyright": "Created and maintained by Aurelio Avila. © 2026 Aurelio Avila",
     "motto": "// every millisecond is earned",
-    "tipThanks": "Thank you for supporting PC Tweaker."
+    "tipThanks": "Thank you for supporting WinCraft."
   }
 };
 

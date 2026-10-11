@@ -7,7 +7,7 @@
 //! desktop settles. These are Windows' own measurements; nothing here times a
 //! boot or estimates one.
 //!
-//! The log is readable by administrators only, so a non-elevated PC Tweaker
+//! The log is readable by administrators only, so a non-elevated WinCraft
 //! asks once through the headless helper, which writes what it read to a file
 //! and exits. Records are kept in the app data folder, so the history grows
 //! past the log's own retention and is shown without asking again.

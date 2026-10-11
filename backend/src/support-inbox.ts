@@ -10,5 +10,5 @@
  */
 // The product alias is routed to the owner's mailbox by Cloudflare Email
 // Routing, so no personal address has to live in the code or the deploy.
-export const SUPPORT_REPLY_TO = "support@pctweaker.app";
+export const SUPPORT_REPLY_TO = "support@wincraft.app";
 export const SUPPORT_INBOX = process.env.SUPPORT_EMAIL || SUPPORT_REPLY_TO;

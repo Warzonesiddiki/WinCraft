@@ -367,7 +367,7 @@ mod tests {
 // Keep the task at the scheduler root. `schtasks` cannot create a missing
 // folder from a task path, and managed Windows installations may report that
 // failure as the misleading "Access is denied".
-pub const TASK_NAME: &str = "PC Tweaker Update drift watch";
+pub const TASK_NAME: &str = "WinCraft Update drift watch";
 
 #[cfg(test)]
 mod task_name_tests {
@@ -400,17 +400,17 @@ pub fn notify(reverted_count: usize) -> Result<(), String> {
     const CREATE_NO_WINDOW: u32 = 0x0800_0000;
 
     let body = if reverted_count == 1 {
-        "A Windows update reverted 1 tweak. Open PC Tweaker to re-apply it.".to_string()
+        "A Windows update reverted 1 tweak. Open WinCraft to re-apply it.".to_string()
     } else {
         format!(
-            "A Windows update reverted {reverted_count} tweaks. Open PC Tweaker to re-apply them."
+            "A Windows update reverted {reverted_count} tweaks. Open WinCraft to re-apply them."
         )
     };
 
     // The AppID has to be one Windows already knows, or the toast is dropped
     // with no error at all - which is how this nearly shipped broken. It
-    // looked for a Start Menu shortcut named "PC Tweaker.lnk" while the
-    // installer writes "pc-tweaker-app.lnk", so every notification would have
+    // looked for a Start Menu shortcut named "WinCraft.lnk" while the
+    // installer writes "wincraft.lnk", so every notification would have
     // borrowed Windows PowerShell's identity and arrived as PowerShell
     // talking about tweaks.
     //
@@ -432,7 +432,7 @@ foreach ($c in @('AurelioAvila.PCTweaker_27nraqq9g21x0!App', 'com.aurel.pc-tweak
 if (-not $appId) {{ exit 3 }}
 $xml = New-Object Windows.Data.Xml.Dom.XmlDocument
 $xml.LoadXml(@'
-<toast><visual><binding template="ToastGeneric"><text>PC Tweaker</text><text>{body}</text></binding></visual></toast>
+<toast><visual><binding template="ToastGeneric"><text>WinCraft</text><text>{body}</text></binding></visual></toast>
 '@)
 [Windows.UI.Notifications.ToastNotificationManager]::CreateToastNotifier($appId).Show([Windows.UI.Notifications.ToastNotification]::new($xml))
 "#

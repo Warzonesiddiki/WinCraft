@@ -21,19 +21,19 @@ import { bulletRow, emailShell, EMAIL_MUTED_TEXT } from "./layout";
 const ACCENT = "#ff5500";
 
 export function verificationText(link: string): string {
-  return `Confirm your email for PC Tweaker\n\nConfirm this address to activate your account:\n${link}\n\nThis link expires in 24 hours. If you did not create this account, ignore this message.`;
+  return `Confirm your email for WinCraft\n\nConfirm this address to activate your account:\n${link}\n\nThis link expires in 24 hours. If you did not create this account, ignore this message.`;
 }
 
 export function passwordResetText(link: string): string {
-  return `Reset your PC Tweaker password\n\nChoose a new password:\n${link}\n\nThis link works once and expires in one hour. If you did not request this, ignore this message. Your password stays unchanged.`;
+  return `Reset your WinCraft password\n\nChoose a new password:\n${link}\n\nThis link works once and expires in one hour. If you did not request this, ignore this message. Your password stays unchanged.`;
 }
 
 export function passwordChangedText(when: string): string {
-  return `Your PC Tweaker password was changed on ${when}. Every device that was signed in has been signed out.\n\nIf this was not you, request a new reset link from the app immediately and contact support: https://pctweaker.app/support\n\nWe will never ask you for your password by email.`;
+  return `Your WinCraft password was changed on ${when}. Every device that was signed in has been signed out.\n\nIf this was not you, request a new reset link from the app immediately and contact support: https://wincraft.app/support\n\nWe will never ask you for your password by email.`;
 }
 
 export function accountWelcomeText(freeTweakCount: number): string {
-  return `Your PC Tweaker account is ready\n\nYour email is confirmed. Sign in from the app to get started.\n\nYour free account includes ${freeTweakCount} tweaks, live processor, memory and disk monitoring, a startup manager, temporary file cleanup and a password breach check.\n\nOpen PC Tweaker: https://pctweaker.app\nSupport: https://pctweaker.app/support`;
+  return `Your WinCraft account is ready\n\nYour email is confirmed. Sign in from the app to get started.\n\nYour free account includes ${freeTweakCount} tweaks, live processor, memory and disk monitoring, a startup manager, temporary file cleanup and a password breach check.\n\nOpen WinCraft: https://wincraft.app\nSupport: https://wincraft.app/support`;
 }
 
 /** The URL under the button, shown so it can be read rather than trusted. */
@@ -49,27 +49,27 @@ function linkFallback(link: string): string {
 }
 
 export function verificationSubject(): string {
-  return "Confirm your email for PC Tweaker";
+  return "Confirm your email for WinCraft";
 }
 
 export function verificationHtml(firstName: string, link: string): string {
   const name = (firstName || "").trim().split(/\s+/)[0];
   return emailShell({
-    preheader: "Confirm this address to activate your PC Tweaker account. The link works for 24 hours.",
+    preheader: "Confirm this address to activate your WinCraft account. The link works for 24 hours.",
     eyebrow: "Confirm your email",
     headline: name ? `One step left, ${name}.` : "One step left.",
     intro:
-      "Confirm this address and your PC Tweaker account is ready. It is what lets you sign in on another PC and keeps your license attached to you rather than to one machine.",
+      "Confirm this address and your WinCraft account is ready. It is what lets you sign in on another PC and keeps your license attached to you rather than to one machine.",
     action: { label: "Confirm my email", url: link },
     afterActionHtml: linkFallback(link),
     note: "The link works for 24 hours.",
-    footerNote: "If you did not create a PC Tweaker account, ignore this message and nothing happens.",
+    footerNote: "If you did not create a WinCraft account, ignore this message and nothing happens.",
     accent: ACCENT,
   });
 }
 
 export function passwordResetSubject(): string {
-  return "Reset your PC Tweaker password";
+  return "Reset your WinCraft password";
 }
 
 export function passwordResetHtml(link: string): string {
@@ -77,7 +77,7 @@ export function passwordResetHtml(link: string): string {
     preheader: "Set a new password with the link inside. It works once, for one hour.",
     eyebrow: "Password reset",
     headline: "Choose a new password.",
-    intro: "Use the button below to set a new password for your PC Tweaker account.",
+    intro: "Use the button below to set a new password for your WinCraft account.",
     action: { label: "Set a new password", url: link },
     afterActionHtml: linkFallback(link),
     note: "The link works for one hour, and only once.",
@@ -88,7 +88,7 @@ export function passwordResetHtml(link: string): string {
 }
 
 export function passwordChangedSubject(): string {
-  return "Your PC Tweaker password was changed";
+  return "Your WinCraft password was changed";
 }
 
 /**
@@ -126,9 +126,9 @@ export function passwordChangedHtml(firstName: string, when: string): string {
     preheader: "Every signed-in device has been signed out. If this was not you, contact support now.",
     eyebrow: "Security notice",
     headline: name ? `Your password was changed, ${name}.` : "Your password was changed.",
-    intro: `The password on your PC Tweaker account was changed on ${when}. Every device that was signed in has been signed out.`,
+    intro: `The password on your WinCraft account was changed on ${when}. Every device that was signed in has been signed out.`,
     bodyHtml: body,
-    action: { label: "Contact support", url: "https://pctweaker.app/support" },
+    action: { label: "Contact support", url: "https://wincraft.app/support" },
     note: "We will never ask you for your password by email.",
     footerNote:
       "This notice is sent every time the password changes and cannot be turned off.",
@@ -137,7 +137,7 @@ export function passwordChangedHtml(firstName: string, when: string): string {
 }
 
 export function accountWelcomeSubject(): string {
-  return "Your PC Tweaker account is ready";
+  return "Your WinCraft account is ready";
 }
 
 /**
@@ -170,7 +170,7 @@ ${bulletRow(ACCENT, "Startup manager, temporary file cleanup and a password brea
     intro:
       "Your email is confirmed and the account is active. Sign in from the app and everything below is already yours.",
     bodyHtml: body,
-    action: { label: "Open PC Tweaker", url: "https://pctweaker.app" },
+    action: { label: "Open WinCraft", url: "https://wincraft.app" },
     footerNote: "Questions? Just reply to this email.",
     accent: ACCENT,
   });

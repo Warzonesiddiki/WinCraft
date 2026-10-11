@@ -16,7 +16,7 @@ const router = express.Router();
  */
 
 /** Products allowed to report. Anything else is dropped without a hint. */
-const APPS = new Set(["pctweaker", "uninstaller"]);
+const APPS = new Set(["wincraft", "uninstaller"]);
 
 const MAX_MESSAGE_LEN = 500;
 const MAX_CONTEXT_LEN = 100;

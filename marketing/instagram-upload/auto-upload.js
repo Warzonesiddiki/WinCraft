@@ -61,7 +61,7 @@ function appendLog(entry) {
 // carrying a specific NUMBER measures +27% link clicks against the vague
 // phrasing (FastLinkIt/Korli). The numbers are the REAL ones from the app's
 // README: 36 tweaks total, 28 free forever.
-const CAPTION_OFFER = "PC Tweaker: 36 one-click Windows tweaks, 28 free forever. Link in bio.";
+const CAPTION_OFFER = "WinCraft: 36 one-click Windows tweaks, 28 free forever. Link in bio.";
 
 function buildCaption(meta) {
   const rawTags = (meta.instagramTags || meta.tags || []).slice(0, MAX_HASHTAGS);

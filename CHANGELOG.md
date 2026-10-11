@@ -2,15 +2,15 @@
 
 ## v1.18.1
 
-PC Tweaker 1.18.1 makes Before & After a measured comparison, turns Change history into a record you can filter, export and undo by session, gives Debloat facts about how each app is really used, adds starter profiles and moves Portuguese to European Portuguese.
+WinCraft 1.18.1 makes Before & After a measured comparison, turns Change history into a record you can filter, export and undo by session, gives Debloat facts about how each app is really used, adds starter profiles and moves Portuguese to European Portuguese.
 
 - Before & After, on PC Health: measure, apply your changes, measure again. Each timed test runs at least 7 times and shows its median with the usual spread. A difference is reported only when the two series are clearly apart (exact rank test, p < 0.01), at least 5% apart and in the same direction; otherwise it says there is no meaningful change. Processes, startup apps, memory in use and free space are read once and count only above stated thresholds. Boot time comes from the times Windows itself records, which needs administrator permission to read. If Windows restarted between the two measurements, the result says so. The comparison can be saved as an image that includes the method.
 - Starter profiles: Gaming, Streaming, Work, Study, Laptop and No interruptions. They use only reversible, per-user switches. Nothing is selected or applied until you choose, and a control this PC's Windows does not support is shown but never applied.
 - Change history becomes a timeline by day and session. Each change says where it came from (its own switch, a profile, a starter profile, Scan, or a re-apply after a Windows update), whether it is still in effect, and, from this version on, the registry values before and after. Undo one change, a whole session or everything still in effect, always after a confirmation that lists what goes back. Filter by type, result and period, search names and registry values, export to CSV or JSON, or print to PDF. App removals from Debloat appear in the same timeline. Clearing the history asks first.
 - Debloat shows, for each app, when its data last changed, whether it starts with Windows and how much memory it uses while running, all as Windows records them; a data change is a hint, not proof of use. Minimal, Balanced and Aggressive fill the selection only when clicked, and the preview still lists every app before anything is removed. A selection can be saved as a list and loaded on another PC, which selects apps but never removes them. Apps can be sorted by their last data change.
-- Turbo Boost shows how much of the processor load is PC Tweaker itself and how much is everything else.
+- Turbo Boost shows how much of the processor load is WinCraft itself and how much is everything else.
 - The Windows AI Components Host control now sets the service to Manual instead of Disabled, so Windows can still start it when an app or a Windows feature asks for it.
-- The Microsoft Edge AI control states which policies apply to personal profiles and which only to work or school profiles. The drag tray and Windows suggestions controls state that their values come from Windows community documentation. Automatic RAM cleanup explains that it needs PC Tweaker running as administrator.
+- The Microsoft Edge AI control states which policies apply to personal profiles and which only to work or school profiles. The drag tray and Windows suggestions controls state that their values come from Windows community documentation. Automatic RAM cleanup explains that it needs WinCraft running as administrator.
 - On current Windows 11, Windows protects the taskbar Widgets switch from other apps. Where it does, "Hide Widgets from the taskbar" is shown as unavailable, with the way to change it in Settings, instead of failing.
 - Portuguese is now European Portuguese throughout, and the language menu lists it as Português (Portugal). English remains the language on first launch, whatever the Windows language; a language you choose is remembered.
 - Decimals follow the app's language on PC Health, Gaming and the X3D list.
@@ -20,7 +20,7 @@ Windows binaries and installers are digitally signed by Aurelio Avila and timest
 
 ## v1.18.0
 
-PC Tweaker 1.18.0 "Halloween Update" adds 15 controls, including the Windows AI features, shows exactly what every change will write before it is written, undoes a failed application on its own, asks before re-applying anything a Windows update put back, and turns PC Health into a live dashboard.
+WinCraft 1.18.0 "Halloween Update" adds 15 controls, including the Windows AI features, shows exactly what every change will write before it is written, undoes a failed application on its own, asks before re-applying anything a Windows update put back, and turns PC Health into a live dashboard.
 
 - The catalog grows from 66 to 81 controls: 46 Free and 35 Pro.
 - Five new controls cover the Windows AI layer: Click to Do (where Windows offers it), the Windows AI Fabric service, and the AI features in Microsoft Edge, Paint and Notepad. Each can be restored from the change ledger.
@@ -29,76 +29,76 @@ PC Tweaker 1.18.0 "Halloween Update" adds 15 controls, including the Windows AI 
 - Every tweak has a "What this changes, exactly" panel, behind the (i) next to its name, that lists each value as it is now and as it will be set, without changing anything. Batches list every value they will write.
 - If an application fails partway, the values already written are restored immediately.
 - With "Watch for Windows updates" on, a check at sign-in tells you only when something has actually stopped being in effect. After a cumulative update, the affected tweaks are listed with one checkbox each; untick anything you changed on purpose and re-apply the rest. Nothing is re-applied on its own.
-- App priority rules (Pro): pick an app and a priority. PC Tweaker sets it each time the app starts while PC Tweaker is open and puts the old priority back when the rule is removed or PC Tweaker closes. Never above High.
+- App priority rules (Pro): pick an app and a priority. WinCraft sets it each time the app starts while WinCraft is open and puts the old priority back when the rule is removed or WinCraft closes. Never above High.
 - Weekly temporary file cleanup (Pro): once a week, a few minutes after sign-in, temporary files nobody has touched for a day are moved to the Recycle Bin. It waits while a game is running and never touches memory or open apps.
-- "Leave self-managed games alone": while such a game is running, PC Tweaker pauses its per-app adjustments and leaves the game exactly as it is. Priority and background-efficiency rules never touch Windows components.
+- "Leave self-managed games alone": while such a game is running, WinCraft pauses its per-app adjustments and leaves the game exactly as it is. Priority and background-efficiency rules never touch Windows components.
 - PC Health becomes a live dashboard: processor load per core, memory in use, cached and free, disk read and write, network download and upload, graphics load, temperature, fan and video memory on NVIDIA graphics cards, and "What's using resources" grouped by app from Windows' own process list, over 1 or 5 minutes. Missing sensors are reported, not guessed.
 - Scan can be paused, resumed or ended. Resume reads only what is still missing; ending early keeps a partial result that names the checks that did not run. Unavailable checks remain unknown, not passed. Scan now runs 13 checks; scheduled startup tasks, optional Windows apps and background-efficiency conflicts are new.
 - Duplicate and large-file searches can be stopped.
-- The RAM cleaner asks Windows to trim memory for the whole system in one administrator step instead of opening each app: a manual clean asks for administrator permission, and automatic cleanup runs only while PC Tweaker has administrator rights.
+- The RAM cleaner asks Windows to trim memory for the whole system in one administrator step instead of opening each app: a manual clean asks for administrator permission, and automatic cleanup runs only while WinCraft has administrator rights.
 - Debloat is redesigned: apps grouped by kind with their real size, a "What you lose" popover with app files, your data, package identity and a link to the Microsoft Store page, and a bottom action bar. Nothing is selected for you.
 - Turbo Boost shows measured processor load smoothed over about three seconds, the measured clock speeds, the power plan's minimum processor state and the apps using the processor most, plus a fixed 3-second workload to compare work done, average and peak speed in each mode. After Start it shows when Turbo Boost was turned on and whether your power plan already had these settings. Numbers only; results depend on the workload.
 - Badges are uniform across Hardware, Startup and tweak cards; spacing is refined throughout.
-- A page that fails shows a recovery screen: the rest of PC Tweaker keeps working, nothing on the PC is changed by the error, and the page or the app can be reloaded.
+- A page that fails shows a recovery screen: the rest of WinCraft keeps working, nothing on the PC is changed by the error, and the page or the app can be reloaded.
 - The window reopens where it belongs, sized and placed correctly.
 
 Windows binaries and installers are digitally signed by Aurelio Avila and timestamped; automatic updates carry a separate updater signature.
 
 ## v1.17.1
 
-PC Tweaker 1.17.1 is a routine maintenance update.
+WinCraft 1.17.1 is a routine maintenance update.
 
 ## v1.17.0
 
-PC Tweaker 1.17.0 is a routine maintenance update.
+WinCraft 1.17.0 is a routine maintenance update.
 
 ## v1.16.4
 
-PC Tweaker 1.16.4 is a maintenance and security update. It strengthens the checks around administrator actions and secure file deletion, and includes the latest framework fixes.
+WinCraft 1.16.4 is a maintenance and security update. It strengthens the checks around administrator actions and secure file deletion, and includes the latest framework fixes.
 
 ## v1.16.3
 
-PC Tweaker 1.16.3 is a routine maintenance update.
+WinCraft 1.16.3 is a routine maintenance update.
 
 ## v1.16.2
 
-PC Tweaker 1.16.2 is a routine maintenance update.
+WinCraft 1.16.2 is a routine maintenance update.
 
 ## v1.16.1
 
-PC Tweaker 1.16.1 is a routine maintenance update.
+WinCraft 1.16.1 is a routine maintenance update.
 
 ## v1.16.0
 
-PC Tweaker 1.16.0 is a routine daily maintenance update.
+WinCraft 1.16.0 is a routine daily maintenance update.
 
 ## v1.15.9
 
-PC Tweaker 1.15.9 is a routine daily maintenance update.
+WinCraft 1.15.9 is a routine daily maintenance update.
 
 ## v1.15.8
 
-PC Tweaker 1.15.8 is a routine daily maintenance update.
+WinCraft 1.15.8 is a routine daily maintenance update.
 
 ## v1.15.6
 
-PC Tweaker 1.15.6 is a routine daily maintenance update.
+WinCraft 1.15.6 is a routine daily maintenance update.
 
 ## v1.15.5
 
-PC Tweaker 1.15.5 is a routine daily maintenance update.
+WinCraft 1.15.5 is a routine daily maintenance update.
 
 ## v1.15.4
 
-PC Tweaker 1.15.4 is a routine daily maintenance update.
+WinCraft 1.15.4 is a routine daily maintenance update.
 
 ## v1.15.3
 
-PC Tweaker 1.15.3 is a routine daily maintenance update.
+WinCraft 1.15.3 is a routine daily maintenance update.
 
 ## v1.15.2
 
-PC Tweaker 1.15.2 is a routine daily maintenance update.
+WinCraft 1.15.2 is a routine daily maintenance update.
 
 ## v1.15.1
 
@@ -114,7 +114,7 @@ PC Tweaker 1.15.2 is a routine daily maintenance update.
 ## v1.15.0
 
 - Adds a DPC and ISR latency trace to Diagnostics. A 5 to 30 second kernel capture measures how long each driver routine holds a processor and names the driver responsible. Results follow Microsoft's 100 µs and 25 µs guidance, only stalls over one millisecond are marked red, and durations are shown in milliseconds. Without administrator rights the capture asks for approval once; it changes nothing, so no restore point is created.
-- Game Sessions can steer a registered game to the V-Cache die on AMD X3D processors or to the performance cores on Intel hybrid processors. On hybrid processors other apps in your session move to the efficiency cores, except Windows components, the game's own processes, apps with their own CPU sets and apps raised above normal priority. Nothing is suspended. Every change is recorded first and undone when the game exits, when steering is turned off, when PC Tweaker quits, or at the next launch after a crash.
+- Game Sessions can steer a registered game to the V-Cache die on AMD X3D processors or to the performance cores on Intel hybrid processors. On hybrid processors other apps in your session move to the efficiency cores, except Windows components, the game's own processes, apps with their own CPU sets and apps raised above normal priority. Nothing is suspended. Every change is recorded first and undone when the game exits, when steering is turned off, when WinCraft quits, or at the next launch after a crash.
 - Adds a network check: 32 pings with jitter, plus a reading of one live TCP connection, taken before and after the two TCP tweaks and on demand. A difference is reported as a change in the line, never as the effect of a tweak. Latency tweaks now target the adapter that carries the internet route.
 - Power plan, CPU turbo boost, core parking, DNS, BBR2 and Windows Search controls use native Windows APIs instead of powercfg, sc.exe and PowerShell.
 - Turbo boost and core parking now restore on Windows 11 when Windows refuses to delete a plan override: the previously effective value is written back, and battery settings you changed meanwhile are kept.
@@ -123,15 +123,15 @@ PC Tweaker 1.15.2 is a routine daily maintenance update.
 
 ## v1.14.10
 
-PC Tweaker 1.14.10 is a routine daily maintenance update.
+WinCraft 1.14.10 is a routine daily maintenance update.
 
 ## v1.14.9
 
-PC Tweaker 1.14.9 fixes an issue that caused the installed app to open a localhost connection error instead of the desktop interface.
+WinCraft 1.14.9 fixes an issue that caused the installed app to open a localhost connection error instead of the desktop interface.
 
 ## v1.14.8
 
-PC Tweaker 1.14.8 is a routine daily maintenance update.
+WinCraft 1.14.8 is a routine daily maintenance update.
 
 ## v1.14.7
 
@@ -142,14 +142,14 @@ PC Tweaker 1.14.8 is a routine daily maintenance update.
 ## v1.14.6
 
 - Adds Debloat: remove optional Windows apps for the current user only, starting with Microsoft Solitaire Collection, MSN Weather, Microsoft News, Microsoft Copilot, Microsoft Clipchamp and Outlook for Windows. Each package must match its verified publisher, and you review the exact packages before removal. Store, App Installer, frameworks, shell, security components, WebView2 and gaming services are excluded. Every result is verified, and the removal history links to the Store page to reinstall an app.
-- Adds three configurable Pro controls: background app efficiency rules that lower the energy priority of chosen non-critical apps while PC Tweaker is open, a limit for Windows background downloads through Delivery Optimization, and per-game monitor refresh profiles with a 15-second preview that reverts unless confirmed.
+- Adds three configurable Pro controls: background app efficiency rules that lower the energy priority of chosen non-critical apps while WinCraft is open, a limit for Windows background downloads through Delivery Optimization, and per-game monitor refresh profiles with a 15-second preview that reverts unless confirmed.
 - Adds three Free controls: stop reopening apps after sign-in, enable long paths for compatible apps, and turn off the Filter Keys shortcut.
 - Renames and re-describes two legacy multimedia values to match Microsoft's documentation; they no longer raise the scan or health score. The retired Copilot policy becomes restore-only, and the current Copilot app is managed in Debloat.
 - The catalog now contains 66 controls: 39 Free and 27 Pro.
 
 ## v1.14.5
 
-PC Tweaker 1.14.5 is a routine daily maintenance update.
+WinCraft 1.14.5 is a routine daily maintenance update.
 
 ## v1.14.4
 
@@ -157,7 +157,7 @@ PC Tweaker 1.14.5 is a routine daily maintenance update.
 
 ## v1.14.3
 
-PC Tweaker 1.14.3 is a routine daily maintenance update.
+WinCraft 1.14.3 is a routine daily maintenance update.
 
 ## v1.14.2
 
@@ -210,7 +210,7 @@ Windows binaries and installers are digitally signed by Aurelio Avila and timest
 
 ## v1.12.1
 
-- Signed PC Tweaker licenses now carry the paid subscription expiry. Native Pro checks enforce that cutoff offline alongside the existing three-day cache freshness limit.
+- Signed WinCraft licenses now carry the paid subscription expiry. Native Pro checks enforce that cutoff offline alongside the existing three-day cache freshness limit.
 - Fresh signed licenses reflect renewed periods. Cancellation at period end preserves access through the paid period; Lifetime access is preserved.
 - Older signed caches without an expiry retain their existing freshness limit until refreshed.
 
@@ -233,9 +233,9 @@ These releases distribute digitally signed, timestamped Windows application file
 
 ## v1.10.3
 
-PC Tweaker now stays in the Windows notification area when you close its window, keeping ongoing app features available until you choose to exit.
+WinCraft now stays in the Windows notification area when you close its window, keeping ongoing app features available until you choose to exit.
 
-- Click the tray icon to reopen PC Tweaker, or right-click it for Open PC Tweaker and Exit PC Tweaker.
+- Click the tray icon to reopen WinCraft, or right-click it for Open WinCraft and Exit WinCraft.
 - Turn off Keep running in the background from the tray menu if you prefer closing the window to quit. Your choice is saved.
 - A one-time notice explains where to find the app after closing its window.
 - Local Windows preview builds no longer open an accompanying console window.
@@ -352,7 +352,7 @@ entry here.
 
 Windows quietly undoes your tweaks after an update. Now you find out.
 
-- **The update watchdog runs on its own.** PC Tweaker has always been able to
+- **The update watchdog runs on its own.** WinCraft has always been able to
   tell when a cumulative update reverted something you applied — Windows keeps
   the registry entries it recognises and discards the rest, and documents that
   as expected behaviour. Until now it only noticed if you happened to open the
@@ -545,7 +545,7 @@ Windows quietly undoes your tweaks after an update. Now you find out.
   eviction, to a different install channel having a different store, and to
   this app's own duplicate scanner being able to delete its own database.
   Existing photos are migrated automatically.
-- The cleaner could delete PC Tweaker's own settings storage. That folder is
+- The cleaner could delete WinCraft's own settings storage. That folder is
   now protected the same way Windows and Program Files are.
 - Disk optimisation could be started without an active Pro subscription by
   calling it directly; every Pro feature now verifies the licence in the
@@ -673,7 +673,7 @@ The Health Update.
   performance was mis-cased), laptop-aware Balanced rating, no raw GUIDs
   as evidence.
 
-All notable changes to PC Tweaker are logged here, newest first. Every
+All notable changes to WinCraft are logged here, newest first. Every
 update from here on (features, fixes, infra changes) gets an entry —
 this is the single source of truth for "what changed and why," not just
 the git log.
@@ -683,7 +683,7 @@ the git log.
 ### Added
 
 - **Instagram pinned-CTA comment.** `marketing/instagram-upload/lib.js` now
-  posts a "Try PC Tweaker for free" comment with the GitHub Releases link
+  posts a "Try WinCraft for free" comment with the GitHub Releases link
   right after every Reel publish (mirrors the same pattern already used by
   the YouTube Ghostcut bot). The Graph API still has no way to actually pin
   a comment via the API, so it stays a manual step from the Instagram app.
@@ -693,14 +693,14 @@ the git log.
 
 ## v1.0.0 "Control Room" — 2026-08-21
 
-One-point-zero. The release where PC Tweaker stops being a tweak list and
+One-point-zero. The release where WinCraft stops being a tweak list and
 becomes a control room: a live instrument panel, an advisor that argues
 from your hardware, and a ledger that remembers every change it ever made
 — all wrapped in a design language built for this app alone.
 
 ### Added
 
-- **PC Tweaker Intelligence.** Two new surfaces built on the audit and
+- **WinCraft Intelligence.** Two new surfaces built on the audit and
   advice engines:
   - **Recommended for your PC** — one concrete, hardware-motivated
     recommendation on the home screen, with the reason it applies to this
@@ -728,7 +728,7 @@ from your hardware, and a ledger that remembers every change it ever made
   avatar upload endpoint, on purpose.
 - **Report an issue** in the account menu, opening pctweaker.app/support.
 - **Suite cross-promotion done honestly.** The Maintenance screen links
-  to PC Tweaker Uninstaller (with its real icon), and the Privacy screen
+  to WinCraft Uninstaller (with its real icon), and the Privacy screen
   closes with PromptShield — because the biggest modern privacy leak is
   what gets pasted into AI chats.
 

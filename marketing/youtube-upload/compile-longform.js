@@ -1,4 +1,4 @@
-// Builds a "normal" (non-Shorts) video for PC Tweaker by concatenating
+// Builds a "normal" (non-Shorts) video for WinCraft by concatenating
 // several Reels already published individually from marketing/published/ -
 // unlike the other channels (xn0time, SoloFounded, etc), there is no pool of
 // facts here to generate new content from: the material is already

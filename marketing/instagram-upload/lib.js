@@ -32,10 +32,10 @@ const EXPECTED_USERNAME = "pctweaker10";
 // called IG_ACCESS_TOKEN/IG_USER_ID, GENERIC names shared with certsprint-bot
 // and solofounded-bot, and they won over credentials.json. On this machine
 // they exist as Windows user variables and hold @solo_founded's credentials
-// (set for a local test of that bot): from 2026-08-01 onward EVERY PC Tweaker
+// (set for a local test of that bot): from 2026-08-01 onward EVERY WinCraft
 // Reel was published to @solo_founded, with HTTP 200, a valid media_id and an
 // "[OK] Published" log line. Confirmed by resolving the "ghost" media_ids with
-// the environment token: they were PC Tweaker Reels (#windows11
+// the environment token: they were WinCraft Reels (#windows11
 // #pcoptimization) on the wrong profile.
 // credentials.json, which is by definition specific to THIS folder and THIS
 // account, now takes precedence; the env vars remain as a fallback but only
@@ -122,7 +122,7 @@ async function createContainer(igUserId, igAccessToken, videoUrl, caption) {
       video_url: videoUrl,
       caption,
       is_ai_generated: "true",
-      audio_name: "PC Tweaker Windows Tips",
+      audio_name: "WinCraft Windows Tips",
     }),
   });
   const data = await resp.json();
@@ -166,7 +166,7 @@ async function publish(igUserId, igAccessToken, creationId) {
 // point at the GitHub repo rather than the product's own site - the same fix
 // was applied in parallel on YouTube (auto-upload.js) and X (post-to-x.js).
 const PINNED_COMMENT_TEXT =
-  "Try PC Tweaker for free \u{1F447}\nhttps://pctweaker.app";
+  "Try WinCraft for free \u{1F447}\nhttps://pctweaker.app";
 
 // Posts a CTA comment right after publishing (mirrors the
 // _pinned_comment/_post_pinned_comment pattern in the Ghostcut YouTube bot).

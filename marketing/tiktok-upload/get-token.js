@@ -1,7 +1,7 @@
 // Run ONCE, locally, to get a TikTok refresh token to save as secrets.
 //
 // Prerequisites (you do these, not automatable):
-// 1. developers.tiktok.com -> create a new app for PC Tweaker (separate from
+// 1. developers.tiktok.com -> create a new app for WinCraft (separate from
 //    the getcertsprint one)
 // 2. Add product "Login Kit" (Redirect URI, Web tab):
 //    https://pc-tweaker-app-production.up.railway.app/tiktok-callback

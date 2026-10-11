@@ -1,10 +1,10 @@
-//! The one place PC Tweaker looks at, or opens, other people's processes.
+//! The one place WinCraft looks at, or opens, other people's processes.
 //!
 //! Some games ship their own kernel-level protection, which watches who holds
 //! a handle to the game and what rights it carries. An optimizer that opens
 //! the game with read or write access, or keeps a handle to every process on
 //! the machine, looks exactly like the tools that protection exists to stop.
-//! Those games manage their own performance, and PC Tweaker leaves them be. So:
+//! Those games manage their own performance, and WinCraft leaves them be. So:
 //!
 //! * **Seeing processes opens nothing.** [`processes`] and [`image_path`] read
 //!   the kernel's process table with `NtQuerySystemInformation`: names,
@@ -53,15 +53,15 @@ pub const GAME_RUNNING_PREFIX: &str = "SELF_MANAGED_GAME_RUNNING: ";
 pub const REGISTERED_GAME_PREFIX: &str = "REGISTERED_GAME_RUNNING: ";
 
 pub fn self_managed_error() -> String {
-    format!("{SELF_MANAGED_PREFIX}This game manages its own performance, so PC Tweaker leaves it as it is.")
+    format!("{SELF_MANAGED_PREFIX}This game manages its own performance, so WinCraft leaves it as it is.")
 }
 
 pub fn registered_game_error() -> String {
-    format!("{REGISTERED_GAME_PREFIX}One of your games is running, so PC Tweaker waits until it closes.")
+    format!("{REGISTERED_GAME_PREFIX}One of your games is running, so WinCraft waits until it closes.")
 }
 
 pub fn game_running_error() -> String {
-    format!("{GAME_RUNNING_PREFIX}A game that manages its own performance is running, so PC Tweaker leaves apps as they are until it closes.")
+    format!("{GAME_RUNNING_PREFIX}A game that manages its own performance is running, so WinCraft leaves apps as they are until it closes.")
 }
 
 /* ---------------------------------------------------------------- *
@@ -388,7 +388,7 @@ fn fresh() -> Arc<Assessment> {
     assessment
 }
 
-/// Records an action taken on another process. Every change PC Tweaker makes
+/// Records an action taken on another process. Every change WinCraft makes
 /// to a process it does not own goes through here, so the local audit log
 /// answers "what touched which process, and when". Silent in unit tests,
 /// which must not write the real log.
@@ -564,8 +564,10 @@ mod native {
             use windows_sys::Win32::Foundation::FILETIME;
             use windows_sys::Win32::System::Threading::GetProcessTimes;
             // SAFETY: four live FILETIME out-parameters; the handle is open.
+            // SAFETY: zeroed() creates a valid zero-initialized FILETIME array.
             let mut t: [FILETIME; 4] = unsafe { std::mem::zeroed() };
             let [a, b, c, d] = &mut t;
+            // SAFETY: self.0 is a valid process handle; a,b,c,d are valid pointers to FILETIME.
             let ok = unsafe { GetProcessTimes(self.0, a, b, c, d) } != 0;
             let value = (u64::from(t[0].dwHighDateTime) << 32) | u64::from(t[0].dwLowDateTime);
             (ok && value != 0).then_some(value)
@@ -575,6 +577,7 @@ mod native {
     impl Drop for ProcessHandle {
         fn drop(&mut self) {
             // SAFETY: opened by OpenProcess below and closed exactly once.
+            // SAFETY: self.0 is a valid handle from OpenProcess; CloseHandle is the correct cleanup.
             unsafe { CloseHandle(self.0) };
         }
     }

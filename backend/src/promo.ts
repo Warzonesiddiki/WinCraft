@@ -44,9 +44,9 @@ export const PROMO = {
   // Exclusive: the last second on sale is 23:59:59 on 6 November, Rome (CET).
   endsAt: "2026-11-06T23:00:00.000Z",
   offers: [
-    { product: "pctweaker", plan: "monthly", priceEnv: "STRIPE_PRICE_MONTHLY", couponEnv: "STRIPE_COUPON_HALLOWEEN_MONTHLY", regular: 799, reference: 799, price: 399 },
-    { product: "pctweaker", plan: "annual", priceEnv: "STRIPE_PRICE_ANNUAL", couponEnv: "STRIPE_COUPON_HALLOWEEN_ANNUAL", regular: 5999, reference: 4999, price: 2499 },
-    { product: "pctweaker", plan: "lifetime", priceEnv: "STRIPE_PRICE_LIFETIME", promoPriceEnv: "STRIPE_PRICE_LIFETIME_PROMO", regular: 9900, reference: 7999, price: 3999 },
+    { product: "wincraft", plan: "monthly", priceEnv: "STRIPE_PRICE_MONTHLY", couponEnv: "STRIPE_COUPON_HALLOWEEN_MONTHLY", regular: 799, reference: 799, price: 399 },
+    { product: "wincraft", plan: "annual", priceEnv: "STRIPE_PRICE_ANNUAL", couponEnv: "STRIPE_COUPON_HALLOWEEN_ANNUAL", regular: 5999, reference: 4999, price: 2499 },
+    { product: "wincraft", plan: "lifetime", priceEnv: "STRIPE_PRICE_LIFETIME", promoPriceEnv: "STRIPE_PRICE_LIFETIME_PROMO", regular: 9900, reference: 7999, price: 3999 },
     // Standard price only: the loyalty price (€4.99) already equals the promo price and is not discounted twice.
     { product: "uninstaller", plan: "annual", priceEnv: "STRIPE_PRICE_UNINSTALLER_ANNUAL", couponEnv: "STRIPE_COUPON_HALLOWEEN_UNINSTALLER", regular: 999, reference: 999, price: 499 },
   ],

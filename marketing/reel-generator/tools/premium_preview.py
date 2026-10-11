@@ -27,11 +27,11 @@ def frame(style, t):
     mask=Image.new("L",card.size,0); ImageDraw.Draw(mask).rounded_rectangle((0,0,*card.size),28,fill=255); clipped=Image.new("RGBA",card.size); clipped.paste(card,mask=mask)
     base.alpha_composite(clipped,((W-cardw)//2,int(610-p*25)))
     labels=("SYSTEM OVERVIEW","GAMING CONTROL","CLEANER MAINTENANCE"); d=ImageDraw.Draw(base)
-    d.text((70,1540),labels[i],font=f(25,True),fill=accent); d.text((70,1590),"See the change. Keep the control.",font=f(33,True),fill="white"); d.text((70,1765),"PC Tweaker  ·  Link in bio",font=f(27),fill=(184,178,198))
+    d.text((70,1540),labels[i],font=f(25,True),fill=accent); d.text((70,1590),"See the change. Keep the control.",font=f(33,True),fill="white"); d.text((70,1765),"WinCraft  ·  Link in bio",font=f(27),fill=(184,178,198))
     return np.asarray(base.convert("RGB"))
 
 def render(style):
-    OUT.mkdir(parents=True,exist_ok=True); target=OUT/f"pc-tweaker-premium-{style}.mp4"
+    OUT.mkdir(parents=True,exist_ok=True); target=OUT/f"wincraft-premium-{style}.mp4"
     clip=VideoClip(lambda t:frame(style,t),duration=DURATION); clip.write_videofile(str(target),fps=24,codec="libx264",audio=False,bitrate="7000k",threads=2); clip.close(); print(target)
 
 if __name__ == "__main__":

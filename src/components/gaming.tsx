@@ -117,7 +117,7 @@ export function GameSessionsPanel({
   const steeringLive = Boolean(activeGame && steering?.enabled);
   useEffect(() => {
     if (!steeringLive) return;
-    const timer = window.setInterval(refreshSteering, 5000);
+    const timer = window.setInterval(() => { if (!document.hidden) refreshSteering(); }, 5000);
     return () => window.clearInterval(timer);
   }, [steeringLive]);
 
@@ -489,7 +489,7 @@ export function TurboBoostPanel({
         });
     };
     tick();
-    const id = window.setInterval(tick, 1000);
+    const id = window.setInterval(() => { if (!document.hidden) tick(); }, 1000);
     return () => {
       cancelled = true;
       window.clearInterval(id);

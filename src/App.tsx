@@ -9,7 +9,6 @@ import { ThemeName, detectInitialTheme } from "./theme";
 import {
   API_BASE_URL,
   FEATURE_INTELLIGENCE,
-  ProPlan,
   RAM_AUTO_STORAGE_KEY,
   adoptLegacyAvatar,
   clearSession,
@@ -35,7 +34,7 @@ import {
   HeartPulseIcon,
   ThermometerIcon,
 } from "./components/icons";
-import { Badge, PaywallModal, Toggle, UpdateBanner } from "./components/ui";
+import { Badge, Toggle, UpdateBanner } from "./components/ui";
 import {
   BrowserCleanupCard,
   CleanupCard,
@@ -70,27 +69,18 @@ import { usePulseSamples } from "./components/command";
 import { ScheduledTaskManager, StartupManager } from "./components/startup";
 import { ProfilesPanel } from "./components/profiles";
 import { PricingPanel } from "./components/pricing";
-import { PRICING_COPY } from "./components/pricing-copy";
 import { GamingHudCard, ZeroTraceCard } from "./components/pro";
 import { TitleBar } from "./components/titlebar";
 import { CATEGORY_STYLE } from "./categories";
-import { OverviewPanel } from "./components/overview";
+import { Dashboard } from "./components/dashboard";
+import { CommandPalette, useCommandPaletteShortcut } from "./components/command-palette";
+import { OnboardingFlow, shouldShowOnboarding } from "./components/onboarding";
 import { WorkspaceSidebar } from "./components/workspace-sidebar";
 import { DebloatPanel } from "./components/debloat";
 import { AdvancedControlCard } from "./components/advanced-controls";
 import { CONFIGURABLE_TWEAK_IDS, buildName, isCurrentCatalogTweak } from "./catalog";
 import "./App.css";
 import "./desktop-refresh.css";
-
-/** Carries the backend's machine-readable reason alongside its message. */
-class CheckoutError extends Error {
-  constructor(
-    message: string,
-    readonly code?: string,
-  ) {
-    super(message);
-  }
-}
 
 function App() {
   // Dev builds only: VITE_START_LANG opens in a chosen language for review,
@@ -102,14 +92,14 @@ function App() {
 
   function setLang(l: Lang) {
     setLangState(l);
-    localStorage.setItem("pc-tweaker-lang", l);
+    localStorage.setItem("wincraft-lang", l);
   }
 
   const [theme, setThemeState] = useState<ThemeName>(() => detectInitialTheme());
 
   function setTheme(t: ThemeName) {
     setThemeState(t);
-    localStorage.setItem("pc-tweaker-theme", t);
+    localStorage.setItem("wincraft-theme", t);
   }
 
   useEffect(() => {
@@ -142,21 +132,14 @@ function App() {
       : { status: "anonymous" };
   });
 
-  const isProUnlocked = auth.status === "authenticated" && auth.isPro;
+  // WinCraft is now free for everyone — every feature is unlocked
+  // regardless of account or subscription state.
+  const isProUnlocked = true;
 
-  // The plan someone clicked before being stopped by sign-in or an
-  // unconfirmed inbox. Without it they had to find the pricing panel again
-  // and click a third time; now checkout reopens on its own once the account
-  // can pay. Expires so a stale click never opens Stripe hours later.
-  const pendingPlan = useRef<{ plan: ProPlan; until: number } | null>(null);
-  function rememberPlan(plan: ProPlan) {
-    pendingPlan.current = { plan, until: Date.now() + 60 * 60 * 1000 };
-  }
-
-  // Re-reads Pro status from the backend. Called on mount (if already logged
-  // in), right after login/register, and when the window regains focus —
-  // that last one is what picks up a Stripe payment completed in the system
-  // browser, since there's no deep link back into the app yet.
+  // Re-reads the account from the backend. Called on mount (if already logged
+  // in), right after login/register, and when the window regains focus.
+  // Account status is still useful for profiles, support, and preferences
+  // even though Pro gating is gone.
   async function refreshAccount() {
     if (!API_BASE_URL) return;
     const token = readToken();
@@ -196,16 +179,9 @@ function App() {
       });
       // Fire-and-forget: refreshLicense() has its own error handling and
       // must never block the UI's account status on a signing hiccup.
+      // Kept for compatibility: the Rust license store still reads it, but
+      // since require_pro() always succeeds, this is a no-op in practice.
       void refreshLicense();
-      const pending = pendingPlan.current;
-      if (pending && (data.isPro || pending.until < Date.now())) {
-        pendingPlan.current = null;
-      } else if (pending && data.emailVerified) {
-        pendingPlan.current = null;
-        startCheckout(pending.plan).catch((e) =>
-          pushToast("error", String(e instanceof Error ? e.message : e)),
-        );
-      }
     } catch {
       // Network hiccup: keep whatever Pro status we already had rather than
       // dropping the user back to Free on a transient failure — but say so,
@@ -217,33 +193,12 @@ function App() {
   }
 
   /**
-   * Fetches a freshly signed Pro entitlement and hands it to the Rust side,
-   * which is what `apply_tweak` actually checks before running a Pro tweak —
-   * this UI's `isPro` flag on its own was never enough, since nothing
-   * stopped a Pro-gated tweak from being invoked directly, bypassing this
-   * screen entirely. See `src-tauri/src/license.rs`.
-   *
-   * Called every time `refreshAccount` succeeds, which already covers
-   * mount, focus, and right after login — so this never needs its own
-   * separate trigger wiring.
+   * WinCraft is now free for everyone — no license check is needed.
+   * Kept as a no-op stub so call sites compile without changes and the
+   * function can be removed in a future cleanup pass.
    */
   async function refreshLicense() {
-    if (!API_BASE_URL) return;
-    const token = readToken();
-    if (!token) return;
-    try {
-      const res = await fetch(`${API_BASE_URL}/api/license`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (!res.ok) return;
-      const response = (await res.json()) as { payloadJson: string; signature: string };
-      await invoke("save_license", { response });
-    } catch {
-      // Offline, or the backend's signer isn't configured: whatever was
-      // cached before keeps working until its grace period runs out. No
-      // toast — this runs silently in the background on every focus event
-      // and a real subscriber should never see noise from it.
-    }
+    // No-op: require_pro() always succeeds on the Rust side.
   }
 
   // The server can hold every runtime adjustment to other apps for everyone
@@ -365,34 +320,6 @@ function App() {
     }
   }
 
-  // Opens real Stripe Checkout in the system browser (Checkout can't run
-  // inside the app's webview). Throws with a clear reason when the backend
-  // isn't configured or the user isn't logged in yet, instead of pretending
-  // to charge anything.
-  async function startCheckout(plan: ProPlan = "annual") {
-    if (import.meta.env.DEV && import.meta.env.VITE_LIFETIME_PREVIEW_ENDS_AT) {
-      throw new Error(PRICING_COPY[lang].previewCheckout);
-    }
-    if (!API_BASE_URL) {
-      throw new Error(s.auth.backendNotConfigured);
-    }
-    const token = readToken();
-    if (!token) {
-      throw new Error(s.auth.loginRequiredForCheckout);
-    }
-    const res = await fetch(`${API_BASE_URL}/api/checkout`, {
-      method: "POST",
-      headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
-      body: JSON.stringify({ plan }),
-    });
-    if (!res.ok) {
-      const body = await res.json().catch(() => ({}) as { error?: string; code?: string });
-      throw new CheckoutError(body.error || `HTTP ${res.status}`, body.code);
-    }
-    const data = (await res.json()) as { url: string };
-    await openUrl(data.url);
-  }
-
   // A one-off tip. No login required — it isn't tied to an account and
   // unlocks nothing, so there's nothing to gate behind sign-in. The count is
   // sent, but the backend clamps it; this side is convenience, not the limit.
@@ -404,26 +331,6 @@ function App() {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ quantity }),
-    });
-    if (!res.ok) {
-      const body = await res.json().catch(() => ({}) as { error?: string });
-      throw new Error(body.error || `HTTP ${res.status}`);
-    }
-    const data = (await res.json()) as { url: string };
-    await openUrl(data.url);
-  }
-
-  async function openBillingPortal() {
-    if (!API_BASE_URL) {
-      throw new Error(s.auth.backendNotConfigured);
-    }
-    const token = readToken();
-    if (!token) {
-      throw new Error(s.auth.loginRequiredForCheckout);
-    }
-    const res = await fetch(`${API_BASE_URL}/api/portal`, {
-      method: "POST",
-      headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
     });
     if (!res.ok) {
       const body = await res.json().catch(() => ({}) as { error?: string });
@@ -486,7 +393,6 @@ function App() {
   }, []);
   const [busyId, setBusyId] = useState<string | null>(null);
   const [toasts, setToasts] = useState<Toast[]>([]);
-  const [paywallFeature, setPaywallFeature] = useState<string | null>(null);
   const [accountMenuOpen, setAccountMenuOpen] = useState(false);
   /** Id of the tweak whose exact registry write is currently disclosed. */
   const [inspecting, setInspecting] = useState<string | null>(null);
@@ -501,6 +407,12 @@ function App() {
   const toastSeq = useRef(0);
 
   const autoClean = useScheduledRamClean(ramAutoMinutes);
+
+  // Command palette (Ctrl+K)
+  const [paletteOpen, closePalette, openPalette] = useCommandPaletteShortcut();
+
+  // Onboarding: shown once on first launch
+  const [showOnboarding, setShowOnboarding] = useState(() => shouldShowOnboarding());
 
   function chooseRamAuto(minutes: number) {
     setRamAutoMinutes(minutes);
@@ -535,7 +447,7 @@ function App() {
   async function toggle(tweak: TweakInfo) {
     const text = textFor(s.tweaks, tweak.id, tweak.name, tweak.description);
     if (tweak.requires_pro && !isProUnlocked) {
-      setPaywallFeature(text.name);
+      void 0;
       return;
     }
     setBusyId(tweak.id);
@@ -803,8 +715,17 @@ function App() {
                     onKeyDown={(e) => e.key === "Escape" && setQuery("")}
                     aria-label={s.search.placeholder}
                     placeholder={s.search.placeholder}
-                    className="w-full rounded-xl border border-line bg-surface-2 py-2 pl-9 pr-8 text-sm text-ink outline-none transition-colors placeholder:text-ink-3 focus:border-line-2 focus:bg-surface-hover"
+                    className="w-full rounded-xl border border-line bg-surface-2 py-2 pl-9 pr-16 text-sm text-ink outline-none transition-colors placeholder:text-ink-3 focus:border-line-2 focus:bg-surface-hover"
                   />
+                  {!searching && (
+                    <button
+                      onClick={openPalette}
+                      className="absolute right-2 top-1/2 flex -translate-y-1/2 items-center gap-1 rounded-md border border-line bg-surface-1 px-1.5 py-0.5 text-[9px] font-semibold text-ink-3 transition-colors hover:text-ink"
+                      title="Open command palette (Ctrl+K)"
+                    >
+                      ⌘K
+                    </button>
+                  )}
                   {searching && (
                     <button
                       onClick={() => setQuery("")}
@@ -830,7 +751,7 @@ function App() {
                 onLogout={logout}
                 onResendVerification={resendVerification}
                 onForgotPassword={forgotPassword}
-                onUpgrade={() => setPaywallFeature(s.menu.planPro)}
+                onUpgrade={() => void 0}
                 onViewPlan={() => setFilter("pricing")}
                 pushToast={pushToast}
               />
@@ -858,12 +779,14 @@ function App() {
             <div key={filter} className="workspace-view">
               <PageBoundary s={s} resetKey={filter}>
                 {showOverview && (
-                  <OverviewPanel
+                  <Dashboard
                     s={s}
                     lang={lang}
                     tweaks={tweaks}
                     samples={pulseSamples}
                     onNavigate={setFilter}
+                    onScan={() => setFilter("scan")}
+                    onRestoreAll={restoreAll}
                   />
                 )}
 
@@ -881,7 +804,7 @@ function App() {
                       <DiskToolsSection
                         s={s}
                         isPro={isProUnlocked}
-                        onRequirePro={() => setPaywallFeature(s.diskOptimize.title)}
+                        onRequirePro={() => void 0}
                         onToast={pushToast}
                       />
                     </ul>
@@ -893,7 +816,7 @@ function App() {
                   <HardwarePanel
                     s={s}
                     isPro={isProUnlocked}
-                    onRequirePro={() => setPaywallFeature(s.driverBooster.title)}
+                    onRequirePro={() => void 0}
                     pushToast={pushToast}
                   />
                 )}
@@ -906,7 +829,7 @@ function App() {
                   <SystemRepairCard
                     s={s}
                     isPro={isProUnlocked}
-                    onRequirePro={() => setPaywallFeature(s.systemRepair.title)}
+                    onRequirePro={() => void 0}
                     pushToast={pushToast}
                   />
                 )}
@@ -989,9 +912,7 @@ function App() {
                   <ProfilesPanel
                     s={s}
                     lang={lang}
-                    lifetimeOwned={
-                      isProUnlocked && auth.status === "authenticated" && auth.plan === "lifetime"
-                    }
+                    lifetimeOwned={true}
                     onViewPlans={() => setFilter("pricing")}
                     tweaks={tweaks}
                     isPro={isProUnlocked}
@@ -1000,7 +921,7 @@ function App() {
                       pushToast("error", s.profiles.signInRequired);
                       setAccountMenuOpen(true);
                     }}
-                    onRequirePro={() => setPaywallFeature(s.profiles.title)}
+                    onRequirePro={() => void 0}
                     onChanged={refresh}
                     pushToast={pushToast}
                   />
@@ -1015,42 +936,6 @@ function App() {
                     hasBilling={auth.status === "authenticated" && auth.hasBilling}
                     freeTweakCount={freeTweakCount}
                     onOpenLifetimeTools={() => setFilter("profiles")}
-                    onChoosePro={async (plan) => {
-                      // A visitor without an account is exactly who this button is
-                      // for, and it used to answer them with a red toast and
-                      // nowhere to go: startCheckout throws without a token and
-                      // the catch below only reported it. ProfilesPanel already
-                      // had the right shape — say what is missing and open the
-                      // place where it is fixed.
-                      if (auth.status !== "authenticated") {
-                        rememberPlan(plan);
-                        pushToast("error", s.auth.loginRequiredForCheckout);
-                        setAccountMenuOpen(true);
-                        return;
-                      }
-                      try {
-                        await startCheckout(plan);
-                      } catch (e) {
-                        // Checkout needs a confirmed inbox. Same shape as above: say
-                        // what is missing and open the menu with the resend button.
-                        // The server decides, since emailVerified starts false
-                        // until refreshAccount() answers.
-                        if (e instanceof CheckoutError && e.code === "email_unverified") {
-                          rememberPlan(plan);
-                          pushToast("error", s.auth.verifyEmailForCheckout);
-                          setAccountMenuOpen(true);
-                          return;
-                        }
-                        pushToast("error", String(e instanceof Error ? e.message : e));
-                      }
-                    }}
-                    onManageBilling={async () => {
-                      try {
-                        await openBillingPortal();
-                      } catch (e) {
-                        pushToast("error", String(e instanceof Error ? e.message : e));
-                      }
-                    }}
                   />
                 )}
 
@@ -1059,7 +944,7 @@ function App() {
                     <ZeroTraceCard
                       s={s}
                       isPro={isProUnlocked}
-                      onRequirePro={() => setPaywallFeature(s.zeroTrace.title)}
+                      onRequirePro={() => void 0}
                       pushToast={pushToast}
                     />
                     <PasswordBreachCheck s={s} />
@@ -1078,7 +963,7 @@ function App() {
                     <GameSessionsPanel
                       s={s}
                       isPro={isProUnlocked}
-                      onRequirePro={() => setPaywallFeature(s.gameSessions.title)}
+                      onRequirePro={() => void 0}
                     />
                   </>
                 )}
@@ -1091,7 +976,7 @@ function App() {
                   <GamingHudCard
                     s={s}
                     isPro={isProUnlocked}
-                    onRequirePro={() => setPaywallFeature(s.hud.title)}
+                    onRequirePro={() => void 0}
                     pushToast={pushToast}
                   />
                 )}
@@ -1116,7 +1001,7 @@ function App() {
                             id={t.id}
                             lang={lang}
                             isPro={isProUnlocked}
-                            onRequirePro={setPaywallFeature}
+                            onRequirePro={() => {}}
                             onChanged={refresh}
                           />
                         </li>
@@ -1239,9 +1124,7 @@ function App() {
                         text={textFor(s.cleanup, c.id, c.name, c.description)}
                         busy={busyId === c.id}
                         isPro={isProUnlocked}
-                        onRequirePro={() =>
-                          setPaywallFeature(textFor(s.cleanup, c.id, c.name, c.description).name)
-                        }
+                        onRequirePro={() => {}}
                         onRun={(info) => setConfirmCleanup(info)}
                       />
                     ))}
@@ -1250,7 +1133,7 @@ function App() {
                     <ScheduledCleanupCard
                       s={s}
                       isPro={isProUnlocked}
-                      onRequirePro={() => setPaywallFeature(s.scheduledCleanup.title)}
+                      onRequirePro={() => void 0}
                       onToast={pushToast}
                     />
                   )}
@@ -1267,7 +1150,7 @@ function App() {
                     <CookieCleanerCard
                       s={s}
                       isPro={isProUnlocked}
-                      onRequirePro={() => setPaywallFeature(s.cookieCleaner.title)}
+                      onRequirePro={() => void 0}
                       onToast={pushToast}
                     />
                   )}
@@ -1276,7 +1159,7 @@ function App() {
                     <AppCacheCard
                       s={s}
                       isPro={isProUnlocked}
-                      onRequirePro={() => setPaywallFeature(s.appCache.title)}
+                      onRequirePro={() => void 0}
                       onToast={pushToast}
                     />
                   )}
@@ -1285,7 +1168,7 @@ function App() {
                     <DuplicateFinder
                       s={s}
                       isPro={isProUnlocked}
-                      onRequirePro={() => setPaywallFeature(s.duplicateFinder.title)}
+                      onRequirePro={() => void 0}
                       onToast={pushToast}
                     />
                   )}
@@ -1294,7 +1177,7 @@ function App() {
                     <LargeFileFinder
                       s={s}
                       isPro={isProUnlocked}
-                      onRequirePro={() => setPaywallFeature(s.largeFiles.title)}
+                      onRequirePro={() => void 0}
                       onToast={pushToast}
                     />
                   )}
@@ -1374,18 +1257,24 @@ function App() {
         </div>
       )}
 
-      {paywallFeature && (
-        <PaywallModal
+      <CommandPalette
+        s={s}
+        tweaks={tweaks}
+        open={paletteOpen}
+        onClose={closePalette}
+        onNavigate={(section) => { setFilter(section); }}
+        onToggleTweak={(tweak) => toggle(tweak)}
+        onScan={() => setFilter("scan")}
+        onRestoreAll={restoreAll}
+        onOpenProfiles={() => setFilter("profiles")}
+      />
+
+      {showOnboarding && (
+        <OnboardingFlow
           s={s}
-          lang={lang}
-          featureName={paywallFeature}
-          onClose={() => setPaywallFeature(null)}
-          // Send them to the plans instead of straight to a checkout for a
-          // plan they never picked — they should see monthly vs yearly first.
-          onNotify={() => {
-            setPaywallFeature(null);
-            setFilter("pricing");
-          }}
+          tweaks={tweaks}
+          onComplete={() => { setShowOnboarding(false); setFilter("scan"); }}
+          onSkip={() => setShowOnboarding(false)}
         />
       )}
 

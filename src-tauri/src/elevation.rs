@@ -30,6 +30,7 @@ pub fn current_user_session_allowed() -> bool {
     if !uac_disabled {
         return false;
     }
+    // SAFETY: ShellExecuteW is called with valid null-terminated strings and a valid HWND (None).
     unsafe {
         let shell = GetShellWindow();
         if shell.is_null() {

@@ -8,7 +8,7 @@
   tests (see README.md); a release build has no such option. Run it in the
   VM, in an elevated PowerShell, as the user being tested:
 
-    .\run-auto.ps1 -TestBuild 'C:\test\PC Tweaker.exe'
+    .\run-auto.ps1 -TestBuild 'C:\test\WinCraft.exe'
 
   The build applies and restores every control itself and, on restore, reads
   back every registry value it recorded before applying. verify-tweaks.ps1
@@ -29,7 +29,7 @@ if (-not ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdenti
 }
 $verify = Join-Path $PSScriptRoot 'verify-tweaks.ps1'
 $matrix = Get-Content -Raw -Path (Join-Path $PSScriptRoot 'tweak-matrix.json') | ConvertFrom-Json
-$log = Join-Path $env:APPDATA 'com.aurel.pc-tweaker-app\test-pro-cli.log'
+$log = Join-Path $env:APPDATA 'com.wincraft.app\test-pro-cli.log'
 
 # Returns the build's exit code: refused controls on apply (unsupported ones
 # are expected), real failures on restore (restore errors or values that did

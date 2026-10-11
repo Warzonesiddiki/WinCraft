@@ -231,7 +231,7 @@ export function ProfilesPanel({
     try {
       const path = await saveFileDialog({
         defaultPath: `${profile.name || "pctweaker"}.pctweaker.json`,
-        filters: [{ name: "PC Tweaker profile", extensions: ["json"] }],
+        filters: [{ name: "WinCraft profile", extensions: ["json"] }],
       });
       if (!path) return;
       await invoke("write_profile_file", { path, profile });
@@ -246,7 +246,7 @@ export function ProfilesPanel({
       const picked = await openFolderDialog({
         multiple: false,
         directory: false,
-        filters: [{ name: "PC Tweaker profile", extensions: ["json"] }],
+        filters: [{ name: "WinCraft profile", extensions: ["json"] }],
       });
       if (typeof picked !== "string") return;
       const loaded = await invoke<LoadedProfile>("read_profile_file", { path: picked });

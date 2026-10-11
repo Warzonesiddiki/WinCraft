@@ -147,9 +147,9 @@ function endLine(endsAt: string, c = COPY.en) {
   return c.ends(`${end}${zone ? ` ${zone}` : ""}`);
 }
 
-/** The smallest real discount among PC Tweaker's offers: the headline never claims more. */
+/** The smallest real discount among WinCraft's offers: the headline never claims more. */
 function headlinePercent(promo: Promo) {
-  const own = promo.offers.filter((o) => o.product === "pctweaker");
+  const own = promo.offers.filter((o) => o.product === "wincraft");
   const list = own.length ? own : promo.offers;
   return list.length ? Math.min(...list.map(promoPercent)) : 0;
 }
@@ -181,8 +181,8 @@ export function PromoStrip({ href }: { href: string }) {
 }
 
 /** Offer card for a page headline: struck reference and promo price, from the server.
- *  Home: PC Tweaker Lifetime. Uninstaller page: its Pro year. */
-export function PromoCard({ product = "pctweaker", plan = "lifetime", href = "#access" }: { product?: string; plan?: string; href?: string }) {
+ *  Home: WinCraft Lifetime. Uninstaller page: its Pro year. */
+export function PromoCard({ product = "wincraft", plan = "lifetime", href = "#access" }: { product?: string; plan?: string; href?: string }) {
   const { promo, offer, reserve } = usePromo();
   const c = useCopy();
   const o = offer(product, plan);

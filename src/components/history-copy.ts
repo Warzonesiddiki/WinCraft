@@ -32,7 +32,7 @@ const en = {
   clearBody:
     "This deletes the record of every change, with its origin and values, from this PC. Settings that are on stay on, and can still be undone from their switches.",
   undoBody:
-    "These settings go back to the values Windows had before PC Tweaker changed them. Nothing else is touched.",
+    "These settings go back to the values Windows had before WinCraft changed them. Nothing else is touched.",
   undoConfirmCount: "Undo {count} changes",
   undoConfirmOne: "Undo the change",
   undoDone: "{count} changes undone.",
@@ -44,7 +44,7 @@ const en = {
   originStarter: "Starter profile “{name}”",
   originScan: "Scan",
   originReapply: "Re-applied after a Windows update",
-  originApp: "PC Tweaker",
+  originApp: "WinCraft",
   stillActive: "In effect",
   noLongerActive: "No longer in effect",
   showValues: "Show values",
@@ -57,11 +57,11 @@ const en = {
   export: "Export",
   exportPdf: "PDF (print)",
   exported: "History saved.",
-  compareTitle: "Now compared with before PC Tweaker",
+  compareTitle: "Now compared with before WinCraft",
   compareBody:
-    "Every change PC Tweaker is keeping in effect, with the value Windows had before it.",
+    "Every change WinCraft is keeping in effect, with the value Windows had before it.",
   compareEmpty:
-    "PC Tweaker is not keeping any change in effect: these settings are as Windows had them.",
+    "WinCraft is not keeping any change in effect: these settings are as Windows had them.",
   undoAll: "Undo all ({count})",
   compareShow: "Show the changes in effect ({count})",
   compareHide: "Hide",
@@ -73,7 +73,7 @@ const en = {
   removalFailed: "App removal failed",
   removalUnknown: "App removal: result unknown",
   removalPending: "App removal not confirmed yet",
-  printTitle: "PC Tweaker · Change history",
+  printTitle: "WinCraft · Change history",
   printed: "Printed {date}",
 };
 
@@ -111,7 +111,7 @@ const it: Copy = {
   clearBody:
     "Elimina da questo PC la registrazione di ogni modifica, con origine e valori. Le impostazioni attive restano attive e si possono ancora annullare dai loro interruttori.",
   undoBody:
-    "Queste impostazioni tornano ai valori che Windows aveva prima che PC Tweaker le cambiasse. Nient'altro viene toccato.",
+    "Queste impostazioni tornano ai valori che Windows aveva prima che WinCraft le cambiasse. Nient'altro viene toccato.",
   undoConfirmCount: "Annulla {count} modifiche",
   undoConfirmOne: "Annulla la modifica",
   undoDone: "{count} modifiche annullate.",
@@ -123,7 +123,7 @@ const it: Copy = {
   originStarter: "Profilo iniziale «{name}»",
   originScan: "Verifica",
   originReapply: "Riapplicata dopo un aggiornamento di Windows",
-  originApp: "PC Tweaker",
+  originApp: "WinCraft",
   stillActive: "Attiva",
   noLongerActive: "Non più attiva",
   showValues: "Mostra i valori",
@@ -137,11 +137,11 @@ const it: Copy = {
   export: "Esporta",
   exportPdf: "PDF (stampa)",
   exported: "Cronologia salvata.",
-  compareTitle: "Ora rispetto a prima di PC Tweaker",
+  compareTitle: "Ora rispetto a prima di WinCraft",
   compareBody:
-    "Ogni modifica che PC Tweaker mantiene attiva, con il valore che Windows aveva prima.",
+    "Ogni modifica che WinCraft mantiene attiva, con il valore che Windows aveva prima.",
   compareEmpty:
-    "PC Tweaker non mantiene attiva nessuna modifica: queste impostazioni sono come le aveva Windows.",
+    "WinCraft non mantiene attiva nessuna modifica: queste impostazioni sono come le aveva Windows.",
   undoAll: "Annulla tutto ({count})",
   compareShow: "Mostra le modifiche attive ({count})",
   compareHide: "Nascondi",
@@ -153,7 +153,7 @@ const it: Copy = {
   removalFailed: "Rimozione dell'app non riuscita",
   removalUnknown: "Rimozione dell'app: esito sconosciuto",
   removalPending: "Rimozione dell'app non ancora confermata",
-  printTitle: "PC Tweaker · Cronologia delle modifiche",
+  printTitle: "WinCraft · Cronologia delle modifiche",
   printed: "Stampata il {date}",
 };
 
@@ -189,7 +189,7 @@ const fr: Copy = {
   clearBody:
     "Supprime de ce PC l'enregistrement de chaque modification, avec son origine et ses valeurs. Les réglages actifs le restent et peuvent toujours être annulés depuis leurs interrupteurs.",
   undoBody:
-    "Ces réglages reprennent les valeurs que Windows avait avant que PC Tweaker les modifie. Rien d'autre n'est touché.",
+    "Ces réglages reprennent les valeurs que Windows avait avant que WinCraft les modifie. Rien d'autre n'est touché.",
   undoConfirmCount: "Annuler {count} modifications",
   undoConfirmOne: "Annuler la modification",
   undoDone: "{count} modifications annulées.",
@@ -201,7 +201,7 @@ const fr: Copy = {
   originStarter: "Profil de départ « {name} »",
   originScan: "Analyse",
   originReapply: "Réappliquée après une mise à jour de Windows",
-  originApp: "PC Tweaker",
+  originApp: "WinCraft",
   stillActive: "Active",
   noLongerActive: "Plus active",
   showValues: "Afficher les valeurs",
@@ -215,11 +215,11 @@ const fr: Copy = {
   export: "Exporter",
   exportPdf: "PDF (impression)",
   exported: "Historique enregistré.",
-  compareTitle: "Maintenant par rapport à avant PC Tweaker",
+  compareTitle: "Maintenant par rapport à avant WinCraft",
   compareBody:
-    "Chaque modification que PC Tweaker maintient active, avec la valeur que Windows avait avant.",
+    "Chaque modification que WinCraft maintient active, avec la valeur que Windows avait avant.",
   compareEmpty:
-    "PC Tweaker ne maintient aucune modification active : ces réglages sont tels que Windows les avait.",
+    "WinCraft ne maintient aucune modification active : ces réglages sont tels que Windows les avait.",
   undoAll: "Tout annuler ({count})",
   compareShow: "Afficher les modifications actives ({count})",
   compareHide: "Masquer",
@@ -231,7 +231,7 @@ const fr: Copy = {
   removalFailed: "Échec de la suppression de l'application",
   removalUnknown: "Suppression de l'application : résultat inconnu",
   removalPending: "Suppression de l'application pas encore confirmée",
-  printTitle: "PC Tweaker · Historique des modifications",
+  printTitle: "WinCraft · Historique des modifications",
   printed: "Imprimé le {date}",
 };
 
@@ -267,7 +267,7 @@ const es: Copy = {
   clearBody:
     "Elimina de este PC el registro de cada cambio, con su origen y sus valores. Los ajustes activos siguen activos y aún se pueden deshacer desde sus interruptores.",
   undoBody:
-    "Estos ajustes vuelven a los valores que Windows tenía antes de que PC Tweaker los cambiara. No se toca nada más.",
+    "Estos ajustes vuelven a los valores que Windows tenía antes de que WinCraft los cambiara. No se toca nada más.",
   undoConfirmCount: "Deshacer {count} cambios",
   undoConfirmOne: "Deshacer el cambio",
   undoDone: "{count} cambios deshechos.",
@@ -279,7 +279,7 @@ const es: Copy = {
   originStarter: "Perfil inicial «{name}»",
   originScan: "Análisis",
   originReapply: "Reaplicado tras una actualización de Windows",
-  originApp: "PC Tweaker",
+  originApp: "WinCraft",
   stillActive: "Activo",
   noLongerActive: "Ya no está activo",
   showValues: "Mostrar valores",
@@ -292,10 +292,10 @@ const es: Copy = {
   export: "Exportar",
   exportPdf: "PDF (imprimir)",
   exported: "Historial guardado.",
-  compareTitle: "Ahora frente a antes de PC Tweaker",
-  compareBody: "Cada cambio que PC Tweaker mantiene activo, con el valor que Windows tenía antes.",
+  compareTitle: "Ahora frente a antes de WinCraft",
+  compareBody: "Cada cambio que WinCraft mantiene activo, con el valor que Windows tenía antes.",
   compareEmpty:
-    "PC Tweaker no mantiene ningún cambio activo: estos ajustes están como los tenía Windows.",
+    "WinCraft no mantiene ningún cambio activo: estos ajustes están como los tenía Windows.",
   undoAll: "Deshacer todo ({count})",
   compareShow: "Mostrar los cambios activos ({count})",
   compareHide: "Ocultar",
@@ -307,7 +307,7 @@ const es: Copy = {
   removalFailed: "No se pudo eliminar la aplicación",
   removalUnknown: "Eliminación de la aplicación: resultado desconocido",
   removalPending: "Eliminación de la aplicación aún sin confirmar",
-  printTitle: "PC Tweaker · Historial de cambios",
+  printTitle: "WinCraft · Historial de cambios",
   printed: "Impreso el {date}",
 };
 
@@ -343,7 +343,7 @@ const de: Copy = {
   clearBody:
     "Löscht auf diesem PC die Aufzeichnung jeder Änderung samt Herkunft und Werten. Aktive Einstellungen bleiben aktiv und lassen sich weiter über ihre Schalter rückgängig machen.",
   undoBody:
-    "Diese Einstellungen bekommen die Werte zurück, die Windows hatte, bevor PC Tweaker sie geändert hat. Sonst wird nichts angefasst.",
+    "Diese Einstellungen bekommen die Werte zurück, die Windows hatte, bevor WinCraft sie geändert hat. Sonst wird nichts angefasst.",
   undoConfirmCount: "{count} Änderungen rückgängig machen",
   undoConfirmOne: "Änderung rückgängig machen",
   undoDone: "{count} Änderungen rückgängig gemacht.",
@@ -355,7 +355,7 @@ const de: Copy = {
   originStarter: "Startprofil „{name}“",
   originScan: "Prüfung",
   originReapply: "Nach einem Windows-Update erneut angewendet",
-  originApp: "PC Tweaker",
+  originApp: "WinCraft",
   stillActive: "Aktiv",
   noLongerActive: "Nicht mehr aktiv",
   showValues: "Werte anzeigen",
@@ -368,10 +368,10 @@ const de: Copy = {
   export: "Exportieren",
   exportPdf: "PDF (Drucken)",
   exported: "Verlauf gespeichert.",
-  compareTitle: "Jetzt im Vergleich zum Zustand vor PC Tweaker",
-  compareBody: "Jede Änderung, die PC Tweaker aktiv hält, mit dem Wert, den Windows vorher hatte.",
+  compareTitle: "Jetzt im Vergleich zum Zustand vor WinCraft",
+  compareBody: "Jede Änderung, die WinCraft aktiv hält, mit dem Wert, den Windows vorher hatte.",
   compareEmpty:
-    "PC Tweaker hält keine Änderung aktiv: Diese Einstellungen sind so, wie Windows sie hatte.",
+    "WinCraft hält keine Änderung aktiv: Diese Einstellungen sind so, wie Windows sie hatte.",
   undoAll: "Alles rückgängig machen ({count})",
   compareShow: "Aktive Änderungen anzeigen ({count})",
   compareHide: "Ausblenden",
@@ -383,7 +383,7 @@ const de: Copy = {
   removalFailed: "Entfernen der App fehlgeschlagen",
   removalUnknown: "Entfernen der App: Ergebnis unbekannt",
   removalPending: "Entfernen der App noch nicht bestätigt",
-  printTitle: "PC Tweaker · Änderungsverlauf",
+  printTitle: "WinCraft · Änderungsverlauf",
   printed: "Gedruckt am {date}",
 };
 
@@ -419,7 +419,7 @@ const pt: Copy = {
   clearBody:
     "Apaga deste PC o registo de cada alteração, com a origem e os valores. As definições ativas continuam ativas e ainda podem ser anuladas nos respetivos interruptores.",
   undoBody:
-    "Estas definições voltam aos valores que o Windows tinha antes de o PC Tweaker as alterar. Nada mais é tocado.",
+    "Estas definições voltam aos valores que o Windows tinha antes de o WinCraft as alterar. Nada mais é tocado.",
   undoConfirmCount: "Anular {count} alterações",
   undoConfirmOne: "Anular a alteração",
   undoDone: "{count} alterações anuladas.",
@@ -431,7 +431,7 @@ const pt: Copy = {
   originStarter: "Perfil inicial «{name}»",
   originScan: "Verificação",
   originReapply: "Reaplicada após uma atualização do Windows",
-  originApp: "PC Tweaker",
+  originApp: "WinCraft",
   stillActive: "Ativa",
   noLongerActive: "Já não está ativa",
   showValues: "Mostrar valores",
@@ -444,11 +444,11 @@ const pt: Copy = {
   export: "Exportar",
   exportPdf: "PDF (imprimir)",
   exported: "Histórico guardado.",
-  compareTitle: "Agora em comparação com antes do PC Tweaker",
+  compareTitle: "Agora em comparação com antes do WinCraft",
   compareBody:
-    "Cada alteração que o PC Tweaker mantém ativa, com o valor que o Windows tinha antes.",
+    "Cada alteração que o WinCraft mantém ativa, com o valor que o Windows tinha antes.",
   compareEmpty:
-    "O PC Tweaker não mantém nenhuma alteração ativa: estas definições estão como o Windows as tinha.",
+    "O WinCraft não mantém nenhuma alteração ativa: estas definições estão como o Windows as tinha.",
   undoAll: "Anular tudo ({count})",
   compareShow: "Mostrar as alterações ativas ({count})",
   compareHide: "Ocultar",
@@ -460,7 +460,7 @@ const pt: Copy = {
   removalFailed: "A remoção da aplicação falhou",
   removalUnknown: "Remoção da aplicação: resultado desconhecido",
   removalPending: "Remoção da aplicação ainda não confirmada",
-  printTitle: "PC Tweaker · Histórico de alterações",
+  printTitle: "WinCraft · Histórico de alterações",
   printed: "Impresso em {date}",
 };
 

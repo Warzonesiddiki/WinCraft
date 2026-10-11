@@ -13,7 +13,7 @@ export function Nav({
 }: {
   navigate: (to: string) => void;
   onSubpage: boolean;
-  /** Overridden on product pages that are not PC Tweaker itself. */
+  /** Overridden on product pages that are not WinCraft itself. */
   downloadHref?: string;
   downloadLabel?: string;
   /** Where the Halloween strip's button goes; the home pricing by default. */
@@ -41,7 +41,7 @@ export function Nav({
           className="font-display flex items-center gap-2.5 text-[17px] whitespace-nowrap font-700 tracking-tight text-[var(--fg)]"
         >
           <img src={logoUrl} alt="" className="h-6 w-6 rounded-md" />
-          PC Tweaker
+          WinCraft
         </Link>
         <div className="flex items-center gap-7">
           {links.map((l) => (

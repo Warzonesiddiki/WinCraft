@@ -6,13 +6,13 @@ import { DriverAudit } from "./types";
 
 // The first-party Cloudflare hostname is the stable production endpoint.
 // VITE_API_BASE_URL remains available for an explicit local/staging build.
-export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://api.pctweaker.app";
+export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://api.wincraft.app";
 
 // ---- Anonymous, opt-in error reporting --------------------------------------
 // Off by default; the AccountMenu toggle flips a localStorage flag that is
 // read at send time (no state plumbing). What leaves the machine: app name,
 // version, and the error message the user already saw — nothing else.
-export const ERROR_REPORTS_KEY = "pc-tweaker-error-reports";
+export const ERROR_REPORTS_KEY = "wincraft-error-reports";
 
 export let cachedAppVersion = "";
 void getVersion()
@@ -120,13 +120,13 @@ export function loadColor(pct: number): string {
 /** Auto-cleanup choices, in minutes. `0` means "off". */
 export const RAM_AUTO_INTERVALS = [0, 10, 30, 60, 180, 360, 720, 1440] as const;
 
-export const RAM_AUTO_STORAGE_KEY = "pc-tweaker-ram-auto";
+export const RAM_AUTO_STORAGE_KEY = "wincraft-ram-auto";
 
 /** Only honor a stored value we actually offer: a hand-edited or stale entry
  *  must not become a rogue interval (or a 0ms one, which would spin the CPU). */
-export const TOKEN_KEY = "pc-tweaker-token";
+export const TOKEN_KEY = "wincraft-token";
 
-export const EMAIL_KEY = "pc-tweaker-email";
+export const EMAIL_KEY = "wincraft-email";
 
 /**
  * The session token, from whichever store it was put in.
@@ -240,7 +240,7 @@ export async function sha1Hex(text: string): Promise<string> {
  * to the MSIX build getting a different storage origin than the .exe build.
  * See src-tauri/src/avatar.rs.
  */
-export const AVATAR_KEY = "pc-tweaker-avatar";
+export const AVATAR_KEY = "wincraft-avatar";
 
 /**
  * Reads the signed-in account's photo.
@@ -366,7 +366,7 @@ export function fileToAvatarDataUrl(file: File): Promise<string> {
 }
 
 /**
- * Feature flag for the PC Tweaker Intelligence slice (Advisor + Change
+ * Feature flag for the WinCraft Intelligence slice (Advisor + Change
  * Ledger). Compile-time on purpose: flipping it to false removes the nav
  * entry and both surfaces in one place, with no dead UI left behind.
  */
@@ -380,7 +380,7 @@ export const FEATURE_INTELLIGENCE = true;
 // the last read. Persisting the last result means a relaunch shows it
 // immediately; only the explicit Rescan button ever pays the sixteen
 // seconds again.
-const DRIVER_AUDIT_KEY = "pc-tweaker-driver-audit";
+const DRIVER_AUDIT_KEY = "wincraft-driver-audit";
 
 export function readCachedDriverAudit(): { audit: DriverAudit; at: Date } | null {
   const raw = localStorage.getItem(DRIVER_AUDIT_KEY);

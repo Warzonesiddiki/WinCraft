@@ -70,6 +70,8 @@ impl DnsServers for WinDns {
         let dll: Vec<u16> = "iphlpapi.dll\0".encode_utf16().collect();
         // SAFETY: `dll` is NUL-terminated and outlives the call.
         let module =
+        // SAFETY: LoadLibraryExW with LOAD_LIBRARY_SEARCH_SYSTEM32 only searches System32,
+        // preventing DLL hijacking. The DLL path is a compile-time constant.
             unsafe { LoadLibraryExW(dll.as_ptr(), std::ptr::null_mut(), LOAD_LIBRARY_SEARCH_SYSTEM32) };
         if module.is_null() {
             return false;

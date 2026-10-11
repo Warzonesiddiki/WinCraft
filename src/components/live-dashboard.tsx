@@ -44,7 +44,7 @@ export type ResourceUser = { name: string; processes: number; cpu: number; memor
 export type ResourceUsers = {
   cpu: ResourceUser[];
   memory: ResourceUser[];
-  /** PC Tweaker's own share (with its WebView2 processes) and everything else's. */
+  /** WinCraft's own share (with its WebView2 processes) and everything else's. */
   own_cpu?: number | null;
   others_cpu?: number | null;
 };

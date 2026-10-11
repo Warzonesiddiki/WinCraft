@@ -20,7 +20,7 @@ test('Lifetime bonus activates once only from Uninstaller license request, expir
  await upsertEntitlement(id,'uninstaller',{plan:'lifetime',expiresAt:null});
  assert.equal((await productEntitlement(id,'uninstaller',true)).plan,'lifetime');
 });
-test('Monthly PC Tweaker subscription cannot claim the bonus',async()=>{
+test('Monthly WinCraft subscription cannot claim the bonus',async()=>{
  const {rows}=await getPool().query("INSERT INTO users(email,password_hash,is_pro,plan) VALUES('monthly-bonus@example.com','x',TRUE,'monthly') RETURNING id");
  assert.equal((await productEntitlement(rows[0].id,'uninstaller',true)).active,false);
 });

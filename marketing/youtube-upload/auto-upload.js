@@ -17,7 +17,7 @@ const { validateUpload } = require("./quality-gate");
 // point at the GitHub repo rather than the product's own site - the same fix
 // was applied in parallel on Instagram (instagram-upload/lib.js) and X.
 const DEFAULT_CTA_COMMENT =
-  "Try PC Tweaker for free \u{1F447}\nhttps://pctweaker.app";
+  "Try WinCraft for free \u{1F447}\nhttps://pctweaker.app";
 
 const ROOT = path.join(__dirname, "..");
 const QUEUE_DIR = path.join(ROOT, "to-publish");

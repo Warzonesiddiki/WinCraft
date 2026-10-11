@@ -54,9 +54,9 @@ export function escapeHtml(value: string): string {
 const DEFAULT_ACCENT = "#ff5500";
 // Secondary text remains readable on the dark email surface (WCAG AA).
 export const EMAIL_MUTED_TEXT = "#9ca3af";
-const DEFAULT_PRODUCT = "PC Tweaker";
-const DEFAULT_SITE = "https://pctweaker.app";
-const DEFAULT_LOGO = "https://pctweaker.app/logo.png";
+const DEFAULT_PRODUCT = "WinCraft";
+const DEFAULT_SITE = "https://wincraft.app";
+const DEFAULT_LOGO = "https://wincraft.app/logo.png";
 
 /** A row of text with the accent arrow, for lists inside `bodyHtml`. */
 export function bulletRow(accent: string, text: string): string {
@@ -147,7 +147,7 @@ ${bodyHtml}${button}${noteRow}${afterActionHtml}
           <td style="padding:32px 40px 40px; text-align:center;">
             <p style="margin:0; font-size:13px; color:${EMAIL_MUTED_TEXT}; line-height:1.6;">
               ${footerNote ? `${escapeHtml(footerNote)}<br>` : ""}
-              ${escapeHtml(productName)} &middot; <a href="${escapeHtml(siteUrl)}" style="color:${EMAIL_MUTED_TEXT};">pctweaker.app</a>
+              ${escapeHtml(productName)} &middot; <a href="${escapeHtml(siteUrl)}" style="color:${EMAIL_MUTED_TEXT};">wincraft.app</a>
             </p>
           </td>
         </tr>

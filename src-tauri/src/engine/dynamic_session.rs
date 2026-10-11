@@ -29,7 +29,7 @@
 //! exact sets applied. Restore clears a process's sets only while they are
 //! still exactly those, so a reused PID or a process something else re-steered
 //! is left alone. It runs when the game exits, when steering or the session is
-//! turned off, when PC Tweaker quits, and on the next launch after a crash.
+//! turned off, when WinCraft quits, and on the next launch after a crash.
 //! CPU sets die with their process, so a reboot needs no restore at all.
 
 use serde::Serialize;
@@ -610,7 +610,7 @@ mod native {
     /// Clears one process's sets if it is still the same process and still
     /// has exactly the sets it was given. A process that is gone, reused or
     /// re-steered by someone else counts as done. One that exists but cannot
-    /// be opened (steered while PC Tweaker ran elevated, restored now without)
+    /// be opened (steered while WinCraft ran elevated, restored now without)
     /// keeps the journal, which resolves itself once that process exits.
     pub fn restore_process(pid: u32, creation: u64, applied: &[u32]) -> Result<(), String> {
         let process = match Process::open_checked(pid) {

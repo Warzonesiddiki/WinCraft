@@ -42,12 +42,12 @@ export const GUIDES: Record<string, Guide> = {
     eyebrow: "WINDOWS 11 OPTIMIZATION",
     title: "Optimize Windows 11 without losing control",
     intro:
-      "PC Tweaker applies documented, reversible Windows adjustments while preserving a clear record of what changed and how to restore it.",
+      "WinCraft applies documented, reversible Windows adjustments while preserving a clear record of what changed and how to restore it.",
     sections: [
       {
         heading: "A safer alternative to one-click optimization",
         body:
-          "Generic optimizers often combine unrelated changes behind a single button. PC Tweaker keeps adjustments visible, categorized and individually reversible so you can improve the system without treating Windows as a black box.",
+          "Generic optimizers often combine unrelated changes behind a single button. WinCraft keeps adjustments visible, categorized and individually reversible so you can improve the system without treating Windows as a black box.",
         points: [
           "Review each optimization before applying it",
           "Restore supported changes through automatic rollback",
@@ -73,7 +73,7 @@ export const GUIDES: Record<string, Guide> = {
       {
         heading: "What a Windows 11 optimizer can actually change",
         body:
-          "Strip away the marketing and an optimizer is a list of Windows settings. PC Tweaker's list is grouped the way you will meet it in the app. Performance: the roughly ten-second delay Windows adds before launching startup programs, the delay before menus open, the 400 ms the interface waits before reacting to a resting pointer, the open-and-close window animations, and Store apps that keep running, refreshing and polling the network when you are not using them. Gaming: Xbox Game Bar background recording, the network throttle Windows applies while multimedia runs, the Sticky Keys shortcut that drops you out of a fullscreen game, mouse acceleration, fullscreen optimizations and hardware-accelerated GPU scheduling. Privacy: diagnostic data level, the advertising ID, Bing results in Start, tailored experiences, app-launch tracking, feedback prompts, suggested apps and the Recall screenshot policy. Interface: file extensions, Widgets, the Chat button, the taskbar search box and alignment, transparency, and Explorer's folder-type guessing. Maintenance: Delivery Optimization uploads, the long-path limit and the screen that lets a frozen app block shutdown.",
+          "Strip away the marketing and an optimizer is a list of Windows settings. WinCraft's list is grouped the way you will meet it in the app. Performance: the roughly ten-second delay Windows adds before launching startup programs, the delay before menus open, the 400 ms the interface waits before reacting to a resting pointer, the open-and-close window animations, and Store apps that keep running, refreshing and polling the network when you are not using them. Gaming: Xbox Game Bar background recording, the network throttle Windows applies while multimedia runs, the Sticky Keys shortcut that drops you out of a fullscreen game, mouse acceleration, fullscreen optimizations and hardware-accelerated GPU scheduling. Privacy: diagnostic data level, the advertising ID, Bing results in Start, tailored experiences, app-launch tracking, feedback prompts, suggested apps and the Recall screenshot policy. Interface: file extensions, Widgets, the Chat button, the taskbar search box and alignment, transparency, and Explorer's folder-type guessing. Maintenance: Delivery Optimization uploads, the long-path limit and the screen that lets a frozen app block shutdown.",
         points: [
           "Performance: startup, menu and hover delays, animations, background Store apps",
           "Gaming: Game Bar recording, network throttle, Sticky Keys, mouse acceleration",
@@ -95,7 +95,7 @@ export const GUIDES: Record<string, Guide> = {
       {
         heading: "The changes the app refuses to oversell",
         body:
-          "Several settings that other optimizers sell as performance gains are listed in PC Tweaker with their limits spelled out, because the limits are documented. The MMCSS background reserve is written as 0, which Windows treats as 20%; it does not hand every foreground app the whole CPU. The legacy Games GPU Priority value is one Microsoft documents as unused, and the app says so: no gain is expected from it. The global timer resolution flag does not itself request or verify a timer resolution, and its effect depends on the Windows version. Disabling Memory Integrity removes a layer of kernel protection in exchange for a performance change that varies by hardware, and a policy or UEFI lock may prevent it anyway. Hardware-accelerated GPU scheduling can improve, worsen or leave latency unchanged depending on the game. Reducing diagnostic data requests the lowest level Windows allows and is not an off switch. If you want those settings, apply them knowing what they are.",
+          "Several settings that other optimizers sell as performance gains are listed in WinCraft with their limits spelled out, because the limits are documented. The MMCSS background reserve is written as 0, which Windows treats as 20%; it does not hand every foreground app the whole CPU. The legacy Games GPU Priority value is one Microsoft documents as unused, and the app says so: no gain is expected from it. The global timer resolution flag does not itself request or verify a timer resolution, and its effect depends on the Windows version. Disabling Memory Integrity removes a layer of kernel protection in exchange for a performance change that varies by hardware, and a policy or UEFI lock may prevent it anyway. Hardware-accelerated GPU scheduling can improve, worsen or leave latency unchanged depending on the game. Reducing diagnostic data requests the lowest level Windows allows and is not an off switch. If you want those settings, apply them knowing what they are.",
         points: [
           "MMCSS reserve 0 means 20%, not zero",
           "Games GPU Priority: documented as unused, no gain expected",
@@ -134,7 +134,7 @@ export const GUIDES: Record<string, Guide> = {
     related: [
       {
         to: "/what-pc-tweaker-changes/",
-        label: "the full list of what PC Tweaker changes on your system",
+        label: "the full list of what WinCraft changes on your system",
         note: "The exact registry locations, permission levels and recovery path behind each category.",
       },
       {
@@ -156,7 +156,7 @@ export const GUIDES: Record<string, Guide> = {
         { label: "Microsoft: Delivery Optimization for Windows updates", url: "https://learn.microsoft.com/en-us/windows/deployment/do/waas-delivery-optimization" },
         { label: "Microsoft: manage Recall", url: "https://learn.microsoft.com/en-us/windows/client-management/manage-recall" },
         { label: "Microsoft: startup apps in Windows", url: "https://support.microsoft.com/en-us/windows/add-an-app-to-run-automatically-at-startup-in-windows-10-150da165-dcd9-7230-517b-cf3c295d89dd" },
-        { label: "PC Tweaker: the tweak catalogue in the source", url: "https://github.com/AurelioAvila/pc-tweaker-app/blob/master/src-tauri/src/tweaks.rs" },
+        { label: "WinCraft: the tweak catalogue in the source", url: "https://github.com/AurelioAvila/pc-tweaker-app/blob/master/src-tauri/src/tweaks.rs" },
       ],
     },
   },
@@ -169,7 +169,7 @@ export const GUIDES: Record<string, Guide> = {
       {
         heading: "Consistency matters more than a synthetic promise",
         body:
-          "PC Tweaker focuses on transparent system configuration rather than guaranteed FPS claims. The goal is to remove avoidable friction while keeping thermals, drivers, hardware limits and game-specific settings in perspective.",
+          "WinCraft focuses on transparent system configuration rather than guaranteed FPS claims. The goal is to remove avoidable friction while keeping thermals, drivers, hardware limits and game-specific settings in perspective.",
         points: [
           "Gaming-oriented Windows adjustments",
           "Live CPU, memory and system monitoring",
@@ -236,7 +236,7 @@ export const GUIDES: Record<string, Guide> = {
       {
         heading: "Rollback is part of the feature",
         body:
-          "PC Tweaker treats recovery as a core requirement. Supported changes preserve the information needed to restore their previous state instead of relying on generic reset instructions after something goes wrong.",
+          "WinCraft treats recovery as a core requirement. Supported changes preserve the information needed to restore their previous state instead of relying on generic reset instructions after something goes wrong.",
         points: [
           "Apply supported tweaks individually",
           "Keep changes understandable and auditable",
@@ -247,7 +247,7 @@ export const GUIDES: Record<string, Guide> = {
       {
         heading: "Transparent by design",
         body:
-          "The project is publicly inspectable, and the interface explains what each available action targets. This makes PC Tweaker suitable for users who want convenience without giving up visibility into their system.",
+          "The project is publicly inspectable, and the interface explains what each available action targets. This makes WinCraft suitable for users who want convenience without giving up visibility into their system.",
       },
       {
         heading: "What a recorded previous value actually is",
@@ -298,18 +298,18 @@ export const GUIDES: Record<string, Guide> = {
       {
         heading: "Privacy controls without destructive presets",
         body:
-          "Aggressive debloat scripts can disable dependencies or remove components a user still needs. PC Tweaker favors explicit settings and recovery over irreversible package removal and blanket service disabling.",
+          "Aggressive debloat scripts can disable dependencies or remove components a user still needs. WinCraft favors explicit settings and recovery over irreversible package removal and blanket service disabling.",
         points: [
           "Separate privacy choices from performance changes",
           "Review the purpose of each supported action",
           "Restore supported settings when requirements change",
-          "Avoid advertising trackers on the PC Tweaker website",
+          "Avoid advertising trackers on the WinCraft website",
         ],
       },
       {
         heading: "Privacy is more than a toggle",
         body:
-          "No optimizer can replace account security, operating-system updates or informed application permissions. PC Tweaker provides focused controls while keeping those wider security responsibilities clear.",
+          "No optimizer can replace account security, operating-system updates or informed application permissions. WinCraft provides focused controls while keeping those wider security responsibilities clear.",
       },
       {
         heading: "Is it safe to turn Windows diagnostic data down?",
@@ -342,7 +342,7 @@ export const GUIDES: Record<string, Guide> = {
       {
         to: "/turn-off-windows-recall/",
         label: "how to turn off Windows Recall, and keep it off",
-        note: "The Settings switch, the machine policy PC Tweaker writes and removing the component, with what each one deletes.",
+        note: "The Settings switch, the machine policy WinCraft writes and removing the component, with what each one deletes.",
       },
       {
         to: "/what-pc-tweaker-changes/",
@@ -450,7 +450,7 @@ export function GuidePage({ path, navigate }: { path: string; navigate: (to: str
         )}
         <section className="mt-12 flex flex-wrap items-center justify-between gap-6 border-t border-white/10 pt-9">
           <div>
-            <h2 className="font-display text-xl font-bold text-[var(--fg)]">Try PC Tweaker</h2>
+            <h2 className="font-display text-xl font-bold text-[var(--fg)]">Try WinCraft</h2>
             <p className="mt-2 text-[14px] text-[var(--fg-dim)]">
               Free download for Windows 10 and Windows 11.
             </p>
@@ -461,7 +461,7 @@ export function GuidePage({ path, navigate }: { path: string; navigate: (to: str
             </Link>
             <a href={storeLink} className="rounded-lg border border-white/10 px-5 py-3 text-sm font-semibold text-[var(--fg)]">Get it from Microsoft Store</a>
             <a href={DOWNLOAD_EXE} className="bg-accent rounded-lg px-5 py-3 text-sm font-semibold text-[var(--bg)]">
-              Download PC Tweaker
+              Download WinCraft
             </a>
           </div>
         </section>

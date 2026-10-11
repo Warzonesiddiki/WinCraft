@@ -70,6 +70,7 @@ impl TraceProperties {
         // and a GUID, for which an all-zero bit pattern is the documented
         // starting point — the API requires callers to zero it and fill in
         // only the fields they set.
+        // SAFETY: EVENT_TRACE_LOGFILEW is a POD struct; zeroed() creates a valid default state.
         let mut me: Self = unsafe { std::mem::zeroed() };
         me.props.Wnode.BufferSize = std::mem::size_of::<Self>() as u32;
         me.props.Wnode.Flags = WNODE_FLAG_TRACED_GUID;
@@ -115,6 +116,7 @@ fn qpc_frequency() -> i64 {
     // SAFETY: writes a single i64 through a valid pointer. Documented never
     // to fail on Windows XP or later; the return value is checked anyway so
     // that a zero cannot reach the arithmetic.
+    // SAFETY: hz is a valid mutable pointer to i64; QueryPerformanceFrequency always succeeds on supported platforms.
     let ok = unsafe { QueryPerformanceFrequency(&mut hz) };
     if ok == 0 {
         0
@@ -126,6 +128,7 @@ fn qpc_frequency() -> i64 {
 fn qpc_now() -> i64 {
     let mut now = 0i64;
     // SAFETY: as above.
+    // SAFETY: OpenTraceW is called with a valid EVENT_TRACE_LOGFILEW; the returned handle is checked for INVALID_HANDLE_VALUE.
     unsafe {
         windows_sys::Win32::System::Performance::QueryPerformanceCounter(&mut now);
     }
@@ -240,7 +243,7 @@ impl Capture {
         return Err(if started == ERROR_ACCESS_DENIED {
             // Deliberately the whole explanation: "access denied" on its own
             // invites the reader to think something is broken.
-            "Measuring frame rate needs a system trace session, which Windows only grants to an administrator. Restart PC Tweaker as administrator to use it.".to_string()
+            "Measuring frame rate needs a system trace session, which Windows only grants to an administrator. Restart WinCraft as administrator to use it.".to_string()
         } else {
             format!("Windows refused to start the trace session (error {started}).")
         });

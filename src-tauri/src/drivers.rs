@@ -459,7 +459,7 @@ pub fn reboot_now() -> Result<(), String> {
     // A short delay lets this command return so the UI can close cleanly
     // instead of being killed mid-frame.
     crate::system_tools::run("shutdown", |tool| {
-        tool.args(["/r", "/t", "5", "/c", "Restart requested from PC Tweaker"])
+        tool.args(["/r", "/t", "5", "/c", "Restart requested from WinCraft"])
             .creation_flags(0x08000000)
             .spawn()
     })

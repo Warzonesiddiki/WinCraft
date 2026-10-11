@@ -2,14 +2,14 @@
  *  A "Stable download alias" GitHub Action re-uploads this fixed filename on
  *  every published release, so the URL never needs to change again. */
 export const DOWNLOAD_EXE =
-  "https://github.com/AurelioAvila/pc-tweaker-app/releases/latest/download/PCTweaker-Setup.exe";
+  "https://github.com/AurelioAvila/pc-tweaker-app/releases/latest/download/WinCraft-Setup.exe";
 
 /** The Uninstaller is a separate product with its own release stream and its
- *  own stable alias. The nav's Download button used to serve PC Tweaker's
+ *  own stable alias. The nav's Download button used to serve WinCraft's
  *  installer on every page, including /uninstaller/ — the loudest control on
  *  that page downloaded the wrong application. */
 export const UNINSTALLER_DOWNLOAD_EXE =
-  "https://github.com/AurelioAvila/pc-tweaker-uninstaller/releases/latest/download/PCTweakerUninstaller-Setup.exe";
+  "https://github.com/AurelioAvila/pc-tweaker-uninstaller/releases/latest/download/WinCraftUninstaller-Setup.exe";
 
 export const UNINSTALLER_RELEASES =
   "https://github.com/AurelioAvila/pc-tweaker-uninstaller/releases/latest";
@@ -27,4 +27,4 @@ export const RELEASES_PAGE = "https://github.com/AurelioAvila/pc-tweaker-app/rel
 /** Backend that relays the support form and stores reviews. The support
  *  inbox address itself lives only on that server and is never shipped in
  *  this bundle — see backend/src/support-inbox.ts. */
-export const API_BASE = "https://api.pctweaker.app";
+export const API_BASE = "https://api.wincraft.app";

@@ -45,13 +45,13 @@ for (const tag of ["it-IT", "pt-PT", "pt-BR", "de-DE", "fr-FR", "es-ES", "en-US"
 // 2. An explicit choice is kept, on any system language.
 windowsLanguage("it-IT");
 for (const lang of ["it", "en", "fr", "es", "de", "pt"]) {
-  store.set("pc-tweaker-lang", lang);
+  store.set("wincraft-lang", lang);
   assert.equal(detectInitialLang(), lang, `a saved "${lang}" must be kept`);
 }
 
 // 3. Anything that is not one of the six languages falls back to English.
 for (const junk of ["", "pt-BR", "xx", "toString", "__proto__", "constructor"]) {
-  store.set("pc-tweaker-lang", junk);
+  store.set("wincraft-lang", junk);
   assert.equal(detectInitialLang(), "en", `a saved "${junk}" must fall back to English`);
 }
 
@@ -67,14 +67,14 @@ const files = (dir) =>
     e.isDirectory() ? files(`${dir}/${e.name}`) : /\.(ts|tsx)$/.test(e.name) ? [`${dir}/${e.name}`] : [],
   );
 const sources = files(`${root}src`).map((f) => [f, fs.readFileSync(f, "utf8")]);
-const writers = sources.filter(([, s]) => /setItem\(\s*["']pc-tweaker-lang["']/.test(s));
+const writers = sources.filter(([, s]) => /setItem\(\s*["']wincraft-lang["']/.test(s));
 assert.deepEqual(
   writers.map(([f]) => f.slice(root.length).replace(/\\/g, "/")),
   ["src/App.tsx"],
   "only App.tsx may save the language",
 );
 const app = writers[0][1];
-assert.match(app, /function setLang\(l: Lang\) \{\s*setLangState\(l\);\s*localStorage\.setItem\("pc-tweaker-lang", l\);/);
+assert.match(app, /function setLang\(l: Lang\) \{\s*setLangState\(l\);\s*localStorage\.setItem\("wincraft-lang", l\);/);
 assert.match(app, /import\.meta\.env\.DEV && \(import\.meta\.env\.VITE_START_LANG/);
 const callers = sources.filter(([, s]) => /\bsetLang\(/.test(s)).map(([f]) => f.slice(root.length).replace(/\\/g, "/"));
 assert.deepEqual(callers.sort(), ["src/App.tsx", "src/components/account.tsx"], "setLang is called only by the language menu");

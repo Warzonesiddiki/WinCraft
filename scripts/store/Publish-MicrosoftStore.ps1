@@ -1,11 +1,11 @@
 <#
 .SYNOPSIS
-Packages the signed PC Tweaker binary as an MSIX and submits it to the Microsoft Store.
+Packages the signed WinCraft binary as an MSIX and submits it to the Microsoft Store.
 
 .DESCRIPTION
 One-time setup: run with -SaveCredential and enter the Partner Center Entra application's
 tenant ID, client ID and client secret. The secret is stored with Windows DPAPI under
-%APPDATA%\PCTweaker-Store and can only be read by this Windows user.
+%APPDATA%\WinCraft-Store and can only be read by this Windows user.
 
 A release run verifies the binary's Authenticode signature, packs the MSIX, uploads it
 through the Microsoft Store submission API and commits the submission. Certification and
@@ -36,7 +36,7 @@ param(
     # Write the published listing of every language to <dir>/<language>.json (read only).
     [Parameter(ParameterSetName = 'Export', Mandatory)][string]$ExportListing,
     [Parameter(ParameterSetName = 'Publish', Mandatory)][ValidatePattern('^\d+\.\d+\.\d+$')][string]$Version,
-    [Parameter(ParameterSetName = 'Publish')][string]$Exe = "$PSScriptRoot/../../src-tauri/target/release/PC Tweaker.shipped.exe",
+    [Parameter(ParameterSetName = 'Publish')][string]$Exe = "$PSScriptRoot/../../src-tauri/target/release/WinCraft.shipped.exe",
     [Parameter(ParameterSetName = 'Publish')][Parameter(ParameterSetName = 'Status')][Parameter(ParameterSetName = 'Export')][Parameter(ParameterSetName = 'Listing')][string]$AppId = '9NH3C6DT1G87',
     [Parameter(ParameterSetName = 'Publish')][string]$ReleaseNotes,
     # Listing texts (<dir>/<language>.json) and screenshots (<dir>/<two-letter language>/<file>).
@@ -52,7 +52,7 @@ param(
 $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
 
-$credentialPath = Join-Path $env:APPDATA 'PCTweaker-Store/msstore.json'
+$credentialPath = Join-Path $env:APPDATA 'WinCraft-Store/msstore.json'
 $api = 'https://manage.devcenter.microsoft.com/v1.0/my/applications'
 
 if ($SaveCredential) {
@@ -163,8 +163,8 @@ $stage = New-Item -ItemType Directory -Force (Join-Path $work 'stage')
 Copy-Item -LiteralPath "$PSScriptRoot/msix/Assets" -Destination $stage -Recurse
 (Get-Content -LiteralPath "$PSScriptRoot/msix/AppxManifest.xml" -Raw).Replace('{{VERSION}}', "$Version.0") |
     Set-Content -LiteralPath (Join-Path $stage 'AppxManifest.xml') -Encoding utf8 -NoNewline
-Copy-Item -LiteralPath $Exe -Destination (Join-Path $stage 'PC Tweaker.exe')
-$msixName = "PCTweaker_$($Version).0_x64.msix"
+Copy-Item -LiteralPath $Exe -Destination (Join-Path $stage 'WinCraft.exe')
+$msixName = "WinCraft_$($Version).0_x64.msix"
 $msix = Join-Path $work $msixName
 & $makeAppx pack /d $stage /p $msix /o | Out-Null
 if ($LASTEXITCODE) { throw "MakeAppx failed with exit code $LASTEXITCODE." }

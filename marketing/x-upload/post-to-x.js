@@ -25,7 +25,7 @@ const POSTED_LOG = path.join(__dirname, ".x-posted.json");
 
 // Official pctweaker.app link (2026-08-22, explicitly requested): it used to
 // point at the GitHub repo rather than the product's own site.
-const CTA = "Try PC Tweaker for free \u{1F447}\nhttps://pctweaker.app";
+const CTA = "Try WinCraft for free \u{1F447}\nhttps://pctweaker.app";
 const MAX_HASHTAGS = 2;
 const MAX_TWEET_LENGTH = 280;
 
