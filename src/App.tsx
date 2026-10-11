@@ -73,6 +73,9 @@ import { GamingHudCard, ZeroTraceCard } from "./components/pro";
 import { TitleBar } from "./components/titlebar";
 import { CATEGORY_STYLE } from "./categories";
 import { OverviewPanel } from "./components/overview";
+import { Dashboard } from "./components/dashboard";
+import { CommandPalette, useCommandPaletteShortcut } from "./components/command-palette";
+import { OnboardingFlow, shouldShowOnboarding } from "./components/onboarding";
 import { WorkspaceSidebar } from "./components/workspace-sidebar";
 import { DebloatPanel } from "./components/debloat";
 import { AdvancedControlCard } from "./components/advanced-controls";
@@ -406,6 +409,12 @@ function App() {
 
   const autoClean = useScheduledRamClean(ramAutoMinutes);
 
+  // Command palette (Ctrl+K)
+  const [paletteOpen, closePalette, openPalette] = useCommandPaletteShortcut();
+
+  // Onboarding: shown once on first launch
+  const [showOnboarding, setShowOnboarding] = useState(() => shouldShowOnboarding());
+
   function chooseRamAuto(minutes: number) {
     setRamAutoMinutes(minutes);
     localStorage.setItem(RAM_AUTO_STORAGE_KEY, String(minutes));
@@ -707,8 +716,17 @@ function App() {
                     onKeyDown={(e) => e.key === "Escape" && setQuery("")}
                     aria-label={s.search.placeholder}
                     placeholder={s.search.placeholder}
-                    className="w-full rounded-xl border border-line bg-surface-2 py-2 pl-9 pr-8 text-sm text-ink outline-none transition-colors placeholder:text-ink-3 focus:border-line-2 focus:bg-surface-hover"
+                    className="w-full rounded-xl border border-line bg-surface-2 py-2 pl-9 pr-16 text-sm text-ink outline-none transition-colors placeholder:text-ink-3 focus:border-line-2 focus:bg-surface-hover"
                   />
+                  {!searching && (
+                    <button
+                      onClick={openPalette}
+                      className="absolute right-2 top-1/2 flex -translate-y-1/2 items-center gap-1 rounded-md border border-line bg-surface-1 px-1.5 py-0.5 text-[9px] font-semibold text-ink-3 transition-colors hover:text-ink"
+                      title="Open command palette (Ctrl+K)"
+                    >
+                      ⌘K
+                    </button>
+                  )}
                   {searching && (
                     <button
                       onClick={() => setQuery("")}
@@ -1236,6 +1254,27 @@ function App() {
             </button>
           </div>
         </div>
+      )}
+
+      <CommandPalette
+        s={s}
+        tweaks={tweaks}
+        open={paletteOpen}
+        onClose={closePalette}
+        onNavigate={(section) => { setFilter(section); }}
+        onToggleTweak={(tweak) => toggle(tweak)}
+        onScan={() => setFilter("scan")}
+        onRestoreAll={restoreAll}
+        onOpenProfiles={() => setFilter("profiles")}
+      />
+
+      {showOnboarding && (
+        <OnboardingFlow
+          s={s}
+          tweaks={tweaks}
+          onComplete={() => { setShowOnboarding(false); setFilter("scan"); }}
+          onSkip={() => setShowOnboarding(false)}
+        />
       )}
 
       <UpdateBanner s={s} onToast={pushToast} />
