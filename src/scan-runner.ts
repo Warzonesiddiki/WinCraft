@@ -277,9 +277,9 @@ export async function applyScanSelection(
   ]);
   const advice = await call<TweakAdvice[]>("advise_tweaks", { ids });
   const eligible = new Set(
-    recommendedTweaks({ ...report, tweaks, ids, advice }, isPro).map((t) => t.id),
+    recommendedTweaks({ ...report, tweaks, ids, advice }, _isPro).map((t) => t.id),
   );
-  const originallyOffered = new Set(recommendedTweaks(report, isPro).map((t) => t.id));
+  const originallyOffered = new Set(recommendedTweaks(report, _isPro).map((t) => t.id));
   const requested = [...new Set(selected)].filter((id) => originallyOffered.has(id));
   const apply = requested.filter((id) => eligible.has(id));
   const skipped = requested.filter((id) => !eligible.has(id));

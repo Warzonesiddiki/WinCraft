@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { invoke } from "@tauri-apps/api/core";
-import { format, Strings } from "../i18n";
+import { Strings } from "../i18n";
 import type { TweakInfo } from "../types";
+import { textFor } from "../lib";
 
 const ONBOARDING_KEY = "wincraft-onboarding-complete";
 

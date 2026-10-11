@@ -1,10 +1,9 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { invoke } from "@tauri-apps/api/core";
-import { format, type Lang, type Strings } from "../i18n";
-import type { Section, TweakInfo, SystemStats } from "../types";
+import { type Lang, type Strings } from "../i18n";
+import type { Section, TweakInfo } from "../types";
 import { textFor } from "../lib";
 import { type PulseSample } from "./command";
-import { ChipIcon, HistoryIcon, LayersIcon, RadarIcon } from "./icons";
 
 /* ==========================================================================
    Widget system: each widget is a self-contained card that can be rearranged.
@@ -61,7 +60,7 @@ function saveLayout(order: WidgetId[]) {
 /* ---- Stats Widget -------------------------------------------------------- */
 
 function StatsWidget({
-  s,
+  s: _s,
   samples,
 }: {
   s: Strings;
@@ -89,25 +88,12 @@ function StatsWidget({
             ? "var(--warning)"
             : "var(--success)",
     },
-    {
-      label: "Disk",
-      value: latest && latest.diskTotal > 0
-        ? `${Math.round((latest.diskUsed / latest.diskTotal) * 100)}%`
-        : "—",
-      pct: latest && latest.diskTotal > 0 ? (latest.diskUsed / latest.diskTotal) * 100 : 0,
-      color:
-        latest && latest.diskTotal > 0 && (latest.diskUsed / latest.diskTotal) > 0.9
-          ? "var(--danger)"
-          : latest && latest.diskTotal > 0 && (latest.diskUsed / latest.diskTotal) > 0.75
-            ? "var(--warning)"
-            : "var(--success)",
-    },
   ];
 
   return (
     <div className="dashboard-widget" data-widget="stats">
       <h3 className="widget-title">System Stats</h3>
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-2 gap-4">
         {readings.map((r) => (
           <div key={r.label} className="flex flex-col items-center">
             <div className="relative h-16 w-16">
@@ -142,7 +128,7 @@ function StatsWidget({
 /* ---- Quick Actions Widget ------------------------------------------------ */
 
 function QuickActionsWidget({
-  s,
+  s: _s,
   onNavigate,
   onScan,
   onRestoreAll,
@@ -228,7 +214,7 @@ function AppliedTweaksWidget({
 /* ---- Next Step Widget ---------------------------------------------------- */
 
 function NextStepWidget({
-  s,
+  s: _s,
   tweaks,
   onNavigate,
 }: {
@@ -287,8 +273,8 @@ function NextStepWidget({
 /* ---- Recent Activity Widget ---------------------------------------------- */
 
 function RecentActivityWidget({
-  s,
-  lang,
+  s: _s,
+  lang: _lang,
 }: {
   s: Strings;
   lang: Lang;
@@ -325,7 +311,7 @@ function RecentActivityWidget({
 
 /* ---- Health Score Widget ------------------------------------------------- */
 
-function HealthScoreWidget({ s }: { s: Strings }) {
+function HealthScoreWidget({ s: _s }: { s: Strings }) {
   const [score, setScore] = useState<number | null>(null);
 
   useEffect(() => {

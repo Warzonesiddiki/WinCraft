@@ -72,7 +72,6 @@ import { PricingPanel } from "./components/pricing";
 import { GamingHudCard, ZeroTraceCard } from "./components/pro";
 import { TitleBar } from "./components/titlebar";
 import { CATEGORY_STYLE } from "./categories";
-import { OverviewPanel } from "./components/overview";
 import { Dashboard } from "./components/dashboard";
 import { CommandPalette, useCommandPaletteShortcut } from "./components/command-palette";
 import { OnboardingFlow, shouldShowOnboarding } from "./components/onboarding";
@@ -780,12 +779,14 @@ function App() {
             <div key={filter} className="workspace-view">
               <PageBoundary s={s} resetKey={filter}>
                 {showOverview && (
-                  <OverviewPanel
+                  <Dashboard
                     s={s}
                     lang={lang}
                     tweaks={tweaks}
                     samples={pulseSamples}
                     onNavigate={setFilter}
+                    onScan={() => setFilter("scan")}
+                    onRestoreAll={restoreAll}
                   />
                 )}
 

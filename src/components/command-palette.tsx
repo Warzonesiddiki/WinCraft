@@ -70,7 +70,7 @@ export function CommandPalette({
     ];
 
     const actions: Command[] = [
-      { id: "action-scan", label: s.scan?.runScan ?? "Run Scan", icon: "▶️", shortcut: "Ctrl+Shift+S", action: { kind: "action", id: "scan", label: s.scan?.runScan ?? "Run Scan", run: onScan } },
+      { id: "action-scan", label: s.command?.runScan ?? "Run Scan", icon: "▶️", shortcut: "Ctrl+Shift+S", action: { kind: "action", id: "scan", label: s.command?.runScan ?? "Run Scan", run: onScan } },
       { id: "action-restore", label: s.restore?.button ?? "Restore All", icon: "↩️", action: { kind: "action", id: "restore", label: s.restore?.button ?? "Restore All", run: onRestoreAll } },
       { id: "action-profiles", label: s.profiles?.title ?? "Profiles", icon: "📁", action: { kind: "action", id: "profiles", label: s.profiles?.title ?? "Profiles", run: onOpenProfiles } },
     ];
@@ -138,17 +138,19 @@ export function CommandPalette({
   const execute = useCallback(
     (cmd: Command) => {
       onClose();
-      switch (cmd.action.kind) {
+      const action = cmd.action;
+      switch (action.kind) {
         case "navigate":
-          onNavigate(cmd.action.section);
+          onNavigate(action.section);
           break;
         case "tweak": {
-          const tweak = tweaks.find((t) => t.id === cmd.action.id);
+          const tweakId = action.id;
+          const tweak = tweaks.find((t) => t.id === tweakId);
           if (tweak) onToggleTweak(tweak);
           break;
         }
         case "action":
-          cmd.action.run();
+          action.run();
           break;
       }
     },
