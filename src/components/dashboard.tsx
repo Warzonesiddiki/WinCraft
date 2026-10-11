@@ -60,7 +60,6 @@ function saveLayout(order: WidgetId[]) {
 /* ---- Stats Widget -------------------------------------------------------- */
 
 function StatsWidget({
-  s: _s,
   samples,
 }: {
   s: Strings;
@@ -128,7 +127,6 @@ function StatsWidget({
 /* ---- Quick Actions Widget ------------------------------------------------ */
 
 function QuickActionsWidget({
-  s: _s,
   onNavigate,
   onScan,
   onRestoreAll,
@@ -214,7 +212,6 @@ function AppliedTweaksWidget({
 /* ---- Next Step Widget ---------------------------------------------------- */
 
 function NextStepWidget({
-  s: _s,
   tweaks,
   onNavigate,
 }: {
@@ -272,10 +269,8 @@ function NextStepWidget({
 
 /* ---- Recent Activity Widget ---------------------------------------------- */
 
-function RecentActivityWidget({
-  s: _s,
-  lang: _lang,
-}: {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+function RecentActivityWidget(_props: {
   s: Strings;
   lang: Lang;
 }) {
@@ -311,7 +306,8 @@ function RecentActivityWidget({
 
 /* ---- Health Score Widget ------------------------------------------------- */
 
-function HealthScoreWidget({ s: _s }: { s: Strings }) {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+function HealthScoreWidget(_props: { s: Strings }) {
   const [score, setScore] = useState<number | null>(null);
 
   useEffect(() => {

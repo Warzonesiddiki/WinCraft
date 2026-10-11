@@ -232,6 +232,7 @@ export function unknownSecuritySignals(report: ScanReport): string[] {
 }
 
 /** Optional toggles are not defects: bulk fixes require current hardware advice. */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function recommendedTweaks(report: ScanReport, _isPro: boolean): TweakInfo[] {
   const allowed = new Set(report.ids ?? []);
   const advised = new Set(
