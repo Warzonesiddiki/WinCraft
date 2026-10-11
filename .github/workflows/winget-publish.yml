@@ -65,7 +65,7 @@ jobs:
       - if: steps.gate.outputs.skip != 'true'
         uses: vedantmgoyal9/winget-releaser@4ffc7888bffd451b357355dc214d43bb9f23917e # v2
         with:
-          identifier: AurelioAvila.WinCraft
+          identifier: AurelioAvila.PCTweaker
           # The release also carries an MSI and two stable-named copies of
           # the same binaries for the download link on the site. The default
           # pattern would match all four and produce a manifest listing the
