@@ -18,16 +18,16 @@
   <a href="https://community.chocolatey.org/packages/pc-tweaker"><img src="https://img.shields.io/chocolatey/v/pc-tweaker?label=Chocolatey&color=80B5E3" alt="Latest approved version in Chocolatey"></a>
   <a href="https://github.com/AurelioAvila/pc-tweaker-app/releases"><img src="https://img.shields.io/github/downloads/AurelioAvila/pc-tweaker-app/total?label=GitHub%20asset%20downloads" alt="GitHub release asset download events"></a>
   <img src="https://img.shields.io/badge/platform-Windows%2010%2F11%20x64-0078D4" alt="Windows 10 and 11 x64">
-  <a href="LICENSE"><img src="https://img.shields.io/badge/license-proprietary-6B7280" alt="Source available under a proprietary license"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-2E7D32" alt="MIT License"></a>
 </p>
 
 **[Download Free for Windows](https://github.com/AurelioAvila/pc-tweaker-app/releases/latest/download/PCTweaker-Setup.exe)** · **[Microsoft Store](https://apps.microsoft.com/detail/9nh3c6dt1g87)** · [Chocolatey](https://community.chocolatey.org/packages/pc-tweaker) · [Website](https://pctweaker.app/) · [Support](https://pctweaker.app/support/) · [Release notes](CHANGELOG.md)
 
-<p align="center"><a href="#whats-new-in-115">What's new</a> · <a href="#what-you-can-do">Features</a> · <a href="#what-changes-on-your-system">What changes</a> · <a href="#free-and-pro">Free and Pro</a> · <a href="#download-integrity-and-code-signing">Code signing</a> · <a href="#build-from-source">Build from source</a></p>
+<p align="center"><a href="#whats-new-in-115">What's new</a> · <a href="#what-you-can-do">Features</a> · <a href="#what-changes-on-your-system">What changes</a> · <a href="#free-for-everyone">Free for Everyone</a> · <a href="#download-integrity-and-code-signing">Code signing</a> · <a href="#build-from-source">Build from source</a></p>
 
 <p align="center"><img src="docs/screenshots/pc-tweaker-1.16-overview.png" alt="PC Tweaker 1.16 Overview in the default Graphite Ember theme, showing live CPU, memory and applied settings" width="85%"></p>
 
-**Start with one task:** review a setting, read its trade-offs, apply it if appropriate, and use its restore control when supported. Free includes core tools without an account. See [what changes on your system](#what-changes-on-your-system) before tuning.
+**Start with one task:** review a setting, read its trade-offs, apply it if appropriate, and use its restore control when supported. PC Tweaker is free and open source — all features included, no account required. See [what changes on your system](#what-changes-on-your-system) before tuning.
 
 <p align="center">
   <a href="#safe-download-via-winget"><img src="https://img.shields.io/badge/Safe_download-via_Winget-1793D1?style=for-the-badge" alt="Safe download via Winget"></a>
@@ -132,17 +132,21 @@ The website has previously displayed a 330-to-551 FPS comparison. Its drawn fram
 
 For useful comparisons, keep the game build, scene, settings, drivers, power source and capture method fixed. Warm caches, alternate baseline/tuned runs, retain all valid runs and publish raw data. Separate security-reducing configurations from normal recommendations. Report regressions and unchanged results alongside gains.
 
-## Free and Pro
+## Free for Everyone
 
-Free does not require an account. It includes core tweaks, scans, supported restore tools, hardware monitoring and selected maintenance tools. Pro adds advanced tools, guided repair, additional cleanup options and Game Sessions.
+PC Tweaker is now completely free and open source under the MIT license. All features, all tweaks, all tools — no subscriptions, no paywalls, no accounts required. Just download and start optimizing.
 
-| Current plan | Price |
-| --- | --- |
-| Monthly | €7.99 per month |
-| Annual | €59.99 per year |
-| Lifetime | €99 once |
+Every feature that was previously part of the Pro and Lifetime tiers is now available to everyone at no cost:
 
-Annual billing is approximately 37% below twelve monthly payments. Check the app and checkout for current offers, taxes and renewal terms. Existing lifetime purchases retain the access promised when purchased. Payments use Stripe Checkout; the app does not handle card details. Pro is linked to the purchasing account; the app refreshes its license when you return from checkout while online.
+- All system tweaks and optimizations
+- Advanced gaming and privacy tools
+- Disk cleanup, defragmentation and system repair
+- Driver updates and diagnostics
+- Game Sessions and monitoring profiles
+- Zero-Trace memory purge and secure file shredder
+- All future updates included
+
+Existing supporters who previously purchased a license — thank you for making this possible. Your support helped build a tool that can now reach everyone.
 
 ## Download integrity and code signing
 

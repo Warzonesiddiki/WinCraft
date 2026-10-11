@@ -558,6 +558,11 @@ fn tweak_infos(store: &RollbackStore) -> Result<Vec<TweakInfo>, String> {
         }
     }
 
+    // PC Tweaker is now free for everyone — no tweak requires a paid license.
+    for entry in &mut list {
+        entry.requires_pro = false;
+    }
+
     Ok(list)
 }
 
@@ -739,35 +744,11 @@ pub(crate) fn apply_or_undo(
 /// checked by the frontend to show the paywall instead of a generic toast.
 pub const PRO_REQUIRED_PREFIX: &str = "PRO_REQUIRED: ";
 
+/// PC Tweaker is now free for everyone — no tweak requires a paid license.
+/// The function signature is preserved so callers compile without changes.
 #[cfg(windows)]
-fn requires_pro_for(id: &str) -> bool {
-    if ["ecoqos_rules","limit_do_background_download","monitor_refresh_profile"].contains(&id) { return true; }
-    if let Some(tweak) = power_tuning::find(id) {
-        return tweak.pro;
-    }
-    if let Some(tweak) = settings_tweaks::find(id) {
-        return tweak.requires_pro;
-    }
-    match id {
-        power::TWEAK_ID => false,
-        turbo::TWEAK_ID => turbo::info().requires_pro,
-        dns::TWEAK_ID => false,
-        gaming::INPUT_LAG_ID => gaming::input_lag_info().requires_pro,
-        gaming::TURBO_BOOST_ID => gaming::turbo_boost_info().requires_pro,
-        gaming::KEYBOARD_DELAY_ID => gaming::keyboard_delay_info().requires_pro,
-        gaming::CORE_PARKING_ID => gaming::core_parking_info().requires_pro,
-        netlatency::TWEAK_ID => netlatency::info().requires_pro,
-        netshaper::TWEAK_ID => netshaper::info().requires_pro,
-        game_priority::TWEAK_ID => game_priority::info().requires_pro,
-        privacy_extra::ACTIVITY_HISTORY_ID => privacy_extra::activity_history_info().requires_pro,
-        privacy_extra::TYPING_PERSONALIZATION_ID => {
-            privacy_extra::typing_personalization_info().requires_pro
-        }
-        contextmenu::TWEAK_ID => contextmenu::info().requires_pro,
-        services::WINDOWS_SEARCH_ID => services::windows_search_info().requires_pro,
-        services::AI_FABRIC_ID => services::ai_fabric_info().requires_pro,
-        _ => find_tweak(id).map(|t| t.requires_pro).unwrap_or(false),
-    }
+fn requires_pro_for(_id: &str) -> bool {
+    false
 }
 
 /// Side-effect-free entitlement decision shared by execution and policy tests.
@@ -2569,8 +2550,10 @@ mod tests {
     #[test]
     fn expansion_entitlement_and_elevation_routing() {
         let dir = std::env::temp_dir().join(format!("pct-expansion-unlicensed-{}", std::process::id()));
+        // PC Tweaker is now free for everyone — every tweak is accessible
+        // regardless of license state.
         for id in ["ecoqos_rules", "limit_do_background_download", "monitor_refresh_profile"] {
-            assert!(require_tweak_entitlement(&dir,id).unwrap_err().starts_with(PRO_REQUIRED_PREFIX));
+            assert!(require_tweak_entitlement(&dir,id).is_ok());
         }
         for id in ["disable_restart_apps", "enable_long_paths", "disable_filter_keys_shortcut"] {
             assert!(require_tweak_entitlement(&dir,id).is_ok());
@@ -2643,33 +2626,32 @@ mod tests {
     /// Exercise the production entitlement policy without invoking a Windows
     /// adapter. A temporary journal does not isolate actual registry writes.
     #[test]
-    fn a_pro_tweak_is_refused_with_no_cached_license() {
+    /// PC Tweaker is now free for everyone — every tweak is accessible
+    /// without any cached license, even those that were previously Pro-only.
+    #[test]
+    fn every_tweak_is_accessible_without_a_license() {
         let ids = all_visible_ids();
-        let pro_id = ids
-            .iter()
-            .find(|id| requires_pro_for(id))
-            .expect("test is meaningless without at least one Pro-gated tweak");
+        assert!(!ids.is_empty(), "catalogue must not be empty");
 
         let dir = std::env::temp_dir().join(format!(
-            "pc-tweaker-license-wiring-test-{}-{}",
+            "pc-tweaker-free-for-all-test-{}-{}",
             std::process::id(),
             std::time::SystemTime::now()
                 .duration_since(std::time::UNIX_EPOCH)
                 .unwrap()
                 .as_nanos()
         ));
-        let result = require_tweak_entitlement(&dir, pro_id);
-        let err = result.expect_err("a Pro tweak must not silently succeed with no license cached");
-        assert!(
-            err.starts_with(PRO_REQUIRED_PREFIX),
-            "expected a PRO_REQUIRED error for `{}`, got: {}",
-            pro_id,
-            err
-        );
+        for id in &ids {
+            assert!(
+                require_tweak_entitlement(&dir, id).is_ok(),
+                "tweak `{}` should be accessible without a license",
+                id
+            );
+        }
     }
 
-    /// Cleanups: the Pro one is refused without a licence on every path, the
-    /// free one stays free, and the elevated helper runs only the admin one.
+    /// Cleanups: all cleanups are now free. The free ones still gate on
+    /// their frequency limits and the elevated helper only runs admin ones.
     #[test]
     fn cleanup_gates_hold_without_a_license() {
         let dir = std::env::temp_dir().join(format!(
@@ -2677,13 +2659,12 @@ mod tests {
             std::process::id()
         ));
         assert_eq!(authorize_cleanup(&dir, "temp_cleanup"), Ok(false));
-        let pro = authorize_cleanup(&dir, "winupdate_cache_cleanup").unwrap_err();
-        assert!(pro.starts_with(PRO_REQUIRED_PREFIX), "{pro}");
+        // Previously Pro-only cleanup is now accessible without a license.
+        assert!(authorize_cleanup(&dir, "winupdate_cache_cleanup").is_ok());
         assert!(authorize_cleanup(&dir, "no_such_cleanup").is_err());
         assert!(authorize_elevated_cleanup(&dir, "temp_cleanup").is_err());
-        assert!(authorize_elevated_cleanup(&dir, "winupdate_cache_cleanup")
-            .unwrap_err()
-            .starts_with(PRO_REQUIRED_PREFIX));
+        // Previously Pro-only elevated cleanup is now accessible.
+        assert!(authorize_elevated_cleanup(&dir, "winupdate_cache_cleanup").is_ok());
     }
 
     /// The catalogue's size and its free/Pro split, pinned.
@@ -2702,8 +2683,12 @@ mod tests {
         assert_eq!(tweak.value_name, "TaskbarDa");
     }
 
+    /// The source data still carries `requires_pro` flags for historical
+    /// bookkeeping, but `tweak_infos()` overrides them all to `false` and
+    /// `require_pro()` always succeeds — PC Tweaker is free for everyone.
+    /// This test pins the source-level counts so a refactor notices drift.
     #[test]
-    fn the_catalogue_is_eighty_one_tweaks_thirty_five_of_them_pro() {
+    fn the_catalogue_is_eighty_one_tweaks_all_free_in_output() {
         let registry: Vec<_> = tweaks::all_tweaks().into_iter().filter(|t| t.id != "disable_copilot").collect();
         let registry_pro = registry.iter().filter(|t| t.requires_pro).count();
 
@@ -2878,25 +2863,13 @@ mod tests {
  * reachable from anything that can talk to the IPC channel.
  * ================================================================== */
 
-/// Shared Pro gate. Returns the `PRO_REQUIRED_PREFIX` error the frontend
-/// already knows how to turn into a paywall rather than a red toast.
+/// Shared Pro gate. PC Tweaker is now free for everyone — this always
+/// succeeds. The function signature is preserved so the rest of the
+/// enforcement plumbing compiles without churn and can be removed in a
+/// later cleanup pass.
 pub(crate) fn require_pro(app_data_dir: &std::path::Path) -> Result<(), String> {
-    // Debug VM test builds only (feature "test-pro"); see Cargo.toml.
-    #[cfg(feature = "test-pro")]
-    {
-        let _ = app_data_dir;
-        Ok(())
-    }
-    #[cfg(not(feature = "test-pro"))]
-    {
-        if license::LicenseStore::new(app_data_dir.to_path_buf()).is_pro_and_fresh() {
-            return Ok(());
-        }
-        Err(format!(
-            "{}this feature requires an active PC Tweaker Pro license",
-            PRO_REQUIRED_PREFIX
-        ))
-    }
+    let _ = app_data_dir;
+    Ok(())
 }
 
 /// Marker the release checks look for: present in a binary only when it was

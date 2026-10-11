@@ -142,7 +142,9 @@ function App() {
       : { status: "anonymous" };
   });
 
-  const isProUnlocked = auth.status === "authenticated" && auth.isPro;
+  // PC Tweaker is now free for everyone — every feature is unlocked
+  // regardless of account or subscription state.
+  const isProUnlocked = true;
 
   // The plan someone clicked before being stopped by sign-in or an
   // unconfirmed inbox. Without it they had to find the pricing panel again
