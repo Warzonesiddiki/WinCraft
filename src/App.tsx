@@ -191,33 +191,12 @@ function App() {
   }
 
   /**
-   * Fetches a freshly signed Pro entitlement and hands it to the Rust side,
-   * which is what `apply_tweak` actually checks before running a Pro tweak —
-   * this UI's `isPro` flag on its own was never enough, since nothing
-   * stopped a Pro-gated tweak from being invoked directly, bypassing this
-   * screen entirely. See `src-tauri/src/license.rs`.
-   *
-   * Called every time `refreshAccount` succeeds, which already covers
-   * mount, focus, and right after login — so this never needs its own
-   * separate trigger wiring.
+   * PC Tweaker is now free for everyone — no license check is needed.
+   * Kept as a no-op stub so call sites compile without changes and the
+   * function can be removed in a future cleanup pass.
    */
   async function refreshLicense() {
-    if (!API_BASE_URL) return;
-    const token = readToken();
-    if (!token) return;
-    try {
-      const res = await fetch(`${API_BASE_URL}/api/license`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (!res.ok) return;
-      const response = (await res.json()) as { payloadJson: string; signature: string };
-      await invoke("save_license", { response });
-    } catch {
-      // Offline, or the backend's signer isn't configured: whatever was
-      // cached before keeps working until its grace period runs out. No
-      // toast — this runs silently in the background on every focus event
-      // and a real subscriber should never see noise from it.
-    }
+    // No-op: require_pro() always succeeds on the Rust side.
   }
 
   // The server can hold every runtime adjustment to other apps for everyone
@@ -914,9 +893,7 @@ function App() {
                   <ProfilesPanel
                     s={s}
                     lang={lang}
-                    lifetimeOwned={
-                      isProUnlocked && auth.status === "authenticated" && auth.plan === "lifetime"
-                    }
+                    lifetimeOwned={true}
                     onViewPlans={() => setFilter("pricing")}
                     tweaks={tweaks}
                     isPro={isProUnlocked}
