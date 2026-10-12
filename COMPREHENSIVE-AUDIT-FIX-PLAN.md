@@ -1898,7 +1898,21 @@ final pass (2026-10-12).
 
 ### Remaining risks
 
-1. **Rust is unverified in this environment.** All Rust statements here are static
+0. **Resolved: the Rust gates have now run.** Items 1, 4 and 5 below were written
+   when this machine had no Rust toolchain, so every Rust claim in this report
+   rested on static review. A stable toolchain with clippy, rustfmt and
+   cargo-audit has since been installed and all four gates were run: `cargo fmt
+   --check`, `cargo clippy --all-targets -- -D warnings`, `cargo test` (523
+   passed, 0 failed, 17 ignored) and `cargo audit` (0 vulnerabilities; its two
+   warnings are Linux/macOS-only lockfile entries, in neither the Windows
+   dependency tree nor the shipped binary). None of them were clean on arrival:
+   `cargo fmt --check` failed on 38 of 72 files, the build emitted five warnings
+   that were all Batch AB's orphans, clippy failed with 22 errors across 14
+   files, and `every_id_is_translated_in_every_language` had been failing on its
+   own first assertion since Batch Z moved the locale tables out of
+   `src/i18n.ts`. Each fix is recorded in the commit that made it.
+1. **Rust is now verified, not reviewed.** What follows records what was run and
+   why; treat the gates as run, and their findings as fixed. All Rust statements here are static
    review, and text heuristics over Rust files proved unreliable (see the
    `unwrap`/`expect` note under _Changes not applied_), so no Rust finding in this
    report should be treated as measured. Before merging, run on Windows:
@@ -1919,27 +1933,30 @@ directory and rejects `--manifest-path`). That applies to Batch AB
    key in `src-tauri/tauri.conf.json` are upstream's, and the fork has no releases
    (0 Actions runs, ever). Documented in RELEASING.md; changing the endpoint
    without a matching key change makes every update fail verification.
-3. **CI has still never executed.** The workflow is now correct as far as static
-   reading goes, but the first real run may surface environment problems (Node
-   version, pg-mem, Rust target). Treat the first CI run as a gate, not a formality.
-4. **The catalogue's Pro flags are gone at the source and uncompiled (Batch AI).**
+3. **CI has executed once, and failed where it was predicted to.** The first run
+   (PR #2) passed every step up to the retired `check-no-test-pro` script and
+   failed there, skipping the Rust tests. The workflow changes that fix it are
+   now applied; treat the next run as a gate, not a formality.
+4. **The catalogue's Pro flags are gone at the source, and now compiled (Batch AI).**
    Thirty literals, three power entries and three composite entries flipped to
-   false, and the assertion changed from 35/46 to 0/81. Nothing in this environment
-   compiles Rust, so `cargo test --lib` on Windows is what confirms the counts and
-   the flipped fields. This supersedes the old item 4, which said the metadata still
+   false, and the assertion changed from 35/46 to 0/81. `cargo test --lib` now
+   confirms the counts and the flipped fields on Windows:
+   `the_catalogue_is_eighty_one_tweaks_all_free_in_output` passes.
+   This supersedes the old item 4, which said the metadata still
    read "35 Pro" and nothing public repeated it.
    The app ignores the flag; the data and the Rust assertion keep the split as
    metadata; the nine public files no longer publish it, and
-   `check-public-counts` fails if they start again. What remains is the flag
-   itself, which only a Rust build can change.
-5. **The Rust gate is deleted but uncompiled.** Both halves of Batch AB are in the
-   tree — the interface's two `PRO_REQUIRED: ` handlers and the string behind them,
+   `check-public-counts` fails if they start again. It now also covers the
+   release notes for the version being shipped, which is where the stale split
+   survived longest.
+5. **The Rust gate is deleted and now compiled.** Both halves of Batch AB are in
+   the tree — the interface's two `PRO_REQUIRED: ` handlers and the string behind them,
    and then `require_pro()`, `PRO_REQUIRED_PREFIX` and all 38 call sites in Rust.
-   The one thing standing between that and a finished batch is a compiler: every
-   binding the removal orphaned was found by reading (`NativeBackend.dir`, the four
-   `AppHandle`s that became `_app`, the `is_ok()`/`is_err()` clauses inside four
-   monitors' `allowed` expressions), and only `cargo clippy -- -D warnings` proves
-   the list complete.
+   The compiler has now spoken: the removal orphaned five bindings the reading
+   missed (an `app_data_dir` parameter, an `AppHandle`, a test `temp_dir`, and
+   `LOW_RAM_BYTES`/`ram_is_tight` left reachable only from their own test), and
+   `cargo clippy --all-targets -- -D warnings` found 22 further lints across 14
+   files that had never been linted. All fixed.
 6. **The app shell has no test.** The tweak list left it in Batch X, so the rows
    and the rule that selects them are covered — but the shell itself is not:
    `App.tsx` still has 295 uncovered lines of state, IPC, routing and layout, and
