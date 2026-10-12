@@ -38,10 +38,12 @@ test("the offer ends at 23:59:59 on 6 November, Rome time", () => {
 
 // Prices charged to the public, from live Stripe Checkout Sessions and the
 // configuration changes of 14 September (UTC). [from, until, cents]
+// The three WinCraft rows this table used to carry are history now rather than
+// configuration: those offers were retired on 12 October, and the prices they
+// charged (€39.99 / €24.99 / €3.99) are the references a future WinCraft
+// promotion would have to be measured against until about 6 December. The full
+// history and the reasoning are in the comment in src/promo.ts.
 const HISTORY = {
-  "wincraft:lifetime": [["2026-08-31T01:24Z", "2026-09-07T22:36Z", 7499], ["2026-09-07T22:36Z", "2026-09-11T08:24Z", 8999], ["2026-09-11T08:24Z", "2026-09-14T02:06Z", 7999], ["2026-09-14T02:06Z", null, 9900]],
-  "wincraft:annual": [["2026-08-03T11:35Z", "2026-09-14T02:03Z", 5900], ["2026-09-14T02:03Z", "2026-09-14T02:20Z", 4999], ["2026-09-14T02:20Z", null, 5999]],
-  "wincraft:monthly": [["2026-08-03T11:33Z", "2026-09-14T02:03Z", 999], ["2026-09-14T02:03Z", null, 799]],
   "uninstaller:annual": [["2026-08-19T23:59Z", null, 999]],
 };
 // Owner rule: the highest price at or below half the reference that ends in
@@ -69,8 +71,9 @@ test("every struck price is the lowest charged in the 30 days before the start, 
     assert.ok(offer.price < offer.reference && offer.reference <= offer.regular);
     assert.equal(offer.price, bestPromoPrice(offer.reference), `${key} is the highest round price at or below half its reference`);
   }
-  assert.deepEqual(PROMO.offers.map((o) => [o.reference, o.price]), [[799, 399], [4999, 2499], [7999, 3999], [999, 499]]);
-  assert.deepEqual(PROMO.offers.map((o) => percentOff(o.reference, o.price)), [50, 50, 50, 50]);
+  assert.deepEqual(PROMO.offers.map((o) => [o.reference, o.price]), [[999, 499]]);
+  assert.deepEqual(PROMO.offers.map((o) => percentOff(o.reference, o.price)), [50]);
+  assert.deepEqual(PROMO.offers.map((o) => o.product), ["uninstaller"], "the WinCraft offers were retired on 12 October");
 });
 
 test("the percentage is rounded down, never up", () => {
@@ -87,11 +90,10 @@ test("simulated clock: nothing before the start, every offer during, nothing fro
   for (const now of [START, DURING, END - 1]) {
     const state = promoState(environment, now);
     assert.equal(state.status, "active");
-    assert.equal(state.offers.length, 4);
+    assert.equal(state.offers.length, 1);
     assert.equal(state.endsAt, PROMO.endsAt);
-    assert.deepEqual(state.offers.find((o) => o.plan === "lifetime"),
-      { product: "wincraft", plan: "lifetime", currency: "eur", regular: 9900, reference: 7999, price: 3999, percentOff: 50, firstPeriodOnly: false });
-    assert.equal(state.offers.find((o) => o.plan === "monthly").firstPeriodOnly, true);
+    assert.deepEqual(state.offers[0],
+      { product: "uninstaller", plan: "annual", currency: "eur", regular: 999, reference: 999, price: 499, percentOff: 50, firstPeriodOnly: true });
   }
   for (const now of [END, END + 86_400_000, Date.parse("2027-10-31T12:00:00Z")]) {
     assert.deepEqual(promoState(environment, now), { serverTime: new Date(now).toISOString(), id: null, status: "disabled", startsAt: null, endsAt: null, offers: [] });
@@ -103,18 +105,24 @@ test("the kill switch and missing coupons turn offers off", () => {
   assert.equal(promoState({ ...environment, PROMO_DISABLED: "0" }, DURING).status, "active");
   const noCoupons = Object.fromEntries(Object.entries(environment).filter(([k]) => !k.startsWith("STRIPE_COUPON_") && k !== "STRIPE_PRICE_LIFETIME_PROMO"));
   assert.equal(promoState(noCoupons, DURING).status, "disabled");
-  const onlyLifetime = { ...noCoupons, STRIPE_PRICE_LIFETIME_PROMO: "price_lifetime_promo_fixture" };
-  assert.deepEqual(promoState(onlyLifetime, DURING).offers.map((o) => o.plan), ["lifetime"]);
-  assert.equal(promoCheckout(onlyLifetime, DURING, "STRIPE_PRICE_ANNUAL"), null);
+  // The retired WinCraft offers cannot be charged again from their old
+  // variables: the campaign has one offer, and only its own coupon makes it
+  // live. The Lifetime promo Price keeps working as a Stripe object the webhook
+  // resolves, but it buys nothing.
+  const onlyLifetimePrice = { ...noCoupons, STRIPE_PRICE_LIFETIME_PROMO: "price_lifetime_promo_fixture" };
+  assert.equal(promoState(onlyLifetimePrice, DURING).status, "disabled");
+  for (const priceEnv of ["STRIPE_PRICE_MONTHLY", "STRIPE_PRICE_ANNUAL", "STRIPE_PRICE_LIFETIME"]) {
+    assert.equal(promoCheckout(environment, DURING, priceEnv), null, priceEnv);
+  }
 });
 
 test("checkout expiry: none far from the end, then well inside Stripe's 24 hours and the grace", () => {
   // Stripe rejects expires_at even two seconds past 24 hours on its own clock.
   for (const now of [START, DURING, END - 24 * 3600_000, END - 23.5 * 3600_000 - 1000]) {
-    assert.equal(promoCheckout(environment, now, "STRIPE_PRICE_ANNUAL").expiresAt, undefined, new Date(now).toISOString());
+    assert.equal(promoCheckout(environment, now, "STRIPE_PRICE_UNINSTALLER_ANNUAL").expiresAt, undefined, new Date(now).toISOString());
   }
   for (const now of [END - 23.5 * 3600_000, END - 12 * 3600_000, END - 3600_000, END - 31 * 60_000, END - 1000]) {
-    const { expiresAt } = promoCheckout(environment, now, "STRIPE_PRICE_LIFETIME");
+    const { expiresAt } = promoCheckout(environment, now, "STRIPE_PRICE_UNINSTALLER_ANNUAL");
     const nowSeconds = Math.floor(now / 1000);
     assert.ok(expiresAt - nowSeconds <= 23.5 * 3600, "at least 30 minutes of margin for clock skew");
     assert.ok(expiresAt >= nowSeconds + 30 * 60, "Stripe's 30-minute minimum");
@@ -130,6 +138,7 @@ test("the public route is uncached and carries no Stripe identifiers", () => {
   promoHandler(environment, () => DURING)({}, res);
   assert.equal(res.headers["cache-control"], "no-store");
   assert.equal(res.body.status, "active");
+  assert.deepEqual(res.body.offers.map((o) => [o.product, o.plan]), [["uninstaller", "annual"]]);
   assert.equal(/coupon_|price_|sk_test/.test(JSON.stringify(res.body)), false);
 });
 
@@ -152,30 +161,34 @@ async function checkout(body, now, userId) {
   return calls[0];
 }
 
-test("checkout applies the plan's own coupon only inside the window", async () => {
-  for (const [body, coupon] of [
-    [{ plan: "monthly" }, "coupon_monthly"],
-    [{ plan: "annual" }, "coupon_annual"],
-    [{ plan: "lifetime" }, null],
-    [{ product: "uninstaller", plan: "annual" }, "coupon_uninstaller"],
-  ]) {
-    const during = await checkout(body, DURING);
-    if (coupon) assert.deepEqual(during.discounts, [{ coupon }]);
-    else {
-      // Lifetime: its own promo Price, no coupon, so Stripe shows only what is paid.
-      assert.equal(during.discounts, undefined);
-      assert.deepEqual(during.line_items, [{ price: "price_lifetime_promo_fixture", quantity: 1 }]);
-    }
-    assert.equal(during.metadata.promo_id, "halloween50r-2026");
-    assert.deepEqual(during.after_expiration, { recovery: { enabled: false } });
-    if (during.mode === "subscription") assert.equal(during.subscription_data.metadata.promo_id, "halloween50r-2026");
-    if (coupon) assert.equal(during.line_items[0].price.includes("promo"), false, "subscriptions keep their regular Price");
-    for (const now of [START - 1, END, END + 7 * 86_400_000]) {
-      const outside = await checkout(body, now);
-      assert.equal(outside.discounts, undefined);
-      assert.equal(outside.metadata.promo_id, undefined);
-      assert.equal(outside.expires_at, undefined);
-      assert.equal(outside.line_items[0].price.includes("promo"), false, "outside the window every plan sells at its regular Price");
+test("checkout applies the Uninstaller's coupon only inside the window", async () => {
+  const body = { product: "uninstaller", plan: "annual" };
+  const during = await checkout(body, DURING);
+  assert.deepEqual(during.discounts, [{ coupon: "coupon_uninstaller" }]);
+  assert.equal(during.metadata.promo_id, "halloween50r-2026");
+  assert.deepEqual(during.after_expiration, { recovery: { enabled: false } });
+  assert.equal(during.subscription_data.metadata.promo_id, "halloween50r-2026");
+  assert.equal(during.line_items[0].price.includes("promo"), false, "the plan keeps its regular Price");
+  for (const now of [START - 1, END, END + 7 * 86_400_000]) {
+    const outside = await checkout(body, now);
+    assert.equal(outside.discounts, undefined);
+    assert.equal(outside.metadata.promo_id, undefined);
+    assert.equal(outside.expires_at, undefined);
+  }
+});
+
+// The retirement of 12 October: the three WinCraft plans sell at their regular
+// price again, at every moment of the window, with nothing from the campaign
+// attached — the app is free, and no page offers them a discount any more.
+test("the retired WinCraft offers never discount again", async () => {
+  for (const plan of ["monthly", "annual", "lifetime"]) {
+    for (const now of [START, DURING, END - 1000]) {
+      const params = await checkout({ plan }, now);
+      const at = new Date(now).toISOString();
+      assert.equal(params.discounts, undefined, `${plan} at ${at}`);
+      assert.equal(params.metadata.promo_id, undefined, `${plan} at ${at}`);
+      assert.equal(params.expires_at, undefined, `${plan} at ${at}`);
+      assert.equal(params.line_items[0].price.includes("promo"), false, `${plan} at ${at}`);
     }
   }
 });

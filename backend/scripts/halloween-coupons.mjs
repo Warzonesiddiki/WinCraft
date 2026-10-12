@@ -7,6 +7,10 @@
  *   railway run node scripts/halloween-coupons.mjs --apply    # create what is missing
  *   railway run node scripts/halloween-coupons.mjs --verify-session
  *
+ * The three WinCraft coupons this script used to create belong to offers
+ * retired on 12 October, so they are no longer iterated or checked: leave them
+ * in Stripe, where nothing references them.
+ *
  * Reads STRIPE_SECRET_KEY and the STRIPE_PRICE_* variables from the
  * environment and never prints them. Coupon IDs and promo Price lookup keys
  * are fixed, so a rerun creates nothing twice. --verify-session opens one

@@ -1444,6 +1444,57 @@ listings and README, the app's 309 tests and build (entry unchanged, 229.17 kB),
 backend **161/161**, and a grep of the built site: no WinCraft price, and
 "Halloween" only on the Uninstaller and Tweaky Driver pages, which keep their own.
 
+### Batch AD — the campaign the freed app no longer needs (done)
+
+`backend/src/promo.ts` ran a −50% Halloween campaign from 10 October to
+23:59:59 on 6 November whose offers were four paid plans. Three of them were
+WinCraft's, and by the time the site and the app had stopped selling anything
+there was no surface left for them: the offer endpoint still published them, the
+site's strip still read it, and a reader who followed it reached a page with no
+price at all. The owner retired them.
+
+- `PROMO.offers` is the Uninstaller's alone. Because the campaign is described by
+  its `reference` price and the Omnibus rule that produces it, the comments
+  carry what the retirement needs: the reference for the surviving offer (€9.99
+  since 19 August), and the fact that a future WinCraft promotion may not strike
+  the list price — until about 6 December its lawful reference is what the
+  October offer charged (€39.99 lifetime, €24.99 annual, €3.99 monthly).
+- The offer shape split into named types (`CouponOffer` for a subscription's
+  once-only coupon, `PromoPriceOffer` for a plan sold at its own one-time Price).
+  It used to be derived from the array itself, which stopped compiling the moment
+  the only price-shaped offer left: the Lifetime shape stays, because the webhook
+  still resolves that Price to attribute the purchases the offer already sold.
+- `test/promo.test.mjs` follows: the Omnibus table keeps only the Uninstaller's
+  row (with a pointer to the history it used to carry), the four-offer
+  assertions became one-offer assertions, expiry is exercised through the
+  surviving coupon, and a new test pins the retirement — the three WinCraft
+  plans sell at their regular price at every moment of the window, with no
+  discount, no `promo_id` and no promo Price, whatever the environment says.
+  162 backend tests pass.
+- **Nothing was deleted in Stripe.** The three coupons
+  (`halloween50r-2026-wincraft-*`) and the one-time Price in
+  `STRIPE_PRICE_LIFETIME_PROMO` stay configured: deleting the Price would break
+  the webhook's attribution of the €39.99 Lifetime purchases that were sold
+  under the offer, and refunds of them are matched by it. That reasoning is now
+  written down in `src/promo.ts`, `.env.example`, `RELEASING.md` and the
+  `halloween-coupons.mjs` header, because the variables that point at them are
+  what a future cleanup would reach for first.
+
+The same batch closed the last old-domain address: the Tweaky Driver return page
+said `tweakydriver@pctweaker.app` while the page above it said
+`tweakydriver@wincraft.app`. It now says the same thing in both, and no shipped
+site file mentions the old domain anywhere (only `site/package.json`'s private
+package name still does — an npm name, not copy).
+
+Also closed, as a non-issue: the `€00.00` strings in the built Uninstaller page
+are the *reserved* skeleton card in `site/src/promo.tsx`, rendered inside
+`<div style="visibility:hidden" aria-hidden="true">` while the offer endpoint
+answers, with placeholder digits so the card cannot change size when the real
+price arrives. Invisible to readers and to assistive technology by construction.
+
+Validation: `cd backend && npm test` (162/162), `cd site && npm run build &&
+npm run check:seo` (17/17 routes), and the built page greppped for the address.
+
 ## Final report
 
 ### Changes applied
@@ -1466,6 +1517,8 @@ backend **161/161**, and a grep of the built site: no WinCraft price, and
 | Store/docs   | The six listings' "WITH PRO" paragraphs became "everything included", the README's power-controls table lost its Free/Pro column, and `docs/pad.xml` and both privacy copies no longer describe a paid plan            |                                                                                                          | No  |
 | Desktop app  | The Rust licence gate is retired: `require_pro()`, `PRO_REQUIRED_PREFIX`, `requires_pro_for()`, `require_tweak_entitlement()` and `authorize_configuration_change()` deleted with all 38 call sites, and every binding that only existed for the gate (`AppHandle`s, `NativeBackend.dir`, the pre-measurement condition in `apply_by_id`, the `is_ok()`/`is_err()` clauses in four monitors)                                                                                    | No — the check could no longer fail                                                                      |
 | Desktop app  | The last copy that offered a paid tier: the game-session preview's "· Pro feature" claim, the unread "Also available with Pro"/"Unlock Pro" keys and the checkout strings removed, and the sign-in string on the resend-verification path rewritten, in all six locales                                                        | No                                                                                                       |
+| Backend      | The Halloween campaign's three WinCraft offers are retired: one offer left (the Uninstaller's), the offer shape now typed, the Omnibus table and tests reduced to what still runs, and the Stripe objects deliberately left in place because the webhook resolves them | **BREAKING (commerce only)** — the three WinCraft plans can no longer be discounted |
+| Website      | The Tweaky Driver return page sends readers to `tweakydriver@wincraft.app`, the address the page above it already used; no shipped site file mentions the old domain | No |
 
 ### Changes not applied (and why)
 
@@ -1553,9 +1606,12 @@ backend **161/161**, and a grep of the built site: no WinCraft price, and
    offers those clients receive. Rust temp-file prefixes (`pctweaker-*`) are
    internal and harmless. The exported profile file name was renamed to
    `.wincraft.json`, which is safe because importing matches on the extension.
-9. **The offer pipeline in the backend** (`/api/offers/lifetime`, `/api/offers/promo`,
-   promo coupons) still runs for installed clients up to 1.16.x. Its client-side
-   parsers stay because the promo test suites import them.
+9. **The offer pipeline in the backend** (`/api/offers/lifetime`, `/api/offers/promo`)
+   still runs for installed clients up to 1.16.x, and Batch AD removed the
+   WinCraft offers from it without deleting anything in Stripe. What is left
+   deliberately: the `LIFETIME_CAMPAIGN_*` window (`RELEASING.md` says not to set
+   it again, because 1.16.4 clients strike through a €119 price that was never
+   charged), the promo Price the webhook resolves, and the retired coupons.
 10. **`COMPREHENSIVE-AUDIT-FIX-PLAN.md` itself is new** — the file was never in the
     repository, so this is the record the instruction asked to keep, created here.
 
@@ -1688,13 +1744,12 @@ Ranked by value per unit of risk. None of these are started.
    canonical/OpenGraph tags, the origin assertion in `check-seo.mjs`, the four
    marketing CTAs, and every published price claim — pricing cards, the campaign
    strip, the hero offer, the JSON-LD offers, the listings and the README column.
-7. **Retire the WinCraft half of the offer pipeline** (the one open commercial
-   item). `backend/src/promo.ts` still runs the Halloween promotion until 6
-   November, and three of its four offers are WinCraft plans whose only possible
-   surface — the site, and the desktop client below 1.17 — no longer shows them.
-   Ending them means retiring Stripe prices and coupons and updating the test that
-   recomputes the Omnibus reference prices; the Uninstaller offer and the Tweaky
-   Driver page stay. `HalloweenStrip` is kept, unrendered, until that call is made.
+7. **Settled: the WinCraft half of the offer pipeline is retired** (Batch AD), on
+   the owner's instruction. The Uninstaller's offer runs to 6 November as before;
+   the three WinCraft coupons and the Lifetime promo Price stay configured in
+   Stripe on purpose, and the comment that says so now sits where a cleanup would
+   look for it. `HalloweenStrip` stays in the tree, unrendered — it is the
+   Uninstaller page's card component, which still has a live offer behind it.
 8. **Rust unwrap audit** with `cargo clippy` (see item 5 above for why the count
    is not quoted here). Replace `unwrap`/`expect` with propagated errors where
    the failure is reachable at runtime — file I/O, registry reads and process
@@ -1716,10 +1771,3 @@ Ranked by value per unit of risk. None of these are started.
     what is left there is the part worth testing next: the section routing, the
     mount reads and the toasts. It needs the workspace's own reads mocked and the
     locale table accepted, which makes it the heaviest single test in the tree.
-13. **Decide the live Halloween campaign** (Batch AA): `backend/src/promo.ts` runs
-    a −50% promotion until 6 November whose three WinCraft offers are for plans the
-    app no longer sells, and the site's strip is fed by that endpoint. Either end
-    the WinCraft part of it, or let it run knowing the strip can show a discount
-    above a price section that lists no price. Everything else the site published
-    about a paid tier is gone, and the app's own Plans screen has said "free for
-    everyone" since Batch C.
