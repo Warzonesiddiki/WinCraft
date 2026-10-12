@@ -1,6 +1,4 @@
-mod process_guard;
 mod appcache;
-mod update_identity;
 mod audit;
 mod avatar;
 pub mod baseline;
@@ -9,16 +7,18 @@ mod cleanup;
 mod contextmenu;
 mod cookies;
 mod debloat;
+mod process_guard;
+mod update_identity;
 mod diagnostics {
     pub mod boot;
     pub mod dpc;
     pub mod network_verify;
 }
 #[cfg(windows)]
-mod everyday;
-#[cfg(windows)]
 mod download_limit;
 mod ecoqos;
+#[cfg(windows)]
+mod everyday;
 mod engine {
     pub mod dynamic_session;
 }
@@ -55,10 +55,11 @@ mod hud_window;
 mod ipc_commands;
 #[cfg(test)]
 mod ipc_tests;
+mod lifetime_tools;
+mod livemetrics;
 #[cfg(all(test, windows))]
 #[path = "tests/mock_registry.rs"]
 mod mock_registry;
-mod lifetime_tools;
 mod netcheck;
 mod netlatency;
 mod netmaintenance;
@@ -68,18 +69,17 @@ mod power_tuning;
 mod privacy_extra;
 mod process_rules;
 mod profiles;
+mod program_icons;
 mod ramclean;
 mod recommend;
 mod restore_point;
 mod rollback;
 mod scheduledtasks;
-mod settings_tweaks;
 mod securedefrag;
 mod services;
+mod settings_tweaks;
 mod startup;
-mod program_icons;
 mod sysmon;
-mod livemetrics;
 mod sysrepair;
 mod systemprofile;
 mod technical;
@@ -91,26 +91,41 @@ mod window_state;
 mod x3d;
 mod zerotrace;
 
-pub fn monitor_watchdog(token: &str) { monitor_profiles::watchdog(token); }
+pub fn monitor_watchdog(token: &str) {
+    monitor_profiles::watchdog(token);
+}
 
 #[tauri::command(async)]
-fn download_limit_state(app: tauri::AppHandle) -> Result<download_limit::DownloadLimitState,String> {
+fn download_limit_state(
+    app: tauri::AppHandle,
+) -> Result<download_limit::DownloadLimitState, String> {
     download_limit::state(&store_for(&app)?)
 }
 #[tauri::command(async)]
-fn set_download_limit(app: tauri::AppHandle, kbps: u32) -> Result<download_limit::DownloadLimitState,String> {
-    let dir=store_for_dir(&app)?;
-    if !(1..=1_000_000).contains(&kbps) { return Err("Choose a bandwidth between 1 and 1000000 KB/s".into()); }
+fn set_download_limit(
+    app: tauri::AppHandle,
+    kbps: u32,
+) -> Result<download_limit::DownloadLimitState, String> {
+    let dir = store_for_dir(&app)?;
+    if !(1..=1_000_000).contains(&kbps) {
+        return Err("Choose a bandwidth between 1 and 1000000 KB/s".into());
+    }
     if !elevation::is_elevated() {
-        elevation::run_elevated_action("--elevated-download-limit",&kbps.to_string())?;
-    } else { download_limit::configure(&RollbackStore::new(dir),kbps)?; }
+        elevation::run_elevated_action("--elevated-download-limit", &kbps.to_string())?;
+    } else {
+        download_limit::configure(&RollbackStore::new(dir), kbps)?;
+    }
     download_limit_state(app)
 }
 #[tauri::command(async)]
-fn restore_download_limit(app: tauri::AppHandle) -> Result<download_limit::DownloadLimitState,String> {
+fn restore_download_limit(
+    app: tauri::AppHandle,
+) -> Result<download_limit::DownloadLimitState, String> {
     if !elevation::is_elevated() {
-        elevation::run_elevated_action("--elevated-download-restore","restore")?;
-    } else { download_limit::rollback(&store_for(&app)?)?; }
+        elevation::run_elevated_action("--elevated-download-restore", "restore")?;
+    } else {
+        download_limit::rollback(&store_for(&app)?)?;
+    }
     download_limit_state(app)
 }
 
@@ -302,7 +317,8 @@ fn tweak_infos(store: &RollbackStore) -> Result<Vec<TweakInfo>, String> {
             }],
             unavailable: (t.id == TASKBAR_WIDGETS_ID && services::user_choice_protected())
                 .then_some("windows_protected"),
-            ..Default::default() })
+            ..Default::default()
+        })
         .collect();
 
     list.push(TweakInfo {
@@ -326,7 +342,9 @@ fn tweak_infos(store: &RollbackStore) -> Result<Vec<TweakInfo>, String> {
         changes: Vec::new(), // composite: filled by the pass below
         requires_admin: turbo.requires_admin,
         requires_pro: turbo.requires_pro,
-        applied: applied_ids.contains(turbo.id), ..Default::default() });
+        applied: applied_ids.contains(turbo.id),
+        ..Default::default()
+    });
 
     list.push(TweakInfo {
         applied: applied_ids.contains(dns::TWEAK_ID),
@@ -349,7 +367,9 @@ fn tweak_infos(store: &RollbackStore) -> Result<Vec<TweakInfo>, String> {
         hive: "\u{2014}".to_string(),
         changes: Vec::new(), // composite: filled by the pass below
         requires_admin: input_lag.requires_admin,
-        requires_pro: input_lag.requires_pro, ..Default::default() });
+        requires_pro: input_lag.requires_pro,
+        ..Default::default()
+    });
 
     let turbo_boost = gaming::turbo_boost_info();
     list.push(TweakInfo {
@@ -361,7 +381,9 @@ fn tweak_infos(store: &RollbackStore) -> Result<Vec<TweakInfo>, String> {
         hive: "\u{2014}".to_string(),
         changes: Vec::new(), // composite: filled by the pass below
         requires_admin: turbo_boost.requires_admin,
-        requires_pro: turbo_boost.requires_pro, ..Default::default() });
+        requires_pro: turbo_boost.requires_pro,
+        ..Default::default()
+    });
 
     let games_priority = game_priority::info();
     list.push(TweakInfo {
@@ -373,7 +395,9 @@ fn tweak_infos(store: &RollbackStore) -> Result<Vec<TweakInfo>, String> {
         hive: "\u{2014}".to_string(),
         changes: Vec::new(), // composite: filled by the pass below
         requires_admin: games_priority.requires_admin,
-        requires_pro: games_priority.requires_pro, ..Default::default() });
+        requires_pro: games_priority.requires_pro,
+        ..Default::default()
+    });
 
     let core_parking = gaming::core_parking_info();
     list.push(TweakInfo {
@@ -385,7 +409,9 @@ fn tweak_infos(store: &RollbackStore) -> Result<Vec<TweakInfo>, String> {
         hive: "\u{2014}".to_string(),
         changes: Vec::new(), // composite: filled by the pass below
         requires_admin: core_parking.requires_admin,
-        requires_pro: core_parking.requires_pro, ..Default::default() });
+        requires_pro: core_parking.requires_pro,
+        ..Default::default()
+    });
 
     let keyboard_delay = gaming::keyboard_delay_info();
     list.push(TweakInfo {
@@ -397,7 +423,9 @@ fn tweak_infos(store: &RollbackStore) -> Result<Vec<TweakInfo>, String> {
         hive: "\u{2014}".to_string(),
         changes: Vec::new(), // composite: filled by the pass below
         requires_admin: keyboard_delay.requires_admin,
-        requires_pro: keyboard_delay.requires_pro, ..Default::default() });
+        requires_pro: keyboard_delay.requires_pro,
+        ..Default::default()
+    });
 
     let net_latency = netlatency::info();
     list.push(TweakInfo {
@@ -409,7 +437,9 @@ fn tweak_infos(store: &RollbackStore) -> Result<Vec<TweakInfo>, String> {
         hive: "\u{2014}".to_string(),
         changes: Vec::new(), // composite: filled by the pass below
         requires_admin: net_latency.requires_admin,
-        requires_pro: net_latency.requires_pro, ..Default::default() });
+        requires_pro: net_latency.requires_pro,
+        ..Default::default()
+    });
 
     let net_shaper = netshaper::info();
     list.push(TweakInfo {
@@ -421,7 +451,9 @@ fn tweak_infos(store: &RollbackStore) -> Result<Vec<TweakInfo>, String> {
         hive: "\u{2014}".to_string(),
         changes: Vec::new(), // composite: filled by the pass below
         requires_admin: net_shaper.requires_admin,
-        requires_pro: net_shaper.requires_pro, ..Default::default() });
+        requires_pro: net_shaper.requires_pro,
+        ..Default::default()
+    });
 
     let activity_history = privacy_extra::activity_history_info();
     list.push(TweakInfo {
@@ -433,7 +465,9 @@ fn tweak_infos(store: &RollbackStore) -> Result<Vec<TweakInfo>, String> {
         hive: "\u{2014}".to_string(),
         changes: Vec::new(), // composite: filled by the pass below
         requires_admin: activity_history.requires_admin,
-        requires_pro: activity_history.requires_pro, ..Default::default() });
+        requires_pro: activity_history.requires_pro,
+        ..Default::default()
+    });
 
     let typing = privacy_extra::typing_personalization_info();
     list.push(TweakInfo {
@@ -445,7 +479,9 @@ fn tweak_infos(store: &RollbackStore) -> Result<Vec<TweakInfo>, String> {
         hive: "\u{2014}".to_string(),
         changes: Vec::new(), // composite: filled by the pass below
         requires_admin: typing.requires_admin,
-        requires_pro: typing.requires_pro, ..Default::default() });
+        requires_pro: typing.requires_pro,
+        ..Default::default()
+    });
 
     let context_menu = contextmenu::info();
     list.push(TweakInfo {
@@ -457,7 +493,9 @@ fn tweak_infos(store: &RollbackStore) -> Result<Vec<TweakInfo>, String> {
         hive: "\u{2014}".to_string(),
         changes: Vec::new(), // composite: filled by the pass below
         requires_admin: context_menu.requires_admin,
-        requires_pro: context_menu.requires_pro, ..Default::default() });
+        requires_pro: context_menu.requires_pro,
+        ..Default::default()
+    });
 
     let windows_search = services::windows_search_info();
     list.push(TweakInfo {
@@ -469,7 +507,9 @@ fn tweak_infos(store: &RollbackStore) -> Result<Vec<TweakInfo>, String> {
         hive: "\u{2014}".to_string(),
         changes: Vec::new(), // composite: filled by the pass below
         requires_admin: windows_search.requires_admin,
-        requires_pro: windows_search.requires_pro, ..Default::default() });
+        requires_pro: windows_search.requires_pro,
+        ..Default::default()
+    });
 
     for tweak in &power_tuning::TWEAKS {
         list.push(TweakInfo {
@@ -703,11 +743,7 @@ fn without_retention_note(error: &str) -> String {
 /// back at once rather than leaving the tweak half applied. A tweak that was
 /// already applied before this attempt is left exactly as it was.
 #[cfg(windows)]
-pub(crate) fn apply_or_undo(
-    store: &RollbackStore,
-    app_data_dir: &std::path::Path,
-    id: &str,
-) -> Result<(), String> {
+pub(crate) fn apply_or_undo(store: &RollbackStore, id: &str) -> Result<(), String> {
     let was_applied = store.is_applied_checked(id).unwrap_or(true);
     let error = match apply_by_id_inner(store, id) {
         Ok(()) => return Ok(()),
@@ -730,7 +766,9 @@ pub(crate) fn apply_or_undo(
             "{}. The change was undone automatically, so nothing was left half applied.",
             without_retention_note(&error)
         ),
-        Err(undo) => format!("{error}. Undoing it automatically failed too ({undo}); use Restore to try again."),
+        Err(undo) => format!(
+            "{error}. Undoing it automatically failed too ({undo}); use Restore to try again."
+        ),
     })
 }
 
@@ -763,7 +801,7 @@ fn apply_by_id(
 
     // Single funnel for every apply (direct, batched, and the elevated
     // helper), so this one audit call covers them all exactly once.
-    let mut result = apply_or_undo(store, app_data_dir, id);
+    let mut result = apply_or_undo(store, id);
 
     if result.is_ok() && netcheck::regressed(was_online) {
         // Reverted through the public funnel so the audit log carries the
@@ -774,9 +812,9 @@ fn apply_by_id(
     }
     // The "after" reading only for a change that was kept, and only when the
     // "before" one had enough replies to compare against.
-    if let Some(before) = before.filter(|b| {
-        result.is_ok() && diagnostics::network_verify::enough_replies(&b.link)
-    }) {
+    if let Some(before) =
+        before.filter(|b| result.is_ok() && diagnostics::network_verify::enough_replies(&b.link))
+    {
         let after = diagnostics::network_verify::measure();
         let now = std::time::SystemTime::now()
             .duration_since(std::time::UNIX_EPOCH)
@@ -858,14 +896,26 @@ fn live_value(part: &rollback::RegistrySnapshot) -> Option<String> {
 fn apply_by_id_inner(store: &RollbackStore, id: &str) -> Result<(), String> {
     // The three configurable controls apply from their own panels; a default
     // written from the list would be a value nobody chose.
-    if ["ecoqos_rules","limit_do_background_download","monitor_refresh_profile"].contains(&id) {
+    if [
+        "ecoqos_rules",
+        "limit_do_background_download",
+        "monitor_refresh_profile",
+    ]
+    .contains(&id)
+    {
         return Err("Configure this control in its dedicated panel; no default configuration is applied automatically".into());
     }
     if id == TASKBAR_WIDGETS_ID && services::user_choice_protected() {
         return Err(TASKBAR_WIDGETS_PROTECTED.into());
     }
-    if [everyday::DISABLE_RESTART_APPS_ID,everyday::ENABLE_LONG_PATHS_ID,everyday::DISABLE_FILTER_KEYS_SHORTCUT_ID].contains(&id) {
-        return everyday::apply(id,store);
+    if [
+        everyday::DISABLE_RESTART_APPS_ID,
+        everyday::ENABLE_LONG_PATHS_ID,
+        everyday::DISABLE_FILTER_KEYS_SHORTCUT_ID,
+    ]
+    .contains(&id)
+    {
+        return everyday::apply(id, store);
     }
     if power_tuning::find(id).is_some() {
         return power_tuning::apply(store, id);
@@ -932,10 +982,18 @@ fn rollback_by_id(store: &RollbackStore, id: &str) -> Result<(), String> {
 
 #[cfg(windows)]
 fn rollback_by_id_inner(store: &RollbackStore, id: &str) -> Result<(), String> {
-    if [everyday::DISABLE_RESTART_APPS_ID,everyday::ENABLE_LONG_PATHS_ID,everyday::DISABLE_FILTER_KEYS_SHORTCUT_ID].contains(&id) {
-        return everyday::rollback(id,store);
+    if [
+        everyday::DISABLE_RESTART_APPS_ID,
+        everyday::ENABLE_LONG_PATHS_ID,
+        everyday::DISABLE_FILTER_KEYS_SHORTCUT_ID,
+    ]
+    .contains(&id)
+    {
+        return everyday::rollback(id, store);
     }
-    if id==download_limit::TWEAK_ID { return download_limit::rollback(store).map(|_|()); }
+    if id == download_limit::TWEAK_ID {
+        return download_limit::rollback(store).map(|_| ());
+    }
     if power_tuning::find(id).is_some() {
         return power_tuning::rollback(store, id);
     }
@@ -970,7 +1028,9 @@ fn rollback_by_id_inner(store: &RollbackStore, id: &str) -> Result<(), String> {
 
 #[cfg(windows)]
 fn requires_admin_for(id: &str) -> bool {
-    if id == download_limit::TWEAK_ID { return true; }
+    if id == download_limit::TWEAK_ID {
+        return true;
+    }
     if power_tuning::find(id).is_some() {
         return true;
     }
@@ -1151,9 +1211,9 @@ fn rollback_tweaks(app: tauri::AppHandle, ids: Vec<String>) -> Result<Vec<String
 /// just before the changes it explains so the history can say "from".
 fn record_origin(source: Option<String>, ids: &[String]) {
     // A label, never a path or free text: short and printable.
-    let Some(source) = source.filter(|s| {
-        !s.is_empty() && s.len() <= 120 && !s.chars().any(char::is_control)
-    }) else {
+    let Some(source) =
+        source.filter(|s| !s.is_empty() && s.len() <= 120 && !s.chars().any(char::is_control))
+    else {
         return;
     };
     audit::record("origin", &source, true, Some(ids.join(",")));
@@ -1497,7 +1557,12 @@ fn set_drift_watch(enabled: bool) -> Result<bool, String> {
 #[cfg(any(windows, test))]
 fn task_xml_text(bytes: &[u8]) -> String {
     if bytes.len() >= 2 && bytes.contains(&0) {
-        let units: Vec<u16> = bytes.chunks_exact(2).map(|pair| u16::from_le_bytes([pair[0], pair[1]])).collect();
+        let units: Vec<u16> = bytes
+            .as_chunks::<2>()
+            .0
+            .iter()
+            .map(|pair| u16::from_le_bytes([pair[0], pair[1]]))
+            .collect();
         String::from_utf16_lossy(&units)
     } else {
         String::from_utf8_lossy(bytes).into_owned()
@@ -1505,7 +1570,7 @@ fn task_xml_text(bytes: &[u8]) -> String {
 }
 
 /// The update watch task stores the path of the program that registered it.
-/// Up to 1.16.1 that was `pc-tweaker-app	auri-app.exe`; since the move to the
+/// Up to 1.16.1 that was `pc-tweaker-app\tauri-app.exe`; since the move to the
 /// WinCraft name it would start a file that no longer exists. When the task
 /// is registered and points anywhere but this program, register it again with
 /// the same schedule. Nothing happens when the watch is off.
@@ -1514,7 +1579,9 @@ fn refresh_drift_watch_target() {
     use std::os::windows::process::CommandExt;
     const CREATE_NO_WINDOW: u32 = 0x0800_0000;
 
-    let Ok(exe) = std::env::current_exe() else { return };
+    let Ok(exe) = std::env::current_exe() else {
+        return;
+    };
     let Ok(output) = crate::system_tools::run("schtasks", |tool| {
         tool.args(["/query", "/tn", updatewatch::TASK_NAME, "/xml"])
             .creation_flags(CREATE_NO_WINDOW)
@@ -1626,11 +1693,16 @@ fn scheduled_cleanup_enabled() -> bool {
     task_registered(TEMP_CLEANUP_TASK)
 }
 
-/// Turning the weekly cleanup on needs Pro; turning it off never does.
+/// Turning the weekly cleanup on is free; so is turning it off.
 #[cfg(windows)]
 #[tauri::command(async)]
-fn set_scheduled_cleanup(app: tauri::AppHandle, enabled: bool) -> Result<bool, String> {
-    configure_logon_task(TEMP_CLEANUP_TASK, "--scheduled-temp-cleanup", "0010:00", enabled)?;
+fn set_scheduled_cleanup(enabled: bool) -> Result<bool, String> {
+    configure_logon_task(
+        TEMP_CLEANUP_TASK,
+        "--scheduled-temp-cleanup",
+        "0010:00",
+        enabled,
+    )?;
     let actual = task_registered(TEMP_CLEANUP_TASK);
     if actual != enabled {
         return Err("Windows did not keep the scheduled cleanup task".to_string());
@@ -1754,7 +1826,7 @@ pub fn run_drift_check_headless() -> ! {
 
     let mut states = states;
     states.extend(settings_drift_states(&applied_ids));
-    let report = updatewatch::build_report(previous, current.clone(), &states);
+    let report = updatewatch::build_report(previous, current, &states);
     let _ = updatewatch::write_state(
         &dir,
         &updatewatch::WatchState {
@@ -1832,7 +1904,9 @@ pub fn run_elevated_headless(action: &str, id: &str) -> ! {
             .parse::<u32>()
             .map_err(|_| "Invalid bandwidth".to_string())
             .and_then(|kbps| download_limit::configure(&store, kbps).map(|_| ())),
-        "--elevated-download-restore" if id == "restore" => download_limit::rollback(&store).map(|_|()),
+        "--elevated-download-restore" if id == "restore" => {
+            download_limit::rollback(&store).map(|_| ())
+        }
         "--elevated-session-apply" => game_sessions::validate_owner_token(id)
             .and_then(|_| turbo::apply_for_session(&store, id).map(|_| ())),
         "--elevated-session-rollback" => game_sessions::validate_owner_token(id)
@@ -1902,8 +1976,7 @@ pub fn run_elevated_headless(action: &str, id: &str) -> ! {
             result
         }
         "--elevated-cleanup" => {
-            let result =
-                authorize_elevated_cleanup(id).and_then(|_| cleanup::run_cleanup(id));
+            let result = authorize_elevated_cleanup(id).and_then(|_| cleanup::run_cleanup(id));
             audit::record(
                 "cleanup",
                 id,
@@ -2074,7 +2147,9 @@ fn active_changes(app: tauri::AppHandle) -> Result<Vec<ActiveChange>, String> {
     let all = store.applied_ids()?;
     let mut ids: Vec<String> = {
         let transaction = store.transaction()?;
-        all.into_iter().filter(|id| transaction.owner(id).is_none()).collect()
+        all.into_iter()
+            .filter(|id| transaction.owner(id).is_none())
+            .collect()
     };
     ids.sort();
     Ok(ids
@@ -2228,10 +2303,17 @@ pub fn run() {
         }))
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_dialog::init())
-        .plugin(tauri_plugin_updater::Builder::new().default_version_comparator(|current, release| {
-            release.version > current
-                && update_identity::release_matches(&release.version.to_string(), &release.data)
-        }).build())
+        .plugin(
+            tauri_plugin_updater::Builder::new()
+                .default_version_comparator(|current, release| {
+                    release.version > current
+                        && update_identity::release_matches(
+                            &release.version.to_string(),
+                            &release.data,
+                        )
+                })
+                .build(),
+        )
         .plugin(tauri_plugin_process::init())
         .manage(sysmon::SysMonState::new())
         .manage(fps::FpsState::default())
@@ -2553,10 +2635,6 @@ mod tests {
     /// their frequency limits and the elevated helper only runs admin ones.
     #[test]
     fn cleanup_gates_hold_without_a_license() {
-        let dir = std::env::temp_dir().join(format!(
-            "wincraft-cleanup-gate-test-{}",
-            std::process::id()
-        ));
         assert_eq!(authorize_cleanup("temp_cleanup"), Ok(false));
         // Previously Pro-only cleanup is now accessible without a license.
         assert!(authorize_cleanup("winupdate_cache_cleanup").is_ok());
@@ -2564,7 +2642,11 @@ mod tests {
         // The catalogue's own flags stay as metadata even though nothing gates
         // on them any more: they are the record of what used to be gated.
         assert!(!cleanup::target("temp_cleanup").unwrap().requires_pro);
-        assert!(!cleanup::target("winupdate_cache_cleanup").unwrap().requires_pro);
+        assert!(
+            !cleanup::target("winupdate_cache_cleanup")
+                .unwrap()
+                .requires_pro
+        );
         assert!(authorize_elevated_cleanup("temp_cleanup").is_err());
         // Previously Pro-only elevated cleanup is now accessible.
         assert!(authorize_elevated_cleanup("winupdate_cache_cleanup").is_ok());
@@ -2593,7 +2675,10 @@ mod tests {
     /// This test pins the size of the catalogue so a refactor notices drift.
     #[test]
     fn the_catalogue_is_eighty_one_tweaks_all_free_in_output() {
-        let registry: Vec<_> = tweaks::all_tweaks().into_iter().filter(|t| t.id != "disable_copilot").collect();
+        let registry: Vec<_> = tweaks::all_tweaks()
+            .into_iter()
+            .filter(|t| t.id != "disable_copilot")
+            .collect();
         let registry_pro = registry.iter().filter(|t| t.requires_pro).count();
 
         // The composite tweaks, each owning its own Pro flag. Listed by hand
@@ -2622,14 +2707,18 @@ mod tests {
         ];
 
         let settings = &settings_tweaks::TWEAKS;
-        let total = registry.len() + composite_pro.len() + power_tuning::TWEAKS.len() + settings.len();
+        let total =
+            registry.len() + composite_pro.len() + power_tuning::TWEAKS.len() + settings.len();
         let pro = registry_pro
             + composite_pro.iter().filter(|p| **p).count()
             + power_tuning::TWEAKS.iter().filter(|t| t.pro).count()
             + settings.iter().filter(|t| t.requires_pro).count();
 
         assert_eq!(total, 81, "the catalogue no longer has 81 tweaks");
-        assert_eq!(pro, 0, "a control is Pro again: nothing in this build is gated");
+        assert_eq!(
+            pro, 0,
+            "a control is Pro again: nothing in this build is gated"
+        );
         assert_eq!(total - pro, 81, "every control is free");
 
         // The composite list must stay in step with what list_tweaks builds,
@@ -2698,16 +2787,39 @@ mod tests {
     /// has an entry in every locale.
     #[test]
     fn every_id_is_translated_in_every_language() {
-        let i18n = std::fs::read_to_string(concat!(env!("CARGO_MANIFEST_DIR"), "/../src/i18n.ts"))
-            .expect("could not read src/i18n.ts");
+        // Batch Z moved the locale tables out of src/i18n.ts and into
+        // src/locales/<code>.ts, so that only English ships in the entry chunk
+        // and the other five load on demand. This test still read src/i18n.ts
+        // alone, found no `tweaks:` block in it at all, and failed on its own
+        // first assertion — which is the whole point of running it. Read the
+        // directory the tables actually live in, so the next split of that
+        // layout fails here too rather than silently skipping the check.
+        let locales_dir = concat!(env!("CARGO_MANIFEST_DIR"), "/../src/locales");
+        let mut locales: Vec<(String, String)> = std::fs::read_dir(locales_dir)
+            .unwrap_or_else(|e| panic!("could not read {locales_dir}: {e}"))
+            .filter_map(|entry| {
+                let name = entry.ok()?.file_name().into_string().ok()?;
+                if !name.ends_with(".ts") || name.ends_with(".test.ts") {
+                    return None;
+                }
+                let body = std::fs::read_to_string(format!("{locales_dir}/{name}"))
+                    .unwrap_or_else(|e| panic!("could not read {name}: {e}"));
+                Some((name, body))
+            })
+            .collect();
+        locales.sort_by(|a, b| a.0.cmp(&b.0));
 
-        // One `STRINGS` entry per language; each locale object repeats the
-        // same id keys, so a fully translated id appears once per locale.
-        let locale_count = i18n.matches("  tweaks: {").count();
+        // One `tweaks:` block per locale; each repeats the same id keys, so a
+        // fully translated id appears once per locale.
+        let locale_count: usize = locales
+            .iter()
+            .map(|(_, b)| b.matches("  tweaks: {").count())
+            .sum();
         assert!(
             locale_count >= 5,
-            "expected at least 5 locales, found {}",
-            locale_count
+            "expected at least 5 locale tables in src/locales, found {} across {}",
+            locale_count,
+            locales.len()
         );
 
         let mut ids = all_visible_ids();
@@ -2715,7 +2827,11 @@ mod tests {
 
         let mut missing = Vec::new();
         for id in &ids {
-            let found = i18n.matches(&format!("\n    {}: {{", id)).count();
+            let key = format!("\n    {}: {{", id);
+            let found = locales
+                .iter()
+                .filter(|(_, body)| body.contains(&key))
+                .count();
             if found < locale_count {
                 missing.push(format!(
                     "{} (translated in {}/{} languages)",

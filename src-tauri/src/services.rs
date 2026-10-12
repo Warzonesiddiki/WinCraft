@@ -182,7 +182,11 @@ pub(crate) struct WinServices(pub &'static str);
 /// Whether a service exists on this machine. Opens the service manager only.
 #[cfg(windows)]
 pub fn installed(service: &str) -> bool {
-    open_service(service, windows_sys::Win32::System::Services::SERVICE_QUERY_STATUS).is_ok()
+    open_service(
+        service,
+        windows_sys::Win32::System::Services::SERVICE_QUERY_STATUS,
+    )
+    .is_ok()
 }
 
 /// Whether Windows' User Choice Protection Driver (UCPD) is running. While it
@@ -236,12 +240,7 @@ impl ServiceControl for WinServices {
             SERVICE_AUTO_START => {}
             SERVICE_DEMAND_START => return Ok(StartType::Demand),
             SERVICE_DISABLED => return Ok(StartType::Disabled),
-            other => {
-                return Err(format!(
-                    "{} has an unexpected start type ({other})",
-                    self.0
-                ))
-            }
+            other => return Err(format!("{} has an unexpected start type ({other})", self.0)),
         }
         let mut delayed = SERVICE_DELAYED_AUTO_START_INFO {
             fDelayedAutostart: 0,
@@ -446,7 +445,10 @@ fn wait_for_service_state(scm: &dyn ServiceControl, running: bool) -> Result<(),
             return Ok(());
         }
         if std::time::Instant::now() >= deadline {
-            return Err("the service did not reach the requested state; the rollback snapshot was retained".into());
+            return Err(
+                "the service did not reach the requested state; the rollback snapshot was retained"
+                    .into(),
+            );
         }
         std::thread::sleep(std::time::Duration::from_millis(125));
     }
@@ -696,10 +698,16 @@ mod tests {
                 let scm = install(start_type, running);
                 let fixture = Fixture::new();
                 apply_service(&fixture.store, tweak).unwrap();
-                assert_eq!(scm.start_type.get(), StartType::Demand, "Manual, never Disabled");
+                assert_eq!(
+                    scm.start_type.get(),
+                    StartType::Demand,
+                    "Manual, never Disabled"
+                );
                 assert!(!scm.running.get());
                 match fixture.snapshot(AI_FABRIC_ID) {
-                    Some(SnapshotEntry::Service { name, .. }) => assert_eq!(name, AI_FABRIC_SERVICE),
+                    Some(SnapshotEntry::Service { name, .. }) => {
+                        assert_eq!(name, AI_FABRIC_SERVICE)
+                    }
                     other => panic!("unexpected snapshot: {other:?}"),
                 }
                 assert!(!fixture.store.is_applied(WINDOWS_SEARCH_ID));

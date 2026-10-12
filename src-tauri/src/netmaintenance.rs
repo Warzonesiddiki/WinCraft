@@ -29,8 +29,7 @@ mod imp {
         let detail = stdout
             .lines()
             .map(|l| l.trim())
-            .filter(|l| !l.is_empty())
-            .last()
+            .rfind(|l| !l.is_empty())
             .unwrap_or("DNS cache flushed.")
             .to_string();
 

@@ -440,12 +440,7 @@ fn restore_record(path: &Path, record: &Recovery) -> Result<bool, String> {
         if process.class() != record.original {
             return Err("the restored priority did not stick".to_string());
         }
-        crate::process_guard::audit(
-            "priority-restored",
-            "restored",
-            true,
-            None,
-        );
+        crate::process_guard::audit("priority-restored", "restored", true, None);
     }
     std::fs::remove_file(path).map_err(|e| e.to_string())?;
     Ok(decision == Decision::PutBack)
@@ -484,8 +479,7 @@ fn tick(
     for (path, record) in &records {
         let mine = record.owner_pid == owner_pid && record.owner_creation == owner_creation;
         if !mine && alive(record.owner_pid, record.owner_creation) {
-            status.last_error =
-                Some("Another WinCraft process owns these priority changes".into());
+            status.last_error = Some("Another WinCraft process owns these priority changes".into());
             continue;
         }
         let still_wanted = mine
@@ -782,7 +776,10 @@ mod tests {
         let before = process.class();
         // CI runners may start processes below Normal already, so the rule
         // picks a class the child is not at.
-        assert!(Priority::from_class(before).is_some(), "unexpected class {before:#x}");
+        assert!(
+            Priority::from_class(before).is_some(),
+            "unexpected class {before:#x}"
+        );
         let applied = if before == Priority::BelowNormal.class() {
             Priority::Normal
         } else {

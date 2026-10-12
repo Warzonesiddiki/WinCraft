@@ -86,7 +86,9 @@ pub(crate) mod win {
     use windows_sys::Win32::System::SystemInformation::{
         GetLogicalProcessorInformationEx, RelationCache, SYSTEM_LOGICAL_PROCESSOR_INFORMATION_EX,
     };
-    use windows_sys::Win32::System::Threading::{GetProcessDefaultCpuSets, SetProcessDefaultCpuSets};
+    use windows_sys::Win32::System::Threading::{
+        GetProcessDefaultCpuSets, SetProcessDefaultCpuSets,
+    };
 
     /// Reads the L3 cache groups the machine actually reports.
     ///
@@ -220,7 +222,9 @@ pub(crate) mod win {
         let sets = crate::engine::dynamic_session::cpu_sets()?;
         Ok(sets
             .iter()
-            .filter(|s| s.group == 0 && s.logical_index < 64 && mask & (1u64 << s.logical_index) != 0)
+            .filter(|s| {
+                s.group == 0 && s.logical_index < 64 && mask & (1u64 << s.logical_index) != 0
+            })
             .map(|s| s.id)
             .collect())
     }
@@ -254,7 +258,12 @@ pub(crate) mod win {
             let mut required = 0u32;
             // SAFETY: `ids` holds `ids.len()` u32s; the handle is live.
             let ok = unsafe {
-                GetProcessDefaultCpuSets(process.raw(), ids.as_mut_ptr(), ids.len() as u32, &mut required)
+                GetProcessDefaultCpuSets(
+                    process.raw(),
+                    ids.as_mut_ptr(),
+                    ids.len() as u32,
+                    &mut required,
+                )
             };
             if ok != 0 {
                 ids.truncate(required as usize);
@@ -278,7 +287,11 @@ pub(crate) mod win {
     fn write_sets(pid: u32, ids: &[u32]) -> Result<(), String> {
         let process = process_guard::open(pid, Access::CpuSets)
             .map_err(|e| format!("process {pid} could not be opened: {e}"))?;
-        let pointer = if ids.is_empty() { std::ptr::null() } else { ids.as_ptr() };
+        let pointer = if ids.is_empty() {
+            std::ptr::null()
+        } else {
+            ids.as_ptr()
+        };
         // SAFETY: `pointer` is null with a zero count, or `ids` itself.
         if unsafe { SetProcessDefaultCpuSets(process.raw(), pointer, ids.len() as u32) } == 0 {
             return Err(format!(

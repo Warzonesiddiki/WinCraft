@@ -458,9 +458,12 @@ pub fn own_and_others(
     if budget <= 0.0 {
         return None;
     }
-    let before: std::collections::HashMap<(u32, u64), u64> =
-        table.iter().map(|p| ((p.pid, p.created), p.cpu_time)).collect();
-    let family = crate::process_guard::with_descendants(now, &std::collections::HashSet::from([me]));
+    let before: std::collections::HashMap<(u32, u64), u64> = table
+        .iter()
+        .map(|p| ((p.pid, p.created), p.cpu_time))
+        .collect();
+    let family =
+        crate::process_guard::with_descendants(now, &std::collections::HashSet::from([me]));
     let (mut own, mut others) = (0u64, 0u64);
     for p in now.iter().filter(|p| p.pid != 0) {
         let used = before

@@ -265,31 +265,32 @@ pub fn find(id: &str) -> Option<&'static SettingsTweak> {
 
 /// Why a tweak cannot be applied on this PC. The code is what the frontend
 /// translates; the text is the English fallback.
+///
+/// The variants read as `Version`/`Edition` rather than `WindowsVersion`/
+/// `WindowsEdition` because the enum is already named `Unavailable` and every
+/// variant is a Windows check by definition. The `code()` strings are the wire
+/// format the frontend's `types.ts` matches on and are deliberately unchanged.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Unavailable {
-    WindowsVersion,
-    WindowsEdition,
-    WindowsEditionEnterprise,
+    Version,
+    Edition,
+    EditionEnterprise,
 }
 
 impl Unavailable {
     pub fn code(self) -> &'static str {
         match self {
-            Unavailable::WindowsVersion => "windows_version",
-            Unavailable::WindowsEdition => "windows_edition",
-            Unavailable::WindowsEditionEnterprise => "windows_edition_enterprise",
+            Unavailable::Version => "windows_version",
+            Unavailable::Edition => "windows_edition",
+            Unavailable::EditionEnterprise => "windows_edition_enterprise",
         }
     }
 
     pub fn message(self) -> &'static str {
         match self {
-            Unavailable::WindowsVersion => "This setting needs a newer version of Windows.",
-            Unavailable::WindowsEdition => {
-                "This setting needs Windows Pro, Enterprise or Education."
-            }
-            Unavailable::WindowsEditionEnterprise => {
-                "This setting needs Windows Enterprise or Education."
-            }
+            Unavailable::Version => "This setting needs a newer version of Windows.",
+            Unavailable::Edition => "This setting needs Windows Pro, Enterprise or Education.",
+            Unavailable::EditionEnterprise => "This setting needs Windows Enterprise or Education.",
         }
     }
 }
@@ -305,9 +306,15 @@ fn is_home_edition(edition_id: &str) -> bool {
 /// Windows 11 SE (CloudEdition).
 fn is_enterprise_or_education(edition_id: &str) -> bool {
     let id = edition_id.to_ascii_lowercase();
-    ["enterprise", "education", "iotenterprise", "serverrdsh", "cloudedition"]
-        .iter()
-        .any(|family| id.starts_with(family))
+    [
+        "enterprise",
+        "education",
+        "iotenterprise",
+        "serverrdsh",
+        "cloudedition",
+    ]
+    .iter()
+    .any(|family| id.starts_with(family))
         || id.starts_with("professionaleducation")
 }
 
@@ -319,15 +326,15 @@ pub fn availability(
     edition_id: Option<&str>,
 ) -> Result<(), Unavailable> {
     if build.is_some_and(|b| b < tweak.min_build) {
-        return Err(Unavailable::WindowsVersion);
+        return Err(Unavailable::Version);
     }
     if tweak.edition == Edition::ProOrHigher && edition_id.is_some_and(is_home_edition) {
-        return Err(Unavailable::WindowsEdition);
+        return Err(Unavailable::Edition);
     }
     if tweak.edition == Edition::EnterpriseOrEducation
         && edition_id.is_some_and(|id| !is_enterprise_or_education(id))
     {
-        return Err(Unavailable::WindowsEditionEnterprise);
+        return Err(Unavailable::EditionEnterprise);
     }
     Ok(())
 }
@@ -526,8 +533,12 @@ mod tests {
     fn builds_and_editions_are_checked_and_unknowns_do_not_block() {
         let click = find("disable_click_to_do").unwrap();
         assert_eq!(
-            availability(find("disable_drag_tray").unwrap(), Some(22631), Some("Professional")),
-            Err(Unavailable::WindowsVersion)
+            availability(
+                find("disable_drag_tray").unwrap(),
+                Some(22631),
+                Some("Professional")
+            ),
+            Err(Unavailable::Version)
         );
         assert_eq!(
             availability(click, Some(22631), Some("Professional")),
@@ -536,11 +547,11 @@ mod tests {
         );
         assert_eq!(
             availability(click, Some(26100), Some("Core")),
-            Err(Unavailable::WindowsEdition)
+            Err(Unavailable::Edition)
         );
         assert_eq!(
             availability(click, Some(26100), Some("CoreSingleLanguage")),
-            Err(Unavailable::WindowsEdition)
+            Err(Unavailable::Edition)
         );
         assert_eq!(
             availability(click, Some(26200), Some("Professional")),
@@ -552,23 +563,35 @@ mod tests {
         for id in ["Professional", "ProfessionalWorkstation", "Core"] {
             assert_eq!(
                 availability(start, Some(26100), Some(id)),
-                Err(Unavailable::WindowsEditionEnterprise),
+                Err(Unavailable::EditionEnterprise),
                 "{id}"
             );
         }
-        for id in ["Enterprise", "EnterpriseS", "Education", "ProfessionalEducation", "IoTEnterprise", "ServerRdsh", "CloudEdition"] {
+        for id in [
+            "Enterprise",
+            "EnterpriseS",
+            "Education",
+            "ProfessionalEducation",
+            "IoTEnterprise",
+            "ServerRdsh",
+            "CloudEdition",
+        ] {
             assert_eq!(availability(start, Some(26100), Some(id)), Ok(()), "{id}");
         }
-        assert_eq!(availability(start, Some(26100), None), Ok(()), "unknown edition does not block");
+        assert_eq!(
+            availability(start, Some(26100), None),
+            Ok(()),
+            "unknown edition does not block"
+        );
         assert_eq!(
             availability(start, Some(19045), Some("Enterprise")),
-            Err(Unavailable::WindowsVersion)
+            Err(Unavailable::Version)
         );
         let explorer = find("explorer_open_this_pc").unwrap();
         assert_eq!(availability(explorer, Some(19045), Some("Core")), Ok(()));
         assert_eq!(
             availability(find("taskbar_end_task").unwrap(), Some(22621), Some("Core")),
-            Err(Unavailable::WindowsVersion)
+            Err(Unavailable::Version)
         );
     }
 
@@ -677,6 +700,11 @@ mod tests {
         let stored = std::fs::read_to_string(&path)
             .unwrap_or_default()
             .replace("\r\n", "\n");
-        assert_eq!(stored, current, "run with PCT_WRITE_VM_MATRIX=1 to refresh {}", path.display());
+        assert_eq!(
+            stored,
+            current,
+            "run with PCT_WRITE_VM_MATRIX=1 to refresh {}",
+            path.display()
+        );
     }
 }

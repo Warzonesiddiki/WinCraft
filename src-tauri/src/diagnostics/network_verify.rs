@@ -204,7 +204,8 @@ fn erfc(x: f64) -> f64 {
     let t = 1.0 / (1.0 + 0.327_591_1 * x.abs());
     let poly = t
         * (0.254_829_592
-            + t * (-0.284_496_736 + t * (1.421_413_741 + t * (-1.453_152_027 + t * 1.061_405_429))));
+            + t * (-0.284_496_736
+                + t * (1.421_413_741 + t * (-1.453_152_027 + t * 1.061_405_429))));
     let value = poly * (-x * x).exp();
     if x >= 0.0 {
         value
@@ -224,7 +225,10 @@ pub fn compare(
     after: NetworkSnapshot,
 ) -> NetworkVerification {
     let ms = |l: &LinkQuality| -> Vec<f64> {
-        l.samples_us.iter().map(|v| f64::from(*v) / 1000.0).collect()
+        l.samples_us
+            .iter()
+            .map(|v| f64::from(*v) / 1000.0)
+            .collect()
     };
     let (a, b) = (ms(&before.link), ms(&after.link));
     let enough = enough_replies(&before.link) && enough_replies(&after.link);
@@ -316,10 +320,10 @@ pub fn last_network_verification(
 mod native {
     use super::*;
     use std::mem::{size_of, zeroed};
+    use std::net::Ipv6Addr;
     use std::os::windows::io::AsRawSocket;
     use std::time::Instant;
     use windows_sys::core::GUID;
-    use std::net::Ipv6Addr;
     use windows_sys::Win32::Foundation::HANDLE;
     use windows_sys::Win32::NetworkManagement::IpHelper::{
         ConvertInterfaceAliasToLuid, ConvertInterfaceIndexToLuid, ConvertInterfaceLuidToGuid,
@@ -328,8 +332,8 @@ mod native {
     };
     use windows_sys::Win32::NetworkManagement::Ndis::NET_LUID_LH;
     use windows_sys::Win32::Networking::WinSock::{
-        getsockopt, WSAIoctl, AF_INET, AF_INET6, SIO_TCP_INFO, SOCKADDR, SOCKADDR_IN, SOCKADDR_IN6,
-        SOCKET, SOL_SOCKET, SO_RCVBUF, SO_SNDBUF, TCP_INFO_v0,
+        getsockopt, TCP_INFO_v0, WSAIoctl, AF_INET, AF_INET6, SIO_TCP_INFO, SOCKADDR, SOCKADDR_IN,
+        SOCKADDR_IN6, SOCKET, SOL_SOCKET, SO_RCVBUF, SO_SNDBUF,
     };
 
     /// GUID of the adapter Windows would use to reach the internet, formatted
@@ -348,8 +352,8 @@ mod native {
         let mut v6: SOCKADDR_IN6 = unsafe { zeroed() };
         v6.sin6_family = AF_INET6;
         v6.sin6_addr.u.Byte = Ipv6Addr::new(0x2606, 0x4700, 0x4700, 0, 0, 0, 0, 0x1111).octets();
-        let luid = best_route_luid(&v4 as *const SOCKADDR_IN as *const SOCKADDR)
-            .or_else(|v4_error| {
+        let luid =
+            best_route_luid(&v4 as *const SOCKADDR_IN as *const SOCKADDR).or_else(|v4_error| {
                 best_route_luid(&v6 as *const SOCKADDR_IN6 as *const SOCKADDR).map_err(|_| v4_error)
             })?;
         guid_of(&luid)
@@ -372,7 +376,9 @@ mod native {
         // SAFETY: `luid` is a live local of the right type.
         let code = unsafe { ConvertInterfaceIndexToLuid(index, &mut luid) };
         if code != 0 {
-            return Err(format!("could not identify the network adapter (error {code})"));
+            return Err(format!(
+                "could not identify the network adapter (error {code})"
+            ));
         }
         Ok(luid)
     }
@@ -401,7 +407,9 @@ mod native {
         // SAFETY: `luid` is a live, filled-in LUID and `guid` a live out-parameter.
         let code = unsafe { ConvertInterfaceLuidToGuid(luid, &mut guid) };
         if code != 0 {
-            return Err(format!("could not identify the network adapter (error {code})"));
+            return Err(format!(
+                "could not identify the network adapter (error {code})"
+            ));
         }
         let d = guid.data4;
         Ok(format!(
@@ -668,7 +676,12 @@ mod tests {
     #[test]
     fn a_verification_survives_the_trip_through_disk() {
         let dir = std::env::temp_dir().join(format!("pct-netverify-{}", std::process::id()));
-        let record = compare("tcp_congestion_bbr", 7, snapshot(&[20.0; 9]), snapshot(&[21.0; 9]));
+        let record = compare(
+            "tcp_congestion_bbr",
+            7,
+            snapshot(&[20.0; 9]),
+            snapshot(&[21.0; 9]),
+        );
         save(&dir, &record);
         assert_eq!(load(&dir), Some(record));
         let _ = std::fs::remove_dir_all(&dir);
@@ -683,17 +696,46 @@ mod tests {
         let json = serde_json::to_value(&record).unwrap();
         let mut keys: Vec<_> = json.as_object().unwrap().keys().cloned().collect();
         keys.sort();
-        assert_eq!(keys, ["after", "before", "latency", "measuredAt", "medianDeltaMs", "pValue", "tweakId"]);
+        assert_eq!(
+            keys,
+            [
+                "after",
+                "before",
+                "latency",
+                "measuredAt",
+                "medianDeltaMs",
+                "pValue",
+                "tweakId"
+            ]
+        );
         assert_eq!(json["latency"], "noMeasurableChange");
-        assert_eq!(serde_json::to_value(Verdict::LineChanged).unwrap(), "lineChanged");
-        assert_eq!(serde_json::to_value(Verdict::Inconclusive).unwrap(), "inconclusive");
+        assert_eq!(
+            serde_json::to_value(Verdict::LineChanged).unwrap(),
+            "lineChanged"
+        );
+        assert_eq!(
+            serde_json::to_value(Verdict::Inconclusive).unwrap(),
+            "inconclusive"
+        );
         for key in ["online", "link", "tcp"] {
             assert!(json["before"].get(key).is_some(), "{key}");
         }
-        for key in ["target", "sent", "received", "samplesUs", "minMs", "medianMs", "maxMs", "jitterMs"] {
+        for key in [
+            "target",
+            "sent",
+            "received",
+            "samplesUs",
+            "minMs",
+            "medianMs",
+            "maxMs",
+            "jitterMs",
+        ] {
             assert!(json["before"]["link"].get(key).is_some(), "{key}");
         }
-        for key in ["soRcvbuf", "soSndbuf", "nodelay", "rttUs", "minRttUs", "mss", "rcvWnd", "sndWnd", "rcvBuf"] {
+        for key in [
+            "soRcvbuf", "soSndbuf", "nodelay", "rttUs", "minRttUs", "mss", "rcvWnd", "sndWnd",
+            "rcvBuf",
+        ] {
             assert!(json["before"]["tcp"].get(key).is_some(), "{key}");
         }
     }

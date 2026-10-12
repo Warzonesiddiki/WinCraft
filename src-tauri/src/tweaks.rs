@@ -680,7 +680,13 @@ pub mod windows_impl {
             }
         }
 
-        fn write(&self, hive: Hive, path: &str, name: &str, value: &RegValue) -> std::io::Result<()> {
+        fn write(
+            &self,
+            hive: Hive,
+            path: &str,
+            name: &str,
+            value: &RegValue,
+        ) -> std::io::Result<()> {
             refuse_in_unit_tests()?;
             let (key, _) = root(&hive).create_subkey(path)?;
             match value {
@@ -729,12 +735,12 @@ pub mod windows_impl {
         fn delete(&self, hive: Hive, path: &str, name: &str) -> std::io::Result<()> {
             use winreg::enums::{KEY_QUERY_VALUE, KEY_SET_VALUE};
             refuse_in_unit_tests()?;
-            let key = match root(&hive).open_subkey_with_flags(path, KEY_QUERY_VALUE | KEY_SET_VALUE)
-            {
-                Ok(key) => key,
-                Err(e) if e.kind() == std::io::ErrorKind::NotFound => return Ok(()),
-                Err(e) => return Err(e),
-            };
+            let key =
+                match root(&hive).open_subkey_with_flags(path, KEY_QUERY_VALUE | KEY_SET_VALUE) {
+                    Ok(key) => key,
+                    Err(e) if e.kind() == std::io::ErrorKind::NotFound => return Ok(()),
+                    Err(e) => return Err(e),
+                };
             match key.delete_value(name) {
                 Err(e) if e.kind() == std::io::ErrorKind::NotFound => Ok(()),
                 other => other,

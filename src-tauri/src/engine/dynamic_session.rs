@@ -94,7 +94,10 @@ pub fn plan(sets: &[CpuSet]) -> Option<Plan> {
         }
     }
     let largest = domains.iter().map(|(_, size)| *size).max()?;
-    let winners: Vec<_> = domains.iter().filter(|(_, size)| *size == largest).collect();
+    let winners: Vec<_> = domains
+        .iter()
+        .filter(|(_, size)| *size == largest)
+        .collect();
     if domains.len() < 2 || winners.len() != 1 || largest == 0 {
         return None;
     }
@@ -267,8 +270,8 @@ pub fn core_steering_status(app: tauri::AppHandle) -> Result<CoreSteeringStatus,
 #[cfg(windows)]
 mod native {
     use super::*;
-    use std::mem::{size_of, zeroed};
     use crate::process_guard::{self, Access, OpenError, ProcessHandle};
+    use std::mem::{size_of, zeroed};
     use windows_sys::Win32::Foundation::{GetLastError, ERROR_INSUFFICIENT_BUFFER, FILETIME};
     use windows_sys::Win32::System::RemoteDesktop::ProcessIdToSessionId;
     use windows_sys::Win32::System::SystemInformation::{
@@ -285,7 +288,13 @@ mod native {
         let mut needed = 0u32;
         // SAFETY: a null buffer with length 0 only asks for the size.
         unsafe {
-            GetSystemCpuSetInformation(std::ptr::null_mut(), 0, &mut needed, std::ptr::null_mut(), 0)
+            GetSystemCpuSetInformation(
+                std::ptr::null_mut(),
+                0,
+                &mut needed,
+                std::ptr::null_mut(),
+                0,
+            )
         };
         if needed == 0 {
             return Err("Windows reported no CPU sets".into());
@@ -349,6 +358,14 @@ mod native {
     /// rights only: enough for CPU sets, refused for protected processes.
     struct Process(ProcessHandle);
 
+    /// One background process chosen for steering: its PID, the process
+    /// creation time that proves the PID was not recycled between selection and
+    /// use, and the background CPU set it is meant to run on.
+    type SteerTarget = (u32, u64, Vec<u32>);
+
+    /// A process handle and the target it is being steered to.
+    type SteeredProcess = (Process, SteerTarget);
+
     impl Process {
         fn open(pid: u32) -> Option<Self> {
             Self::open_checked(pid).ok()
@@ -364,7 +381,8 @@ mod native {
             let [created, exited, kernel, user] = &mut times;
             // SAFETY: the handle is open with query rights.
             let ok = unsafe { GetProcessTimes(self.0.raw(), created, exited, kernel, user) };
-            let value = (u64::from(times[0].dwHighDateTime) << 32) | u64::from(times[0].dwLowDateTime);
+            let value =
+                (u64::from(times[0].dwHighDateTime) << 32) | u64::from(times[0].dwLowDateTime);
             (ok != 0 && value != 0).then_some(value)
         }
 
@@ -373,7 +391,9 @@ mod native {
             const STILL_ACTIVE: u32 = 259;
             let mut code = 0u32;
             // SAFETY: the handle is open with query rights; `code` is live.
-            (unsafe { windows_sys::Win32::System::Threading::GetExitCodeProcess(self.0.raw(), &mut code) } != 0)
+            (unsafe {
+                windows_sys::Win32::System::Threading::GetExitCodeProcess(self.0.raw(), &mut code)
+            } != 0)
                 && code == STILL_ACTIVE
         }
 
@@ -388,7 +408,12 @@ mod native {
         fn priority_is_normal_or_lower(&self) -> bool {
             // SAFETY: the handle is open with query rights.
             let class = unsafe { GetPriorityClass(self.0.raw()) };
-            [NORMAL_PRIORITY_CLASS, BELOW_NORMAL_PRIORITY_CLASS, IDLE_PRIORITY_CLASS].contains(&class)
+            [
+                NORMAL_PRIORITY_CLASS,
+                BELOW_NORMAL_PRIORITY_CLASS,
+                IDLE_PRIORITY_CLASS,
+            ]
+            .contains(&class)
         }
 
         fn cpu_sets(&self) -> Option<Vec<u32>> {
@@ -397,7 +422,12 @@ mod native {
                 let mut required = 0u32;
                 // SAFETY: `ids` holds `ids.len()` u32s.
                 let ok = unsafe {
-                    GetProcessDefaultCpuSets(self.0.raw(), ids.as_mut_ptr(), ids.len() as u32, &mut required)
+                    GetProcessDefaultCpuSets(
+                        self.0.raw(),
+                        ids.as_mut_ptr(),
+                        ids.len() as u32,
+                        &mut required,
+                    )
                 };
                 if ok != 0 {
                     ids.truncate(required as usize);
@@ -416,7 +446,11 @@ mod native {
 
         /// An empty slice clears the process default.
         fn set_cpu_sets(&self, ids: &[u32]) -> bool {
-            let pointer = if ids.is_empty() { std::ptr::null() } else { ids.as_ptr() };
+            let pointer = if ids.is_empty() {
+                std::ptr::null()
+            } else {
+                ids.as_ptr()
+            };
             // SAFETY: `pointer` is null with a zero count, or `ids` itself.
             (unsafe { SetProcessDefaultCpuSets(self.0.raw(), pointer, ids.len() as u32) }) != 0
         }
@@ -457,7 +491,7 @@ mod native {
         game_pid: u32,
         skip: &HashSet<u32>,
         room: usize,
-    ) -> Vec<(Process, (u32, u64, Vec<u32>))> {
+    ) -> Vec<SteeredProcess> {
         if plan.background.is_empty() {
             return Vec::new();
         }
@@ -500,7 +534,7 @@ mod native {
         game_executable: &str,
         candidates: &[Candidate],
     ) -> Result<bool, String> {
-        let mut steered: Vec<(Process, (u32, u64, Vec<u32>))> = Vec::new();
+        let mut steered: Vec<SteeredProcess> = Vec::new();
         if let Some(game) = Process::open(game_pid) {
             // The PID must still be the game that was matched, and a game
             // that chose its own CPU sets keeps them.
@@ -743,9 +777,17 @@ mod tests {
 
     #[test]
     fn uniform_or_single_die_cpus_have_nothing_to_steer() {
-        assert_eq!(plan(&machine(&[(16, 0, 0, 32), (16, 0, 16, 32)])), None, "7950X");
+        assert_eq!(
+            plan(&machine(&[(16, 0, 0, 32), (16, 0, 16, 32)])),
+            None,
+            "7950X"
+        );
         assert_eq!(plan(&machine(&[(16, 0, 0, 96)])), None, "7800X3D");
-        assert_eq!(plan(&machine(&[(8, 0, 0, 0), (8, 0, 8, 0)])), None, "sizes unknown");
+        assert_eq!(
+            plan(&machine(&[(8, 0, 0, 0), (8, 0, 8, 0)])),
+            None,
+            "sizes unknown"
+        );
         assert_eq!(plan(&[]), None);
     }
 
@@ -801,7 +843,10 @@ mod tests {
         ] {
             assert!(crate::rollback::validate_snapshot(TWEAK_ID, &bad).is_err());
         }
-        assert_eq!(records(good), vec![(1234, 133_000_000_000_000_000, vec![256, 257])]);
+        assert_eq!(
+            records(good),
+            vec![(1234, 133_000_000_000_000_000, vec![256, 257])]
+        );
     }
 
     fn fixture() -> (std::path::PathBuf, RollbackStore) {
@@ -822,7 +867,9 @@ mod tests {
         let mut tx = store.transaction().unwrap();
         tx.save_owned_entry(TWEAK_ID, entry.clone(), owner).unwrap();
         let bigger = composite(&[(9, 9, vec![256]), (10, 10, vec![257])]);
-        assert!(tx.replace_owned_entry(TWEAK_ID, bigger.clone(), "gs-5-6-7-8").is_err());
+        assert!(tx
+            .replace_owned_entry(TWEAK_ID, bigger.clone(), "gs-5-6-7-8")
+            .is_err());
         tx.replace_owned_entry(TWEAK_ID, bigger, owner).unwrap();
         drop(tx);
         assert_eq!(session_owner(&store).unwrap().as_deref(), Some(owner));
@@ -846,7 +893,10 @@ mod tests {
             .save_owned_entry(TWEAK_ID, composite(&[(9, 9, vec![256])]), &foreign)
             .unwrap();
         restore_owned_by_this_process(&store).unwrap();
-        assert!(store.is_applied(TWEAK_ID), "another process's session was restored");
+        assert!(
+            store.is_applied(TWEAK_ID),
+            "another process's session was restored"
+        );
         let _ = std::fs::remove_dir_all(dir);
     }
 

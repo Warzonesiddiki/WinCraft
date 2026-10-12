@@ -293,7 +293,8 @@ mod tests {
     use super::*;
 
     fn temp_dir(tag: &str) -> PathBuf {
-        let dir = std::env::temp_dir().join(format!("pctweaker-crash-{}-{}", tag, std::process::id()));
+        let dir =
+            std::env::temp_dir().join(format!("pctweaker-crash-{}-{}", tag, std::process::id()));
         std::fs::create_dir_all(&dir).unwrap();
         let _ = std::fs::remove_file(dir.join(CRASH_FILE));
         dir
@@ -342,7 +343,11 @@ mod tests {
     fn the_bare_account_name_goes_too() {
         // The name shows up without the full path often enough — a user
         // directory referenced relatively, a service account in an error.
-        let scrubbed = scrub_with("access denied for aurelio", Some(r"C:\Users\aurelio"), Some("aurelio"));
+        let scrubbed = scrub_with(
+            "access denied for aurelio",
+            Some(r"C:\Users\aurelio"),
+            Some("aurelio"),
+        );
         assert_eq!(scrubbed, "access denied for <user>");
     }
 
@@ -400,7 +405,10 @@ mod tests {
         append_in(&dir, &report("second")).unwrap();
         let all = list_in(&dir);
         assert_eq!(all.len(), 2);
-        assert_eq!(all[0].message, "second", "the newest crash is the one being investigated");
+        assert_eq!(
+            all[0].message, "second",
+            "the newest crash is the one being investigated"
+        );
         std::fs::remove_dir_all(&dir).ok();
     }
 

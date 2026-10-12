@@ -270,7 +270,11 @@ fn resolve(id: &str) -> Vec<PathBuf> {
         _ => vec![],
     };
 
-    paths.into_iter().flatten().filter(|p| is_safe_target(p)).collect()
+    paths
+        .into_iter()
+        .flatten()
+        .filter(|p| is_safe_target(p))
+        .collect()
 }
 
 /// Last line of defence between a mistake in the table and someone's drive.
@@ -330,7 +334,11 @@ fn prune_empty_dirs(dir: &Path) {
     };
     for entry in entries.filter_map(|e| e.ok()) {
         let path = entry.path();
-        if entry.file_type().map(|t| t.is_dir() && !t.is_symlink()).unwrap_or(false) {
+        if entry
+            .file_type()
+            .map(|t| t.is_dir() && !t.is_symlink())
+            .unwrap_or(false)
+        {
             prune_empty_dirs(&path);
             let _ = std::fs::remove_dir(&path);
         }
@@ -492,7 +500,9 @@ mod tests {
         assert!(!is_safe_target(Path::new(r"C:\Users")));
         assert!(!is_safe_target(Path::new(r"C:\Windows\System32")));
         // Not a directory at all.
-        assert!(!is_safe_target(Path::new(r"C:\this\does\not\exist\anywhere")));
+        assert!(!is_safe_target(Path::new(
+            r"C:\this\does\not\exist\anywhere"
+        )));
     }
 
     /// A real, deep, unprotected directory is accepted — otherwise the guard
@@ -500,7 +510,10 @@ mod tests {
     /// nothing.
     #[test]
     fn a_real_deep_directory_is_accepted() {
-        let dir = std::env::temp_dir().join("pctweaker-cache-test").join("a").join("b");
+        let dir = std::env::temp_dir()
+            .join("pctweaker-cache-test")
+            .join("a")
+            .join("b");
         std::fs::create_dir_all(&dir).unwrap();
         assert!(is_safe_target(&dir));
         let _ = std::fs::remove_dir_all(std::env::temp_dir().join("pctweaker-cache-test"));

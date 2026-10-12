@@ -104,9 +104,17 @@ fn plan_index(setting: &str, ac: bool, value: u32) -> TechnicalChange {
     dword(
         format!(
             "HKLM\\{}",
-            crate::power::setting_index_path("<active plan GUID>", crate::gaming::SUB_PROCESSOR_GUID, setting)
+            crate::power::setting_index_path(
+                "<active plan GUID>",
+                crate::gaming::SUB_PROCESSOR_GUID,
+                setting
+            )
         ),
-        if ac { "ACSettingIndex" } else { "DCSettingIndex" },
+        if ac {
+            "ACSettingIndex"
+        } else {
+            "DCSettingIndex"
+        },
         value,
     )
 }
@@ -151,7 +159,10 @@ pub fn composite_changes(id: &str) -> Vec<TechnicalChange> {
     if id == dns::TWEAK_ID {
         // Written through SetInterfaceDnsSettings; this is the value it sets.
         return vec![sz(
-            format!("HKLM\\{}\\<active adapter GUID>", netlatency::INTERFACES_PATH),
+            format!(
+                "HKLM\\{}\\<active adapter GUID>",
+                netlatency::INTERFACES_PATH
+            ),
             "NameServer",
             &format!("{},{}", dns::PRIMARY_DNS, dns::SECONDARY_DNS),
         )];
@@ -171,8 +182,16 @@ pub fn composite_changes(id: &str) -> Vec<TechnicalChange> {
     if id == gaming::TURBO_BOOST_ID {
         return vec![
             plan_index(gaming::PERF_BOOST_MODE_GUID, true, gaming::BOOST_AGGRESSIVE),
-            plan_index(gaming::PERF_BOOST_MODE_GUID, false, gaming::BOOST_AGGRESSIVE),
-            plan_index(gaming::PROC_THROTTLE_MIN_GUID, true, gaming::THROTTLE_MIN_MAX),
+            plan_index(
+                gaming::PERF_BOOST_MODE_GUID,
+                false,
+                gaming::BOOST_AGGRESSIVE,
+            ),
+            plan_index(
+                gaming::PROC_THROTTLE_MIN_GUID,
+                true,
+                gaming::THROTTLE_MIN_MAX,
+            ),
         ];
     }
     if id == gaming::CORE_PARKING_ID {

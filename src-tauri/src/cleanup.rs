@@ -1,8 +1,8 @@
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
-use std::sync::atomic::{AtomicU64, Ordering};
 use std::hash::{Hash, Hasher};
 use std::path::{Path, PathBuf};
+use std::sync::atomic::{AtomicU64, Ordering};
 
 #[derive(Serialize, Clone)]
 pub struct CleanupInfo {
@@ -154,7 +154,7 @@ pub fn preview_cleanup(id: &str) -> Result<CleanupPreview, String> {
             bytes,
         });
     }
-    items.sort_by(|a, b| b.bytes.cmp(&a.bytes));
+    items.sort_by_key(|a| std::cmp::Reverse(a.bytes));
     if items.len() > PREVIEW_MAX_ITEMS {
         items.truncate(PREVIEW_MAX_ITEMS);
         preview.truncated = true;
@@ -286,7 +286,10 @@ fn newest_change(path: &Path, depth: usize, budget: &mut usize) -> Option<std::t
 /// nothing has changed for `min_age`, so an installer or an app still working
 /// in its temporary folder is never pulled out from under it. Unreadable
 /// items are left alone. Still the Recycle Bin, never a permanent delete.
-pub fn run_cleanup_older_than(id: &str, min_age: std::time::Duration) -> Result<CleanupResult, String> {
+pub fn run_cleanup_older_than(
+    id: &str,
+    min_age: std::time::Duration,
+) -> Result<CleanupResult, String> {
     let dir = target_dir(id).ok_or_else(|| format!("unknown cleanup action: {}", id))?;
     let cutoff = std::time::SystemTime::now()
         .checked_sub(min_age)
@@ -321,7 +324,6 @@ pub fn run_cleanup_older_than(id: &str, min_age: std::time::Duration) -> Result<
 /// Bumped by [`cancel_folder_scan`], one counter per kind of folder search.
 /// A search remembers the value it started under and stops once it changes.
 static FOLDER_SCAN_GENERATION: [AtomicU64; 2] = [AtomicU64::new(0), AtomicU64::new(0)];
-
 
 #[derive(Clone, Copy)]
 pub enum FolderScan {
@@ -372,10 +374,7 @@ fn hash_file(path: &Path) -> Option<u64> {
 
 /// Scans a folder recursively for byte-identical files (grouped first by
 /// size, then by content hash, to avoid hashing everything up front).
-pub fn scan_duplicates(
-    root: &str,
-    stop: &dyn Fn() -> bool,
-) -> Result<Vec<DuplicateGroup>, String> {
+pub fn scan_duplicates(root: &str, stop: &dyn Fn() -> bool) -> Result<Vec<DuplicateGroup>, String> {
     let root_path = Path::new(root);
     if !root_path.is_dir() {
         return Err("the selected path is not a valid folder".to_string());
@@ -424,7 +423,7 @@ pub fn scan_duplicates(
         }
     }
 
-    groups.sort_by(|a, b| b.size.cmp(&a.size));
+    groups.sort_by_key(|a| std::cmp::Reverse(a.size));
     groups.truncate(MAX_DUPLICATE_GROUPS);
     Ok(groups)
 }
@@ -464,7 +463,7 @@ pub fn scan_large_files(
         })
         .collect();
 
-    large.sort_by(|a, b| b.size.cmp(&a.size));
+    large.sort_by_key(|a| std::cmp::Reverse(a.size));
     large.truncate(MAX_LARGE_FILES);
     Ok(large)
 }
@@ -542,13 +541,17 @@ mod age_tests {
         std::fs::write(root.join("a/b/new.txt"), b"x").unwrap();
         let mut budget = 100;
         let newest = newest_change(&root.join("a"), 8, &mut budget).unwrap();
-        let age = std::time::SystemTime::now().duration_since(newest).unwrap_or_default();
+        let age = std::time::SystemTime::now()
+            .duration_since(newest)
+            .unwrap_or_default();
         assert!(age < std::time::Duration::from_secs(60));
         // An exhausted budget never declares an unexplored tree old.
         let mut none_left = 0;
         let capped = newest_change(&root.join("a"), 8, &mut none_left).unwrap();
         assert!(
-            std::time::SystemTime::now().duration_since(capped).unwrap_or_default()
+            std::time::SystemTime::now()
+                .duration_since(capped)
+                .unwrap_or_default()
                 < std::time::Duration::from_secs(5)
         );
         let _ = std::fs::remove_dir_all(root);
@@ -573,7 +576,7 @@ mod tests {
         assert_eq!(scan_duplicates(root, &duplicates).unwrap().len(), 1);
         cancel_folder_scan(FolderScan::Duplicates);
         cancel_folder_scan(FolderScan::Duplicates); // a second click changes nothing
-        // Stopped before comparing anything: nothing is claimed as a duplicate.
+                                                    // Stopped before comparing anything: nothing is claimed as a duplicate.
         assert!(scan_duplicates(root, &duplicates).unwrap().is_empty());
         // Stopping one kind leaves the other alone, and a new search runs.
         assert_eq!(scan_large_files(root, 1_000, &large).unwrap().len(), 2);
@@ -604,7 +607,10 @@ mod tests {
             Some(value) => std::env::set_var("WINDIR", value),
             None => std::env::remove_var("WINDIR"),
         }
-        assert_eq!(dir, Some(real.join("SoftwareDistribution").join("Download")));
+        assert_eq!(
+            dir,
+            Some(real.join("SoftwareDistribution").join("Download"))
+        );
     }
 
     fn temp_dir(tag: &str) -> PathBuf {
@@ -646,7 +652,8 @@ mod tests {
 
     #[test]
     fn an_invalid_path_is_a_clear_error_not_an_empty_result() {
-        let err = scan_large_files(r"Z:\this\path\does\not\exist\at\all", 0, &|| false).unwrap_err();
+        let err =
+            scan_large_files(r"Z:\this\path\does\not\exist\at\all", 0, &|| false).unwrap_err();
         assert!(err.contains("not a valid folder"));
     }
 

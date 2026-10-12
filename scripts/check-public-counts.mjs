@@ -10,10 +10,18 @@ import fs from "node:fs";
 
 const read = (file) => fs.readFileSync(new URL(`../${file}`, import.meta.url), "utf8");
 const lib = read("src-tauri/src/lib.rs");
-const total = Number(lib.match(/assert_eq!\(total, (\d+),/)?.[1]);
-const pro = Number(lib.match(/assert_eq!\(pro, (\d+),/)?.[1]);
+// Whitespace-tolerant on purpose. These two were matched with a single-line
+// pattern, and the first `cargo fmt` in this repository reflowed the `pro`
+// assertion across four lines - at which point this check could not find the
+// number it exists to compare against and every public count became unverified.
+// Reading formatted source needs a pattern that survives formatting.
+const total = Number(lib.match(/assert_eq!\(\s*total,\s*(\d+)\s*,/)?.[1]);
+const pro = Number(lib.match(/assert_eq!\(\s*pro,\s*(\d+)\s*,/)?.[1]);
 if (!total || !Number.isInteger(pro)) {
-  throw new Error("catalogue counts not found in src-tauri/src/lib.rs");
+  throw new Error(
+    "catalogue counts not found in src-tauri/src/lib.rs: expected an " +
+      "`assert_eq!(total, <n>, ...)` and an `assert_eq!(pro, <n>, ...)`",
+  );
 }
 const free = total - pro;
 

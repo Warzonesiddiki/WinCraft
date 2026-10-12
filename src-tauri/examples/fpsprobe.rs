@@ -71,12 +71,15 @@ fn main() {
     if !seen_pids.is_empty() {
         let mut sys = sysinfo::System::new();
         sys.refresh_processes(sysinfo::ProcessesToUpdate::All, true);
-        println!("
--- processes that presented --");
+        println!(
+            "
+-- processes that presented --"
+        );
         for pid in &seen_pids {
-            let name = sys
-                .process(sysinfo::Pid::from_u32(*pid))
-                .map_or_else(|| "(exited)".to_string(), |p| p.name().to_string_lossy().to_string());
+            let name = sys.process(sysinfo::Pid::from_u32(*pid)).map_or_else(
+                || "(exited)".to_string(),
+                |p| p.name().to_string_lossy().to_string(),
+            );
             let (fps, frames) = best.get(pid).copied().unwrap_or((0.0, 0));
             println!("  pid {pid:>6}  {name:<24} best {fps:>7.1} fps over {frames} frames");
         }

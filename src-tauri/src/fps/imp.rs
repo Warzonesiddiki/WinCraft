@@ -2,7 +2,7 @@
 //! DXGI provider's present events. See the module documentation in `fps.rs`
 //! for why this is the only honest way to get the number.
 
-use super::{Frames, FpsStats};
+use super::{FpsStats, Frames};
 use serde::Serialize;
 use std::sync::{Mutex, OnceLock};
 use std::thread::JoinHandle;
@@ -96,7 +96,10 @@ impl TraceProperties {
 }
 
 fn session_name_wide() -> Vec<u16> {
-    SESSION_NAME.encode_utf16().chain(std::iter::once(0)).collect()
+    SESSION_NAME
+        .encode_utf16()
+        .chain(std::iter::once(0))
+        .collect()
 }
 
 /// Where the callback puts what it sees.
@@ -105,7 +108,6 @@ fn session_name_wide() -> Vec<u16> {
 /// context parameter that survives the trace handle, so there is nowhere else
 /// for the consumer to reach the buffer from.
 static FRAMES: OnceLock<Mutex<Frames>> = OnceLock::new();
-
 
 fn frames() -> &'static Mutex<Frames> {
     FRAMES.get_or_init(|| Mutex::new(Frames::new(qpc_frequency())))
@@ -230,111 +232,129 @@ fn stop_orphan_session() {
 
 impl Capture {
     pub fn start() -> Result<Self, String> {
-    stop_orphan_session();
+        stop_orphan_session();
 
-    let mut props = TraceProperties::new();
-    let name = session_name_wide();
-    let mut control = CONTROLTRACE_HANDLE { Value: 0 };
+        let mut props = TraceProperties::new();
+        let name = session_name_wide();
+        let mut control = CONTROLTRACE_HANDLE { Value: 0 };
 
-    // SAFETY: `control` is a live local, `name` is nul-terminated and lives
-    // past the call, and `props` is laid out as StartTrace requires.
-    let started = unsafe { StartTraceW(&mut control, name.as_ptr(), props.as_mut_ptr()) };
-    if started != ERROR_SUCCESS {
-        return Err(if started == ERROR_ACCESS_DENIED {
-            // Deliberately the whole explanation: "access denied" on its own
-            // invites the reader to think something is broken.
-            "Measuring frame rate needs a system trace session, which Windows only grants to an administrator. Restart WinCraft as administrator to use it.".to_string()
-        } else {
-            format!("Windows refused to start the trace session (error {started}).")
-        });
-    }
+        // SAFETY: `control` is a live local, `name` is nul-terminated and lives
+        // past the call, and `props` is laid out as StartTrace requires.
+        let started = unsafe { StartTraceW(&mut control, name.as_ptr(), props.as_mut_ptr()) };
+        if started != ERROR_SUCCESS {
+            return Err(if started == ERROR_ACCESS_DENIED {
+                // Deliberately the whole explanation: "access denied" on its own
+                // invites the reader to think something is broken.
+                "Measuring frame rate needs a system trace session, which Windows only grants to an administrator. Restart WinCraft as administrator to use it.".to_string()
+            } else {
+                format!("Windows refused to start the trace session (error {started}).")
+            });
+        }
 
-    for (provider, label) in [(&DXGI_PROVIDER, "DXGI"), (&D3D9_PROVIDER, "Direct3D 9")] {
-        // SAFETY: `control` is the handle StartTrace just returned. A null
-        // parameter block means "no filters", which is what is wanted here.
-        let enabled = unsafe {
-            EnableTraceEx2(
-                control,
-                provider,
-                // EVENT_CONTROL_CODE_ENABLE_PROVIDER
-                1,
-                // TRACE_LEVEL_VERBOSE. The present events sit below
-                // informational on some Windows builds, and asking for more
-                // than is emitted costs nothing.
-                5,
-                // Every keyword: each provider's whole volume is roughly two
-                // events per presented frame, so there is nothing to gain by
-                // narrowing it and a real risk of excluding the events on a
-                // build where the keyword differs.
-                0,
-                0,
-                0,
-                std::ptr::null(),
-            )
-        };
-        if enabled != ERROR_SUCCESS {
+        for (provider, label) in [(&DXGI_PROVIDER, "DXGI"), (&D3D9_PROVIDER, "Direct3D 9")] {
+            // SAFETY: `control` is the handle StartTrace just returned. A null
+            // parameter block means "no filters", which is what is wanted here.
+            let enabled = unsafe {
+                EnableTraceEx2(
+                    control,
+                    provider,
+                    // EVENT_CONTROL_CODE_ENABLE_PROVIDER
+                    1,
+                    // TRACE_LEVEL_VERBOSE. The present events sit below
+                    // informational on some Windows builds, and asking for more
+                    // than is emitted costs nothing.
+                    5,
+                    // Every keyword: each provider's whole volume is roughly two
+                    // events per presented frame, so there is nothing to gain by
+                    // narrowing it and a real risk of excluding the events on a
+                    // build where the keyword differs.
+                    0,
+                    0,
+                    0,
+                    std::ptr::null(),
+                )
+            };
+            if enabled != ERROR_SUCCESS {
+                // SAFETY: stopping the session just created, with its own name.
+                unsafe {
+                    ControlTraceW(
+                        control,
+                        name.as_ptr(),
+                        props.as_mut_ptr(),
+                        EVENT_TRACE_CONTROL_STOP,
+                    );
+                }
+                return Err(format!(
+                    "Windows refused to enable the {label} provider (error {enabled})."
+                ));
+            }
+        }
+
+        // SAFETY: zeroed is the documented starting point for this structure too.
+        let mut logfile: EVENT_TRACE_LOGFILEW = unsafe { std::mem::zeroed() };
+        let mut name_owned: Box<[u16]> = session_name_wide().into_boxed_slice();
+        logfile.LoggerName = name_owned.as_mut_ptr();
+        logfile.Anonymous1.ProcessTraceMode =
+            PROCESS_TRACE_MODE_REAL_TIME | PROCESS_TRACE_MODE_EVENT_RECORD;
+        logfile.Anonymous2.EventRecordCallback = Some(on_event);
+
+        // SAFETY: `logfile` is fully initialised above and outlives the call.
+        let trace = unsafe { OpenTraceW(&mut logfile) };
+        // OpenTrace reports failure as an all-ones handle rather than zero.
+        if trace.Value == u64::MAX {
+            // SAFETY: as above.
+            unsafe {
+                ControlTraceW(
+                    control,
+                    name.as_ptr(),
+                    props.as_mut_ptr(),
+                    EVENT_TRACE_CONTROL_STOP,
+                );
+            }
+            return Err("Windows refused to open the trace session for reading.".to_string());
+        }
+
+        // ProcessTrace blocks until the session is stopped, so it gets its own
+        // thread. Stopping the session is what makes it return.
+        //
+        // Its result comes back over a channel because the failure that matters
+        // is the immediate one: a consumer that cannot attach returns at once,
+        // and without this the session would look started while delivering
+        // nothing at all — which is precisely how the first version of this
+        // failed, silently.
+        let (tx, rx) = std::sync::mpsc::channel::<u32>();
+        let worker = std::thread::Builder::new()
+            .name("fps-etw".to_string())
+            .spawn(move || {
+                // SAFETY: `trace` is the handle OpenTrace returned and is not
+                // closed until this call has returned.
+                let code = unsafe { ProcessTrace(&trace, 1, std::ptr::null(), std::ptr::null()) };
+                let _ = tx.send(code);
+            })
+            .map_err(|e| format!("could not start the trace reader: {e}"))?;
+
+        // A healthy consumer blocks here for the life of the session, so nothing
+        // arriving is the good case.
+        if let Ok(code) = rx.recv_timeout(std::time::Duration::from_millis(250)) {
+            let _ = worker.join();
             // SAFETY: stopping the session just created, with its own name.
             unsafe {
-                ControlTraceW(control, name.as_ptr(), props.as_mut_ptr(), EVENT_TRACE_CONTROL_STOP);
+                ControlTraceW(
+                    control,
+                    name.as_ptr(),
+                    props.as_mut_ptr(),
+                    EVENT_TRACE_CONTROL_STOP,
+                );
+                CloseTrace(trace);
             }
             return Err(format!(
-                "Windows refused to enable the {label} provider (error {enabled})."
+                "the trace reader stopped immediately (error {code})."
             ));
         }
-    }
 
-    // SAFETY: zeroed is the documented starting point for this structure too.
-    let mut logfile: EVENT_TRACE_LOGFILEW = unsafe { std::mem::zeroed() };
-    let mut name_owned: Box<[u16]> = session_name_wide().into_boxed_slice();
-    logfile.LoggerName = name_owned.as_mut_ptr();
-    logfile.Anonymous1.ProcessTraceMode = PROCESS_TRACE_MODE_REAL_TIME | PROCESS_TRACE_MODE_EVENT_RECORD;
-    logfile.Anonymous2.EventRecordCallback = Some(on_event);
-
-    // SAFETY: `logfile` is fully initialised above and outlives the call.
-    let trace = unsafe { OpenTraceW(&mut logfile) };
-    // OpenTrace reports failure as an all-ones handle rather than zero.
-    if trace.Value == u64::MAX {
-        // SAFETY: as above.
-        unsafe {
-            ControlTraceW(control, name.as_ptr(), props.as_mut_ptr(), EVENT_TRACE_CONTROL_STOP);
-        }
-        return Err("Windows refused to open the trace session for reading.".to_string());
-    }
-
-    // ProcessTrace blocks until the session is stopped, so it gets its own
-    // thread. Stopping the session is what makes it return.
-    //
-    // Its result comes back over a channel because the failure that matters
-    // is the immediate one: a consumer that cannot attach returns at once,
-    // and without this the session would look started while delivering
-    // nothing at all — which is precisely how the first version of this
-    // failed, silently.
-    let (tx, rx) = std::sync::mpsc::channel::<u32>();
-    let worker = std::thread::Builder::new()
-        .name("fps-etw".to_string())
-        .spawn(move || {
-            // SAFETY: `trace` is the handle OpenTrace returned and is not
-            // closed until this call has returned.
-            let code = unsafe { ProcessTrace(&trace, 1, std::ptr::null(), std::ptr::null()) };
-            let _ = tx.send(code);
-        })
-        .map_err(|e| format!("could not start the trace reader: {e}"))?;
-
-    // A healthy consumer blocks here for the life of the session, so nothing
-    // arriving is the good case.
-    if let Ok(code) = rx.recv_timeout(std::time::Duration::from_millis(250)) {
-        let _ = worker.join();
-        // SAFETY: stopping the session just created, with its own name.
-        unsafe {
-            ControlTraceW(control, name.as_ptr(), props.as_mut_ptr(), EVENT_TRACE_CONTROL_STOP);
-            CloseTrace(trace);
-        }
-        return Err(format!("the trace reader stopped immediately (error {code})."));
-    }
-
-    // Force the buffer into existence now, so its clock frequency is read on
-    // this thread rather than inside the first callback.
-    let _ = frames();
+        // Force the buffer into existence now, so its clock frequency is read on
+        // this thread rather than inside the first callback.
+        let _ = frames();
 
         Ok(Self {
             control,
@@ -383,7 +403,8 @@ pub fn active() -> Vec<(u32, FpsStats)> {
         return Vec::new();
     };
     frames.prune(now);
-    frames.measured_pids()
+    frames
+        .measured_pids()
         .into_iter()
         .filter_map(|pid| frames.stats(pid, now).map(|s| (pid, s)))
         .collect()

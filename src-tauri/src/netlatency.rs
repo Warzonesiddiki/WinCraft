@@ -69,9 +69,9 @@ pub(crate) fn apply_for_interface(store: &RollbackStore, guid: &str) -> Result<(
     // back and move the tweak here, in the same transaction, instead of
     // refusing every re-apply from a profile.
     if let Some(SnapshotEntry::Composite { entries }) = transaction.entry(TWEAK_ID) {
-        let elsewhere = entries.iter().any(|e| {
-            matches!(e, SnapshotEntry::Registry(s) if !s.path.eq_ignore_ascii_case(&path))
-        });
+        let elsewhere = entries.iter().any(
+            |e| matches!(e, SnapshotEntry::Registry(s) if !s.path.eq_ignore_ascii_case(&path)),
+        );
         if elsewhere {
             transaction.restore_entry(TWEAK_ID, restore_values)?;
         }

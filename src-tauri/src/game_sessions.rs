@@ -515,16 +515,19 @@ impl Steering {
             game: matched.clone(),
             candidates: &candidates,
         };
-        let result = self
-            .state
-            .tick(allowed, matched, &mut backend, || new_owner_token(watcher_start))
-            .and_then(|_| match &self.state {
-                SessionState::Active {
-                    game,
-                    owner: Some(owner),
-                } => dynamic_session::extend(store, owner, game.process.pid, &candidates).map(|_| ()),
-                _ => Ok(()),
-            });
+        let result =
+            self.state
+                .tick(allowed, matched, &mut backend, || {
+                    new_owner_token(watcher_start)
+                })
+                .and_then(|_| match &self.state {
+                    SessionState::Active {
+                        game,
+                        owner: Some(owner),
+                    } => dynamic_session::extend(store, owner, game.process.pid, &candidates)
+                        .map(|_| ()),
+                    _ => Ok(()),
+                });
         if let Err(error) = result {
             eprintln!("core steering: operation pending recovery: {error}");
             self.retry_after = Some(Instant::now() + Duration::from_secs(30));
@@ -561,7 +564,8 @@ impl ExecutableCache {
                     .0
                     .entry((p.pid, p.created))
                     .or_insert_with(|| {
-                        crate::process_guard::image_path(p.pid).and_then(|path| executable_key(&path))
+                        crate::process_guard::image_path(p.pid)
+                            .and_then(|path| executable_key(&path))
                     })
                     .clone(),
                 parent: p.parent,
@@ -584,11 +588,17 @@ pub(crate) fn registered_game_running(dir: &Path) -> bool {
         // Unknown counts as running: nothing is better than the wrong thing.
         return true;
     };
-    let keys: Vec<String> = games.iter().filter_map(|g| executable_key(&g.path)).collect();
+    let keys: Vec<String> = games
+        .iter()
+        .filter_map(|g| executable_key(&g.path))
+        .collect();
     list.iter()
         .filter(|p| {
-            keys.iter()
-                .any(|k| k.rsplit('\\').next().is_some_and(|n| n.eq_ignore_ascii_case(&p.name)))
+            keys.iter().any(|k| {
+                k.rsplit('\\')
+                    .next()
+                    .is_some_and(|n| n.eq_ignore_ascii_case(&p.name))
+            })
         })
         .any(|p| {
             crate::process_guard::image_path(p.pid)
@@ -627,8 +637,11 @@ pub fn spawn_watcher(app: tauri::AppHandle) {
             let mut processes = executables.observe(&snapshot.unwrap_or_default());
             processes.sort_by_key(|p| (p.pid, p.started_at));
             if refreshed {
-                let paths=processes.iter().filter_map(|p|p.executable.clone()).collect::<Vec<_>>();
-                crate::monitor_profiles::tick(&dir,&paths);
+                let paths = processes
+                    .iter()
+                    .filter_map(|p| p.executable.clone())
+                    .collect::<Vec<_>>();
+                crate::monitor_profiles::tick(&dir, &paths);
             }
             let store = RollbackStore::new(dir.clone());
             let watcher_start = processes
@@ -651,9 +664,9 @@ pub fn spawn_watcher(app: tauri::AppHandle) {
                     .games
                     .iter()
                     .filter(|g| {
-                        !*self_managed
-                            .entry(g.path.clone())
-                            .or_insert_with(|| crate::process_guard::is_protected_executable(&g.path))
+                        !*self_managed.entry(g.path.clone()).or_insert_with(|| {
+                            crate::process_guard::is_protected_executable(&g.path)
+                        })
                     })
                     .cloned()
                     .collect();
@@ -1068,7 +1081,10 @@ mod tests {
         let mut steering = Steering::default();
         steering.tick(&store, false, &[], &[live], 0);
         assert!(!steering.recovery_checked);
-        assert_eq!(dynamic_session::session_owner(&store).unwrap().as_deref(), Some(owner));
+        assert_eq!(
+            dynamic_session::session_owner(&store).unwrap().as_deref(),
+            Some(owner)
+        );
         let _ = std::fs::remove_dir_all(dir);
     }
 }

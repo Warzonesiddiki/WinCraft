@@ -334,7 +334,7 @@ mod imp {
         let mut command = command;
         // SAFETY: the pointer is to a live local of exactly the declared size.
         let status = unsafe {
-        // SAFETY: NtSetSystemInformation called with valid pointers and correct struct size for MemoryPurgeLowPriorityStandbyList.
+            // SAFETY: NtSetSystemInformation called with valid pointers and correct struct size for MemoryPurgeLowPriorityStandbyList.
             NtSetSystemInformation(
                 SYSTEM_MEMORY_LIST_INFORMATION,
                 &mut command as *mut u32 as *mut core::ffi::c_void,
@@ -479,7 +479,10 @@ mod tests {
         assert_eq!(result.shredded_count, 0);
         assert_eq!(result.skipped_count, 1);
         assert_eq!(std::fs::read(&target).unwrap(), b"keep me");
-        assert!(shred_one(&link).is_err(), "a link must never be opened through");
+        assert!(
+            shred_one(&link).is_err(),
+            "a link must never be opened through"
+        );
         assert_eq!(std::fs::read(&target).unwrap(), b"keep me");
         std::fs::remove_dir_all(&dir).ok();
     }

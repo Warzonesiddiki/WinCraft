@@ -117,7 +117,8 @@ mod tests {
     use super::*;
 
     fn temp_dir(tag: &str) -> std::path::PathBuf {
-        let dir = std::env::temp_dir().join(format!("pctweaker-hud-{}-{}", tag, std::process::id()));
+        let dir =
+            std::env::temp_dir().join(format!("pctweaker-hud-{}-{}", tag, std::process::id()));
         std::fs::create_dir_all(&dir).unwrap();
         dir
     }
@@ -133,7 +134,11 @@ mod tests {
     #[test]
     fn a_position_survives_a_round_trip() {
         let dir = temp_dir("roundtrip");
-        let placed = HudPlacement { x: 1280.0, y: 720.0, compact: false };
+        let placed = HudPlacement {
+            x: 1280.0,
+            y: 720.0,
+            compact: false,
+        };
         write_placement(&dir, placed).unwrap();
         assert_eq!(read_placement(&dir), placed);
         std::fs::remove_dir_all(&dir).ok();
@@ -142,7 +147,11 @@ mod tests {
     #[test]
     fn a_negative_position_is_kept_because_a_second_monitor_can_be_left_of_the_first() {
         let dir = temp_dir("negative");
-        let placed = HudPlacement { x: -1900.0, y: 40.0, compact: true };
+        let placed = HudPlacement {
+            x: -1900.0,
+            y: 40.0,
+            compact: true,
+        };
         write_placement(&dir, placed).unwrap();
         assert_eq!(read_placement(&dir), placed);
         std::fs::remove_dir_all(&dir).ok();
@@ -151,7 +160,15 @@ mod tests {
     #[test]
     fn a_position_from_a_monitor_that_is_gone_falls_back_to_the_corner() {
         let dir = temp_dir("faraway");
-        write_placement(&dir, HudPlacement { x: 99_000.0, y: 12.0, compact: false }).unwrap();
+        write_placement(
+            &dir,
+            HudPlacement {
+                x: 99_000.0,
+                y: 12.0,
+                compact: false,
+            },
+        )
+        .unwrap();
         assert_eq!(read_placement(&dir), HudPlacement::default());
         std::fs::remove_dir_all(&dir).ok();
     }
@@ -178,7 +195,10 @@ mod tests {
             y: 0.0,
             compact: true,
         };
-        assert!(sanitise(out_of_reach).compact, "the size was the user's choice, not the monitor's");
+        assert!(
+            sanitise(out_of_reach).compact,
+            "the size was the user's choice, not the monitor's"
+        );
     }
 
     #[test]

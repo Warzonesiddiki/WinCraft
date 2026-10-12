@@ -214,7 +214,8 @@ mod imp {
     /// Every cookie host in the database with how many cookies it has set.
     fn host_counts(db: &Path, browser_id: &str) -> Result<Vec<DomainCount>, String> {
         let (table, column) = schema_for(browser_id);
-        let conn = Connection::open(db).map_err(|e| format!("could not open the cookies: {}", e))?;
+        let conn =
+            Connection::open(db).map_err(|e| format!("could not open the cookies: {}", e))?;
         let sql = format!(
             "SELECT {col}, COUNT(*) FROM {tbl} GROUP BY {col}",
             col = column,
@@ -409,7 +410,9 @@ mod imp {
                 })
                 .collect();
             mine.sort();
-            let newest = mine.pop().ok_or_else(|| "there is no backup to restore".to_string())?;
+            let newest = mine
+                .pop()
+                .ok_or_else(|| "there is no backup to restore".to_string())?;
 
             // The write-ahead log belongs to the database being replaced, and
             // leaving it in place would let SQLite replay the deletes back
@@ -596,8 +599,11 @@ mod tests {
                 .unwrap()
                 .as_nanos()
         ));
-        save_whitelist(&dir, &list(&[" GitHub.com ", ".github.com", "github.com", "junk", ""]))
-            .unwrap();
+        save_whitelist(
+            &dir,
+            &list(&[" GitHub.com ", ".github.com", "github.com", "junk", ""]),
+        )
+        .unwrap();
         assert_eq!(load_whitelist(&dir), list(&["github.com"]));
         let _ = std::fs::remove_dir_all(&dir);
     }

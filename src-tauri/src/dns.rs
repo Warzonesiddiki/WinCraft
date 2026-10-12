@@ -78,7 +78,8 @@ impl DnsServers for WinDns {
         }
         // SAFETY: `module` is live and the name NUL-terminated; the module is
         // released straight after the lookup and the address never called.
-        let found = unsafe { GetProcAddress(module, c"SetInterfaceDnsSettings".as_ptr().cast()) }.is_some();
+        let found =
+            unsafe { GetProcAddress(module, c"SetInterfaceDnsSettings".as_ptr().cast()) }.is_some();
         // SAFETY: `module` came from LoadLibraryExW above.
         unsafe { FreeLibrary(module) };
         found
@@ -366,7 +367,10 @@ mod tests {
             self.can_set.get()
         }
         fn set_servers(&self, guid: &str, servers: &[String]) -> Result<(), String> {
-            assert!(self.can_set.get(), "SetInterfaceDnsSettings called where it does not exist");
+            assert!(
+                self.can_set.get(),
+                "SetInterfaceDnsSettings called where it does not exist"
+            );
             if self.deny_writes.get() {
                 return Err("Windows refused the DNS change (error 5)".into());
             }
@@ -700,7 +704,12 @@ mod tests {
             previous_servers: vec!["9.9.9.9".into()],
             previous_automatic: Some(false),
         };
-        fixture.store.transaction().unwrap().save_entry(TWEAK_ID, legacy).unwrap();
+        fixture
+            .store
+            .transaction()
+            .unwrap()
+            .save_entry(TWEAK_ID, legacy)
+            .unwrap();
         rollback(&fixture.store).unwrap();
         assert_eq!(name_server(&registry, ADAPTER).as_deref(), Some("9.9.9.9"));
         assert!(!fixture.store.is_applied(TWEAK_ID));
@@ -717,7 +726,12 @@ mod tests {
             previous_servers: Vec::new(),
             previous_automatic: Some(true),
         };
-        fixture.store.transaction().unwrap().save_entry(TWEAK_ID, untouched).unwrap();
+        fixture
+            .store
+            .transaction()
+            .unwrap()
+            .save_entry(TWEAK_ID, untouched)
+            .unwrap();
         rollback(&fixture.store).unwrap();
         assert!(dns.writes.borrow().is_empty());
         assert!(!fixture.store.is_applied(TWEAK_ID));

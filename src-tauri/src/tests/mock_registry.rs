@@ -66,7 +66,9 @@ fn key(hive: Hive, path: &str, name: &str) -> Key {
 
 impl MemRegistry {
     pub fn set(&self, hive: Hive, path: &str, name: &str, value: Stored) {
-        self.values.borrow_mut().insert(key(hive, path, name), value);
+        self.values
+            .borrow_mut()
+            .insert(key(hive, path, name), value);
     }
 
     pub fn get(&self, hive: Hive, path: &str, name: &str) -> Option<Stored> {
@@ -81,13 +83,23 @@ impl MemRegistry {
     pub fn has_key(&self, hive: Hive, path: &str) -> bool {
         let (hive, path) = (hive_str(&hive), path.to_ascii_lowercase());
         let under = |other: &str| other == path || other.starts_with(&format!("{path}\\"));
-        self.values.borrow().keys().any(|(h, p, _)| *h == hive && under(p))
-            || self.keys.borrow().iter().any(|(h, p)| *h == hive && under(p))
+        self.values
+            .borrow()
+            .keys()
+            .any(|(h, p, _)| *h == hive && under(p))
+            || self
+                .keys
+                .borrow()
+                .iter()
+                .any(|(h, p)| *h == hive && under(p))
     }
 
     fn mutate(&self, change: impl FnOnce(&mut BTreeMap<Key, Stored>)) -> std::io::Result<()> {
         // One refusal, then writes work again: the next caller is the undo.
-        let tripped = self.fail_after.get().is_some_and(|n| self.mutations.get() >= n);
+        let tripped = self
+            .fail_after
+            .get()
+            .is_some_and(|n| self.mutations.get() >= n);
         if tripped {
             self.fail_after.set(None);
         }
@@ -126,7 +138,10 @@ impl RegistryBackend for MemRegistry {
 
     fn delete(&self, hive: Hive, path: &str, name: &str) -> std::io::Result<()> {
         if self.deny_deletes.get() {
-            return Err(std::io::Error::new(std::io::ErrorKind::PermissionDenied, "access denied"));
+            return Err(std::io::Error::new(
+                std::io::ErrorKind::PermissionDenied,
+                "access denied",
+            ));
         }
         self.mutate(|map| {
             map.remove(&key(hive, path, name));
@@ -151,7 +166,9 @@ impl RegistryBackend for MemRegistry {
         let under = move |p: &str| p == prefix || p.starts_with(&format!("{prefix}\\"));
         self.mutate(|map| map.retain(|(vh, vp, _), _| !(*vh == h && under(vp))))?;
         if !self.drop_writes.get() {
-            self.keys.borrow_mut().retain(|(kh, kp)| !(*kh == h && under(kp)));
+            self.keys
+                .borrow_mut()
+                .retain(|(kh, kp)| !(*kh == h && under(kp)));
         }
         Ok(())
     }
@@ -320,7 +337,7 @@ const COVERED_IN_MODULE: [&str; 11] = [
     crate::contextmenu::TWEAK_ID,                     // contextmenu::tests (registry keys)
     crate::dns::TWEAK_ID,                             // dns::tests (DNS client settings)
     crate::netshaper::TWEAK_ID,                       // netshaper::tests (NetTCPSetting over WMI)
-    crate::download_limit::TWEAK_ID,                  // download_limit::tests (registry plus provider state)
+    crate::download_limit::TWEAK_ID, // download_limit::tests (registry plus provider state)
 ];
 
 /// Visible in the list but configured in their own panels, each with its own
@@ -400,7 +417,9 @@ fn discover(id: &str) -> Vec<((Hive, String, String), Stored)> {
     let registry = install();
     let fixture = Fixture::new();
     apply_direct(&fixture.store, id).unwrap_or_else(|e| panic!("{id}: {e}"));
-    let entry = fixture.snapshot(id).unwrap_or_else(|| panic!("{id}: no snapshot"));
+    let entry = fixture
+        .snapshot(id)
+        .unwrap_or_else(|| panic!("{id}: no snapshot"));
     let found: Vec<_> = targets(&entry)
         .into_iter()
         .map(|(hive, path, name)| {
@@ -423,7 +442,11 @@ fn every_registry_tweak_restores_an_absent_original_by_deleting_it() {
         assert!(fixture.store.is_applied(id), "{id}: journal missing");
         assert!(!registry.dump().is_empty(), "{id}: nothing written");
         rollback_direct(&fixture.store, id).unwrap_or_else(|e| panic!("{id}: {e}"));
-        assert!(registry.dump().is_empty(), "{id}: left {:?}", registry.dump());
+        assert!(
+            registry.dump().is_empty(),
+            "{id}: left {:?}",
+            registry.dump()
+        );
         assert!(!fixture.store.is_applied(id), "{id}: journal not cleared");
     }
 }
@@ -467,7 +490,10 @@ fn an_original_of_an_unsupported_type_is_never_snapshotted_or_overwritten() {
         registry.set(*hive, path, name, Stored::Unsupported);
         let before = registry.dump();
         assert!(apply_direct(&fixture.store, id).is_err(), "{id}");
-        assert!(!fixture.store.is_applied(id), "{id}: snapshot of an unreadable value");
+        assert!(
+            !fixture.store.is_applied(id),
+            "{id}: snapshot of an unreadable value"
+        );
         assert_eq!(registry.dump(), before, "{id}");
         assert_eq!(registry.mutations.get(), 0, "{id}");
     }
@@ -492,14 +518,19 @@ fn starter_presets() -> Vec<(String, Vec<String>)> {
     let mut presets: Vec<(String, Vec<String>)> = Vec::new();
     for line in source.lines().map(str::trim) {
         let Some(rest) = line.strip_prefix("id: \"") else {
-            let Some(rest) = line.strip_prefix("{ id: \"") else { continue };
+            let Some(rest) = line.strip_prefix("{ id: \"") else {
+                continue;
+            };
             let id = rest.split('"').next().unwrap().to_string();
             presets.last_mut().expect("tweak before preset").1.push(id);
             continue;
         };
         presets.push((rest.split('"').next().unwrap().to_string(), Vec::new()));
     }
-    assert!(presets.len() >= 6 && presets.iter().all(|p| !p.1.is_empty()), "{presets:?}");
+    assert!(
+        presets.len() >= 6 && presets.iter().all(|p| !p.1.is_empty()),
+        "{presets:?}"
+    );
     presets
 }
 
@@ -538,7 +569,8 @@ fn every_starter_profile_round_trips_through_switching_and_restore_all() {
         applied.sort_unstable();
         applied.dedup();
         for id in applied {
-            rollback_direct(&fixture.store, id).unwrap_or_else(|e| panic!("{name} restore {id}: {e}"));
+            rollback_direct(&fixture.store, id)
+                .unwrap_or_else(|e| panic!("{name} restore {id}: {e}"));
         }
         assert_eq!(registry.dump(), before, "{name}");
     }
@@ -566,7 +598,10 @@ fn a_rollback_that_does_not_stick_keeps_the_journal_for_a_retry() {
         apply_direct(&fixture.store, id).unwrap();
         registry.drop_writes.set(true);
         assert!(rollback_direct(&fixture.store, id).is_err(), "{id}");
-        assert!(fixture.store.is_applied(id), "{id}: journal dropped on a failed restore");
+        assert!(
+            fixture.store.is_applied(id),
+            "{id}: journal dropped on a failed restore"
+        );
         registry.drop_writes.set(false);
         rollback_direct(&fixture.store, id).unwrap();
         assert_eq!(registry.dump(), before, "{id}");
@@ -603,7 +638,11 @@ fn overlapping_tweaks_are_refused_before_their_first_write() {
         let writes = registry.mutations.get();
         let error = apply_direct(&fixture.store, second).unwrap_err();
         assert!(error.contains("overlaps"), "{second}: {error}");
-        assert_eq!(registry.mutations.get(), writes, "{second} wrote before refusing");
+        assert_eq!(
+            registry.mutations.get(),
+            writes,
+            "{second} wrote before refusing"
+        );
         assert_eq!(registry.dump(), after_first);
         assert!(!fixture.store.is_applied(second));
         rollback_direct(&fixture.store, first).unwrap();
@@ -651,7 +690,11 @@ fn the_adapter_latency_tweak_round_trips_on_a_given_interface() {
     crate::netlatency::apply_for_interface(&fixture.store, other).unwrap();
     let moved = format!(r"{}\{other}", crate::netlatency::INTERFACES_PATH);
     for name in crate::netlatency::VALUES {
-        assert_eq!(registry.get(Hive::Hklm, &path, name), None, "old adapter restored");
+        assert_eq!(
+            registry.get(Hive::Hklm, &path, name),
+            None,
+            "old adapter restored"
+        );
         assert_eq!(
             registry.get(Hive::Hklm, &moved, name),
             Some(Stored::Value(RegValue::Dword(1)))
@@ -730,7 +773,8 @@ fn every_visible_tweak_is_covered_by_a_seam_test_or_is_panel_only() {
 #[test]
 fn unit_tests_cannot_write_the_real_registry() {
     // Skipped only where the guard itself is off: the disposable VM.
-    if std::env::var("PC_TWEAKER_EXPANSION_VM_TEST").as_deref() == Ok("I_ACKNOWLEDGE_DISPOSABLE_VM") {
+    if std::env::var("PC_TWEAKER_EXPANSION_VM_TEST").as_deref() == Ok("I_ACKNOWLEDGE_DISPOSABLE_VM")
+    {
         return;
     }
     use crate::tweaks::windows_impl::WinRegistry;
@@ -761,10 +805,18 @@ fn a_tweak_that_fails_halfway_is_rolled_back_automatically() {
     for tweak in multi {
         let (registry, fixture, before) = seeded(tweak.id);
         registry.fail_after.set(Some(1));
-        let error = crate::apply_or_undo(&fixture.store, &fixture.dir, tweak.id).unwrap_err();
-        assert!(error.contains("undone automatically"), "{}: {error}", tweak.id);
+        let error = crate::apply_or_undo(&fixture.store, tweak.id).unwrap_err();
+        assert!(
+            error.contains("undone automatically"),
+            "{}: {error}",
+            tweak.id
+        );
         assert_eq!(registry.dump(), before, "{}: not restored", tweak.id);
-        assert!(!fixture.store.is_applied(tweak.id), "{}: journal left", tweak.id);
+        assert!(
+            !fixture.store.is_applied(tweak.id),
+            "{}: journal left",
+            tweak.id
+        );
     }
 }
 
@@ -775,10 +827,10 @@ fn a_failed_reapply_does_not_undo_what_the_user_already_had() {
     let tweak = crate::settings_tweaks::find("disable_game_bar_captures").unwrap();
     let registry = install();
     let fixture = Fixture::new();
-    crate::apply_or_undo(&fixture.store, &fixture.dir, tweak.id).unwrap();
+    crate::apply_or_undo(&fixture.store, tweak.id).unwrap();
     let applied = registry.dump();
     registry.deny_writes.set(true);
-    assert!(crate::apply_or_undo(&fixture.store, &fixture.dir, tweak.id).is_err());
+    assert!(crate::apply_or_undo(&fixture.store, tweak.id).is_err());
     assert_eq!(registry.dump(), applied);
     assert!(fixture.store.is_applied(tweak.id));
 }
@@ -800,7 +852,10 @@ fn the_preview_reads_current_values_without_writing() {
     assert_eq!(preview.rows.len(), tweak.writes.len());
     assert_eq!(preview.rows[0].current.as_deref(), Some("1 (0x1)"));
     assert!(preview.rows[0].changes);
-    assert_eq!(preview.rows[1].current, None, "an absent value reads as not set");
+    assert_eq!(
+        preview.rows[1].current, None,
+        "an absent value reads as not set"
+    );
     assert!(preview.will_change);
     assert!(!preview.applied);
 }

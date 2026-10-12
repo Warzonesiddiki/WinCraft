@@ -46,8 +46,7 @@ mod imp {
         let summary = stdout
             .lines()
             .map(|l| l.trim())
-            .filter(|l| !l.is_empty())
-            .last()
+            .rfind(|l| !l.is_empty())
             .unwrap_or("Optimization complete.")
             .to_string();
 
@@ -86,8 +85,7 @@ mod tests {
         let summary = stdout
             .lines()
             .map(|l| l.trim())
-            .filter(|l| !l.is_empty())
-            .last()
+            .rfind(|l| !l.is_empty())
             .unwrap_or("Optimization complete.")
             .to_string();
         assert_eq!(summary, "Optimization complete.");
@@ -99,8 +97,7 @@ mod tests {
         let summary = stdout
             .lines()
             .map(|l| l.trim())
-            .filter(|l| !l.is_empty())
-            .last()
+            .rfind(|l| !l.is_empty())
             .unwrap_or("Optimization complete.")
             .to_string();
         assert_eq!(summary, "The operation completed successfully.");

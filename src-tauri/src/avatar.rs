@@ -245,7 +245,10 @@ mod tests {
         save(&dir, "a@example.com", &url).expect("save failed");
         assert_eq!(read(&dir, "a@example.com").as_deref(), Some(url.as_str()));
         clear(&dir, "a@example.com").expect("clear failed");
-        assert!(read(&dir, "a@example.com").is_none(), "clear left the photo behind");
+        assert!(
+            read(&dir, "a@example.com").is_none(),
+            "clear left the photo behind"
+        );
         let _ = std::fs::remove_dir_all(&dir);
     }
 
@@ -283,7 +286,10 @@ mod tests {
             read(&dir, "second@example.com").is_none(),
             "a brand new account inherited someone else's photo"
         );
-        assert_eq!(read(&dir, "first@example.com").as_deref(), Some(first.as_str()));
+        assert_eq!(
+            read(&dir, "first@example.com").as_deref(),
+            Some(first.as_str())
+        );
         let _ = std::fs::remove_dir_all(&dir);
     }
 
@@ -306,7 +312,10 @@ mod tests {
         let dir = fresh("case");
         let url = url_of(&[4, 5, 6]);
         save(&dir, "Name@Example.com", &url).expect("save failed");
-        assert_eq!(read(&dir, " name@example.com ").as_deref(), Some(url.as_str()));
+        assert_eq!(
+            read(&dir, " name@example.com ").as_deref(),
+            Some(url.as_str())
+        );
         let _ = std::fs::remove_dir_all(&dir);
     }
 
@@ -317,8 +326,14 @@ mod tests {
         let bytes = [7u8, 7, 7];
         std::fs::write(legacy_path(&dir), bytes).unwrap();
         adopt_legacy(&dir, "owner@example.com");
-        assert_eq!(read(&dir, "owner@example.com").as_deref(), Some(url_of(&bytes).as_str()));
-        assert!(!legacy_path(&dir).exists(), "the shared file survived the migration");
+        assert_eq!(
+            read(&dir, "owner@example.com").as_deref(),
+            Some(url_of(&bytes).as_str())
+        );
+        assert!(
+            !legacy_path(&dir).exists(),
+            "the shared file survived the migration"
+        );
         let _ = std::fs::remove_dir_all(&dir);
     }
 
@@ -329,7 +344,10 @@ mod tests {
         save(&dir, "owner@example.com", &mine).expect("save failed");
         std::fs::write(legacy_path(&dir), [2u8, 2, 2]).unwrap();
         adopt_legacy(&dir, "owner@example.com");
-        assert_eq!(read(&dir, "owner@example.com").as_deref(), Some(mine.as_str()));
+        assert_eq!(
+            read(&dir, "owner@example.com").as_deref(),
+            Some(mine.as_str())
+        );
         assert!(!legacy_path(&dir).exists());
         let _ = std::fs::remove_dir_all(&dir);
     }

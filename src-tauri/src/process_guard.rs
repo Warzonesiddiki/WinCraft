@@ -57,7 +57,9 @@ pub fn self_managed_error() -> String {
 }
 
 pub fn registered_game_error() -> String {
-    format!("{REGISTERED_GAME_PREFIX}One of your games is running, so WinCraft waits until it closes.")
+    format!(
+        "{REGISTERED_GAME_PREFIX}One of your games is running, so WinCraft waits until it closes."
+    )
 }
 
 pub fn game_running_error() -> String {

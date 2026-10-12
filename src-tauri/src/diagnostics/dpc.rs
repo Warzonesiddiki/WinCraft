@@ -165,10 +165,12 @@ impl Tally {
         let mut totals = [KindTotals::new(Kind::Dpc), KindTotals::new(Kind::Isr)];
         for ((kind, routine), stat) in &self.routines {
             let name = name_of(*routine);
-            let entry = per_driver.entry(name.clone()).or_insert_with(|| DriverLatency {
-                driver: name,
-                ..DriverLatency::default()
-            });
+            let entry = per_driver
+                .entry(name.clone())
+                .or_insert_with(|| DriverLatency {
+                    driver: name,
+                    ..DriverLatency::default()
+                });
             let side = match kind {
                 Kind::Dpc => &mut entry.dpc,
                 Kind::Isr => &mut entry.isr,
@@ -413,7 +415,7 @@ pub(crate) mod native {
     const SESSION_NAME: &str = "PCTweakerDpcLatency";
     /// A GUID of our own for the session: a system logger must not use
     /// SystemTraceControlGuid unless it is the NT Kernel Logger itself.
-    const SESSION_GUID: GUID = GUID::from_u128(0x6b0f_2c3a_8e1d_4f57_9a64_3d2b7c1e5f90);
+    const SESSION_GUID: GUID = GUID::from_u128(0x6b0f_2c3a_8e1d_4f57_9a64_3d2b_7c1e_5f90);
     const ERROR_ACCESS_DENIED: u32 = 5;
     const ERROR_NO_SYSTEM_RESOURCES: u32 = 1450;
     const ERROR_CANCELLED: u32 = 1223;
@@ -437,9 +439,7 @@ pub(crate) mod native {
 
     /// `None` when another process already holds the capture.
     fn take_capture_mutex() -> Result<Option<Held>, String> {
-        use windows_sys::Win32::Foundation::{
-            CloseHandle, GetLastError, ERROR_ALREADY_EXISTS,
-        };
+        use windows_sys::Win32::Foundation::{CloseHandle, GetLastError, ERROR_ALREADY_EXISTS};
         use windows_sys::Win32::System::Threading::CreateMutexW;
         let name = wide(MUTEX_NAME);
         // SAFETY: default security, initial ownership, nul-terminated name.
@@ -531,7 +531,11 @@ pub(crate) mod native {
             std::slice::from_raw_parts(record.UserData as *const u8, record.UserDataLength as usize)
         };
         let flags = u32::from(header.Flags);
-        let pointer_size = if flags & EVENT_HEADER_FLAG_32_BIT_HEADER != 0 { 4 } else { 8 };
+        let pointer_size = if flags & EVENT_HEADER_FLAG_32_BIT_HEADER != 0 {
+            4
+        } else {
+            8
+        };
         let Some((initial, routine)) = parse(payload, pointer_size) else {
             return;
         };
@@ -576,13 +580,21 @@ pub(crate) mod native {
             let mut token: HANDLE = std::ptr::null_mut();
             // SAFETY: the current-thread pseudo handle and a live out-parameter.
             if unsafe {
-                OpenThreadToken(GetCurrentThread(), TOKEN_ADJUST_PRIVILEGES | TOKEN_QUERY, 0, &mut token)
+                OpenThreadToken(
+                    GetCurrentThread(),
+                    TOKEN_ADJUST_PRIVILEGES | TOKEN_QUERY,
+                    0,
+                    &mut token,
+                )
             } == 0
             {
                 return Some(scope);
             }
             let name = wide("SeDebugPrivilege");
-            let mut luid = LUID { LowPart: 0, HighPart: 0 };
+            let mut luid = LUID {
+                LowPart: 0,
+                HighPart: 0,
+            };
             // SAFETY: nul-terminated name and a live out-parameter.
             if unsafe { LookupPrivilegeValueW(std::ptr::null(), name.as_ptr(), &mut luid) } != 0 {
                 let privileges = TOKEN_PRIVILEGES {
@@ -596,7 +608,14 @@ pub(crate) mod native {
                 // initialised structure. If nothing is granted, the addresses
                 // simply stay hidden and the report says so.
                 unsafe {
-                    AdjustTokenPrivileges(token, 0, &privileges, 0, std::ptr::null_mut(), std::ptr::null_mut())
+                    AdjustTokenPrivileges(
+                        token,
+                        0,
+                        &privileges,
+                        0,
+                        std::ptr::null_mut(),
+                        std::ptr::null_mut(),
+                    )
                 };
             }
             // SAFETY: opened above, closed once.
@@ -625,7 +644,10 @@ pub(crate) mod native {
                 bases.truncate(needed as usize / std::mem::size_of::<usize>());
                 break;
             }
-            bases.resize(needed as usize / std::mem::size_of::<usize>() + 16, std::ptr::null_mut());
+            bases.resize(
+                needed as usize / std::mem::size_of::<usize>() + 16,
+                std::ptr::null_mut(),
+            );
         }
         bases
             .into_iter()
@@ -718,7 +740,12 @@ pub(crate) mod native {
                 // SAFETY: the handle came from OpenTraceW and is closed only
                 // after this call has returned or been given time to drain.
                 let code = unsafe {
-                    ProcessTrace(&PROCESSTRACE_HANDLE { Value: handle }, 1, std::ptr::null(), std::ptr::null())
+                    ProcessTrace(
+                        &PROCESSTRACE_HANDLE { Value: handle },
+                        1,
+                        std::ptr::null(),
+                        std::ptr::null(),
+                    )
                 };
                 let _ = done_tx.send(code);
             });
@@ -738,7 +765,12 @@ pub(crate) mod native {
         // SAFETY: `control` is the live session handle; `stop` is sized for
         // the final statistics the call writes back.
         let stopped = unsafe {
-            ControlTraceW(control, std::ptr::null(), &mut stop.props, EVENT_TRACE_CONTROL_STOP)
+            ControlTraceW(
+                control,
+                std::ptr::null(),
+                &mut stop.props,
+                EVENT_TRACE_CONTROL_STOP,
+            )
         };
         let lost = LostEvents {
             events: stop.props.EventsLost,
@@ -755,18 +787,24 @@ pub(crate) mod native {
         drop(logger_name);
 
         if stopped != 0 {
-            return Err(format!("the kernel trace session did not stop cleanly (error {stopped})"));
+            return Err(format!(
+                "the kernel trace session did not stop cleanly (error {stopped})"
+            ));
         }
         if let Some(code) = consumed.filter(|c| *c != 0 && *c != ERROR_CANCELLED) {
             return Err(format!("reading the kernel trace failed (error {code})"));
         }
         let drivers = loaded_drivers();
-        let tally = tally.lock().map_err(|_| "the capture state was lost".to_string())?;
+        let tally = tally
+            .lock()
+            .map_err(|_| "the capture state was lost".to_string())?;
         let report = tally.report(seconds, &drivers, lost);
         // Every running Windows machine takes timer interrupts; a capture
         // with none measured nothing and must not read as a clean result.
         if report.dpc.count + report.isr.count == 0 {
-            return Err("the kernel delivered no DPC or interrupt events; nothing was measured".into());
+            return Err(
+                "the kernel delivered no DPC or interrupt events; nothing was measured".into(),
+            );
         }
         Ok(report)
     }
@@ -836,7 +874,10 @@ mod tests {
         assert_eq!(report.dpc.over_limit, 1);
         assert!((report.dpc.max_us - 850.0).abs() < 0.2);
         assert_eq!(report.isr.count, 2);
-        assert_eq!(report.isr.over_limit, 1, "30 us is past the 25 us ISR limit");
+        assert_eq!(
+            report.isr.over_limit, 1,
+            "30 us is past the 25 us ISR limit"
+        );
         // nvlddmkm is 8.5x its limit; ndis 1.2x. Worst first.
         assert_eq!(report.drivers[0].driver.as_deref(), Some("nvlddmkm.sys"));
         assert_eq!(report.drivers[0].dpc.count, 2);
@@ -848,7 +889,12 @@ mod tests {
     fn an_address_outside_every_driver_stays_unattributed() {
         let mut tally = Tally::new(HZ);
         tally.record(Kind::Dpc, 0x1000, 0, us(5.0));
-        tally.record(Kind::Dpc, 0xffff_f801_2000_0000 + MAX_DRIVER_SPAN, 0, us(5.0));
+        tally.record(
+            Kind::Dpc,
+            0xffff_f801_2000_0000 + MAX_DRIVER_SPAN,
+            0,
+            us(5.0),
+        );
         let report = tally.report(5, &drivers(), LostEvents::default());
         assert_eq!(report.drivers.len(), 1);
         assert_eq!(report.drivers[0].driver, None);
@@ -879,7 +925,14 @@ mod tests {
     fn a_negative_duration_is_counted_as_skew_not_measured() {
         let mut tally = Tally::new(HZ);
         tally.record(Kind::Isr, 0xffff_f801_2000_0000, 500, 100);
-        let report = tally.report(5, &drivers(), LostEvents { events: 3, buffers: 1 });
+        let report = tally.report(
+            5,
+            &drivers(),
+            LostEvents {
+                events: 3,
+                buffers: 1,
+            },
+        );
         assert_eq!((report.skewed_events, report.isr.count), (1, 0));
         assert_eq!((report.events_lost, report.buffers_lost), (3, 1));
     }
@@ -899,7 +952,10 @@ mod tests {
     fn live_capture_sees_interrupts_and_names_their_drivers() {
         let report = native::capture(2).expect("capture");
         println!("{}", serde_json::to_string_pretty(&report).unwrap());
-        assert!(report.isr.count + report.dpc.count > 0, "no events in two seconds");
+        assert!(
+            report.isr.count + report.dpc.count > 0,
+            "no events in two seconds"
+        );
         assert!(report.drivers_resolved, "driver addresses were hidden");
         assert!(report.drivers.iter().any(|d| d.driver.is_some()));
     }
@@ -915,7 +971,17 @@ mod tests {
         keys.sort();
         assert_eq!(
             keys,
-            ["buffersLost", "dpc", "drivers", "driversResolved", "eventsLost", "isr", "seconds", "skewedEvents", "worst"]
+            [
+                "buffersLost",
+                "dpc",
+                "drivers",
+                "driversResolved",
+                "eventsLost",
+                "isr",
+                "seconds",
+                "skewedEvents",
+                "worst"
+            ]
         );
         assert_eq!(json["isr"]["kind"], "isr");
         assert_eq!(json["dpc"]["kind"], "dpc");

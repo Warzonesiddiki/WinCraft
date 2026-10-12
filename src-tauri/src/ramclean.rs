@@ -172,7 +172,7 @@ pub fn top_by_memory(rows: Vec<(String, u64)>, limit: usize) -> Vec<ProcessMemor
         .into_iter()
         .map(|(name, mem_bytes)| ProcessMemory { name, mem_bytes })
         .collect();
-    out.sort_by(|a, b| b.mem_bytes.cmp(&a.mem_bytes));
+    out.sort_by_key(|a| std::cmp::Reverse(a.mem_bytes));
     out.truncate(limit);
     out
 }

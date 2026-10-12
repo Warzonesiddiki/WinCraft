@@ -1905,7 +1905,8 @@ final pass (2026-10-12).
    `cargo fmt --check --manifest-path src-tauri/Cargo.toml`,
    `cargo clippy --all-targets --manifest-path src-tauri/Cargo.toml -- -D warnings`,
    `cargo test --manifest-path src-tauri/Cargo.toml`,
-   `cargo audit --manifest-path src-tauri/Cargo.toml`. That applies to Batch AB
+   `cargo audit` (run from `src-tauri/`: it reads the Cargo.lock in the current
+directory and rejects `--manifest-path`). That applies to Batch AB
    more than to anything before it: that batch edited eleven Rust files and the
    module tests, and its correctness claim rests on review — the `is_ok()` branch
    that fed `allowed`, the `NativeBackend.dir` field, the four commands whose

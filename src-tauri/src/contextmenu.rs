@@ -58,8 +58,9 @@ pub fn apply(store: &RollbackStore) -> Result<(), String> {
     // key someone removed), writing it again repairs it instead of reporting
     // success with the short menu still there.
     if transaction.entry(TWEAK_ID).is_some() {
-        let in_place = registry::read_value(Hive::Hkcu, INPROC_PATH, "", &RegValue::Str(String::new()))
-            .map_err(|e| format!("could not inspect the shell override: {e}"))?;
+        let in_place =
+            registry::read_value(Hive::Hkcu, INPROC_PATH, "", &RegValue::Str(String::new()))
+                .map_err(|e| format!("could not inspect the shell override: {e}"))?;
         if in_place == Some(RegValue::Str(String::new())) {
             return Ok(());
         }

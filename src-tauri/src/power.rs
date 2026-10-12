@@ -16,13 +16,23 @@ pub(crate) trait PowerPlans {
     fn activate(&self, guid: &str) -> Result<(), String>;
     /// The index one setting has in effect in `scheme`: the plan's own
     /// override, or the default it inherits when there is none.
-    fn read_index(&self, scheme: &str, subgroup: &str, setting: &str, ac: bool)
-        -> Result<u32, String>;
+    fn read_index(
+        &self,
+        scheme: &str,
+        subgroup: &str,
+        setting: &str,
+        ac: bool,
+    ) -> Result<u32, String>;
     /// The default `scheme` inherits for a setting it does not override: the
     /// value for the plan's personality (Balanced, High performance or Power
     /// saver), which is what Windows applies when no override exists.
-    fn default_index(&self, scheme: &str, subgroup: &str, setting: &str, ac: bool)
-        -> Result<u32, String>;
+    fn default_index(
+        &self,
+        scheme: &str,
+        subgroup: &str,
+        setting: &str,
+        ac: bool,
+    ) -> Result<u32, String>;
     /// Writes one setting's AC index (`ac`) or DC index in `scheme`.
     fn write_index(
         &self,
@@ -55,8 +65,13 @@ impl PowerPlans for WinPowerPlans {
         checked(unsafe { PowerSetActiveScheme(std::ptr::null_mut(), &scheme) })
     }
 
-    fn read_index(&self, scheme: &str, subgroup: &str, setting: &str, ac: bool)
-        -> Result<u32, String> {
+    fn read_index(
+        &self,
+        scheme: &str,
+        subgroup: &str,
+        setting: &str,
+        ac: bool,
+    ) -> Result<u32, String> {
         use crate::power_tuning::native::{checked, guid as parse};
         use windows_sys::Win32::System::Power::{PowerReadACValueIndex, PowerReadDCValueIndex};
         let (scheme, subgroup, setting) = (parse(scheme)?, parse(subgroup)?, parse(setting)?);
@@ -66,17 +81,34 @@ impl PowerPlans for WinPowerPlans {
         // power policy store.
         let code = unsafe {
             if ac {
-                PowerReadACValueIndex(std::ptr::null_mut(), &scheme, &subgroup, &setting, &mut value)
+                PowerReadACValueIndex(
+                    std::ptr::null_mut(),
+                    &scheme,
+                    &subgroup,
+                    &setting,
+                    &mut value,
+                )
             } else {
-                PowerReadDCValueIndex(std::ptr::null_mut(), &scheme, &subgroup, &setting, &mut value)
+                PowerReadDCValueIndex(
+                    std::ptr::null_mut(),
+                    &scheme,
+                    &subgroup,
+                    &setting,
+                    &mut value,
+                )
             }
         };
         checked(code)?;
         Ok(value)
     }
 
-    fn default_index(&self, scheme: &str, subgroup: &str, setting: &str, ac: bool)
-        -> Result<u32, String> {
+    fn default_index(
+        &self,
+        scheme: &str,
+        subgroup: &str,
+        setting: &str,
+        ac: bool,
+    ) -> Result<u32, String> {
         use crate::power_tuning::native::{checked, guid as parse};
         use windows_sys::core::GUID;
         use windows_sys::Win32::System::Power::{
@@ -112,9 +144,21 @@ impl PowerPlans for WinPowerPlans {
         // SAFETY: the GUIDs and `value` live on this frame for the whole call.
         checked(unsafe {
             if ac {
-                PowerReadACDefaultIndex(std::ptr::null_mut(), &personality, &subgroup, &setting, &mut value)
+                PowerReadACDefaultIndex(
+                    std::ptr::null_mut(),
+                    &personality,
+                    &subgroup,
+                    &setting,
+                    &mut value,
+                )
             } else {
-                PowerReadDCDefaultIndex(std::ptr::null_mut(), &personality, &subgroup, &setting, &mut value)
+                PowerReadDCDefaultIndex(
+                    std::ptr::null_mut(),
+                    &personality,
+                    &subgroup,
+                    &setting,
+                    &mut value,
+                )
             }
         })?;
         Ok(value)
@@ -342,8 +386,13 @@ pub(crate) mod tests {
             Ok(())
         }
 
-        fn read_index(&self, scheme: &str, subgroup: &str, setting: &str, ac: bool)
-            -> Result<u32, String> {
+        fn read_index(
+            &self,
+            scheme: &str,
+            subgroup: &str,
+            setting: &str,
+            ac: bool,
+        ) -> Result<u32, String> {
             self.exists(scheme)?;
             let name = if ac {
                 "ACSettingIndex"
@@ -351,15 +400,24 @@ pub(crate) mod tests {
                 "DCSettingIndex"
             };
             let path = setting_index_path(scheme, subgroup, setting);
-            match self.registry.read(Hive::Hklm, &path, name).map_err(|e| e.to_string())? {
+            match self
+                .registry
+                .read(Hive::Hklm, &path, name)
+                .map_err(|e| e.to_string())?
+            {
                 Some(RegValue::Dword(value)) => Ok(value),
                 Some(_) => Err("not a power index".into()),
                 None => Ok(INHERITED_DEFAULT),
             }
         }
 
-        fn default_index(&self, scheme: &str, _subgroup: &str, _setting: &str, _ac: bool)
-            -> Result<u32, String> {
+        fn default_index(
+            &self,
+            scheme: &str,
+            _subgroup: &str,
+            _setting: &str,
+            _ac: bool,
+        ) -> Result<u32, String> {
             self.exists(scheme)?;
             Ok(INHERITED_DEFAULT)
         }

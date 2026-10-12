@@ -30,7 +30,6 @@ pub struct HealthFactor {
     pub evidence: String,
 }
 
-
 #[derive(Serialize, Clone, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct HealthCategory {
@@ -487,7 +486,10 @@ mod tests {
         assert_eq!(before.overall, after.overall);
         for (left, right) in before.categories.iter().zip(after.categories.iter()) {
             assert_eq!(left.score, right.score);
-            assert!(right.factors.iter().all(|f| f.id != "gaming_gpu_prio" && f.id != "perf_responsiveness"));
+            assert!(right
+                .factors
+                .iter()
+                .all(|f| f.id != "gaming_gpu_prio" && f.id != "perf_responsiveness"));
         }
     }
     fn base() -> HealthInputs {

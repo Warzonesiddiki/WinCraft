@@ -37,7 +37,9 @@ pub struct Placement {
 /// on 1366x768 it is 1024x700.
 pub fn default_size(work_w: f64, work_h: f64) -> (f64, f64) {
     let fit = |want: f64, min: f64, max: f64, avail: f64| {
-        want.clamp(min, max).min((avail - MARGIN).max(min.min(avail))).floor()
+        want.clamp(min, max)
+            .min((avail - MARGIN).max(min.min(avail)))
+            .floor()
     };
     (
         fit(work_w * SHARE, MIN.0, MAX.0, work_w),
@@ -91,7 +93,9 @@ fn write(dir: &Path, p: &Placement) {
     if std::fs::create_dir_all(dir).is_ok() {
         if let Ok(text) = serde_json::to_string(p) {
             let temp = dir.join(format!("{FILE}.{}.tmp", std::process::id()));
-            if std::fs::write(&temp, text).is_err() || std::fs::rename(&temp, dir.join(FILE)).is_err() {
+            if std::fs::write(&temp, text).is_err()
+                || std::fs::rename(&temp, dir.join(FILE)).is_err()
+            {
                 let _ = std::fs::remove_file(&temp);
             }
         }
@@ -105,7 +109,12 @@ fn write(dir: &Path, p: &Placement) {
 fn work_rect(scale: f64) -> Option<(f64, f64, f64, f64)> {
     use windows_sys::Win32::Foundation::RECT;
     use windows_sys::Win32::UI::WindowsAndMessaging::{SystemParametersInfoW, SPI_GETWORKAREA};
-    let mut r = RECT { left: 0, top: 0, right: 0, bottom: 0 };
+    let mut r = RECT {
+        left: 0,
+        top: 0,
+        right: 0,
+        bottom: 0,
+    };
     // SAFETY: SPI_GETWORKAREA fills the RECT we own; no other pointers.
     let ok = unsafe { SystemParametersInfoW(SPI_GETWORKAREA, 0, &mut r as *mut RECT as *mut _, 0) };
     if ok == 0 || scale <= 0.0 {
@@ -127,7 +136,11 @@ fn work_rect(_scale: f64) -> Option<(f64, f64, f64, f64)> {
 /// A placement in work-area coordinates, so the checks below can assume the
 /// work area starts at 0,0.
 fn relative(p: &Placement, left: f64, top: f64) -> Placement {
-    Placement { x: p.x - left, y: p.y - top, ..*p }
+    Placement {
+        x: p.x - left,
+        y: p.y - top,
+        ..*p
+    }
 }
 
 /// Windows' own word on whether the window is in a Snap layout, for the
@@ -176,29 +189,32 @@ pub struct Saver {
 
 impl Saver {
     pub fn new(dir: PathBuf) -> Self {
-        Self { dir, last: Mutex::new((None, Instant::now())) }
+        Self {
+            dir,
+            last: Mutex::new((None, Instant::now())),
+        }
     }
 }
 
 /// Called from setup, before the first paint.
 pub fn restore(app: &tauri::App) {
-    let Some(window) = app.get_webview_window("main") else { return };
+    let Some(window) = app.get_webview_window("main") else {
+        return;
+    };
     let dir = match app.path().app_data_dir() {
         Ok(d) => d,
         Err(_) => return,
     };
     let scale = window.scale_factor().unwrap_or(1.0);
     let work = work_rect(scale).or_else(|| {
-        window
-            .current_monitor()
-            .ok()
-            .flatten()
-            .map(|m| {
-                let s = m.size().to_logical::<f64>(scale);
-                (s.width, s.height - 48.0, 0.0, 0.0)
-            })
+        window.current_monitor().ok().flatten().map(|m| {
+            let s = m.size().to_logical::<f64>(scale);
+            (s.width, s.height - 48.0, 0.0, 0.0)
+        })
     });
-    let Some((ww, wh, left, top)) = work else { return };
+    let Some((ww, wh, left, top)) = work else {
+        return;
+    };
 
     match read(&dir).filter(|p| fits(&relative(p, left, top), ww, wh)) {
         Some(p) => {
@@ -215,7 +231,11 @@ pub fn restore(app: &tauri::App) {
 }
 
 /// Called from the window event hook on every move and resize.
-pub fn remember(window: &tauri::Window, size: Option<PhysicalSize<u32>>, pos: Option<PhysicalPosition<i32>>) {
+pub fn remember(
+    window: &tauri::Window,
+    size: Option<PhysicalSize<u32>>,
+    pos: Option<PhysicalPosition<i32>>,
+) {
     if window.label() != "main"
         || window.is_maximized().unwrap_or(false)
         || window.is_minimized().unwrap_or(false)
@@ -223,14 +243,23 @@ pub fn remember(window: &tauri::Window, size: Option<PhysicalSize<u32>>, pos: Op
     {
         return;
     }
-    let Some(saver) = window.app_handle().try_state::<Saver>() else { return };
+    let Some(saver) = window.app_handle().try_state::<Saver>() else {
+        return;
+    };
     let scale = window.scale_factor().unwrap_or(1.0);
     let size = size.or_else(|| window.inner_size().ok());
     let pos = pos.or_else(|| window.outer_position().ok());
-    let (Some(size), Some(pos)) = (size, pos) else { return };
+    let (Some(size), Some(pos)) = (size, pos) else {
+        return;
+    };
     let size = size.to_logical::<f64>(scale);
     let pos = pos.to_logical::<f64>(scale);
-    let p = Placement { w: size.width, h: size.height, x: pos.x, y: pos.y };
+    let p = Placement {
+        w: size.width,
+        h: size.height,
+        x: pos.x,
+        y: pos.y,
+    };
     if p.w < SMALLEST.0 || p.h < SMALLEST.1 {
         return;
     }
@@ -241,7 +270,9 @@ pub fn remember(window: &tauri::Window, size: Option<PhysicalSize<u32>>, pos: Op
             return;
         }
     }
-    let Ok(mut last) = saver.last.lock() else { return };
+    let Ok(mut last) = saver.last.lock() else {
+        return;
+    };
     if last.0 == Some(p) || last.1.elapsed() < Duration::from_millis(400) && last.0.is_some() {
         return;
     }
@@ -270,7 +301,12 @@ mod tests {
 
     #[test]
     fn a_placement_off_the_current_screen_is_not_reused() {
-        let on = Placement { w: 1100.0, h: 720.0, x: 200.0, y: 100.0 };
+        let on = Placement {
+            w: 1100.0,
+            h: 720.0,
+            x: 200.0,
+            y: 100.0,
+        };
         let off = Placement { x: 2000.0, ..on };
         assert!(fits(&on, 1920.0, 1032.0));
         assert!(!fits(&off, 1920.0, 1032.0));
@@ -280,9 +316,19 @@ mod tests {
     fn a_maximized_size_saved_as_normal_is_not_reused() {
         // The placement found on a 1920x1080 desktop that kept reopening
         // WinCraft full-screen with no way back to its normal size.
-        let full = Placement { w: 1920.0, h: 1030.0, x: -7.0, y: 0.0 };
+        let full = Placement {
+            w: 1920.0,
+            h: 1030.0,
+            x: -7.0,
+            y: 0.0,
+        };
         assert!(!fits(&full, 1920.0, 1032.0));
-        let large = Placement { w: 1600.0, h: 900.0, x: 100.0, y: 50.0 };
+        let large = Placement {
+            w: 1600.0,
+            h: 900.0,
+            x: 100.0,
+            y: 50.0,
+        };
         assert!(fits(&large, 1920.0, 1032.0));
     }
 
@@ -290,22 +336,63 @@ mod tests {
     fn a_snapped_or_too_small_placement_is_not_reused() {
         // The placement found after the dev window reopened glued to the left
         // half of a 1920x1080 desktop (work area 1920x1032).
-        let left_half = Placement { w: 984.0, h: 1023.0, x: 0.0, y: 0.0 };
+        let left_half = Placement {
+            w: 984.0,
+            h: 1023.0,
+            x: 0.0,
+            y: 0.0,
+        };
         assert!(snapped(&left_half, 1920.0, 1032.0));
         assert!(!fits(&left_half, 1920.0, 1032.0));
-        let right_half = Placement { w: 968.0, h: 1032.0, x: 952.0, y: 0.0 };
+        let right_half = Placement {
+            w: 968.0,
+            h: 1032.0,
+            x: 952.0,
+            y: 0.0,
+        };
         assert!(!fits(&right_half, 1920.0, 1032.0));
         // A tall window the user placed away from the edges is fine.
-        let tall = Placement { w: 1000.0, h: 1000.0, x: 300.0, y: 10.0 };
+        let tall = Placement {
+            w: 1000.0,
+            h: 1000.0,
+            x: 300.0,
+            y: 10.0,
+        };
         assert!(fits(&tall, 1920.0, 1032.0));
         // With the taskbar on the left (work area starting at x=48), a left
         // half snap is caught once the placement is made relative to it.
-        let after_taskbar = Placement { w: 936.0, h: 1080.0, x: 48.0, y: 0.0 };
-        assert!(fits(&after_taskbar, 1872.0, 1080.0), "absolute: looks placed");
+        let after_taskbar = Placement {
+            w: 936.0,
+            h: 1080.0,
+            x: 48.0,
+            y: 0.0,
+        };
+        assert!(
+            fits(&after_taskbar, 1872.0, 1080.0),
+            "absolute: looks placed"
+        );
         assert!(!fits(&relative(&after_taskbar, 48.0, 0.0), 1872.0, 1080.0));
         // Below the window's own minimum, or not a number: not reused.
-        assert!(!fits(&Placement { w: 700.0, h: 640.0, x: 100.0, y: 100.0 }, 1920.0, 1032.0));
-        assert!(!fits(&Placement { w: f64::NAN, h: 700.0, x: 0.0, y: 0.0 }, 1920.0, 1032.0));
+        assert!(!fits(
+            &Placement {
+                w: 700.0,
+                h: 640.0,
+                x: 100.0,
+                y: 100.0
+            },
+            1920.0,
+            1032.0
+        ));
+        assert!(!fits(
+            &Placement {
+                w: f64::NAN,
+                h: 700.0,
+                x: 0.0,
+                y: 0.0
+            },
+            1920.0,
+            1032.0
+        ));
     }
 
     #[test]
@@ -314,17 +401,31 @@ mod tests {
         std::fs::create_dir_all(&dir).unwrap();
         std::fs::write(dir.join(FILE), "{\"w\":1200.0,\"h\":7").unwrap();
         assert_eq!(read(&dir), None);
-        let p = Placement { w: 1200.0, h: 760.0, x: 10.0, y: 20.0 };
+        let p = Placement {
+            w: 1200.0,
+            h: 760.0,
+            x: 10.0,
+            y: 20.0,
+        };
         write(&dir, &p);
         assert_eq!(read(&dir), Some(p));
-        assert_eq!(std::fs::read_dir(&dir).unwrap().count(), 1, "no temporary file left");
+        assert_eq!(
+            std::fs::read_dir(&dir).unwrap().count(),
+            1,
+            "no temporary file left"
+        );
         let _ = std::fs::remove_dir_all(&dir);
     }
 
     #[test]
     fn a_placement_survives_the_round_trip() {
         let dir = std::env::temp_dir().join(format!("pct-wp-{}", std::process::id()));
-        let p = Placement { w: 1200.0, h: 760.0, x: 10.0, y: 20.0 };
+        let p = Placement {
+            w: 1200.0,
+            h: 760.0,
+            x: 10.0,
+            y: 20.0,
+        };
         write(&dir, &p);
         assert_eq!(read(&dir), Some(p));
         let _ = std::fs::remove_dir_all(&dir);

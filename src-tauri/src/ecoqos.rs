@@ -346,7 +346,11 @@ mod native {
 
     impl Process {
         pub(super) fn open(pid: u32, write: bool) -> Result<Option<Self>, String> {
-            let access = if write { Access::Priority } else { Access::Query };
+            let access = if write {
+                Access::Priority
+            } else {
+                Access::Query
+            };
             match process_guard::open(pid, access) {
                 Ok(handle) => Ok(Some(Self(handle))),
                 Err(OpenError::Gone) => Ok(None),
@@ -428,17 +432,17 @@ mod native {
     }
 
     pub(super) fn own_creation() -> Result<u64, String> {
-    // SAFETY: GetCurrentProcess returns a pseudo-handle that is always valid.
+        // SAFETY: GetCurrentProcess returns a pseudo-handle that is always valid.
         creation(unsafe { GetCurrentProcess() })
     }
 
     pub(super) fn foreground_pid() -> Option<u32> {
-    // SAFETY: GetForegroundWindow is a simple Win32 call with no invariants; returns NULL if no foreground window.
+        // SAFETY: GetForegroundWindow is a simple Win32 call with no invariants; returns NULL if no foreground window.
         let window = unsafe { GetForegroundWindow() };
         if window.is_null() {
             return None;
         }
-    // SAFETY: window is from GetForegroundWindow above; pid is a valid mutable pointer.
+        // SAFETY: window is from GetForegroundWindow above; pid is a valid mutable pointer.
         let mut pid = 0;
         unsafe { GetWindowThreadProcessId(window, &mut pid) };
         (pid != 0).then_some(pid)
@@ -536,12 +540,7 @@ fn restore_record(
             if process.masks()? != record.original {
                 return Err("EcoQoS restoration did not reproduce the saved masks".to_string());
             }
-            crate::process_guard::audit(
-                "ecoqos-restored",
-                "restored",
-                true,
-                None,
-            );
+            crate::process_guard::audit("ecoqos-restored", "restored", true, None);
         }
         RestoreDecision::ExternalChange => {
             suppressed.insert(record.identity.clone());
@@ -554,9 +553,11 @@ fn restore_record(
 
 /// Whether `name` is the file name of one of the rule paths.
 fn named_like_a_rule(rule_keys: &[String], name: &str) -> bool {
-    rule_keys
-        .iter()
-        .any(|k| k.rsplit('\\').next().is_some_and(|n| n.eq_ignore_ascii_case(name)))
+    rule_keys.iter().any(|k| {
+        k.rsplit('\\')
+            .next()
+            .is_some_and(|n| n.eq_ignore_ascii_case(name))
+    })
 }
 
 /// One pass of the engine. `paused` freezes it: while a game that manages its
@@ -598,10 +599,8 @@ fn tick(
         status.active_processes = records.len();
         return Ok(status);
     }
-    let allowed = supported
-        && !blocked_global
-        && !SHUTTING_DOWN.load(Ordering::SeqCst)
-        && config.enabled;
+    let allowed =
+        supported && !blocked_global && !SHUTTING_DOWN.load(Ordering::SeqCst) && config.enabled;
     let table = crate::process_guard::processes();
     let refreshed = table.is_ok();
     if !refreshed {
@@ -614,12 +613,19 @@ fn tick(
     let table = table.unwrap_or_default();
     let foreground = foreground_ancestors(&table);
     let owner_pid = std::process::id();
-    let rule_keys: Vec<String> = config.rules.iter().filter_map(|r| path_key(&r.path)).collect();
+    let rule_keys: Vec<String> = config
+        .rules
+        .iter()
+        .filter_map(|r| path_key(&r.path))
+        .collect();
     let mut observed = HashMap::new();
     if refreshed {
         // Only processes named like a rule have their path resolved, and the
         // path comes from the kernel by PID: nothing is opened to find them.
-        for process in table.iter().filter(|p| named_like_a_rule(&rule_keys, &p.name)) {
+        for process in table
+            .iter()
+            .filter(|p| named_like_a_rule(&rule_keys, &p.name))
+        {
             let Some(exe) = crate::process_guard::image_path(process.pid) else {
                 continue;
             };
@@ -699,7 +705,11 @@ fn tick(
             continue;
         }
         let created = table.iter().find(|p| p.pid == pid).map_or(0, |p| p.created);
-        if owned.iter().chain(suppressed.iter()).any(|id| id.pid == pid && id.creation == created) {
+        if owned
+            .iter()
+            .chain(suppressed.iter())
+            .any(|id| id.pid == pid && id.creation == created)
+        {
             // Already handled for this process instance: nothing is reopened.
             continue;
         }

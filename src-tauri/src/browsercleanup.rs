@@ -152,7 +152,12 @@ fn opera_paths(edition: &str) -> Option<(Vec<PathBuf>, Vec<PathBuf>)> {
 
 fn chrome_user_data_dir() -> Option<PathBuf> {
     let local = std::env::var("LOCALAPPDATA").ok()?;
-    Some(PathBuf::from(local).join("Google").join("Chrome").join("User Data"))
+    Some(
+        PathBuf::from(local)
+            .join("Google")
+            .join("Chrome")
+            .join("User Data"),
+    )
 }
 
 /// Brave nests its user data one level deeper than the other two:
@@ -182,7 +187,10 @@ fn edge_user_data_dir() -> Option<PathBuf> {
 /// than this needs.
 fn firefox_profile_dir() -> Option<PathBuf> {
     let appdata = std::env::var("APPDATA").ok()?;
-    let profiles_root = PathBuf::from(&appdata).join("Mozilla").join("Firefox").join("Profiles");
+    let profiles_root = PathBuf::from(&appdata)
+        .join("Mozilla")
+        .join("Firefox")
+        .join("Profiles");
     let ini_path = PathBuf::from(&appdata)
         .join("Mozilla")
         .join("Firefox")
@@ -260,7 +268,8 @@ fn parse_firefox_default_profile(ini: &str) -> Option<String> {
 /// ever postpones a cleanup.
 pub(crate) fn is_running(process_name: &str) -> bool {
     crate::process_guard::processes().map_or(true, |list| {
-        list.iter().any(|p| p.name.eq_ignore_ascii_case(process_name))
+        list.iter()
+            .any(|p| p.name.eq_ignore_ascii_case(process_name))
     })
 }
 
@@ -291,7 +300,11 @@ pub fn detect() -> Vec<BrowserCleanupInfo> {
         .iter()
         .filter_map(|b| {
             let (cache_dirs, cookie_files) = paths_for(b.id)?;
-            if !cache_dirs.iter().chain(cookie_files.iter()).any(|p| p.exists()) {
+            if !cache_dirs
+                .iter()
+                .chain(cookie_files.iter())
+                .any(|p| p.exists())
+            {
                 return None;
             }
             let cache_bytes = cache_dirs.iter().map(|p| dir_size(p)).sum();
@@ -382,7 +395,10 @@ mod tests {
 
     #[test]
     fn dir_size_sums_nested_files() {
-        let tmp = std::env::temp_dir().join(format!("pctweaker-browsercleanup-test-{}", std::process::id()));
+        let tmp = std::env::temp_dir().join(format!(
+            "pctweaker-browsercleanup-test-{}",
+            std::process::id()
+        ));
         std::fs::create_dir_all(tmp.join("nested")).unwrap();
         std::fs::write(tmp.join("a.bin"), vec![0u8; 10]).unwrap();
         std::fs::write(tmp.join("nested").join("b.bin"), vec![0u8; 20]).unwrap();
@@ -406,7 +422,6 @@ mod tests {
         assert!(!is_running("pctweaker-browsercleanup-test-sentinel.exe"));
     }
 
-
     #[test]
     fn brave_is_offered_and_uses_its_own_folder() {
         // Requested by a user who browses only with Brave, so the cleanup
@@ -414,13 +429,18 @@ mod tests {
         // is Chrome's — but its user data sits one level deeper, under
         // BraveSoftware\\Brave-Browser, which is the part that is easy to get
         // wrong by pattern-matching on the other two.
-        assert!(BROWSERS.iter().any(|b| b.id == "brave" && b.process_name == "brave.exe"));
+        assert!(BROWSERS
+            .iter()
+            .any(|b| b.id == "brave" && b.process_name == "brave.exe"));
 
         let Some(dir) = brave_user_data_dir() else {
             return; // No LOCALAPPDATA: nothing to assert about the path.
         };
         let text = dir.to_string_lossy().replace('\\', "/");
-        assert!(text.ends_with("BraveSoftware/Brave-Browser/User Data"), "unexpected path: {text}");
+        assert!(
+            text.ends_with("BraveSoftware/Brave-Browser/User Data"),
+            "unexpected path: {text}"
+        );
     }
 
     #[test]
@@ -452,10 +472,18 @@ mod tests {
             return;
         };
         let (cache_dirs, cookie_files) = opera_paths("Opera Stable").expect("paths");
-        assert!(cache_dirs.iter().all(|p| p.starts_with(&local)), "caches belong under Local");
-        assert!(cookie_files.iter().all(|p| p.starts_with(&roaming)), "cookies belong under Roaming");
         assert!(
-            cookie_files.iter().all(|p| !p.to_string_lossy().contains("Default")),
+            cache_dirs.iter().all(|p| p.starts_with(&local)),
+            "caches belong under Local"
+        );
+        assert!(
+            cookie_files.iter().all(|p| p.starts_with(&roaming)),
+            "cookies belong under Roaming"
+        );
+        assert!(
+            cookie_files
+                .iter()
+                .all(|p| !p.to_string_lossy().contains("Default")),
             "Opera has no Default subfolder"
         );
     }

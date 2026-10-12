@@ -610,9 +610,16 @@ fn known_ids(ids: Vec<String>) -> Vec<String> {
 pub fn write_debloat_list(path: String, catalog_ids: Vec<String>) -> Result<(), String> {
     let target = crate::baseline::local_file(&path, &["json"])
         .ok_or("the list can only be saved as a .json file on a local drive")?;
-    let file = ListFile { format: 1, kind: LIST_KIND.into(), apps: known_ids(catalog_ids) };
-    std::fs::write(target, serde_json::to_string_pretty(&file).map_err(|e| e.to_string())?)
-        .map_err(|e| e.to_string())
+    let file = ListFile {
+        format: 1,
+        kind: LIST_KIND.into(),
+        apps: known_ids(catalog_ids),
+    };
+    std::fs::write(
+        target,
+        serde_json::to_string_pretty(&file).map_err(|e| e.to_string())?,
+    )
+    .map_err(|e| e.to_string())
 }
 
 /// Reads a Debloat list: the catalogue ids it names that this version knows.
@@ -737,7 +744,8 @@ mod platform {
             .unwrap_or_default()
             .into_iter()
             .filter_map(|p| {
-                crate::process_guard::image_path(p.pid).map(|path| (path.to_lowercase(), p.working_set))
+                crate::process_guard::image_path(p.pid)
+                    .map(|path| (path.to_lowercase(), p.working_set))
             })
             .collect();
         for package in packages {
@@ -792,7 +800,10 @@ mod platform {
                 .ok()
                 .and_then(|path| folder_size(std::path::Path::new(&path.to_string())));
             app.memory_bytes = package.InstalledPath().ok().and_then(|path| {
-                let root = format!("{}\\", path.to_string().to_lowercase().trim_end_matches('\\'));
+                let root = format!(
+                    "{}\\",
+                    path.to_string().to_lowercase().trim_end_matches('\\')
+                );
                 let mut found = false;
                 let bytes = running
                     .iter()
@@ -840,7 +851,12 @@ mod platform {
         let states: Vec<u32> = key
             .enum_keys()
             .flatten()
-            .filter_map(|task| key.open_subkey(&task).ok()?.get_value::<u32, _>("State").ok())
+            .filter_map(|task| {
+                key.open_subkey(&task)
+                    .ok()?
+                    .get_value::<u32, _>("State")
+                    .ok()
+            })
             .collect();
         (!states.is_empty()).then(|| states.iter().any(|s| *s == 2 || *s == 4))
     }
@@ -859,17 +875,28 @@ mod platform {
         let deadline = std::time::Instant::now() + std::time::Duration::from_millis(400);
         let mut newest: Option<std::time::SystemTime> = None;
         let mut files = 0usize;
-        let mut stack: Vec<_> = ["Settings", "LocalState", "RoamingState", "LocalCache", "AC", "TempState"]
-            .iter()
-            .map(|sub| dir.join(sub))
-            .collect();
+        let mut stack: Vec<_> = [
+            "Settings",
+            "LocalState",
+            "RoamingState",
+            "LocalCache",
+            "AC",
+            "TempState",
+        ]
+        .iter()
+        .map(|sub| dir.join(sub))
+        .collect();
         'walk: while let Some(current) = stack.pop() {
-            let Ok(entries) = std::fs::read_dir(&current) else { continue };
+            let Ok(entries) = std::fs::read_dir(&current) else {
+                continue;
+            };
             for entry in entries.flatten() {
                 if files >= MAX_FILES || std::time::Instant::now() > deadline {
                     break 'walk;
                 }
-                let Ok(kind) = entry.file_type() else { continue };
+                let Ok(kind) = entry.file_type() else {
+                    continue;
+                };
                 if kind.is_symlink() {
                     continue;
                 }

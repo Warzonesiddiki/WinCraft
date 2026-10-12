@@ -85,12 +85,17 @@ fn with_environment<T>(f: impl FnOnce(&dyn DoEnvironment) -> T) -> T {
 }
 
 fn supported_edition() -> Result<bool, String> {
-    let text = |name: &str| {
-        match registry::read_value(Hive::Hklm, VERSION_PATH, name, &RegValue::Str(String::new())) {
-            Ok(Some(RegValue::Str(value))) => Ok(value),
-            Ok(_) => Err(format!("could not read Windows edition: {name} is missing or not text")),
-            Err(e) => Err(format!("could not read Windows edition: {e}")),
-        }
+    let text = |name: &str| match registry::read_value(
+        Hive::Hklm,
+        VERSION_PATH,
+        name,
+        &RegValue::Str(String::new()),
+    ) {
+        Ok(Some(RegValue::Str(value))) => Ok(value),
+        Ok(_) => Err(format!(
+            "could not read Windows edition: {name} is missing or not text"
+        )),
+        Err(e) => Err(format!("could not read Windows edition: {e}")),
     };
     let build = text("CurrentBuildNumber")?;
     let edition = text("EditionID")?;
@@ -261,7 +266,12 @@ pub fn rollback(store: &RollbackStore) -> Result<DownloadLimitState, String> {
         return Err("administrator rights are required to restore Delivery Optimization".into());
     }
     store.restore_entry(TWEAK_ID, |entry| {
-        let SnapshotEntry::DeliveryOptimization { original_value, written_kbps, .. } = entry else {
+        let SnapshotEntry::DeliveryOptimization {
+            original_value,
+            written_kbps,
+            ..
+        } = entry
+        else {
             return Err("unexpected Delivery Optimization snapshot".into());
         };
         let current = registry::read_dword(Hive::Hklm, PATH, VALUE).map_err(|e| e.to_string())?;
@@ -269,7 +279,10 @@ pub fn rollback(store: &RollbackStore) -> Result<DownloadLimitState, String> {
             return Ok(());
         }
         if current != Some(written_kbps) {
-            return Err("Delivery Optimization policy changed outside WinCraft; original snapshot retained".into());
+            return Err(
+                "Delivery Optimization policy changed outside WinCraft; original snapshot retained"
+                    .into(),
+            );
         }
         let live = with_environment(|e| e.read())?;
         let changed = match &live.config {
@@ -281,10 +294,14 @@ pub fn rollback(store: &RollbackStore) -> Result<DownloadLimitState, String> {
             None => live.managed,
         };
         if changed {
-            return Err("Delivery Optimization provider changed; original snapshot retained".into());
+            return Err(
+                "Delivery Optimization provider changed; original snapshot retained".into(),
+            );
         }
         registry::restore_value(&crate::rollback::RegistrySnapshot {
-            hive: "HKLM".into(), path: PATH.into(), name: VALUE.into(),
+            hive: "HKLM".into(),
+            path: PATH.into(),
+            name: VALUE.into(),
             original_value: original_value.map(crate::rollback::RegValue::Dword),
         })
     })?;
@@ -388,10 +405,18 @@ mod tests {
     fn a_cap_round_trips_to_the_exact_registry_it_found() {
         let m = Machine::new();
         // A neighbouring policy the cap must neither take nor leave behind.
-        m.registry.set(Hive::Hklm, PATH, "DODownloadMode", Stored::Value(RegValue::Dword(1)));
+        m.registry.set(
+            Hive::Hklm,
+            PATH,
+            "DODownloadMode",
+            Stored::Value(RegValue::Dword(1)),
+        );
         let before = m.registry.dump();
         let applied = configure(&m.store, 500).unwrap();
-        assert!(applied.supported && applied.applied && applied.conflict.is_none(), "{applied:?}");
+        assert!(
+            applied.supported && applied.applied && applied.conflict.is_none(),
+            "{applied:?}"
+        );
         assert_eq!(applied.configured_kbps, Some(500));
         assert_eq!(m.policy(), CAP);
         let journal = m.journal().unwrap();
@@ -400,7 +425,10 @@ mod tests {
         // Windows reports the policy as its provider once it is in force.
         m.provider(|c| c.down_back_limit_bps_provider = "GroupPolicyProvider".into());
         let restored = rollback(&m.store).unwrap();
-        assert!(!restored.applied && restored.configured_kbps.is_none(), "{restored:?}");
+        assert!(
+            !restored.applied && restored.configured_kbps.is_none(),
+            "{restored:?}"
+        );
         assert_eq!(m.registry.dump(), before);
         assert!(m.journal().is_none());
     }
@@ -425,7 +453,8 @@ mod tests {
         type Setup = fn(&Machine);
         let cases: [(&str, Setup); 5] = [
             ("already configured", |m| {
-                m.registry.set(Hive::Hklm, PATH, VALUE, Stored::Value(RegValue::Dword(300)))
+                m.registry
+                    .set(Hive::Hklm, PATH, VALUE, Stored::Value(RegValue::Dword(300)))
             }),
             ("already configured", |m| {
                 m.provider(|c| c.down_back_limit_bps_provider = "MdmProvider".into())
@@ -438,7 +467,9 @@ mod tests {
                     c.set_hours_to_limit_download_background_provider = "GroupPolicyProvider".into()
                 })
             }),
-            ("managed by an organization", |m| m.environment.managed.set(true)),
+            ("managed by an organization", |m| {
+                m.environment.managed.set(true)
+            }),
         ];
         for (expected, setup) in cases {
             let m = Machine::new();
@@ -470,15 +501,25 @@ mod tests {
     fn a_standard_user_is_refused_before_anything_is_read_or_written() {
         let m = Machine::new();
         m.environment.elevated.set(false);
-        assert!(configure(&m.store, 500).unwrap_err().contains("administrator"));
+        assert!(configure(&m.store, 500)
+            .unwrap_err()
+            .contains("administrator"));
         assert!(m.journal().is_none());
-        assert_eq!(m.environment.reads.get(), 0, "read before the elevation check");
+        assert_eq!(
+            m.environment.reads.get(),
+            0,
+            "read before the elevation check"
+        );
         m.environment.elevated.set(true);
         configure(&m.store, 500).unwrap();
         m.environment.elevated.set(false);
         let reads = m.environment.reads.get();
         assert!(rollback(&m.store).unwrap_err().contains("administrator"));
-        assert_eq!(m.environment.reads.get(), reads, "read before the elevation check");
+        assert_eq!(
+            m.environment.reads.get(),
+            reads,
+            "read before the elevation check"
+        );
         assert_eq!(m.policy(), CAP);
         assert!(m.journal().is_some());
     }
@@ -533,7 +574,8 @@ mod tests {
         type Drift = fn(&Machine);
         let cases: [(&str, Drift); 3] = [
             ("changed outside WinCraft", |m| {
-                m.registry.set(Hive::Hklm, PATH, VALUE, Stored::Value(RegValue::Dword(700)))
+                m.registry
+                    .set(Hive::Hklm, PATH, VALUE, Stored::Value(RegValue::Dword(700)))
             }),
             ("provider changed", |m| {
                 m.provider(|c| c.down_back_limit_bps_provider = "SettingsProvider".into())
@@ -605,11 +647,19 @@ mod tests {
                 ("EditionID", edition),
                 ("InstallationType", installation),
             ] {
-                registry.set(Hive::Hklm, VERSION_PATH, name, Stored::Value(RegValue::Str(value.into())));
+                registry.set(
+                    Hive::Hklm,
+                    VERSION_PATH,
+                    name,
+                    Stored::Value(RegValue::Str(value.into())),
+                );
             }
             supported_edition().unwrap()
         };
-        assert!(supported_edition().is_err(), "a missing edition is an error, not a no");
+        assert!(
+            supported_edition().is_err(),
+            "a missing edition is an error, not a no"
+        );
         assert!(edition("19041", "Professional", "Client"));
         assert!(edition("26200", "EnterpriseS", "Client"));
         assert!(edition("22631", "IoTEnterprise", "Client"));
@@ -618,9 +668,19 @@ mod tests {
         assert!(!edition("26100", "ServerStandard", "Server"));
 
         assert!(!managed_background_policy().unwrap());
-        registry.set(Hive::Hklm, POLICY_MANAGER, "DODownloadMode", Stored::Value(RegValue::Dword(1)));
+        registry.set(
+            Hive::Hklm,
+            POLICY_MANAGER,
+            "DODownloadMode",
+            Stored::Value(RegValue::Dword(1)),
+        );
         assert!(!managed_background_policy().unwrap());
-        registry.create_key(Hive::Hklm, &format!(r"{POLICY_MANAGER}\DOPercentageMaxBackgroundBandwidth")).unwrap();
+        registry
+            .create_key(
+                Hive::Hklm,
+                &format!(r"{POLICY_MANAGER}\DOPercentageMaxBackgroundBandwidth"),
+            )
+            .unwrap();
         assert!(managed_background_policy().unwrap(), "a subkey counts");
         registry.delete_tree(Hive::Hklm, POLICY_MANAGER).unwrap();
         registry.set(

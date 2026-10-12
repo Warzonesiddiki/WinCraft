@@ -48,6 +48,15 @@ const HAGS_MIN_BUILD: u32 = 19041;
 
 /// Below this, freeing memory is a real win; above it, Windows' own cache
 /// management is a better user of the RAM than an aggressive cleaner is.
+///
+/// Test-only since the RAM-cleanup recommendation that read it was retired.
+/// It is kept, rather than deleted along with its test, because the threshold
+/// is a deliberate decision — measure RAM pressure, do not assume it — and
+/// `ram_pressure_is_measured_not_assumed` below is what holds it to that. A
+/// release build compiles neither, so neither is dead weight in the binary; if
+/// a recommendation reads RAM pressure again, `ram_is_tight` is the entry
+/// point and it already has its test.
+#[cfg(test)]
 const LOW_RAM_BYTES: u64 = 8 * 1024 * 1024 * 1024;
 
 fn build_number(profile: &SystemProfile) -> Option<u32> {
@@ -151,6 +160,9 @@ fn has_weak_gpu(profile: &SystemProfile) -> bool {
 }
 
 /// True when this machine has little enough RAM for freeing it to matter.
+///
+/// Test-only for the same reason as `LOW_RAM_BYTES` above.
+#[cfg(test)]
 pub fn ram_is_tight(profile: &SystemProfile) -> bool {
     profile.ram_total_bytes.is_some_and(|r| r <= LOW_RAM_BYTES)
 }

@@ -555,27 +555,34 @@ fn restore_power_index(
     let writes_dc = setting_guid.eq_ignore_ascii_case(PERF_BOOST_MODE_GUID);
     let current = read_setting_indexes(scheme_guid, setting_guid)?;
     let mut expected = [ac.0, if writes_dc { dc.0 } else { current.1 }];
-    for (slot, (is_ac, value_name, (index, effective))) in [
-        (true, "ACSettingIndex", ac),
-        (false, "DCSettingIndex", dc),
-    ]
-    .into_iter()
-    .enumerate()
+    for (slot, (is_ac, value_name, (index, effective))) in
+        [(true, "ACSettingIndex", ac), (false, "DCSettingIndex", dc)]
+            .into_iter()
+            .enumerate()
     {
         if !is_ac && !writes_dc {
             continue;
         }
         match index {
-            Some(v) => {
-                crate::power::write_setting_index(scheme_guid, subgroup_guid, setting_guid, is_ac, v)?
-            }
+            Some(v) => crate::power::write_setting_index(
+                scheme_guid,
+                subgroup_guid,
+                setting_guid,
+                is_ac,
+                v,
+            )?,
             None => {
-                let path = crate::power::setting_index_path(scheme_guid, subgroup_guid, setting_guid);
+                let path =
+                    crate::power::setting_index_path(scheme_guid, subgroup_guid, setting_guid);
                 // Nothing to undo where no override exists, and nothing may
                 // be created.
-                if crate::tweaks::windows_impl::read_dword(crate::tweaks::Hive::Hklm, &path, value_name)
-                    .map_err(|e| e.to_string())?
-                    .is_none()
+                if crate::tweaks::windows_impl::read_dword(
+                    crate::tweaks::Hive::Hklm,
+                    &path,
+                    value_name,
+                )
+                .map_err(|e| e.to_string())?
+                .is_none()
                 {
                     continue;
                 }
@@ -628,7 +635,9 @@ fn inherited(
 ) -> Result<Option<u32>, String> {
     match index {
         Some(_) => Ok(None),
-        None => crate::power::read_effective_index(scheme, SUB_PROCESSOR_GUID, setting, ac).map(Some),
+        None => {
+            crate::power::read_effective_index(scheme, SUB_PROCESSOR_GUID, setting, ac).map(Some)
+        }
     }
 }
 
@@ -708,8 +717,13 @@ mod tests {
     fn the_plan_default_is_readable_for_the_active_plan() {
         let scheme = crate::power::active_scheme_guid().expect("active scheme");
         for ac in [true, false] {
-            let value = crate::power::default_setting_index(&scheme, SUB_PROCESSOR_GUID, PERF_BOOST_MODE_GUID, ac)
-                .expect("plan default");
+            let value = crate::power::default_setting_index(
+                &scheme,
+                SUB_PROCESSOR_GUID,
+                PERF_BOOST_MODE_GUID,
+                ac,
+            )
+            .expect("plan default");
             assert!(value <= 6, "implausible boost default {value}");
         }
     }
@@ -968,7 +982,9 @@ mod tests {
     /// wrote are left without an override.
     #[test]
     fn an_inherited_setting_is_restored_through_the_api_when_the_delete_is_refused() {
-        let inherited = Some(Stored::Value(RegValue::Dword(crate::power::tests::INHERITED_DEFAULT)));
+        let inherited = Some(Stored::Value(RegValue::Dword(
+            crate::power::tests::INHERITED_DEFAULT,
+        )));
         for case in &CASES {
             let (machine, fixture) = seeded(case, None, None);
             (case.apply)(&fixture.store).unwrap();
@@ -976,8 +992,17 @@ mod tests {
             (case.rollback)(&fixture.store).unwrap_or_else(|e| panic!("{}: {e}", case.id));
             assert!(!fixture.store.is_applied(case.id), "{}", case.id);
             for (setting, ac, written) in case.slots {
-                let expected = if written.is_some() { inherited.clone() } else { None };
-                assert_eq!(index(&machine, setting, *ac), expected, "{} {setting} ac={ac}", case.id);
+                let expected = if written.is_some() {
+                    inherited.clone()
+                } else {
+                    None
+                };
+                assert_eq!(
+                    index(&machine, setting, *ac),
+                    expected,
+                    "{} {setting} ac={ac}",
+                    case.id
+                );
             }
         }
     }
@@ -997,14 +1022,26 @@ mod tests {
             dc_effective: None,
         };
         let path = setting_index_path(BALANCED, SUB_PROCESSOR_GUID, CORE_PARKING_MIN_GUID);
-        machine.registry.set(Hive::Hklm, &path, "ACSettingIndex", Stored::Value(RegValue::Dword(100)));
-        fixture.store.transaction().unwrap().save_entry(CORE_PARKING_ID, older).unwrap();
+        machine.registry.set(
+            Hive::Hklm,
+            &path,
+            "ACSettingIndex",
+            Stored::Value(RegValue::Dword(100)),
+        );
+        fixture
+            .store
+            .transaction()
+            .unwrap()
+            .save_entry(CORE_PARKING_ID, older)
+            .unwrap();
         machine.registry.deny_deletes.set(true);
         rollback_core_parking(&fixture.store).unwrap();
         assert!(!fixture.store.is_applied(CORE_PARKING_ID));
         assert_eq!(
             index(&machine, CORE_PARKING_MIN_GUID, true),
-            Some(Stored::Value(RegValue::Dword(crate::power::tests::INHERITED_DEFAULT)))
+            Some(Stored::Value(RegValue::Dword(
+                crate::power::tests::INHERITED_DEFAULT
+            )))
         );
     }
 
@@ -1016,7 +1053,9 @@ mod tests {
         apply_core_parking(&fixture.store).unwrap();
         let path = setting_index_path(BALANCED, SUB_PROCESSOR_GUID, CORE_PARKING_MIN_GUID);
         let users = Stored::Value(RegValue::Dword(30));
-        machine.registry.set(Hive::Hklm, &path, "DCSettingIndex", users.clone());
+        machine
+            .registry
+            .set(Hive::Hklm, &path, "DCSettingIndex", users.clone());
         machine.registry.deny_deletes.set(true);
         rollback_core_parking(&fixture.store).unwrap();
         assert_eq!(index(&machine, CORE_PARKING_MIN_GUID, false), Some(users));

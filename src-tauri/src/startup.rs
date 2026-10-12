@@ -45,12 +45,11 @@ pub(crate) fn extract_exe_path(command: &str) -> Option<std::path::PathBuf> {
     let candidate = if let Some(rest) = command.strip_prefix('"') {
         // Quoted: everything up to the closing quote is the path, verbatim.
         rest.split('"').next()?.to_string()
-    } else if let Some(idx) = command.to_ascii_lowercase().find(".exe") {
+    } else {
+        let idx = command.to_ascii_lowercase().find(".exe")?;
         // Unquoted: take through the first ".exe", which handles both
         // `C:\Program Files\x\app.exe -flag` and a bare `app.exe`.
         command[..idx + 4].to_string()
-    } else {
-        return None;
     };
 
     let expanded = expand_env_vars(&candidate);
@@ -330,7 +329,7 @@ mod imp {
         collect_run("HKLM", "run32", &mut out);
         collect_folder("HKCU", &mut out);
         collect_folder("HKLM", &mut out);
-        out.sort_by(|a, b| a.name.to_lowercase().cmp(&b.name.to_lowercase()));
+        out.sort_by_key(|a| a.name.to_lowercase());
         out
     }
 
