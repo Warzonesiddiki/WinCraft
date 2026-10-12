@@ -77,7 +77,7 @@ function buildDescription(clipMetas) {
   const bullets = clipMetas.map((m) => `- ${m.title}`).join("\n");
   return (
     `${clipMetas.length} quick Windows tweaks you can apply right now, back to back:\n\n${bullets}\n\n` +
-    "Try it: https://pctweaker.app\n" +
+    "Try it: https://wincraft.app\n" +
     "Install: winget install AurelioAvila.PCTweaker\n" +
     "Project: https://github.com/AurelioAvila/pc-tweaker-app\n\n" +
     "#Windows #PCOptimization #WindowsTips"

@@ -47,7 +47,15 @@ mail paths (verification, reset, receipts, support replies). See
 
 `site/` holds the prerendered website, and `marketing/` holds the release and
 announcement tooling. Both have their own dependency trees and are not part of
-the desktop build.
+the desktop build. The site's origin is written down once, in `site/src/seo.ts`;
+`site/scripts/site-origin.mjs` reads it for the sitemap generator and the SEO
+gate, and that gate also asserts the shipped `public/CNAME` — the deployment
+setting that decides where GitHub Pages answers — so the two cannot drift.
+
+Public copy quotes the catalogue's total from `scripts/check-public-counts.mjs`
+and nothing else: the app has no licence gate, so the Free/Pro split the Rust
+catalogue still carries is metadata, and the check fails if a public text
+publishes it again (or quotes a different total).
 
 ## How a change reaches Windows
 

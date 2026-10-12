@@ -162,11 +162,13 @@ async function publish(igUserId, igAccessToken, creationId) {
   return data.id;
 }
 
-// Official pctweaker.app link (2026-08-22, explicitly requested): it used to
-// point at the GitHub repo rather than the product's own site - the same fix
-// was applied in parallel on YouTube (auto-upload.js) and X (post-to-x.js).
+// Official product link: the owner asked on 2026-08-22 for the product's own
+// site rather than the GitHub repo, and on 2026-10-12 confirmed that
+// wincraft.app is the live one - the domain was pctweaker.app until the rename.
+// The same change was applied in parallel on YouTube
+// (auto-upload.js) and X (post-to-x.js).
 const PINNED_COMMENT_TEXT =
-  "Try WinCraft for free \u{1F447}\nhttps://pctweaker.app";
+  "Try WinCraft for free \u{1F447}\nhttps://wincraft.app";
 
 // Posts a CTA comment right after publishing (mirrors the
 // _pinned_comment/_post_pinned_comment pattern in the Ghostcut YouTube bot).

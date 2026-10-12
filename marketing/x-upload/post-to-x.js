@@ -23,9 +23,10 @@ const ROOT = path.join(__dirname, "..");
 const QUEUE_DIRS = [path.join(ROOT, "to-publish"), path.join(ROOT, "published")];
 const POSTED_LOG = path.join(__dirname, ".x-posted.json");
 
-// Official pctweaker.app link (2026-08-22, explicitly requested): it used to
-// point at the GitHub repo rather than the product's own site.
-const CTA = "Try WinCraft for free \u{1F447}\nhttps://pctweaker.app";
+// Official product link: the owner asked on 2026-08-22 for the product's own
+// site rather than the GitHub repo, and on 2026-10-12 confirmed that
+// wincraft.app is the live one - the domain was pctweaker.app until the rename.
+const CTA = "Try WinCraft for free \u{1F447}\nhttps://wincraft.app";
 const MAX_HASHTAGS = 2;
 const MAX_TWEET_LENGTH = 280;
 

@@ -38,7 +38,7 @@ Windows runtime, real a11y tooling) are marked _static only_.
 | Code quality  | 88     | **93** | ESLint 0 errors **and 0 warnings** (was 2E/6W), Prettier clean, `tsc` clean, ~1,200 lines of dead pricing/paywall/promo/Pro-gate code and 96 lines of dead dialog CSS deleted, stale comments corrected. The frontend has no `isPro` plumbing left; only the Rust `require_pro()` stub and the catalogue metadata remain. **Two deletions in that sweep were wrong** — `halloween-offer.tsx` and `halloween-decor.ts` were imported by the website, and removing them broke its build until Batch S restored them: the lesson on record is that "unrendered" has to be checked per consuming tree, not per repository                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
 | Performance   | 75     | **88** | Entry chunk 1,053.38 kB → **631.46 kB** (335.56 → **211.69 kB gzip**): dead code removed first, then 36 panels split into 16 lazy chunks loaded when their section opens; CSS one file at 210.51 kB. Still a 631 kB entry chunk because the six locale tables are 77% of it (measured), and no runtime profile has been taken on Windows                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
 | Testing       | 40     | **99** | Backend **161/161**, `test-scan` **15/15** (was failing), every script suite green, and **241 Vitest tests in 16 files**: the whole scan flow (13 probes, partial reports, apply/verify, pause/resume), the startup and scheduled-task lists, the update-drift and crash-report cards, the cleaners and maintenance cards, the thermal panel itself (a two-second poll on a fake clock, its verdicts and its profile staging), the thermal judge and driver plans, the driver audit and Windows Update catalogue (scan progress, tiers, restart, install subsets, failure versus emptiness), the debloat panel (what can be removed, presets, list save/load, the per-app removal receipt including a lost answer recorded as unknown), game sessions and core steering (including the five-second re-read that drives the live count), Turbo Boost (live dial, measured facts, before/after measurement), the Before & After comparison (both measurements, the verdicts and their wording, the startup-log read, the history list and the report export), the cached-audit storage contract, a catalogue/translation drift guard, the Fix-all pipeline, and `lib.ts` — all through a fake Tauri IPC bridge, with jest-axe. ESLint is now verified over the whole tree, not per batch, and every script suite in the release chain also runs on every push, so no gate can now first fail on release day. Coverage is measured over every source file (**33.12% of lines**, 3,066 still uncovered — concentrated in `App.tsx` and a dozen untested panels) and enforced as a ratchet in CI, whose thresholds were raised with the tests rather than left behind them. Not measured: a packaged-app run on Windows |
-| Documentation | 70     | **89** | Added `CONTRIBUTING.md`, `docs/ARCHITECTURE.md`, `docs/API.md`; documented the fork's updater/signing path; fixed README's licence contradiction and stale plan copy; every live doc, shipped link and the publisher PAD feed now names the owned domain, and the PAD feed describes the current release instead of one two versions old. Still outstanding: the canned Pro/paid prose in the public files, and the site tree's canonical/CNAME question                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| Documentation | 70     | **91** | Added `CONTRIBUTING.md`, `docs/ARCHITECTURE.md`, `docs/API.md`; documented the fork's updater/signing path; fixed README's licence contradiction and stale plan copy; every live doc, shipped link and the publisher PAD feed now names the owned domain, and the PAD feed describes the current release instead of one two versions old. Every public control count is now the catalogue's own total and nothing more, the site's origin is single-source including the `CNAME` that decides where it is served, and the marketing CTAs point at the site the owner confirmed. Still outstanding: the residual Pro/paid prose (the site's pricing cards and FAQ sentence, the listings' "WITH PRO" sections, `docs/pad.xml`)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
 | Accessibility | 80     | **85** | The unreachable Pro paywall `<dialog>` (dialog semantics, focus handling) is gone. An automated axe run now covers twelve rendered surfaces (the scan, cleaner, maintenance, startup, drift, crash, thermal, driver, debloat, game-session, Before & After and Turbo Boost panels), and it has earned its place twice: the Turbo Boost comparison table opened with an empty `<th>`, which announces an unnamed column — now a `<td>`, with both column headers scoped — and the Before & After panel jumped from `<h2>` straight to `<h4>` in two places, which reads as a broken outline to a screen reader, now `<h3>` with the stylesheet following. Keyboard and screen-reader behaviour on real Windows is still unverified                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
 | i18n          | 90     | **94** | 1,580 keys × 6 locales consistent; the free pricing page is now translated in all six (it used to be English-only); paywall, Pro-upsell and Pro-naming strings removed; dead Halloween/promo components deleted. 175 identical-to-English keys remain on the reviewed list                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
 | DX            | 85     | **96** | CI runs ESLint + Prettier + `npm test`; lint is clean; contributor and architecture docs exist; `npm test` at the root is the one entry point for frontend tests; backend/desktop commands documented; the website now builds and runs its SEO gate in pull requests too, and its deploy workflow watches the app modules it imports from; CI is now a superset of everything `npm run check` enforces except `cargo test`, which needs the Windows toolchain. Rust gates (`fmt`, `clippy`, `audit`) are still absent because the toolchain is unavailable here                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
@@ -893,6 +893,92 @@ under the measurement.
 Validation: `npx tsc --noEmit`, `npx eslint src`, Prettier, `npm run test:coverage`
 (241 tests, thresholds met, exit 0), the five check gates and `npm run build`.
 
+### Batch W — the site's origin, and every public control count (done)
+
+Two loose ends from the "keep wincraft.app" and "drop the counts" answers, both
+about public text rather than code.
+
+**The origin is now single-source, including its deployment setting.** The last
+piece of the rename was `site/public/CNAME`, which still named `pctweaker.app`
+and decides where GitHub Pages answers; it now says `wincraft.app`. The SEO gate
+was asserting everything about the pages _except_ the one setting that decides
+where they are served, so it asserts it now too: the shipped `CNAME` must be the
+host `site/src/seo.ts` builds every canonical from. Verified to bite by setting it
+back and watching the gate fail.
+
+The four marketing CTAs that linked `pctweaker.app` (`instagram-upload/lib.js`,
+`x-upload/post-to-x.js`, `youtube-upload/auto-upload.js`,
+`youtube-upload/compile-longform.js`) now link `wincraft.app`, and their comment
+records both decisions instead of being rewritten as if there had only ever been
+one: the owner asked on 2026-08-22 for the product's own site rather than the
+GitHub repo, and confirmed on 2026-10-12 that the live one is `wincraft.app`.
+Left alone deliberately, because each names an artefact and not the site: the
+`winget install AurelioAvila.PCTweaker` line and the upstream repository URL in
+`compile-longform.js`, and `tweakydriver@pctweaker.app` on the noindex
+checkout-return page, which belongs to a different product and has no evidenced
+replacement.
+
+**The Free/Pro split is no longer published anywhere public.** The catalogue's
+35 flags stay in the Rust metadata and nothing reads them, but the app has no
+licence gate, so a public "46 Free / 35 Pro" was a claim with nothing behind it.
+Removed from the README, from `site/src/i18n/dictionary.ts` (the home page's
+"46 / CONTROLS INCLUDED FREE" stat is gone, the free plan card and the Pro card
+both say the catalogue's 81, and the FAQ answer no longer counts the split), from
+`site/src/pages/practical-guides.ts`, and from all six Store listings in their own
+languages — opening line, feature bullet, "WITH PRO" paragraph and release notes.
+`CHANGELOG.md` and `release-notes/RELEASE-NOTES-*.md` are untouched: those are
+records of what a release said at the time, not live claims.
+
+`scripts/check-public-counts.mjs` was rewritten around the new rule, and it is
+stricter than the version it replaces. It still takes the total from the Rust
+catalogue test, but now: the total is the only count a public text may quote, the
+Free/Pro numbers may not appear in these files at all (they have no other reason
+to, in any of the six languages), each listing description must still state the
+total, and the home page stat must still be the release's controls. Verified red
+on both failure modes — restoring the split into a listing's short description
+and changing the total in the README — then green again.
+
+What this does **not** settle, and should not: the website still sells plans
+(pricing cards at €59.99 / €7.99, the "WITH PRO" sections of the listings, the
+FAQ's subscription sentence), `docs/pad.xml` still says "advanced Pro tools are
+paid", and the Uninstaller page prices a different product. Those are commercial
+claims, not counts, so they need a product decision rather than an edit here.
+
+Validation: `npm run check:public-counts`, `check:i18n` (1,579 keys × 6), the site
+build and `check:seo` (17/17 routes, robots, 404 and now the CNAME), plus the full
+root battery.
+
+### Measurement — what loading the locale tables on demand would save
+
+Asked for numbers before the decision, so here they are, measured rather than
+estimated. The method: in a scratch copy, the five non-English tables in
+`src/i18n.ts` were aliased to the English one and the app built with Vite
+(type-checking skipped, because this is a payload measurement), then the file was
+restored. Nothing was committed.
+
+|                          | Entry chunk (`main-*.js`) | gzip                    |
+| ------------------------ | ------------------------- | ----------------------- |
+| Today (six tables eager) | 631,461 B (631.46 kB)     | 211,422 B               |
+| Without the five tables  | 228,691 B (228.69 kB)     | 71,738 B                |
+| Saving                   | **402,770 B (−63.8%)**    | **−139,684 B (−66.1%)** |
+
+The other entry (`overlay.html`'s chunk, 228,900 B) does not import the tables and
+does not move. Each locale would become its own chunk of roughly 80 kB (about
+28 kB gzip), fetched the first time that language is chosen — so English users pay
+nothing and a German user pays one extra request once.
+
+The work is smaller than "touches every `STRINGS[…]` reader" suggests: all 36
+panels take `s` as a prop and do not change. What does change is `src/i18n.ts`
+(the loader plus one module per locale), `App.tsx:188`, `main.tsx:15`,
+`advanced-controls.tsx` (five reads), `debloat.tsx:124`, `tool-section.tsx:106`
+(which identifies the language by object identity — `Object.keys(STRINGS).find(k
+=> STRINGS[k] === s)` — and needs the loader's map instead), and four scripts that
+read the tables statically (`i18n-tables.mjs`, `audit-i18n.mjs`, `check-i18n.mjs`,
+`test-live-metrics.ts`) plus two tests that iterate locales
+(`catalog.test.ts`, `lib.test.ts`). One behaviour to handle deliberately: a
+language switch would show English until the chunk lands, unless the loader keeps
+the outgoing table until the incoming one arrives.
+
 ## Final report
 
 ### Changes applied
@@ -914,12 +1000,13 @@ Validation: `npx tsc --noEmit`, `npx eslint src`, Prettier, `npm run test:covera
 
 ### Changes not applied (and why)
 
-1. **The 35 controls still flagged `requires_pro` in the Rust catalogue.**
-   `src-tauri/src/lib.rs:2727-2729` asserts `81 total / 35 Pro / 46 Free`, and
-   `scripts/check-public-counts.mjs` keeps nine public files (README, two site
-   files, six Store listings) quoting those numbers. Flipping the flags is a
-   product/marketing decision with a cross-tree content change, and Rust cannot be
-   rebuilt or tested in this environment. Reported rather than guessed.
+1. **The 35 controls still flagged `requires_pro` in the Rust catalogue —
+   decided, and now inert.** `src-tauri/src/lib.rs:2727-2729` still asserts
+   `81 total / 35 Pro / 46 Free` and the flags stay as metadata nothing reads; what
+   changed (Batch W, on the owner's instruction) is that no public text publishes
+   the split any more, and `check-public-counts` fails if one does. Flipping the
+   flags themselves would mean rebuilding and re-testing Rust, which this
+   environment cannot do, and would change nothing the app does.
 2. **The Rust-side licence stub.** `require_pro()` now always returns `Ok`, and
    ~35 catalogue entries still carry `requires_pro` flags that no code reads.
    Removing the stub means touching every gated command's signature, and the
@@ -958,25 +1045,28 @@ Validation: `npx tsc --noEmit`, `npx eslint src`, Prettier, `npm run test:covera
    `turbo.rs`), with a large share of them in test support. This needs a
    Rust-aware pass (`cargo clippy`), not a grep.
 6. **Website and marketing trees** (`site/`, `marketing/`, Python and PowerShell
-   scripts) were not audited in depth; they have their own dependency trees.
+   scripts) have not been audited in depth; they have their own dependency trees.
+   What Batch W did cover: the site's origin end to end (including `CNAME` and the
+   marketing CTAs) and every public control count. What it did not touch, because
+   it is a commercial claim rather than a stale number: the pricing cards
+   (€59.99 / €7.99 / €99), the FAQ's subscription sentence, the listings' "WITH
+   PRO" sections, `docs/pad.xml`'s Pro prose, and the Uninstaller page's own
+   pricing. The app itself has no licence gate, so those texts describe something
+   the app does not enforce.
 7. **The old origin outside the app — resolved in Batch R, three pieces left.**
    Every live doc, shipped link and the PAD feed now names `wincraft.app`, and the
    support address follows the code (`support@wincraft.app`, documented in
    `backend/.env.example` as Cloudflare-routed). Still on the old origin:
-   - **`site/public/CNAME` says `pctweaker.app`** while `site/src/seo.ts` and the
-     committed sitemap say `wincraft.app`. `CNAME` decides where GitHub Pages
-     serves the site, so this is a deployment setting, not copy: it needs one
-     answer from the owner (which origin is live?) before the three files that
-     follow it — `site/index.html`, `site/public/tweaky-driver/index.html` and
-     `site/scripts/check-seo.mjs`, whose origin assertion **fails for all 17
-     sitemap URLs today** — are edited.
-   - **`marketing/**` (four files)** links to `pctweaker.app` under a comment
-     recording an explicit owner request dated 2026-08-22. The rename came later,
-     so this is a decision, not a bug to fix silently.
+   - **`site/public/CNAME` and the marketing CTAs — closed in Batch W.** The
+     owner confirmed on 2026-10-12 that `wincraft.app` is the live origin: `CNAME`
+     follows it, the SEO gate now asserts the shipped `CNAME` against
+     `site/src/seo.ts`, and the four marketing files link the new domain with a
+     comment recording both decisions.
    - **`docs/pad.xml`'s Pro/pricing prose** (`Char_Desc_2000`: "advanced Pro tools
      are paid", plus the `Expire_Other_Info` and `Char_Desc_250/450` access
-     wording) is the same class of stale claim as the public files in item 1, and
-     this feed is a tenth public file those counts do not guard.
+     wording) still describes a paid tier, in the publisher feed no gate watches.
+     It publishes no count, so the "no split" rule does not cover it; it needs the
+     same product decision as the website's pricing copy (item 6).
 8. **Rename leftovers outside the UI** (flagged, not changed, because each is an
    external or persisted name): the uninstaller download URL in
    `maintenance.tsx` points at the upstream `pc-tweaker-uninstaller` release and
@@ -1008,7 +1098,7 @@ final pass (2026-10-12).
 | `npx prettier --check "src/**/*.{ts,tsx,css}"`                                                                                                                                                               | PASS                                                                                                                                                                |
 | `npm run check:i18n`                                                                                                                                                                                         | PASS — 1,583 keys × 6 languages                                                                                                                                     |
 | `npm run check:i18n-quality`                                                                                                                                                                                 | PASS — 175 identical-to-English keys on the reviewed list                                                                                                           |
-| `npm run check:public-counts`                                                                                                                                                                                | PASS — "81 controls, 46 Free, 35 Pro (9 files)" (see item 1 above)                                                                                                  |
+| `npm run check:public-counts`                                                                                                                                                                                | PASS — "81 controls, published without a Free/Pro split" (9 files; verified red twice, see Batches U-W)                                                             |
 | `npm run check:no-test-pro`                                                                                                                                                                                  | PASS                                                                                                                                                                |
 | `node scripts/check-design-tokens.mjs`                                                                                                                                                                       | PASS — 131 legacy raw palette classes, exit 0                                                                                                                       |
 | `node scripts/test-scan.mjs`                                                                                                                                                                                 | PASS — 15/15 (was 14/15)                                                                                                                                            |
@@ -1039,8 +1129,11 @@ final pass (2026-10-12).
 3. **CI has still never executed.** The workflow is now correct as far as static
    reading goes, but the first real run may surface environment problems (Node
    version, pg-mem, Rust target). Treat the first CI run as a gate, not a formality.
-4. **Catalogue metadata still says "35 Pro".** The app ignores the flag, but the
-   data, the assertion and nine public files still publish a Free/Pro split.
+4. **Catalogue metadata still says "35 Pro", and nothing public repeats it.**
+   The app ignores the flag; the data and the Rust assertion keep the split as
+   metadata; the nine public files no longer publish it, and
+   `check-public-counts` fails if they start again. What remains is the flag
+   itself, which only a Rust build can change.
 5. **`require_pro()` is an always-`Ok` stub** in `src-tauri/src/lib.rs`, and the
    `PRO_REQUIRED: ` error path it can no longer produce is still handled in
    `App.tsx` and `profiles.tsx`. Harmless today, but a reader has to follow it to
@@ -1106,3 +1199,15 @@ Ranked by value per unit of risk. None of these are started.
    launch are the likely places; `Regex::new` on a literal is not.
 9. **Accessibility pass** with a real tool (axe/NVDA) on the six main panels,
    then wire the result into CI if it can run headless.
+10. **The locale tables on demand — measured, waiting on the decision.** See
+    _Measurement_ above: −402,770 B from the entry chunk (−63.8%), one ~80 kB
+    chunk per language fetched on first use, and a touch list of seven app files
+    plus four scripts. Approved in principle; the numbers came first on request.
+11. **Extract the tweak list from `App.tsx`** (approved by the owner) so the app's
+    core surface can be mounted on its own, then test it — it is the 310-line hole
+    in the coverage report. A pure move, but in the file every section depends on,
+    so it gets its own batch and its own battery run.
+12. **Decide the site's remaining commercial copy** (Batch W, item 6): the pricing
+    cards, the FAQ's subscription sentence, the listings' "WITH PRO" sections and
+    `docs/pad.xml`'s Pro prose all describe a paid tier the app does not enforce.
+    Either the plans are real and the copy stays, or the copy follows the app.

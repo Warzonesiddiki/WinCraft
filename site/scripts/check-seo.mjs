@@ -85,7 +85,7 @@ const uninstaller = await readFile(new URL("uninstaller/index.html", dist), "utf
 assert.ok(uninstaller.includes("it attempts to create a Windows restore point"), "Restore-point creation must not be guaranteed");
 assert.ok(uninstaller.includes("can fail or be skipped"), "Restore-point limits must be visible");
 assert.ok(!uninstaller.includes("a restore point taken first"), "Metadata must not promise a restore point");
-for (const [value, label] of [[46, "CONTROLS INCLUDED FREE"], [81, "CONTROLS IN THIS RELEASE"], [1, "PLACE TO REVIEW &amp; RESTORE"]]) {
+for (const [value, label] of [[81, "CONTROLS IN THIS RELEASE"], [1, "PLACE TO REVIEW &amp; RESTORE"]]) {
   assert.match(home, new RegExp(`<span>${value}</span>[\\s\\S]{0,500}${label}`), `Stat must render its real value in the initial HTML: ${label}`);
 }
 const app = JSON.parse(
@@ -126,5 +126,13 @@ assert.ok(
 const robots = await readFile(new URL("robots.txt", dist), "utf8");
 assert.match(robots, new RegExp(`Sitemap:\\s*${ORIGIN_PATTERN}/sitemap\\.xml`), "robots.txt must point at the sitemap");
 assert.match(robots, /^\s*Allow:\s*\/$/m, "robots.txt must allow crawling");
+
+// CNAME is what decides where GitHub Pages answers. If it disagrees with the
+// origin every canonical is built from, the pages point at a host that is not
+// serving them - the same class of drift this file exists to catch, and the one
+// part of the origin story that lives in a deployment setting rather than in
+// src/seo.ts.
+const cname = (await readFile(new URL("CNAME", dist), "utf8")).trim();
+assert.equal(cname, new URL(ORIGIN).host, "the shipped CNAME must be the site's host");
 
 console.log(`SEO checks passed for ${urls.length} sitemap routes, robots.txt and the 404 page.`);
