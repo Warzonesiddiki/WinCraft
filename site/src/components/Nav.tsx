@@ -1,7 +1,6 @@
 import { text } from "../i18n/dictionary";
 import { DOWNLOAD_EXE } from "../constants";
 import { Link } from "../router";
-import { PromoStrip } from "../promo";
 import logoUrl from "../assets/favicon.png";
 
 export function Nav({
@@ -9,15 +8,12 @@ export function Nav({
   onSubpage,
   downloadHref = DOWNLOAD_EXE,
   downloadLabel,
-  offerHref,
 }: {
   navigate: (to: string) => void;
   onSubpage: boolean;
   /** Overridden on product pages that are not WinCraft itself. */
   downloadHref?: string;
   downloadLabel?: string;
-  /** Where the Halloween strip's button goes; the home pricing by default. */
-  offerHref?: string;
 }) {
   // Section anchors only resolve on the home page. From /support they need
   // the leading "/" so the browser goes home first instead of hunting for an
@@ -33,7 +29,6 @@ export function Nav({
 
   return (
     <nav className="fixed inset-x-0 top-0 z-50 border-b border-white/5 bg-[var(--bg)]/70 backdrop-blur-xl">
-      <PromoStrip href={offerHref ?? `${prefix}#access`} />
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-5 md:px-12">
         <Link
           to="/"

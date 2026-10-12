@@ -21,7 +21,7 @@
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-2E7D32" alt="MIT License"></a>
 </p>
 
-**[Download Free for Windows](https://github.com/AurelioAvila/pc-tweaker-app/releases/latest/download/PCTweaker-Setup.exe)** · **[Microsoft Store](https://apps.microsoft.com/detail/9nh3c6dt1g87)** · [Chocolatey](https://community.chocolatey.org/packages/pc-tweaker) · [Website](https://wincraft.app/) · [Support](https://wincraft.app/support/) · [Release notes](CHANGELOG.md)
+**[Download for Windows](https://github.com/AurelioAvila/pc-tweaker-app/releases/latest/download/PCTweaker-Setup.exe)** · **[Microsoft Store](https://apps.microsoft.com/detail/9nh3c6dt1g87)** · [Chocolatey](https://community.chocolatey.org/packages/pc-tweaker) · [Website](https://wincraft.app/) · [Support](https://wincraft.app/support/) · [Release notes](CHANGELOG.md)
 
 <p align="center"><a href="#whats-new-in-115">What's new</a> · <a href="#what-you-can-do">Features</a> · <a href="#what-changes-on-your-system">What changes</a> · <a href="#free-for-everyone">Free for Everyone</a> · <a href="#download-integrity-and-code-signing">Code signing</a> · <a href="#build-from-source">Build from source</a></p>
 
@@ -82,19 +82,19 @@ Read the effect and trade-offs before applying a setting. A disabled tweak is no
 
 ### Ready-to-use profiles
 
-**Gaming, Study and Work are included in Free.** Open Profiles, review or customize the selection, then apply the pending tweaks with one click. Each template explains its tradeoffs; optional settings start unchecked. Profiles add the selected settings without undoing other tweaks. Restore individual changes from their category. Results depend on your hardware and workload; no FPS gain is promised.
+**Gaming, Study and Work are included with every install.** Open Profiles, review or customize the selection, then apply the pending tweaks with one click. Each template explains its tradeoffs; optional settings start unchecked. Profiles add the selected settings without undoing other tweaks. Restore individual changes from their category. Results depend on your hardware and workload; no FPS gain is promised.
 
 ### Native power controls
 
 The catalog contains **81 controls**. The five power-policy controls change only mains-power policy in the selected Windows plan. They record the original plan and value before writing, verify the result, and leave battery policy unchanged.
 
-| Control | Access | Purpose and limits |
-| --- | --- | --- |
-| CPU energy-performance preference | Free | Favors performance on systems with autonomous CPPC support; power use and heat can increase. |
-| USB selective-suspend diagnosis | Free | Investigates wake or disconnect problems. Windows recommends leaving selective suspend enabled normally; restore after testing. |
-| PCIe link power management | Pro | Disables ASPM for troubleshooting devices affected by link transitions; idle power use can increase. |
-| Short-thread scheduling preference | Pro | Prefers performant cores on CPUs with multiple efficiency classes; does not impose fixed affinity. |
-| Long-thread scheduling preference | Pro | Prefers performant cores for longer work on compatible hybrid CPUs; other cores remain available. |
+| Control | Purpose and limits |
+| --- | --- |
+| CPU energy-performance preference | Favors performance on systems with autonomous CPPC support; power use and heat can increase. |
+| USB selective-suspend diagnosis | Investigates wake or disconnect problems. Windows recommends leaving selective suspend enabled normally; restore after testing. |
+| PCIe link power management | Disables ASPM for troubleshooting devices affected by link transitions; idle power use can increase. |
+| Short-thread scheduling preference | Prefers performant cores on CPUs with multiple efficiency classes; does not impose fixed affinity. |
+| Long-thread scheduling preference | Prefers performant cores for longer work on compatible hybrid CPUs; other cores remain available. |
 
 These controls use Windows power APIs. Unsupported hybrid settings are refused before a system write. No FPS, DPC-latency or micro-stutter improvement is claimed without a workload-specific measurement.
 
@@ -201,7 +201,7 @@ npm run check:i18n-quality
 npm run check:native-policy
 ```
 
-**Run the complete Rust suite and full check in a disposable Windows VM with a snapshot.** The Free/Pro policy tests now avoid the Windows tweak adapters. Other existing tests still exercise real file operations and protected-path guards; these are not a replacement for an isolated integration environment. A temporary journal directory alone does not isolate Windows. The focused license, IPC, rollback-store and game-session tests use signed fixtures, a mock runtime, temporary stores or fake operations.
+**Run the complete Rust suite and full check in a disposable Windows VM with a snapshot.** The catalogue policy tests now avoid the Windows tweak adapters. Other existing tests still exercise real file operations and protected-path guards; these are not a replacement for an isolated integration environment. A temporary journal directory alone does not isolate Windows. The focused license, IPC, rollback-store and game-session tests use signed fixtures, a mock runtime, temporary stores or fake operations.
 
 Inside the disposable VM:
 

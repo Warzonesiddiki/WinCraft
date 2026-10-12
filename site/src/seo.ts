@@ -58,7 +58,7 @@ export const ROUTE_SEO: Record<string, RouteSeo> = {
   "/terms": {
     title: "WinCraft Terms of Service — Use and Billing",
     description:
-      "The terms governing the WinCraft desktop app, website and subscriptions: licence scope, acceptable use, billing, refunds and service availability.",
+      "The terms governing the WinCraft desktop app and website: the licence it is released under, acceptable use, warranty, liability and service availability.",
     canonical: `${ORIGIN}/terms/`,
     ogType: "website",
   },

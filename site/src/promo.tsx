@@ -1,15 +1,25 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 import { API_BASE } from "./constants";
-import { HalloweenCard, HalloweenStrip } from "../../src/components/halloween-offer";
+import { HalloweenCard } from "../../src/components/halloween-offer";
 // Shared with the desktop app, so both read the server's offer the same way.
-import { msUntil, parsePromo, previewPromo, promoPercent, PROMO_LAYOUT_UNTIL, type Promo, type PromoOffer } from "../../src/promo";
+import {
+  msUntil,
+  parsePromo,
+  previewPromo,
+  promoPercent,
+  PROMO_LAYOUT_UNTIL,
+  type Promo,
+  type PromoOffer,
+} from "../../src/promo";
 
 /** The live promotion, fetched after hydration: the prerendered page always
  *  carries regular prices, and any failure leaves them in place. */
 function usePromoState() {
   const clock = () => ({ perf: performance.now(), wall: Date.now() });
   // undefined until the server has answered once: the panel's room is kept meanwhile.
-  const [received, setReceived] = useState<{ promo: Promo; at: ReturnType<typeof clock> } | null | undefined>(undefined);
+  const [received, setReceived] = useState<
+    { promo: Promo; at: ReturnType<typeof clock> } | null | undefined
+  >(undefined);
   const [now, setNow] = useState(clock);
   const [mounted, setMounted] = useState(false);
   useEffect(() => {
@@ -52,7 +62,6 @@ function usePromoState() {
     /** Room for the panel while the first answer is pending, during the offer window only. */
     // The first render matches the prerendered page; the deadline check waits for mount.
     reserve: received === undefined && (!mounted || now.wall < PROMO_LAYOUT_UNTIL),
-    remaining: active && promo ? msUntil(promo, promo.endsAt, elapsed) : 0,
     offer: (product: string, plan: string): PromoOffer | null =>
       (active && promo?.offers.find((o) => o.product === product && o.plan === plan)) || null,
   };
@@ -61,7 +70,11 @@ function usePromoState() {
 type PromoState = ReturnType<typeof usePromoState>;
 const PromoContext = createContext<PromoState | null>(null);
 
-/** One fetch and one clock for the strip, the hero card, the plans and the Uninstaller page. */
+/** One fetch and one clock for the offer pieces the site still shows — today, the
+ *  Uninstaller page's card. WinCraft's own pages carry no offer: the desktop app has
+ *  no plan to buy, so a discount on one would be selling something that is not for
+ *  sale. The provider stays because the fetch, the deadline check and the re-read
+ *  on return are the same for whatever page does show one. */
 export function PromoProvider({ children }: { children: ReactNode }) {
   return <PromoContext.Provider value={usePromoState()}>{children}</PromoContext.Provider>;
 }
@@ -73,37 +86,19 @@ export function usePromo(): PromoState {
 }
 
 export const euro = (cents: number) =>
-  new Intl.NumberFormat("en-IE", { style: "currency", currency: "EUR", maximumFractionDigits: 2, minimumFractionDigits: cents % 100 ? 2 : 0 }).format(cents / 100);
-
-/** Struck lowest-30-day price, promotional price and the real percentage. */
-export function PromoPrice({ offer, className }: { offer: PromoOffer; className?: string }) {
-  return (
-    <span className={className}>
-      <s className="mr-3 align-middle text-[0.45em] font-medium text-[var(--fg-dim)]">{euro(offer.reference)}</s>
-      {euro(offer.price)}
-      <span className="font-mono-t text-accent ml-3 align-middle text-[0.3em] tracking-wider">−{promoPercent(offer)}%</span>
-    </span>
-  );
-}
-
-export function promoTerms(offer: PromoOffer) {
-  return offer.firstPeriodOnly
-    ? `first ${offer.plan === "monthly" ? "month" : "year"}, then ${euro(offer.regular)} / ${offer.plan === "monthly" ? "month" : "year"}`
-    : "once · no renewal";
-}
+  new Intl.NumberFormat("en-IE", {
+    style: "currency",
+    currency: "EUR",
+    maximumFractionDigits: 2,
+    minimumFractionDigits: cents % 100 ? 2 : 0,
+  }).format(cents / 100);
 
 /** Copy for the offer pieces. The site itself is English-only today; these follow
  *  <html lang> so a European Portuguese version shows pt-PT without further work. */
 const COPY = {
   en: {
     locale: "en-GB",
-    kicker: "Halloween offer",
-    strip: (pct: number) => `Halloween offer · ${pct}% off`,
-    stripShort: (pct: number) => `Halloween · ${pct}% off`,
-    endsIn: "Ends in",
-    units: ["Days", "Hours", "Minutes", "Seconds"] as [string, string, string, string],
     cta: "See the offer",
-    close: "Dismiss the Halloween offer banner",
     tag: "HALLOWEEN",
     lifetime: "Lifetime · one payment",
     firstYear: (then: string) => `First year, then ${then} / year`,
@@ -112,13 +107,7 @@ const COPY = {
   },
   pt: {
     locale: "pt-PT",
-    kicker: "Oferta de Halloween",
-    strip: (pct: number) => `Oferta de Halloween · ${pct}% de desconto`,
-    stripShort: (pct: number) => `Halloween · −${pct}%`,
-    endsIn: "Termina em",
-    units: ["Dias", "Horas", "Minutos", "Segundos"] as [string, string, string, string],
     cta: "Ver a oferta",
-    close: "Fechar o aviso da oferta de Halloween",
     tag: "HALLOWEEN",
     lifetime: "Vitalício · pagamento único",
     firstYear: (then: string) => `Primeiro ano, depois ${then} / ano`,
@@ -140,18 +129,13 @@ function useCopy() {
 
 /** The deadline in the visitor's own time zone, named so it cannot be misread. */
 function endLine(endsAt: string, c = COPY.en) {
-  const end = new Intl.DateTimeFormat(c.locale, { dateStyle: "long", timeStyle: "short" }).format(new Date(Date.parse(endsAt) - 60_000));
+  const end = new Intl.DateTimeFormat(c.locale, { dateStyle: "long", timeStyle: "short" }).format(
+    new Date(Date.parse(endsAt) - 60_000),
+  );
   const zone = new Intl.DateTimeFormat(c.locale, { timeZoneName: "short" })
     .formatToParts(new Date(endsAt))
     .find((p) => p.type === "timeZoneName")?.value;
   return c.ends(`${end}${zone ? ` ${zone}` : ""}`);
-}
-
-/** The smallest real discount among WinCraft's offers: the headline never claims more. */
-function headlinePercent(promo: Promo) {
-  const own = promo.offers.filter((o) => o.product === "wincraft");
-  const list = own.length ? own : promo.offers;
-  return list.length ? Math.min(...list.map(promoPercent)) : 0;
 }
 
 /** Holds a piece's exact room, invisible, while the first answer is pending, so the
@@ -164,32 +148,34 @@ function Reserved({ children }: { children: ReactNode }) {
   );
 }
 
-/** Top-of-page strip, rendered by the nav; nothing without a live offer. */
-export function PromoStrip({ href }: { href: string }) {
-  const { promo, remaining, reserve } = usePromo();
-  const c = useCopy();
-  if (!promo && reserve)
-    return (
-      <Reserved>
-        <HalloweenStrip label={c.strip(50)} shortLabel={c.stripShort(50)} endsIn={c.endsIn} units={c.units} remaining={0} cta={c.cta} href={href} closeLabel={c.close} storageKey="pct-hw-strip:reserved" />
-      </Reserved>
-    );
-  if (!promo) return null;
-  const pct = headlinePercent(promo);
-  if (pct < 1) return null;
-  return <HalloweenStrip key={promo.id} label={c.strip(pct)} shortLabel={c.stripShort(pct)} endsIn={c.endsIn} units={c.units} remaining={remaining} cta={c.cta} href={href} closeLabel={c.close} storageKey={`pct-hw-strip:${promo.id}`} />;
-}
-
-/** Offer card for a page headline: struck reference and promo price, from the server.
- *  Home: WinCraft Lifetime. Uninstaller page: its Pro year. */
-export function PromoCard({ product = "wincraft", plan = "lifetime", href = "#access" }: { product?: string; plan?: string; href?: string }) {
+/** Offer card for a product page's headline: struck reference and promo price, from
+ *  the server. Today only the Uninstaller page renders one, and it passes its own
+ *  product and plan: WinCraft has no plan for a card to price. */
+export function PromoCard({
+  product,
+  plan,
+  href,
+}: {
+  product: string;
+  plan: string;
+  href: string;
+}) {
   const { promo, offer, reserve } = usePromo();
   const c = useCopy();
   const o = offer(product, plan);
   if (!promo && reserve)
     return (
       <Reserved>
-        <HalloweenCard tag={c.tag} plan={plan === "lifetime" ? c.lifetime : c.firstYear("€0.00")} was="€00.00" now="€00.00" pct="−00%" note={c.ends("0 November 0000, 00:00 CET")} cta={c.cta} href={href} />
+        <HalloweenCard
+          tag={c.tag}
+          plan={plan === "lifetime" ? c.lifetime : c.firstYear("€0.00")}
+          was="€00.00"
+          now="€00.00"
+          pct="−00%"
+          note={c.ends("0 November 0000, 00:00 CET")}
+          cta={c.cta}
+          href={href}
+        />
       </Reserved>
     );
   if (!promo || !o) return null;
@@ -214,7 +200,11 @@ export function PromoFine({ className = "" }: { className?: string }) {
   const c = useCopy();
   if (!promo && !reserve) return null;
   return (
-    <p className={className} style={promo ? undefined : { visibility: "hidden" }} aria-hidden={promo ? undefined : true}>
+    <p
+      className={className}
+      style={promo ? undefined : { visibility: "hidden" }}
+      aria-hidden={promo ? undefined : true}
+    >
       {c.fine}
     </p>
   );

@@ -97,7 +97,11 @@ export default function App({ initialPath = "/" }: { initialPath?: string }) {
       page = <AccessibilityPage />;
       break;
     default:
-      page = GUIDES[path] ? <GuidePage path={path} navigate={navigate} /> : <NotFoundPage navigate={navigate} />;
+      page = GUIDES[path] ? (
+        <GuidePage path={path} navigate={navigate} />
+      ) : (
+        <NotFoundPage navigate={navigate} />
+      );
   }
 
   return (
@@ -115,7 +119,7 @@ export default function App({ initialPath = "/" }: { initialPath?: string }) {
         navigate={navigate}
         onSubpage={path !== "/"}
         {...(path === "/uninstaller"
-          ? { downloadHref: UNINSTALLER_DOWNLOAD_EXE, downloadLabel: "Download Uninstaller", offerHref: "#uninstaller-pro" }
+          ? { downloadHref: UNINSTALLER_DOWNLOAD_EXE, downloadLabel: "Download Uninstaller" }
           : {})}
       />
       {page}

@@ -93,13 +93,23 @@ const app = JSON.parse(
 );
 assert.ok(app.softwareVersion, "Software version must be populated");
 assert.equal(app["@type"], "SoftwareApplication");
-// Prices are a factual claim about what a visitor will be charged. Keep them
-// pinned to the plans the pricing section and the FAQ actually state.
+// Prices are a factual claim about what a visitor will be charged, so they are
+// pinned to the plans the page actually states - and the page states one: free.
+// The three paid offers that used to be listed here were the last place on the
+// home page still selling a tier the desktop app does not enforce, and a
+// structured-data claim is the kind that gets quoted without the page around it.
 assert.deepEqual(
-  app.offers.map((offer) => offer.price).sort(),
-  ["0", "59.99", "7.99", "99"].sort(),
+  app.offers.map((offer) => offer.price),
+  ["0"],
   "SoftwareApplication offers must match the published pricing",
 );
+assert.equal(app.offers[0].name, "Free", "The one offer must be the free one");
+// The negative half of the same claim: no paid price may reappear on the home
+// page without this failing. EUR 0 is the price; the Uninstaller page keeps its
+// own, which is a different product on its own page.
+for (const price of ["\u20ac59.99", "\u20ac7.99", "\u20ac99", "\u20ac39.99", "\u20ac49.99"]) {
+  assert.ok(!home.includes(price), `Home page must not advertise a paid plan: ${price}`);
+}
 const uninstallerApp = [...uninstaller.matchAll(/<script type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/g)]
   .map((match) => JSON.parse(match[1]))
   .find((item) => item["@type"] === "SoftwareApplication");

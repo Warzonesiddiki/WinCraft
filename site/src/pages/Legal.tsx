@@ -140,19 +140,28 @@ export function CookiesPage() {
       <h1 className="font-display mb-3 text-[32px] font-bold text-[var(--fg)]">Cookie Policy</h1>
       <p className="mb-5 text-[15px] leading-relaxed text-[var(--fg-dim)]">
         This website sets <strong className="font-semibold text-[var(--fg)]">no cookies</strong> —
-        not for analytics, not for advertising, not for anything else. There is no third-party analytics script
-        on any page, and fonts and images are served from this domain, so visiting the site sends no
-        data to third parties.
+        not for analytics, not for advertising, not for anything else. There is no third-party
+        analytics script on any page, and fonts and images are served from this domain, so visiting
+        the site sends no data to third parties.
       </p>
       <p className="mb-5 text-[15px] leading-relaxed text-[var(--fg-dim)]">
-        The only things stored in your browser are your color-theme preference and, if you dismiss the Halloween offer banner, that choice, kept in{" "}
+        The only thing stored in your browser is your color-theme preference, kept in{" "}
         <code className="font-mono-t rounded bg-white/5 px-1.5 py-0.5 text-[13px]">
           localStorage
         </code>{" "}
-        on your own device. They never leave your browser and you can clear them at any time from
-        your browser settings.
+        on your own device. It never leaves your browser and you can clear it at any time from your
+        browser settings.
       </p>
-      <p className="mb-5 text-[15px] leading-relaxed text-[var(--fg-dim)]">Microsoft Store links can contain a shared campaign label, such as the guide or channel you came from. This is not a personal identifier. The label stays in memory while you browse and is sent to Microsoft only when you follow a Store link. Microsoft reports qualifying campaign page views and acquisitions under its own policies. The same in-memory labels from a social post link (utm_source, utm_medium, utm_campaign, utm_content) are attached only to a tip checkout you start, and counted once if you click the installer download (stored with the time only, no IP or identifier), so we can see which posts lead to downloads and payments.</p>
+      <p className="mb-5 text-[15px] leading-relaxed text-[var(--fg-dim)]">
+        Microsoft Store links can contain a shared campaign label, such as the guide or channel you
+        came from. This is not a personal identifier. The label stays in memory while you browse and
+        is sent to Microsoft only when you follow a Store link. Microsoft reports qualifying
+        campaign page views and acquisitions under its own policies. The same in-memory labels from
+        a social post link (utm_source, utm_medium, utm_campaign, utm_content) are attached only to
+        a tip checkout you start, and counted once if you click the installer download (stored with
+        the time only, no IP or identifier), so we can see which posts lead to downloads and
+        payments.
+      </p>
       <p className="text-[15px] leading-relaxed text-[var(--fg-dim)]">
         Because nothing here requires consent under the ePrivacy directive or the GDPR, the site
         shows no cookie banner — there is nothing to accept or refuse.
