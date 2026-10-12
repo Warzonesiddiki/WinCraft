@@ -10,13 +10,13 @@ export async function loadTranslations() {
         import { SCAN_COPY } from './src/components/scan-copy';
         import { ADVANCED_COPY } from './src/components/advanced-copy';
         import { DEBLOAT_COPY, LIBRARY_COPY, EXTRA_IMPACTS } from './src/components/debloat-copy';
-        import { PRICING_COPY } from './src/components/pricing-copy';
+        import { PROFILE_TOOLS_COPY } from './src/components/profile-tools-copy';
         import { STARTER_COPY } from './src/components/starter-copy';
         import { BEFORE_AFTER_COPY } from './src/components/before-after-copy';
         import { HISTORY_COPY } from './src/components/history-copy';
         const tables = { componentScan: SCAN_COPY, componentAdvanced: ADVANCED_COPY,
           componentDebloat: DEBLOAT_COPY, componentLibrary: LIBRARY_COPY,
-          componentImpacts: EXTRA_IMPACTS, componentPricing: PRICING_COPY,
+          componentImpacts: EXTRA_IMPACTS, componentProfileTools: PROFILE_TOOLS_COPY,
           componentStarter: STARTER_COPY, componentBeforeAfter: BEFORE_AFTER_COPY,
           componentHistory: HISTORY_COPY };
         export const translations = Object.fromEntries(Object.entries(STRINGS).map(([lang, strings]) =>

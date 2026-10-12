@@ -44,9 +44,6 @@ const en = {
   optional: "Optional improvements",
   optionalBody:
     "These inactive settings depend on how you use your PC. Review their trade-offs individually; they are not faults and are not included in Fix all.",
-  proRecommendations: "Recommendations available with Pro",
-  proRecommendationsBody:
-    "These settings match the hardware advice but require Pro. If you already subscribe, sign in to your account.",
   review: "Needs your review",
   empty: "No supported changes to apply.",
   emptyBody:
@@ -172,9 +169,6 @@ export const SCAN_COPY: Record<Lang, Copy> = {
     optional: "Miglioramenti facoltativi",
     optionalBody:
       "Queste impostazioni inattive dipendono da come usi il PC. Valutane gli effetti singolarmente: non sono errori e non rientrano in Correggi tutto.",
-    proRecommendations: "Consigli disponibili con Pro",
-    proRecommendationsBody:
-      "Queste impostazioni corrispondono ai consigli hardware ma richiedono Pro. Se sei già abbonato, accedi al tuo account.",
     review: "Da esaminare",
     empty: "Nessuna modifica supportata da applicare.",
     emptyBody:
@@ -297,9 +291,6 @@ export const SCAN_COPY: Record<Lang, Copy> = {
     optional: "Améliorations facultatives",
     optionalBody:
       "Ces réglages inactifs dépendent de votre usage du PC. Examinez leurs effets individuellement : ce ne sont pas des erreurs et ils sont exclus de Tout corriger.",
-    proRecommendations: "Recommandations disponibles avec Pro",
-    proRecommendationsBody:
-      "Ces réglages correspondent aux conseils matériels mais nécessitent Pro. Si vous êtes déjà abonné, connectez-vous à votre compte.",
     review: "À examiner",
     empty: "Aucune modification prise en charge à appliquer.",
     emptyBody:
@@ -422,9 +413,6 @@ export const SCAN_COPY: Record<Lang, Copy> = {
     optional: "Mejoras opcionales",
     optionalBody:
       "Estos ajustes inactivos dependen de cómo utilizas el PC. Revisa sus efectos individualmente: no son errores ni se incluyen en Corregir todo.",
-    proRecommendations: "Recomendaciones disponibles con Pro",
-    proRecommendationsBody:
-      "Estos ajustes coinciden con los consejos de hardware, pero requieren Pro. Si ya tienes una suscripción, inicia sesión en tu cuenta.",
     review: "Para revisar",
     empty: "No hay cambios compatibles que aplicar.",
     emptyBody:
@@ -547,9 +535,6 @@ export const SCAN_COPY: Record<Lang, Copy> = {
     optional: "Optionale Verbesserungen",
     optionalBody:
       "Diese inaktiven Einstellungen hängen von der PC-Nutzung ab. Prüfe die Auswirkungen einzeln: Sie sind keine Fehler und werden nicht mit Alle beheben angewendet.",
-    proRecommendations: "Empfehlungen für Pro",
-    proRecommendationsBody:
-      "Diese Einstellungen entsprechen den Hardware-Empfehlungen, erfordern aber Pro. Melde dich an, wenn du bereits ein Abonnement hast.",
     review: "Bitte prüfen",
     empty: "Keine unterstützten Änderungen anzuwenden.",
     emptyBody:
@@ -671,9 +656,6 @@ export const SCAN_COPY: Record<Lang, Copy> = {
     optional: "Melhorias opcionais",
     optionalBody:
       "Estas definições inativas dependem da utilização do PC. Analise os efeitos individualmente: não são erros e não entram em Corrigir tudo.",
-    proRecommendations: "Recomendações disponíveis com Pro",
-    proRecommendationsBody:
-      "Estas definições correspondem às recomendações de hardware, mas exigem Pro. Se já tem uma subscrição, inicie sessão na sua conta.",
     review: "Para rever",
     empty: "Nenhuma alteração compatível para aplicar.",
     emptyBody:

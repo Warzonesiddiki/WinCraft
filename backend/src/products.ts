@@ -18,8 +18,36 @@ import { isEntitled, PERPETUAL_PLANS } from "./entitlement";
 export const PRODUCTS = ["wincraft", "uninstaller"] as const;
 export type Product = (typeof PRODUCTS)[number];
 
-export function isKnownProduct(value: unknown): value is Product {
-  return typeof value === "string" && (PRODUCTS as readonly string[]).includes(value);
+/**
+ * Ids the catalogue sold under before the WinCraft rename.
+ *
+ * They are not aliases in the cosmetic sense: rows in `entitlements`, Stripe
+ * checkout metadata written by the old clients, and installed desktop builds
+ * that name their own product id all still say "pctweaker". Dropping the id
+ * outright would strand those customers — a refund webhook would fail to match
+ * its grant, and an existing Uninstaller subscriber's checkout would 400 on a
+ * product the server no longer recognises. So the id stays accepted and always
+ * resolves to its canonical product; nothing new is ever written under it
+ * (`initSchema` rewrites stored rows).
+ */
+export const LEGACY_PRODUCT_IDS = { pctweaker: "wincraft" } as const;
+
+/** Any id the backend acts on: the canonical catalogue plus legacy ids. */
+export type ProductId = Product | keyof typeof LEGACY_PRODUCT_IDS;
+
+/** The canonical product for an accepted id, or null when nothing matches.
+ *  `hasOwnProperty` rather than a plain lookup, so "toString"/"__proto__"
+ *  cannot resolve to a prototype member and be mistaken for a product. */
+export function canonicalProduct(value: unknown): Product | null {
+  if (typeof value !== "string") return null;
+  if ((PRODUCTS as readonly string[]).includes(value)) return value as Product;
+  return Object.prototype.hasOwnProperty.call(LEGACY_PRODUCT_IDS, value)
+    ? LEGACY_PRODUCT_IDS[value as keyof typeof LEGACY_PRODUCT_IDS]
+    : null;
+}
+
+export function isKnownProduct(value: unknown): value is ProductId {
+  return canonicalProduct(value) !== null;
 }
 
 export type ProductEntitlement = {
@@ -50,22 +78,25 @@ export function isProductRowEntitled(row: EntitlementTableRow | null | undefined
 }
 
 /** Resolves one product's entitlement for a user, whichever store backs it. */
-export async function productEntitlement(userId: number | string, product: Product, activateBonus = false): Promise<ProductEntitlement> {
-  if (product === "wincraft") {
+export async function productEntitlement(userId: number | string, product: ProductId, activateBonus = false): Promise<ProductEntitlement> {
+  // A legacy id must read the rows its canonical product owns: "pctweaker" and
+  // "wincraft" are one product with two names, not two products.
+  const canonical = canonicalProduct(product) as Product;
+  if (canonical === "wincraft") {
     const { rows } = await getPool().query(
       "SELECT is_pro, plan, pro_expires_at, legacy_pro_grant FROM users WHERE id = $1",
       [userId],
     );
     const row = rows[0];
     return {
-      product, active: isEntitled(row), plan: row?.plan ?? null,
+      product: canonical, active: isEntitled(row), plan: row?.plan ?? null,
       expiresAt: row?.plan && PERPETUAL_PLANS.has(row.plan) ? null
         : row?.pro_expires_at ? new Date(row.pro_expires_at).toISOString() : null,
     };
   }
   const { rows } = await getPool().query(
     "SELECT plan, expires_at FROM entitlements WHERE user_id = $1 AND product = $2",
-    [userId, product],
+    [userId, canonical],
   );
   const row = rows[0];
   const paidActive = isProductRowEntitled(row);
@@ -83,10 +114,10 @@ export async function productEntitlement(userId: number | string, product: Produ
   const bonusActive = lifetime && bonusExpiry !== null && bonusExpiry.getTime() > Date.now();
   const paidExpiry = row?.expires_at ? new Date(row.expires_at) : null;
   if (paidActive && (row.plan === "lifetime" || !bonusActive || (paidExpiry && paidExpiry >= bonusExpiry!))) {
-    return { product, active: true, plan: row.plan, expiresAt: row.plan === "lifetime" ? null : paidExpiry?.toISOString() };
+    return { product: canonical, active: true, plan: row.plan, expiresAt: row.plan === "lifetime" ? null : paidExpiry?.toISOString() };
   }
-  if (bonusActive) return { product, active: true, plan: "lifetime_bonus", expiresAt: bonusExpiry!.toISOString() };
-  return { product, active: false, plan: row?.plan ?? null, expiresAt: null };
+  if (bonusActive) return { product: canonical, active: true, plan: "lifetime_bonus", expiresAt: bonusExpiry!.toISOString() };
+  return { product: canonical, active: false, plan: row?.plan ?? null, expiresAt: null };
 }
 
 /** All products' entitlements for a user, for account UIs and loyalty pricing. */
@@ -111,7 +142,7 @@ export async function hasAnyActiveEntitlement(userId: number | string): Promise<
  *  only extend, never shorten. */
 export async function upsertEntitlement(
   userId: number | string,
-  product: Product,
+  product: ProductId,
   { plan, expiresAt, stripeSubscriptionId, provisional }: { plan: string | null; expiresAt: Date | null; stripeSubscriptionId?: string | null; provisional?: boolean },
 ): Promise<void> {
   await getPool().query(
@@ -127,7 +158,7 @@ export async function upsertEntitlement(
             END,
             stripe_subscription_id = COALESCE(EXCLUDED.stripe_subscription_id, entitlements.stripe_subscription_id),
             updated_at = now()`,
-    [userId, product, plan, expiresAt, stripeSubscriptionId ?? null, provisional === true],
+    [userId, canonicalProduct(product) as Product, plan, expiresAt, stripeSubscriptionId ?? null, provisional === true],
   );
 }
 
@@ -135,11 +166,11 @@ export async function upsertEntitlement(
  *  The row is kept — history matters for support — but the expiry is now.
  *  Given a subscription, only that subscription's grant ends: a late event
  *  for an old subscription must not cut off the one that replaced it. */
-export async function revokeEntitlement(userId: number | string, product: Product, subscriptionId?: string): Promise<void> {
+export async function revokeEntitlement(userId: number | string, product: ProductId, subscriptionId?: string): Promise<void> {
   await getPool().query(
     `UPDATE entitlements SET expires_at = now(), updated_at = now()
       WHERE user_id = $1 AND product = $2
         AND ($3::text IS NULL OR stripe_subscription_id IS NULL OR stripe_subscription_id = $3)`,
-    [userId, product, subscriptionId ?? null],
+    [userId, canonicalProduct(product) as Product, subscriptionId ?? null],
   );
 }

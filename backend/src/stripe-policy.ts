@@ -1,4 +1,4 @@
-import { isKnownProduct, type Product } from "./products";
+import { canonicalProduct, type Product } from "./products";
 
 /** Missing product metadata is the only legacy case: every checkout created
  * before multi-product support belonged to WinCraft. A present but unknown
@@ -8,7 +8,9 @@ export function productFromMetadata(
 ): Product | null {
   const value = metadata?.product;
   if (value == null || value === "") return "wincraft";
-  return isKnownProduct(value) ? value : null;
+  // Always the canonical id: a checkout created by an older client carries
+  // "pctweaker" and must still resolve to WinCraft's grant.
+  return canonicalProduct(value);
 }
 
 /** A shared Stripe customer does not identify which product was purchased.
@@ -20,14 +22,18 @@ export function billingProductFromEvidence(
   priceIds: string[],
   priceProducts: Record<string, Product | undefined>,
 ): Product | null {
-  const declared = metadata?.product;
-  if (declared && !isKnownProduct(declared)) return null;
-  const products = new Set(priceIds.map((id) => priceProducts[id]).filter(isKnownProduct));
+  const declared = canonicalProduct(metadata?.product);
+  if (metadata?.product && declared === null) return null;
+  const products = new Set(
+    priceIds.map((id) => canonicalProduct(priceProducts[id])).filter((p) => p !== null),
+  );
   if (products.size > 1) return null;
   if (priceIds.length > 1 && priceIds.some((id) => !priceProducts[id])) return null;
   const inferred = [...products][0];
+  // Both sides are canonical here, so a legacy "pctweaker" declaration and a
+  // "wincraft" price agree instead of looking like mixed products.
   if (declared && inferred && declared !== inferred) return null;
-  return inferred ?? (isKnownProduct(declared) ? declared : null);
+  return inferred ?? declared;
 }
 
 /** Checkout completion alone is not proof of payment. Async payment methods

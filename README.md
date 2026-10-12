@@ -237,11 +237,11 @@ Use [support](https://pctweaker.app/support/) or email [support@pctweaker.app](m
 
 Tauri 2 and Rust · React and TypeScript · Express, PostgreSQL and Stripe.
 
-WinCraft is source-available under a **proprietary license**. Public source access does not make it an OSI-approved open-source project or grant unrestricted redistribution rights. See [LICENSE](LICENSE), [PRIVACY.md](PRIVACY.md) and [TERMS.md](TERMS.md).
+WinCraft is free and open source under the **MIT license**: use it, modify it and redistribute it, including commercially. See [LICENSE](LICENSE), [PRIVACY.md](PRIVACY.md) and [TERMS.md](TERMS.md).
 
 Created and maintained by **Aurelio Avila**.
 
-Lifetime includes everything in Pro, plus exclusive access to selected future tweaks, priority support, saved-profile comparison and portable tuning reports. Future exclusive tweaks will arrive in upcoming releases.
+Everything the app can do is available to everyone: every tweak, every tool, no account and no subscription. Saved-profile comparison and portable tuning reports are part of the app.
 
-WinCraft Lifetime includes Uninstaller Pro for 12 months from the first sign-in to Uninstaller with the same account, including existing Lifetime owners. No automatic renewal. Standalone Uninstaller licenses remain separate.
+Entitlements granted before WinCraft became free — including Lifetime — remain honoured on the account that holds them, and the separate Uninstaller product keeps its own licence. Nothing in the app is withheld while that is being wound down.
 

@@ -13,7 +13,7 @@ import type {
 import { ADVANCED_COPY } from "./advanced-copy";
 import { reconcileDownloadState } from "./download-limit-reconcile";
 import { ToolHeader, ToolStatus } from "./tool-section";
-import { Badge, Toggle } from "./ui";
+import { Toggle } from "./ui";
 import "./advanced-controls.css";
 
 export type AdvancedId =
@@ -30,51 +30,24 @@ async function chooseExecutable(label: string) {
 export function AdvancedControlCard({
   id,
   lang,
-  isPro,
-  onRequirePro,
   onChanged,
 }: {
   id: AdvancedId;
   lang: Lang;
-  isPro: boolean;
-  onRequirePro: (title: string) => void;
   onChanged: () => Promise<void>;
 }) {
-  const c = ADVANCED_COPY[lang];
   if (id === "ecoqos_rules")
     return (
       <div className="grid gap-3">
-        <EcoCard
-          lang={lang}
-          isPro={isPro}
-          onRequirePro={() => onRequirePro(c.ecoTitle)}
-          onChanged={onChanged}
-        />
-        <PriorityRulesCard
-          lang={lang}
-          isPro={isPro}
-          onRequirePro={() => onRequirePro(STRINGS[lang].priorityRules.title)}
-        />
+        <EcoCard lang={lang} onChanged={onChanged} />
+        <PriorityRulesCard lang={lang} />
       </div>
     );
-  if (id === "limit_do_background_download")
-    return <DownloadCard lang={lang} isPro={isPro} onRequirePro={() => onRequirePro(c.doTitle)} />;
-  return (
-    <MonitorCard lang={lang} isPro={isPro} onRequirePro={() => onRequirePro(c.monitorTitle)} />
-  );
+  if (id === "limit_do_background_download") return <DownloadCard lang={lang} />;
+  return <MonitorCard lang={lang} />;
 }
 
-function EcoCard({
-  lang,
-  isPro,
-  onRequirePro,
-  onChanged,
-}: {
-  lang: Lang;
-  isPro: boolean;
-  onRequirePro: () => void;
-  onChanged: () => Promise<void>;
-}) {
+function EcoCard({ lang, onChanged }: { lang: Lang; onChanged: () => Promise<void> }) {
   const c = ADVANCED_COPY[lang];
   const [state, setState] = useState<EcoQosState | null>(null);
   const [busy, setBusy] = useState(false);
@@ -87,12 +60,8 @@ function EcoCard({
       .then(setState)
       .catch((e: unknown) => setError(String(e)));
   }, []);
-  async function act(task: () => Promise<unknown>, requiresPro = true) {
+  async function act(task: () => Promise<unknown>) {
     if (busy) return;
-    if (requiresPro && !isPro) {
-      onRequirePro();
-      return;
-    }
     setBusy(true);
     setError(null);
     try {
@@ -107,12 +76,7 @@ function EcoCard({
   return (
     <section className="tool-panel advanced-card" aria-busy={busy}>
       <ToolHeader
-        title={
-          <>
-            {c.ecoTitle}
-            <Badge kind="pro">{STRINGS[lang].badges.pro}</Badge>
-          </>
-        }
+        title={c.ecoTitle}
         description={c.ecoDescription}
         actions={
           <Toggle
@@ -123,10 +87,7 @@ function EcoCard({
             busyLabel={c.working}
             s={STRINGS[lang]}
             onClick={() =>
-              void act(
-                () => invoke("ecoqos_set_enabled", { enabled: !state?.enabled }),
-                !state?.enabled,
-              )
+              void act(() => invoke("ecoqos_set_enabled", { enabled: !state?.enabled }))
             }
           />
         }
@@ -142,7 +103,7 @@ function EcoCard({
               void act(async () => {
                 await invoke("rollback_tweak", { id: "disable_power_throttling" });
                 await onChanged();
-              }, false)
+              })
             }
           >
             {busy && <span className="scan-spinner" aria-hidden="true" />}
@@ -170,7 +131,7 @@ function EcoCard({
         type="button"
         disabled={busy}
         aria-busy={busy}
-        onClick={() => void act(async () => {}, false)}
+        onClick={() => void act(async () => {})}
       >
         {busy ? c.working : c.refresh}
       </button>
@@ -202,9 +163,7 @@ function EcoCard({
                 type="button"
                 disabled={busy}
                 aria-label={`${c.remove}: ${rule.name}`}
-                onClick={() =>
-                  void act(() => invoke("ecoqos_remove_rule", { path: rule.path }), false)
-                }
+                onClick={() => void act(() => invoke("ecoqos_remove_rule", { path: rule.path }))}
               >
                 ×
               </button>
@@ -223,18 +182,10 @@ function EcoCard({
 
 const PRIORITIES: Priority[] = ["idle", "below_normal", "normal", "above_normal", "high"];
 
-/** "Whenever this app runs, give it this priority." Opt-in, Pro, never above
+/** "Whenever this app runs, give it this priority." Opt-in, never above
  *  High, never Windows' own processes or a game that manages its own
  *  performance; the engine and its journal live in process_rules.rs. */
-function PriorityRulesCard({
-  lang,
-  isPro,
-  onRequirePro,
-}: {
-  lang: Lang;
-  isPro: boolean;
-  onRequirePro: () => void;
-}) {
+function PriorityRulesCard({ lang }: { lang: Lang }) {
   const s = STRINGS[lang];
   const c = ADVANCED_COPY[lang];
   const p = s.priorityRules;
@@ -256,12 +207,8 @@ function PriorityRulesCard({
       .then(setState)
       .catch((e: unknown) => setError(friendlyError(e, s)));
   }, [s]);
-  async function act(task: () => Promise<unknown>, requiresPro = true) {
+  async function act(task: () => Promise<unknown>) {
     if (busy) return;
-    if (requiresPro && !isPro) {
-      onRequirePro();
-      return;
-    }
     setBusy(true);
     setError(null);
     try {
@@ -276,12 +223,7 @@ function PriorityRulesCard({
   return (
     <section className="tool-panel advanced-card" aria-busy={busy}>
       <ToolHeader
-        title={
-          <>
-            {p.title}
-            <Badge kind="pro">{STRINGS[lang].badges.pro}</Badge>
-          </>
-        }
+        title={p.title}
         description={p.subtitle}
         actions={
           <Toggle
@@ -291,10 +233,7 @@ function PriorityRulesCard({
             label={p.title}
             s={s}
             onClick={() =>
-              void act(
-                () => invoke("priority_rules_set_enabled", { enabled: !state?.enabled }),
-                !state?.enabled,
-              )
+              void act(() => invoke("priority_rules_set_enabled", { enabled: !state?.enabled }))
             }
           />
         }
@@ -350,9 +289,7 @@ function PriorityRulesCard({
                 type="button"
                 disabled={busy}
                 aria-label={`${p.remove}: ${rule.name}`}
-                onClick={() =>
-                  void act(() => invoke("priority_rules_remove", { path: rule.path }), false)
-                }
+                onClick={() => void act(() => invoke("priority_rules_remove", { path: rule.path }))}
               >
                 ×
               </button>
@@ -369,15 +306,7 @@ function PriorityRulesCard({
   );
 }
 
-function DownloadCard({
-  lang,
-  isPro,
-  onRequirePro,
-}: {
-  lang: Lang;
-  isPro: boolean;
-  onRequirePro: () => void;
-}) {
+function DownloadCard({ lang }: { lang: Lang }) {
   const c = ADVANCED_COPY[lang];
   const [state, setState] = useState<DownloadLimitState | null>(null);
   const [value, setValue] = useState(1024);
@@ -396,11 +325,7 @@ function DownloadCard({
       })
       .catch((e: unknown) => setError(String(e)));
   }, []);
-  async function act(task: () => Promise<DownloadLimitState>, requiresPro = true) {
-    if (requiresPro && !isPro) {
-      onRequirePro();
-      return;
-    }
+  async function act(task: () => Promise<DownloadLimitState>) {
     setBusy(true);
     setError(null);
     try {
@@ -423,15 +348,7 @@ function DownloadCard({
   const valid = Number.isInteger(value) && value >= 1 && value <= 1_000_000;
   return (
     <section className="tool-panel advanced-card" aria-busy={busy}>
-      <ToolHeader
-        title={
-          <>
-            {c.doTitle}
-            <Badge kind="pro">{STRINGS[lang].badges.pro}</Badge>
-          </>
-        }
-        description={c.doDescription}
-      />
+      <ToolHeader title={c.doTitle} description={c.doDescription} />
       {state && !state.supported && <ToolStatus tone="error">{c.doUnsupported}</ToolStatus>}
       {state?.conflict && <ToolStatus tone="error">{state.conflict}</ToolStatus>}
       <div className="advanced-facts">
@@ -477,9 +394,7 @@ function DownloadCard({
         <button
           type="button"
           disabled={busy || !state?.applied}
-          onClick={() =>
-            void act(() => invoke<DownloadLimitState>("restore_download_limit"), false)
-          }
+          onClick={() => void act(() => invoke<DownloadLimitState>("restore_download_limit"))}
         >
           {c.doRestore}
         </button>
@@ -502,15 +417,7 @@ function DownloadCard({
   );
 }
 
-function MonitorCard({
-  lang,
-  isPro,
-  onRequirePro,
-}: {
-  lang: Lang;
-  isPro: boolean;
-  onRequirePro: () => void;
-}) {
+function MonitorCard({ lang }: { lang: Lang }) {
   const c = ADVANCED_COPY[lang];
   const [state, setState] = useState<MonitorProfilesState | null>(null);
   const [displayId, setDisplayId] = useState("");
@@ -554,11 +461,7 @@ function MonitorCard({
       window.clearTimeout(reload);
     };
   }, [state?.deadline_ms]);
-  async function act(task: () => Promise<unknown>, requiresPro = true) {
-    if (requiresPro && !isPro) {
-      onRequirePro();
-      return;
-    }
+  async function act(task: () => Promise<unknown>) {
     setBusy(true);
     setError(null);
     try {
@@ -577,12 +480,7 @@ function MonitorCard({
   return (
     <section className="tool-panel advanced-card" aria-busy={busy}>
       <ToolHeader
-        title={
-          <>
-            {c.monitorTitle}
-            <Badge kind="pro">{STRINGS[lang].badges.pro}</Badge>
-          </>
-        }
+        title={c.monitorTitle}
         description={c.monitorDescription}
         actions={
           <Toggle
@@ -593,10 +491,7 @@ function MonitorCard({
             s={STRINGS[lang]}
             busyLabel={c.working}
             onClick={() =>
-              void act(
-                () => invoke("monitor_set_enabled", { enabled: !state?.enabled }),
-                !state?.enabled,
-              )
+              void act(() => invoke("monitor_set_enabled", { enabled: !state?.enabled }))
             }
           />
         }
@@ -670,7 +565,7 @@ function MonitorCard({
           onClick={() =>
             void act(async () => {
               await invoke("monitor_restore");
-            }, false)
+            })
           }
         >
           {c.monitorRestore}
@@ -728,9 +623,7 @@ function MonitorCard({
                 type="button"
                 disabled={busy}
                 aria-label={`${c.remove}: ${rule.name}`}
-                onClick={() =>
-                  void act(() => invoke("monitor_remove_rule", { path: rule.path }), false)
-                }
+                onClick={() => void act(() => invoke("monitor_remove_rule", { path: rule.path }))}
               >
                 ×
               </button>

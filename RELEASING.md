@@ -13,6 +13,26 @@ Official releases are built locally and published by Aurelio Avila. CI verificat
 9. Update every public listing with the release, not only the package. Microsoft Store: refresh `scripts/store/listing/<language>.json` (short description, description, features, keywords, what's new, screenshot captions) in every listed language (Portuguese is European Portuguese, pt-PT, never Brazilian), and capture new screenshots of the release build with real data (1920x1080 PNG, up to 10, no user names, private paths or e-mail addresses). Submit them with the package (`-ListingDir scripts/store/listing -Screenshots <dir>`); if a submission is still in certification, submit `-ListingOnly` as soon as it is published, never with `-ReplacePending`. `npm run check:public-counts` fails when the README, the site or the Store listing state a catalog count other than the shipped one. Also review the site hero and Open Graph images, the GitHub repository description, the winget description and other directory listings.
 10. Download the public artifacts and compare hashes with the verified local files. Verify stable aliases, updater manifest, website and backend. Check the Winget workflow and upstream PR; submission is not the same as catalog availability. State the actual PR status.
 
+## Forks: updates and signing keys
+
+The updater endpoint and public key in `src-tauri/tauri.conf.json` belong to the
+upstream project (`AurelioAvila/pc-tweaker-app`). Installed clients verify every
+update package against that public key, so a fork has two options and no third
+one:
+
+- **Track upstream**: keep both values unchanged. The fork's own tagged builds
+  are then never delivered as updates — installed apps keep updating from
+  upstream releases, which are signed by the upstream key.
+- **Publish your own**: generate a key pair with `npx tauri signer generate`,
+  set `plugins.updater.pubkey` and `plugins.updater.endpoints` to your own
+  repository and `latest.json`, and accept that clients on the old key will stop
+  receiving updates from you. An endpoint change without a matching key change
+  makes every update fail verification, which the app reports as an update
+  error rather than installing anything.
+
+Version numbers must stay monotonically increasing across both paths: an
+installed client only accepts an update whose version is higher than its own.
+
 ## Recovery and commerce checks
 
 - Failed setting writes retain recovery records. Unsupported targets and overlapping or ambiguous legacy records must fail before mutation.

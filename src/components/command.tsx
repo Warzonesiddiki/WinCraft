@@ -50,7 +50,9 @@ export function usePulseSamples(): PulseSample[] {
         });
     };
     tick();
-    const id = window.setInterval(() => { if (!document.hidden) tick(); }, SAMPLE_EVERY_MS);
+    const id = window.setInterval(() => {
+      if (!document.hidden) tick();
+    }, SAMPLE_EVERY_MS);
     return () => {
       alive = false;
       window.clearInterval(id);
@@ -370,15 +372,11 @@ export function MemoryPressure({
 export function SessionProfiles({
   s,
   tweaks,
-  isPro,
-  onRequirePro,
   onToggleGame,
   gameBusy,
 }: {
   s: Strings;
   tweaks: TweakInfo[];
-  isPro: boolean;
-  onRequirePro: () => void;
   onToggleGame: () => Promise<void>;
   gameBusy: boolean;
 }) {
@@ -458,11 +456,6 @@ export function SessionProfiles({
               </button>
               <button
                 onClick={() => {
-                  if (!isPro && game?.requires_pro) {
-                    setPreview(false);
-                    onRequirePro();
-                    return;
-                  }
                   setPreview(false);
                   void onToggleGame();
                 }}

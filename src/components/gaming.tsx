@@ -17,7 +17,7 @@ import {
 } from "../lib";
 import { CoreSteeringStatus, GameEntry, Toast } from "../types";
 import { BoltIcon } from "./icons";
-import { Badge, Toggle } from "./ui";
+import { Toggle } from "./ui";
 import {
   Spark,
   UsersList,
@@ -28,15 +28,7 @@ import {
 import { ema, push } from "../live-metrics";
 import type { LiveSample } from "../live-metrics";
 
-export function GameSessionsPanel({
-  s,
-  isPro,
-  onRequirePro,
-}: {
-  s: Strings;
-  isPro: boolean;
-  onRequirePro: () => void;
-}) {
+export function GameSessionsPanel({ s }: { s: Strings }) {
   const [enabled, setEnabled] = useState(false);
   const [games, setGames] = useState<GameEntry[]>([]);
   const [steering, setSteering] = useState<CoreSteeringStatus | null>(null);
@@ -65,6 +57,8 @@ export function GameSessionsPanel({
   }
 
   useEffect(() => {
+    // Mount-time load; every setState in refresh() lands after its await.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     refresh().catch((reason: unknown) => setError(String(reason)));
     refreshSteering();
     const unlisten = listen<{ active: boolean; name: string | null }>(
@@ -81,10 +75,6 @@ export function GameSessionsPanel({
   }, []);
 
   async function toggleEnabled() {
-    if (!isPro && !enabled) {
-      onRequirePro();
-      return;
-    }
     const next = !enabled;
     await invoke("set_game_sessions_enabled", { enabled: next });
     setEnabled(next);
@@ -92,10 +82,6 @@ export function GameSessionsPanel({
 
   async function toggleSteering() {
     if (!steering) return;
-    if (!isPro && !steering.enabled) {
-      onRequirePro();
-      return;
-    }
     await invoke("set_core_steering", { enabled: !steering.enabled });
     setSteering({ ...steering, enabled: !steering.enabled });
     // The watcher applies or restores on its next pass (every 3 s).
@@ -117,17 +103,15 @@ export function GameSessionsPanel({
   const steeringLive = Boolean(activeGame && steering?.enabled);
   useEffect(() => {
     if (!steeringLive) return;
-    const timer = window.setInterval(() => { if (!document.hidden) refreshSteering(); }, 5000);
+    const timer = window.setInterval(() => {
+      if (!document.hidden) refreshSteering();
+    }, 5000);
     return () => window.clearInterval(timer);
   }, [steeringLive]);
 
   const steeringIdle = !enabled || games.length === 0;
 
   async function addGame() {
-    if (!isPro) {
-      onRequirePro();
-      return;
-    }
     const path = await openFolderDialog({
       multiple: false,
       filters: [{ name: "Windows executable", extensions: ["exe"] }],
@@ -158,12 +142,7 @@ export function GameSessionsPanel({
   return (
     <section className="tool-panel tool-session-panel" aria-busy={pending}>
       <ToolHeader
-        title={
-          <>
-            {s.gameSessions.title}
-            <Badge kind="pro">{s.badges.pro}</Badge>
-          </>
-        }
+        title={s.gameSessions.title}
         description={s.gameSessions.subtitle}
         actions={
           <Toggle
@@ -489,7 +468,9 @@ export function TurboBoostPanel({
         });
     };
     tick();
-    const id = window.setInterval(() => { if (!document.hidden) tick(); }, 1000);
+    const id = window.setInterval(() => {
+      if (!document.hidden) tick();
+    }, 1000);
     return () => {
       cancelled = true;
       window.clearInterval(id);
@@ -745,9 +726,17 @@ export function TurboBoostPanel({
         <table>
           <thead>
             <tr>
-              <th />
-              <th data-active={!applied}>{s.turboBoost.colDefault}</th>
-              <th data-active={applied}>{s.turboBoost.colBoost}</th>
+              {/* The corner belongs to no column: it is the row-label column's
+                  own header, and an empty <th> is announced as an unnamed
+                  column by a screen reader (and flagged by axe). A <td> says
+                  what it is — nothing. */}
+              <td />
+              <th scope="col" data-active={!applied}>
+                {s.turboBoost.colDefault}
+              </th>
+              <th scope="col" data-active={applied}>
+                {s.turboBoost.colBoost}
+              </th>
             </tr>
           </thead>
           <tbody>

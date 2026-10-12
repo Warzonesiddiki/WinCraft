@@ -91,6 +91,8 @@ export function StartupManager({
   }
 
   useEffect(() => {
+    // Mount-time load; every setState in refresh() lands after its await.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     refresh().catch((e) => pushToast("error", String(e)));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -291,6 +293,8 @@ export function ScheduledTaskManager({
   }
 
   useEffect(() => {
+    // Mount-time load; every setState in refresh() lands after its await.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     refresh().catch((e) => pushToast("error", String(e)));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

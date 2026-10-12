@@ -10,14 +10,12 @@ export function StarterProfiles({
   s,
   lang,
   tweaks,
-  isPro,
   busy,
   onApply,
 }: {
   s: Strings;
   lang: Lang;
   tweaks: TweakInfo[];
-  isPro: boolean;
   busy: boolean;
   onApply: (profile: TweakProfile) => Promise<void>;
 }) {
@@ -30,12 +28,7 @@ export function StarterProfiles({
   );
   const preset = STARTER_PRESETS.find((p) => p.id === current)!;
   const selection = selections[current];
-  const { available, missing, pending, unsupported } = presetSelection(
-    preset,
-    tweaks,
-    selection,
-    isPro,
-  );
+  const { available, missing, pending, unsupported } = presetSelection(preset, tweaks, selection);
   // Selected, not yet applied, but this PC's Windows does not support it.
   const onlyUnsupported = selection.some(
     (id) => unsupported.includes(id) && !available.find((t) => t.id === id)?.applied,

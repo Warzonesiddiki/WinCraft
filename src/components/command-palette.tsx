@@ -30,7 +30,6 @@ type Command = {
 export function CommandPalette({
   s,
   tweaks,
-  open,
   onClose,
   onNavigate,
   onToggleTweak,
@@ -40,7 +39,6 @@ export function CommandPalette({
 }: {
   s: Strings;
   tweaks: TweakInfo[];
-  open: boolean;
   onClose: () => void;
   onNavigate: (section: Section) => void;
   onToggleTweak: (tweak: TweakInfo) => void;
@@ -55,24 +53,110 @@ export function CommandPalette({
 
   const commands = useMemo<Command[]>(() => {
     const nav: Command[] = [
-      { id: "nav-scan", label: s.tabs.scan, icon: "🔍", action: { kind: "navigate", section: "scan" } },
-      { id: "nav-overview", label: s.tabs.overview, icon: "📊", action: { kind: "navigate", section: "overview" } },
-      { id: "nav-health", label: s.tabs.health, icon: "💚", action: { kind: "navigate", section: "health" } },
-      { id: "nav-hardware", label: s.tabs.hardware, icon: "🖥️", action: { kind: "navigate", section: "hardware" } },
-      { id: "nav-performance", label: s.tabs.performance, icon: "⚡", action: { kind: "navigate", section: "performance" } },
-      { id: "nav-gaming", label: s.tabs.gaming, icon: "🎮", action: { kind: "navigate", section: "gaming" } },
-      { id: "nav-privacy", label: s.tabs.privacy, icon: "🔒", action: { kind: "navigate", section: "privacy" } },
-      { id: "nav-startup", label: s.tabs.startup, icon: "🚀", action: { kind: "navigate", section: "startup" } },
-      { id: "nav-debloat", label: "Debloat", icon: "🧹", action: { kind: "navigate", section: "debloat" } },
+      {
+        id: "nav-scan",
+        label: s.tabs.scan,
+        icon: "🔍",
+        action: { kind: "navigate", section: "scan" },
+      },
+      {
+        id: "nav-overview",
+        label: s.tabs.overview,
+        icon: "📊",
+        action: { kind: "navigate", section: "overview" },
+      },
+      {
+        id: "nav-health",
+        label: s.tabs.health,
+        icon: "💚",
+        action: { kind: "navigate", section: "health" },
+      },
+      {
+        id: "nav-hardware",
+        label: s.tabs.hardware,
+        icon: "🖥️",
+        action: { kind: "navigate", section: "hardware" },
+      },
+      {
+        id: "nav-performance",
+        label: s.tabs.performance,
+        icon: "⚡",
+        action: { kind: "navigate", section: "performance" },
+      },
+      {
+        id: "nav-gaming",
+        label: s.tabs.gaming,
+        icon: "🎮",
+        action: { kind: "navigate", section: "gaming" },
+      },
+      {
+        id: "nav-privacy",
+        label: s.tabs.privacy,
+        icon: "🔒",
+        action: { kind: "navigate", section: "privacy" },
+      },
+      {
+        id: "nav-startup",
+        label: s.tabs.startup,
+        icon: "🚀",
+        action: { kind: "navigate", section: "startup" },
+      },
+      {
+        id: "nav-debloat",
+        label: "Debloat",
+        icon: "🧹",
+        action: { kind: "navigate", section: "debloat" },
+      },
       { id: "nav-ui", label: s.tabs.ui, icon: "🎨", action: { kind: "navigate", section: "ui" } },
-      { id: "nav-maintenance", label: s.tabs.maintenance, icon: "🔧", action: { kind: "navigate", section: "maintenance" } },
-      { id: "nav-profiles", label: s.tabs.profiles, icon: "📁", action: { kind: "navigate", section: "profiles" } },
+      {
+        id: "nav-maintenance",
+        label: s.tabs.maintenance,
+        icon: "🔧",
+        action: { kind: "navigate", section: "maintenance" },
+      },
+      {
+        id: "nav-profiles",
+        label: s.tabs.profiles,
+        icon: "📁",
+        action: { kind: "navigate", section: "profiles" },
+      },
     ];
 
     const actions: Command[] = [
-      { id: "action-scan", label: s.command?.runScan ?? "Run Scan", icon: "▶️", shortcut: "Ctrl+Shift+S", action: { kind: "action", id: "scan", label: s.command?.runScan ?? "Run Scan", run: onScan } },
-      { id: "action-restore", label: s.restore?.button ?? "Restore All", icon: "↩️", action: { kind: "action", id: "restore", label: s.restore?.button ?? "Restore All", run: onRestoreAll } },
-      { id: "action-profiles", label: s.profiles?.title ?? "Profiles", icon: "📁", action: { kind: "action", id: "profiles", label: s.profiles?.title ?? "Profiles", run: onOpenProfiles } },
+      {
+        id: "action-scan",
+        label: s.command?.runScan ?? "Run Scan",
+        icon: "▶️",
+        shortcut: "Ctrl+Shift+S",
+        action: {
+          kind: "action",
+          id: "scan",
+          label: s.command?.runScan ?? "Run Scan",
+          run: onScan,
+        },
+      },
+      {
+        id: "action-restore",
+        label: s.restore?.button ?? "Restore All",
+        icon: "↩️",
+        action: {
+          kind: "action",
+          id: "restore",
+          label: s.restore?.button ?? "Restore All",
+          run: onRestoreAll,
+        },
+      },
+      {
+        id: "action-profiles",
+        label: s.profiles?.title ?? "Profiles",
+        icon: "📁",
+        action: {
+          kind: "action",
+          id: "profiles",
+          label: s.profiles?.title ?? "Profiles",
+          run: onOpenProfiles,
+        },
+      },
     ];
 
     const tweakCommands: Command[] = tweaks
@@ -118,15 +202,13 @@ export function CommandPalette({
     return scored.slice(0, 12);
   }, [commands, query]);
 
-  // Reset state when opening
+  // The palette is mounted only while it is open (the caller renders it
+  // conditionally), so the query and the cursor start fresh on every open
+  // without a reset-in-effect pass. Focus is the one thing left to do.
   useEffect(() => {
-    if (open) {
-      setQuery("");
-      setActiveIndex(0);
-      // Focus after render
-      requestAnimationFrame(() => inputRef.current?.focus());
-    }
-  }, [open]);
+    const frame = requestAnimationFrame(() => inputRef.current?.focus());
+    return () => cancelAnimationFrame(frame);
+  }, []);
 
   // Keep active item in view
   useEffect(() => {
@@ -178,8 +260,6 @@ export function CommandPalette({
     }
   }
 
-  if (!open) return null;
-
   return (
     <div
       className="fixed inset-0 z-[100] flex items-start justify-center pt-[15vh]"
@@ -188,7 +268,7 @@ export function CommandPalette({
       }}
     >
       {/* Backdrop */}
-      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" />
+      <div className="absolute inset-0 bg-scrim/50 backdrop-blur-sm" />
 
       {/* Palette */}
       <div
@@ -199,7 +279,12 @@ export function CommandPalette({
       >
         {/* Search input */}
         <div className="flex items-center gap-3 border-b border-line px-4 py-3">
-          <svg viewBox="0 0 24 24" className="h-5 w-5 shrink-0 text-ink-3" fill="none" aria-hidden="true">
+          <svg
+            viewBox="0 0 24 24"
+            className="h-5 w-5 shrink-0 text-ink-3"
+            fill="none"
+            aria-hidden="true"
+          >
             <path
               d="m21 21-4.3-4.3M10.5 18a7.5 7.5 0 1 1 0-15 7.5 7.5 0 0 1 0 15Z"
               stroke="currentColor"
@@ -229,7 +314,7 @@ export function CommandPalette({
         <div ref={listRef} className="max-h-80 overflow-y-auto p-1.5">
           {filtered.length === 0 ? (
             <p className="px-3 py-8 text-center text-sm text-ink-3">
-              {format(s.search?.noResults ?? "No results for \"{query}\"", { query: query.trim() })}
+              {format(s.search?.noResults ?? 'No results for "{query}"', { query: query.trim() })}
             </p>
           ) : (
             filtered.map((cmd, i) => (
@@ -240,7 +325,9 @@ export function CommandPalette({
                 onClick={() => execute(cmd)}
                 onMouseEnter={() => setActiveIndex(i)}
                 className={`flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left transition-colors ${
-                  i === activeIndex ? "bg-accent-soft text-ink" : "text-ink-2 hover:bg-surface-hover"
+                  i === activeIndex
+                    ? "bg-accent-soft text-ink"
+                    : "text-ink-2 hover:bg-surface-hover"
                 }`}
               >
                 <span className="shrink-0 text-base" aria-hidden="true">

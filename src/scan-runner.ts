@@ -232,13 +232,11 @@ export function unknownSecuritySignals(report: ScanReport): string[] {
 }
 
 /** Optional toggles are not defects: bulk fixes require current hardware advice. */
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export function recommendedTweaks(report: ScanReport, _isPro: boolean): TweakInfo[] {
+export function recommendedTweaks(report: ScanReport): TweakInfo[] {
   const allowed = new Set(report.ids ?? []);
   const advised = new Set(
     (report.advice ?? []).filter((a) => a.verdict === "recommended").map((a) => a.id),
   );
-  // WinCraft is free for everyone — no tweak is gated by license.
   return (report.tweaks ?? []).filter(
     (t) =>
       allowed.has(t.id) &&
@@ -265,22 +263,15 @@ export function optionalScanTweaks(report: ScanReport): TweakInfo[] {
   );
 }
 
-export async function applyScanSelection(
-  call: Call,
-  report: ScanReport,
-  _isPro: boolean,
-  selected: string[],
-) {
+export async function applyScanSelection(call: Call, report: ScanReport, selected: string[]) {
   // Re-read eligibility before any write. A failed read aborts the batch.
   const [tweaks, ids] = await Promise.all([
     call<TweakInfo[]>("list_tweaks"),
     call<string[]>("scan_relevant_ids"),
   ]);
   const advice = await call<TweakAdvice[]>("advise_tweaks", { ids });
-  const eligible = new Set(
-    recommendedTweaks({ ...report, tweaks, ids, advice }, _isPro).map((t) => t.id),
-  );
-  const originallyOffered = new Set(recommendedTweaks(report, _isPro).map((t) => t.id));
+  const eligible = new Set(recommendedTweaks({ ...report, tweaks, ids, advice }).map((t) => t.id));
+  const originallyOffered = new Set(recommendedTweaks(report).map((t) => t.id));
   const requested = [...new Set(selected)].filter((id) => originallyOffered.has(id));
   const apply = requested.filter((id) => eligible.has(id));
   const skipped = requested.filter((id) => !eligible.has(id));

@@ -39,9 +39,9 @@ test("the offer ends at 23:59:59 on 6 November, Rome time", () => {
 // Prices charged to the public, from live Stripe Checkout Sessions and the
 // configuration changes of 14 September (UTC). [from, until, cents]
 const HISTORY = {
-  "pctweaker:lifetime": [["2026-08-31T01:24Z", "2026-09-07T22:36Z", 7499], ["2026-09-07T22:36Z", "2026-09-11T08:24Z", 8999], ["2026-09-11T08:24Z", "2026-09-14T02:06Z", 7999], ["2026-09-14T02:06Z", null, 9900]],
-  "pctweaker:annual": [["2026-08-03T11:35Z", "2026-09-14T02:03Z", 5900], ["2026-09-14T02:03Z", "2026-09-14T02:20Z", 4999], ["2026-09-14T02:20Z", null, 5999]],
-  "pctweaker:monthly": [["2026-08-03T11:33Z", "2026-09-14T02:03Z", 999], ["2026-09-14T02:03Z", null, 799]],
+  "wincraft:lifetime": [["2026-08-31T01:24Z", "2026-09-07T22:36Z", 7499], ["2026-09-07T22:36Z", "2026-09-11T08:24Z", 8999], ["2026-09-11T08:24Z", "2026-09-14T02:06Z", 7999], ["2026-09-14T02:06Z", null, 9900]],
+  "wincraft:annual": [["2026-08-03T11:35Z", "2026-09-14T02:03Z", 5900], ["2026-09-14T02:03Z", "2026-09-14T02:20Z", 4999], ["2026-09-14T02:20Z", null, 5999]],
+  "wincraft:monthly": [["2026-08-03T11:33Z", "2026-09-14T02:03Z", 999], ["2026-09-14T02:03Z", null, 799]],
   "uninstaller:annual": [["2026-08-19T23:59Z", null, 999]],
 };
 // Owner rule: the highest price at or below half the reference that ends in
@@ -90,7 +90,7 @@ test("simulated clock: nothing before the start, every offer during, nothing fro
     assert.equal(state.offers.length, 4);
     assert.equal(state.endsAt, PROMO.endsAt);
     assert.deepEqual(state.offers.find((o) => o.plan === "lifetime"),
-      { product: "pctweaker", plan: "lifetime", currency: "eur", regular: 9900, reference: 7999, price: 3999, percentOff: 50, firstPeriodOnly: false });
+      { product: "wincraft", plan: "lifetime", currency: "eur", regular: 9900, reference: 7999, price: 3999, percentOff: 50, firstPeriodOnly: false });
     assert.equal(state.offers.find((o) => o.plan === "monthly").firstPeriodOnly, true);
   }
   for (const now of [END, END + 86_400_000, Date.parse("2027-10-31T12:00:00Z")]) {

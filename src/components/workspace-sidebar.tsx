@@ -3,7 +3,7 @@ import type { Strings } from "../i18n";
 import type { Section } from "../types";
 import { NAV_ACCENT } from "../categories";
 import { CoffeeCard } from "./coffee";
-import { CrownIcon, GemIcon } from "./icons";
+import { GemIcon } from "./icons";
 
 type NavigationItem = { key: Section; label: string; icon: ReactNode };
 
@@ -11,7 +11,6 @@ export function WorkspaceSidebar({
   s,
   items,
   active,
-  isPro,
   showHistory,
   onNavigate,
   onTip,
@@ -19,7 +18,6 @@ export function WorkspaceSidebar({
   s: Strings;
   items: NavigationItem[];
   active: Section;
-  isPro: boolean;
   showHistory: boolean;
   onNavigate: (section: Section) => void;
   onTip: (quantity: number) => Promise<void>;
@@ -79,13 +77,10 @@ export function WorkspaceSidebar({
           className="workspace-plan-link nav-item flex w-full items-center gap-2.5 rounded-[8px] px-3 py-2 text-left text-[13px] font-semibold text-ink"
         >
           {/* One entry for plans: a second "Upgrade to Pro" row led to the
-              same screen and pushed Startup and Maintenance out of view. */}
-          {isPro ? (
-            <CrownIcon className="h-[18px] w-[18px] shrink-0 text-accent" />
-          ) : (
-            <GemIcon className="h-[18px] w-[18px] shrink-0 text-accent" />
-          )}
-          <span>{isPro ? s.menu.planPro : s.tabs.pricing}</span>
+              same screen and pushed Startup and Maintenance out of view. The
+              page states what is included now that nothing is sold there. */}
+          <GemIcon className="h-[18px] w-[18px] shrink-0 text-accent" />
+          <span>{s.tabs.pricing}</span>
         </button>
         <CoffeeCard s={s} onTip={(quantity) => void onTip(quantity)} />
       </div>

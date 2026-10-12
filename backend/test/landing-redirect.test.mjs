@@ -36,7 +36,7 @@ test("only the retired landing redirects; service routes remain available", { ti
     for (const suffix of ["/", "/?code=do-not-forward&redirect=https://example.com"]) {
       const response = await fetch(base + suffix, { method, redirect: "manual" });
       assert.equal(response.status, 301);
-      assert.equal(response.headers.get("location"), "https://pctweaker.app/");
+      assert.equal(response.headers.get("location"), "https://wincraft.app/");
       assert.ok(response.headers.get("content-security-policy"));
     }
   }

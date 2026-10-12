@@ -3,8 +3,7 @@ import { listen } from "@tauri-apps/api/event";
 import { invoke } from "@tauri-apps/api/core";
 import { check as checkForUpdate, type Update } from "@tauri-apps/plugin-updater";
 import { relaunch } from "@tauri-apps/plugin-process";
-import { format, Lang, Strings } from "../i18n";
-import { money, PRICE_ANNUAL, PRICE_LIFETIME, PRICE_MONTHLY } from "../lib";
+import { format, Strings } from "../i18n";
 import { Toast } from "../types";
 import { CrownIcon } from "./icons";
 
@@ -15,7 +14,7 @@ import { CrownIcon } from "./icons";
  * `className` is for layout only (e.g. hiding it on narrow windows).
  */
 export type BadgeKind =
-  "pro" | "admin" | "info" | "neutral" | "muted" | "accent" | "ok" | "warn" | "caution" | "danger";
+  "admin" | "info" | "neutral" | "muted" | "accent" | "ok" | "warn" | "caution" | "danger";
 
 export function Badge({
   kind = "neutral",
@@ -30,14 +29,12 @@ export function Badge({
 }) {
   return (
     <span className={className ? `badge ${className}` : "badge"} data-kind={kind} title={title}>
-      {kind === "pro" && <BadgeIcon d={STAR} fill />}
       {kind === "admin" && <BadgeIcon d={SHIELD} />}
       {children}
     </span>
   );
 }
 
-const STAR = "m12 2 2.7 6.6L21 9l-5 4.5L17.3 21 12 17.3 6.7 21 8 13.5 3 9l6.3-.4Z";
 const SHIELD = "M12 3 5 6v5c0 4.4 3 8.4 7 10 4-1.6 7-5.6 7-10V6l-7-3Z";
 
 function BadgeIcon({ d, fill = false }: { d: string; fill?: boolean }) {
@@ -149,95 +146,6 @@ export function Toggle({
         </span>
       </span>
     </button>
-  );
-}
-
-export function PaywallModal({
-  s,
-  lang,
-  featureName,
-  onClose,
-  onNotify,
-}: {
-  s: Strings;
-  lang: Lang;
-  featureName: string;
-  onClose: () => void;
-  onNotify: () => void;
-}) {
-  const dialog = useRef<HTMLDialogElement>(null);
-  useEffect(() => {
-    const element = dialog.current;
-    const previousFocus = document.activeElement;
-    element?.showModal();
-    return () => {
-      element?.close();
-      if (previousFocus instanceof HTMLElement && previousFocus.isConnected) previousFocus.focus();
-    };
-  }, []);
-
-  return (
-    <dialog
-      ref={dialog}
-      className="pro-feature-dialog"
-      aria-labelledby="pro-feature-title"
-      aria-describedby="pro-feature-description"
-      onCancel={(event) => {
-        event.preventDefault();
-        onClose();
-      }}
-      onClick={(event) => {
-        if (event.target !== event.currentTarget) return;
-        const bounds = event.currentTarget.getBoundingClientRect();
-        if (
-          event.clientX < bounds.left ||
-          event.clientX > bounds.right ||
-          event.clientY < bounds.top ||
-          event.clientY > bounds.bottom
-        )
-          onClose();
-      }}
-    >
-      <header className="pro-feature-header">
-        <span className="pro-feature-brand">
-          <CrownIcon className="h-4 w-4" /> WinCraft Pro
-        </span>
-        <button className="pro-feature-close" onClick={onClose} aria-label={s.paywall.notNow}>
-          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-            <path
-              d="m6 6 12 12M6 18 18 6"
-              stroke="currentColor"
-              strokeWidth="1.7"
-              strokeLinecap="round"
-            />
-          </svg>
-        </button>
-      </header>
-      <div className="pro-feature-content">
-        <span className="pro-feature-eyebrow">{s.paywall.title}</span>
-        <h2 id="pro-feature-title">{featureName}</h2>
-        <p id="pro-feature-description">{format(s.paywall.body, { feature: featureName })}</p>
-        {/* Lifetime leads because it is what people actually buy; the
-            subscriptions follow so nobody has to open the plans to learn
-            the price of the thing they just tried to use. */}
-        <p className="pro-feature-price">
-          {format(s.paywall.priceLine, {
-            lifetime: money(PRICE_LIFETIME, lang),
-            annual: money(PRICE_ANNUAL, lang),
-            monthly: money(PRICE_MONTHLY, lang),
-          })}
-        </p>
-      </div>
-      <footer className="pro-feature-actions">
-        <button onClick={onNotify} className="tool-primary-action">
-          {s.paywall.unlock}
-          <span aria-hidden="true">→</span>
-        </button>
-        <button onClick={onClose} className="tool-secondary-action">
-          {s.paywall.notNow}
-        </button>
-      </footer>
-    </dialog>
   );
 }
 

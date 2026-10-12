@@ -4,7 +4,14 @@ import Stripe from "stripe";
 import { getPool, isConfigured } from "../db";
 import { requireAuth } from "../auth";
 import { periodEndFromSubscription } from "../entitlement";
-import { isKnownProduct, productEntitlement, upsertEntitlement, revokeEntitlement, type Product } from "../products";
+import {
+  canonicalProduct,
+  isKnownProduct,
+  productEntitlement,
+  upsertEntitlement,
+  revokeEntitlement,
+  type Product,
+} from "../products";
 import {
   checkoutSessionParams,
   billingProductFromEvidence,
@@ -180,12 +187,14 @@ export function createCheckoutHandler(effects: CheckoutCreationEffects = {
 }) {
   return async (req: Request, res: Response) => {
     const planKey = String(req.body?.plan || "annual") as PlanKey;
-    const product = req.body?.product ?? "wincraft";
+    // Legacy callers still send "pctweaker"; it resolves to WinCraft, and the
+    // canonical id is what gets written to Stripe metadata from here on.
+    const product = canonicalProduct(req.body?.product ?? "wincraft");
     // `PLANS[planKey]` alone would resolve a key like "__proto__" or
     // "constructor" to Object.prototype instead of undefined, since PLANS is a
     // plain object literal — resolveCheckoutPrice guards it with hasOwnProperty
     // for the same reason as before. The product goes through an allowlist.
-    if (!isKnownProduct(product)) {
+    if (!product) {
       return res.status(400).json({ error: "unknown product" });
     }
     if (!isConfigured) {
@@ -917,7 +926,9 @@ async function findPurchase(paymentIntentId: string, effects: BillingEffects): P
     const userId = session.client_reference_id || session.metadata?.userId;
     // Our own Lifetime checkouts also carry product/plan metadata, so a
     // refund is still matched if a promo Price variable is ever removed.
-    const lifetimeCheckout = session.metadata?.product === "wincraft" && session.metadata?.plan === "lifetime";
+    // Canonical id: a checkout made by an older client says "pctweaker", and
+    // its refund must still end the Lifetime access it bought.
+    const lifetimeCheckout = canonicalProduct(session.metadata?.product) === "wincraft" && session.metadata?.plan === "lifetime";
     if (!userId || !(lifetimeCheckout || priceIds.some((id) => lifetimePrices.includes(id)))) return null;
     return { userId, product: "wincraft", plan: "lifetime", subscriptionId: null };
   }

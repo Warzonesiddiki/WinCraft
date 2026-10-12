@@ -31,19 +31,14 @@ let selection = presetSelection(
   preset,
   catalog,
   ["disable_game_dvr", "reduce_input_lag", "untrusted"],
-  false,
 );
 assert.deepEqual(
   selection.pending.map((t) => t.id),
   ["reduce_input_lag"],
 );
+assert.deepEqual(presetSelection(preset, catalog, []).pending, []);
 assert.deepEqual(
-  selection.locked.map((t) => t.id),
-  ["reduce_input_lag"],
-);
-assert.deepEqual(presetSelection(preset, catalog, [], false).pending, []);
-assert.deepEqual(
-  presetSelection(preset, catalog, ["disable_sticky_keys_prompt"], true).pending.map((t) => t.id),
+  presetSelection(preset, catalog, ["disable_sticky_keys_prompt"]).pending.map((t) => t.id),
   ["disable_sticky_keys_prompt"],
 );
 assert.equal(
@@ -51,7 +46,6 @@ assert.equal(
     preset,
     [],
     preset.tweaks.map((t) => t.id),
-    true,
   ).missing.length,
   3,
 );
@@ -60,7 +54,6 @@ assert.deepEqual(
     preset,
     catalog.map((t) => ({ ...t, applied: true })),
     preset.tweaks.map((t) => t.id),
-    true,
   ).pending,
   [],
 );
@@ -75,7 +68,6 @@ const withUnsupported = presetSelection(
   preset,
   gated,
   preset.tweaks.map((t) => t.id),
-  true,
 );
 assert.ok(!withUnsupported.pending.some((t) => t.id === preset.tweaks[0].id));
 assert.deepEqual(withUnsupported.unsupported, [preset.tweaks[0].id]);
@@ -88,5 +80,5 @@ for (const p of STARTER_PRESETS)
     p.id,
   );
 console.log(
-  "Starter profile checks passed: catalog, Free/user scope, selection, already applied, unavailable and Pro gating.",
+  "Starter profile checks passed: catalog, reachable scope, selection, already applied and unavailable.",
 );

@@ -52,6 +52,14 @@ async function stopAudit(session: ScanSession): Promise<void> {
  *  discards it. */
 let heldScan: { session: ScanSession; driver: ScanProgress | null; elapsed: number } | null = null;
 
+function holdScan(value: { session: ScanSession; driver: ScanProgress | null; elapsed: number }) {
+  heldScan = value;
+}
+
+function clearHeldScan() {
+  heldScan = null;
+}
+
 function probesOf(session: ScanSession): Partial<Record<ScanProbe, ProbeStatus>> {
   return Object.fromEntries(
     SCAN_PROBES.flatMap((p) => (session.steps[p] ? [[p, session.steps[p].state]] : [])),
@@ -67,7 +75,6 @@ function stepTimesOf(session: ScanSession): Partial<Record<ScanProbe, number>> {
 export function ScanPanel({
   s,
   lang,
-  isPro,
   onFixed,
   pushToast,
   onNavigate,
@@ -75,7 +82,6 @@ export function ScanPanel({
 }: {
   s: Strings;
   lang: Lang;
-  isPro: boolean;
   onFixed: () => Promise<void>;
   pushToast: (kind: Toast["kind"], message: string) => void;
   onNavigate: (section: Section) => void;
@@ -141,9 +147,7 @@ export function ScanPanel({
     }
   }, [report, paused]);
 
-  const fixes = report ? recommendedTweaks(report, isPro) : [];
-  const lockedFixes =
-    report && !isPro ? recommendedTweaks(report, true).filter((t) => t.requires_pro) : [];
+  const fixes = report ? recommendedTweaks(report) : [];
   const optional = report ? optionalScanTweaks(report) : [];
   const observations = report ? scanObservations(report) : [];
   const unknownSecurity = report ? unknownSecuritySignals(report) : [];
@@ -164,14 +168,14 @@ export function ScanPanel({
 
   /** Ends a scan where it is and shows what it found, labelled partial. */
   function end(session: ScanSession) {
-    heldScan = null;
+    clearHeldScan();
     void stopAudit(session).then(() =>
       invoke("discard_scan_session", { session: session.id }).catch(() => undefined),
     );
     const partial = scanReport(session);
     setPaused(false);
     setReport(partial);
-    setSelected(recommendedTweaks(partial, isPro).map((t) => t.id));
+    setSelected(recommendedTweaks(partial).map((t) => t.id));
     remember(partial);
   }
 
@@ -197,7 +201,7 @@ export function ScanPanel({
     abort.current = controller;
     intent.current = null;
     const held = resume ? heldScan : null;
-    heldScan = null;
+    clearHeldScan();
     const session = held?.session ?? newScanSession();
     let driver: ScanProgress | null = held?.driver ?? null;
     const elapsedBefore = held?.elapsed ?? 0;
@@ -278,11 +282,11 @@ export function ScanPanel({
       if (!done) {
         if (intent.current === "stop") {
           if (alive.current) end(session);
-          else heldScan = null;
+          else clearHeldScan();
         } else {
           // Paused. The backend audit is given time to save where it was
           // before Resume can be pressed.
-          heldScan = { session, driver, elapsed: seconds };
+          holdScan({ session, driver, elapsed: seconds });
           await stopAudit(session);
           if (alive.current) {
             setPaused(true);
@@ -303,7 +307,7 @@ export function ScanPanel({
       setProgress(100);
       const next = scanReport(session);
       setReport(next);
-      setSelected(recommendedTweaks(next, isPro).map((t) => t.id));
+      setSelected(recommendedTweaks(next).map((t) => t.id));
       remember(next);
     } catch (e) {
       if (alive.current) setError(String(e));
@@ -330,7 +334,7 @@ export function ScanPanel({
     setReviewIds(null);
     setError("");
     try {
-      const result = await applyScanSelection(invoke, report, isPro, ids);
+      const result = await applyScanSelection(invoke, report, ids);
       setOutcome(result);
       // Unknown final states cannot be offered for a second blind application.
       setReport({ ...report, tweaks: result.tweaks, advice: result.advice, ids: result.ids });
@@ -523,7 +527,7 @@ export function ScanPanel({
           {report && !paused && (
             <div className="scan-result-counts" aria-live="polite">
               <div>
-                <strong>{fixes.length + lockedFixes.length}</strong>
+                <strong>{fixes.length}</strong>
                 <span>{c.recommendations}</span>
               </div>
               <div>
@@ -763,24 +767,6 @@ export function ScanPanel({
                   </div>
                 </div>
               )}
-              {lockedFixes.length > 0 && (
-                <div className="scan-locked-results">
-                  <h4>{c.proRecommendations}</h4>
-                  <p>{c.proRecommendationsBody}</p>
-                  {lockedFixes.map((t) => (
-                    <div key={t.id} className="scan-locked-row">
-                      <span>{textFor(s.tweaks, t.id, t.name, t.description).name}</span>
-                      <button
-                        className="scan-secondary"
-                        onClick={() => onNavigate(t.category)}
-                        disabled={applying}
-                      >
-                        {c.manual} · Pro ↗
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              )}
             </div>
             <div className="scan-review-results">
               <div className="scan-section-heading">
@@ -829,10 +815,7 @@ export function ScanPanel({
                     return (
                       <li key={t.id} className="scan-finding scan-manual">
                         <div>
-                          <h4>
-                            {text.name}
-                            {t.requires_pro && <Badge kind="pro">{s.badges.pro}</Badge>}
-                          </h4>
+                          <h4>{text.name}</h4>
                           <p>{text.description}</p>
                         </div>
                         <button

@@ -450,13 +450,9 @@ function ProgressTrace({
  */
 export function SystemRepairCard({
   s,
-  isPro,
-  onRequirePro,
   pushToast,
 }: {
   s: Strings;
-  isPro: boolean;
-  onRequirePro: () => void;
   pushToast: (kind: Toast["kind"], message: string) => void;
 }) {
   const {
@@ -491,11 +487,6 @@ export function SystemRepairCard({
   };
 
   function run(job: RepairJob) {
-    // The read-only check is free; the jobs that change the machine are not.
-    if (job !== "check" && !isPro) {
-      onRequirePro();
-      return;
-    }
     void startRepair(job, (message) => pushToast("error", message));
   }
 
@@ -748,7 +739,6 @@ export function SystemRepairCard({
                     className="tool-primary-action"
                   >
                     {s.systemRepair.askRepairYes}
-                    {!isPro && <Badge kind="pro">{s.badges.pro}</Badge>}
                   </button>
                   <button
                     type="button"
@@ -778,7 +768,6 @@ export function SystemRepairCard({
                     className="tool-secondary-action"
                   >
                     {s.systemRepair.repairAnyway}
-                    {!isPro && <Badge kind="pro">{s.badges.pro}</Badge>}
                   </button>
                 </>
               )}
@@ -807,7 +796,6 @@ export function SystemRepairCard({
           className="tool-secondary-action"
         >
           {s.systemRepair.cleanupButton}
-          {!isPro && <Badge kind="pro">{s.badges.pro}</Badge>}
         </button>
       </div>
     </section>

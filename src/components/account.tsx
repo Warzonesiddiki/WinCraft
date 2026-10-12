@@ -12,7 +12,7 @@ import {
   writeAvatar,
 } from "../lib";
 import { AuthState, ProcessGuardStatus } from "../types";
-import { CheckIcon, CrownIcon } from "./icons";
+import { CheckIcon, GemIcon } from "./icons";
 import { Avatar } from "./ui";
 import "./account-menu.css";
 
@@ -346,7 +346,6 @@ export function AccountMenu({
   onLogout,
   onResendVerification,
   onForgotPassword,
-  onUpgrade,
   onViewPlan,
   pushToast,
 }: {
@@ -371,9 +370,7 @@ export function AccountMenu({
   onLogout: () => void;
   onResendVerification: () => Promise<void>;
   onForgotPassword: (email: string) => Promise<void>;
-  onUpgrade: () => void;
-  /** Opens the plans screen. Same destination for both tiers: a Free
-   *  account is comparing, a Pro account is checking what it pays for. */
+  /** Opens the plans screen, which now states the one plan there is. */
   onViewPlan: () => void;
   pushToast: (kind: "success" | "error", message: string) => void;
 }) {
@@ -559,17 +556,16 @@ export function AccountMenu({
             />
             <div className="account-plan-row">
               <span>
-                <CrownIcon className="h-4 w-4" />
-                {isPro ? s.menu.planPro : s.menu.planFree}
+                <GemIcon className="h-4 w-4" />
+                {s.menu.planFree}
               </span>
               <button
                 onClick={() => {
                   setOpen(false);
-                  if (isPro) onViewPlan();
-                  else onUpgrade();
+                  onViewPlan();
                 }}
               >
-                {isPro ? s.menu.viewPlan : s.menu.upgradeButton} <span aria-hidden="true">↗</span>
+                {s.menu.viewPlan} <span aria-hidden="true">↗</span>
               </button>
             </div>
             <details name="account-settings" className="account-setting">
@@ -673,7 +669,7 @@ export function AccountMenu({
             </details>
             <button
               className="account-support"
-              onClick={() => void openUrl("https://pctweaker.app/support")}
+              onClick={() => void openUrl("https://wincraft.app/support")}
             >
               {s.menu.reportIssue}
               <span aria-hidden="true">↗</span>

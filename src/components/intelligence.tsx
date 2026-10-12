@@ -51,15 +51,11 @@ export function AdvisorCard({
   s,
   tweaks,
   busyId,
-  isPro,
-  onRequirePro,
   onApply,
 }: {
   s: Strings;
   tweaks: TweakInfo[];
   busyId: string | null;
-  isPro: boolean;
-  onRequirePro: () => void;
   onApply: (t: TweakInfo) => Promise<void>;
 }) {
   const [scanIds, setScanIds] = useState<Set<string> | null>(null);
@@ -115,7 +111,6 @@ export function AdvisorCard({
               <h2 className="flex items-center gap-2 font-semibold text-ink">
                 {textFor(s.tweaks, top.id, top.name, top.description).name}
                 {top.requires_admin && <Badge kind="admin">{s.badges.admin}</Badge>}
-                {top.requires_pro && <Badge kind="pro">{s.badges.pro}</Badge>}
               </h2>
               {/* The reason is the card's substance: this machine's hardware
                   argues for the change, and the user can check the argument. */}
@@ -124,13 +119,7 @@ export function AdvisorCard({
               </p>
             </div>
             <button
-              onClick={() => {
-                if (top.requires_pro && !isPro) {
-                  onRequirePro();
-                  return;
-                }
-                void onApply(top);
-              }}
+              onClick={() => void onApply(top)}
               disabled={busyId === top.id}
               className="tool-primary-action shrink-0"
             >

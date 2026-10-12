@@ -718,7 +718,7 @@ mod tests {
         assert!(validate_item_name(r"..\evil").is_err());
         assert!(validate_item_name("a/b").is_err());
         assert!(validate_item_name("a|b").is_err());
-        assert!(validate_item_name("nul byte").is_err());
+        assert!(validate_item_name("nul\0byte").is_err());
     }
 
     #[test]

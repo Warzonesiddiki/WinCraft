@@ -321,45 +321,15 @@ export interface Strings {
     clear: string;
   };
   pricing: {
-    eyebrow: string;
     title: string;
-    subtitle: string;
-    monthly: string;
-    annual: string;
-    lifetime: string;
-    saveBadge: string; // uses {percent}
-    perMonth: string;
-    perYear: string;
-    once: string;
-    lifetimeDetail: string; // uses {months}
-    annualDetail: string; // uses {monthly} {yearly}
-    annualNudge: string; // uses {price}
-    mostChosen: string;
-    freeName: string;
-    freeTagline: string;
-    freePriceNote: string;
-    freeCta: string;
-    freeCurrent: string;
-    proName: string;
-    proTagline: string;
-    proCta: string;
-    proCurrent: string;
-    manageBilling: string;
-    lifetimeOwned: string;
-    switchToLifetime: string;
-    proActiveNoBilling: string;
-    everythingInFree: string;
-    included: string;
-    reassurance: string;
-    freeFeatures: string[];
-    proFeatures: string[];
-    lifetimeName: string;
-    lifetimeTagline: string;
-    lifetimeCta: string;
-    oneTimeBadge: string;
-    everythingInPro: string;
-    lifetimeExclusive: string;
-    lifetimeFeatures: string[];
+    intro: string;
+    planName: string;
+    planTagline: string;
+    priceAmount: string;
+    priceNote: string;
+    features: string[];
+    commitmentTitle: string;
+    commitmentBody: string;
   };
   toggle: { on: string; off: string };
   driverBooster: {
@@ -438,7 +408,7 @@ export interface Strings {
     error: string; // uses {message}
     checkFailed: string; // uses {message}
   };
-  badges: { admin: string; pro: string; soon: string };
+  badges: { admin: string; soon: string };
   emptyCategory: string;
   gameSessions: {
     title: string;
@@ -686,14 +656,6 @@ export interface Strings {
     safe: string;
     breached: string; // uses {count}
     error: string;
-  };
-  paywall: {
-    title: string;
-    body: string; // uses {feature}
-    unlock: string;
-    notNow: string;
-    priceLine: string;
-    notConnectedToast: string;
   };
   cleanupConfirm: {
     previewLoading: string;
@@ -1007,9 +969,7 @@ export interface Strings {
     account: string;
     plan: string;
     planFree: string;
-    planPro: string;
     viewPlan: string;
-    upgradeButton: string;
     language: string;
     theme: string;
     about: string;
@@ -1472,69 +1432,24 @@ const it: Strings = {
     clear: "Cancella",
   },
   pricing: {
-    eyebrow: "Sblocca tutto",
-    title: "Scegli quanto vuoi spingere",
-    subtitle:
-      "Ogni modifica salva prima com'era: qualsiasi cosa provi qui, la annulli in un click. Il gratuito copre l'essenziale, Pro apre il resto.",
-    monthly: "Mensile",
-    annual: "Annuale",
-    lifetime: "A vita",
-    saveBadge: "RISPARMI IL {percent}%",
-    perMonth: "/mese",
-    perYear: "/anno",
-    once: "una tantum",
-    lifetimeDetail:
-      "Paghi una volta e resta tuo. Si ripaga in {months} mesi rispetto all’abbonamento annuale, e da lì in poi non paghi più",
-    annualDetail: "Sono {monthly} al mese, addebitati {yearly} una volta l’anno",
-    annualNudge: "Con il piano annuale sarebbero {price} al mese",
-    mostChosen: "IL PIÙ SCELTO",
-    freeName: "Free",
-    freeTagline: "Tutto il necessario per un PC più pulito e reattivo.",
-    freePriceNote: "Per sempre, senza scadenza",
-    freeCta: "Stai usando il piano Free",
-    freeCurrent: "Piano attuale",
-    proName: "Pro",
-    proTagline:
-      "Ogni tweak, inclusi quelli che richiedono privilegi di amministratore e quelli che altrimenti faresti a mano nel registro.",
-    proCta: "Passa a Pro",
-    proCurrent: "Il tuo piano",
-    manageBilling: "Gestisci abbonamento",
-    lifetimeOwned: "Pro è tuo per sempre",
-    switchToLifetime: "Passa al lifetime",
-    proActiveNoBilling: "Pro è attivo su questo account",
-    everythingInFree: "Tutto quello che c’è nel Free, più:",
-    included: "Cosa include",
-    reassurance:
-      "Disdici quando vuoi. Ogni modifica resta reversibile con un click, anche dopo la disdetta.",
-    freeFeatures: [
-      "{count} tweak Windows da esaminare e applicare",
-      "Monitor di sistema in tempo reale (CPU, memoria, disco)",
-      "Gestione dei programmi all’avvio",
-      "Controllo violazioni password",
-      "Scansione del PC e correzione in un click",
-      "Pulizia dei file temporanei",
+    title: "Free for everyone",
+    intro: "WinCraft is free and open source: every tool included, no subscription, no paywall.",
+    planName: "Everything included",
+    planTagline: "Every tool, every tweak, every feature — no restrictions.",
+    priceAmount: "$0",
+    priceNote: "forever",
+    features: [
+      "All system tweaks and optimizations",
+      "Advanced gaming and privacy tools",
+      "Disk cleanup, defragmentation and system repair",
+      "Driver updates and hardware diagnostics",
+      "Game Sessions and monitoring profiles",
+      "Zero-Trace memory purge and secure shredder",
+      "Every future update included",
     ],
-    proFeatures: [
-      "Game Sessions: attiva il turbo da solo quando lanci un gioco",
-      "Preset Turbo Gaming e priorità massima ai giochi",
-      "Privacy avanzata: telemetria e cronologia attività",
-      "Trova e rimuove i file duplicati",
-      "Svuota la cache di Windows Update",
-      "Disattiva l’indicizzazione che tiene il disco occupato",
-      "Ogni tweak e ogni funzione futura, inclusi",
-    ],
-    lifetimeName: "A vita",
-    lifetimeTagline:
-      "Paghi una volta sola. Tutto il Pro per sempre, e ogni novità prima di chiunque altro.",
-    lifetimeCta: "Passa a vita",
-    oneTimeBadge: "PAGAMENTO UNICO",
-    everythingInPro: "Tutto il Pro, in più:",
-    lifetimeExclusive: "Solo con il piano a vita",
-    lifetimeFeatures: [
-      "Accesso anticipato ad anteprime selezionate, quando disponibili",
-      "Ogni versione futura inclusa, senza mai rinnovare",
-      "Assistenza prioritaria, risposta dallo sviluppatore",
-    ],
+    commitmentTitle: "Our commitment",
+    commitmentBody:
+      "WinCraft is and will remain free. Everyone should have access to tools that help them understand and optimize their PC: no hidden costs, no feature gates, no subscriptions.",
   },
   toggle: { on: "Attivato", off: "Disattivato" },
   driverBooster: {
@@ -1625,7 +1540,7 @@ const it: Strings = {
     error: "Aggiornamento non riuscito: {message}",
     checkFailed: "Controllo aggiornamenti non riuscito: {message}",
   },
-  badges: { admin: "Admin", pro: "PRO", soon: "IN ARRIVO" },
+  badges: { admin: "Admin", soon: "IN ARRIVO" },
   emptyCategory: "Nessun tweak disponibile in questa categoria — presto in arrivo.",
   gameSessions: {
     title: "Game Sessions",
@@ -1901,15 +1816,6 @@ const it: Strings = {
     safe: "Non risulta in nessuna violazione nota. Ottimo segno.",
     breached: "Trovata in {count} violazioni note. Cambiala subito, ovunque la usi.",
     error: "Impossibile controllare ora: verifica la connessione e riprova.",
-  },
-  paywall: {
-    title: "Funzione Pro",
-    body: "Questo strumento è disponibile con WinCraft Pro. Confronta i piani e scopri cosa includono prima di scegliere.",
-    unlock: "Vedi piani e prezzi",
-    notNow: "Non ora",
-    priceLine:
-      "Lifetime: {lifetime} una volta sola, senza rinnovi. Oppure {annual} all'anno o {monthly} al mese.",
-    notConnectedToast: "Il pagamento Pro non è ancora collegato in questa versione di sviluppo.",
   },
   cleanupConfirm: {
     previewLoading: "Calcolo di cosa verrà spostato nel Cestino...",
@@ -2270,9 +2176,7 @@ const it: Strings = {
     account: "Account",
     plan: "Piano",
     planFree: "Gratuito",
-    planPro: "Pro",
     viewPlan: "Vedi il piano",
-    upgradeButton: "Passa a Pro",
     language: "Lingua",
     theme: "Temi",
     about: "Informazioni",
@@ -3142,69 +3046,25 @@ const en: Strings = {
     clear: "Clear",
   },
   pricing: {
-    eyebrow: "Unlock everything",
-    title: "Choose how hard you push",
-    subtitle:
-      "Every change snapshots what was there first, so anything you try here is one click from undone. Free covers the essentials; Pro opens the rest.",
-    monthly: "Monthly",
-    annual: "Yearly",
-    lifetime: "Lifetime",
-    saveBadge: "SAVE {percent}%",
-    perMonth: "/month",
-    perYear: "/year",
-    once: "one-time",
-    lifetimeDetail:
-      "Paid once, yours for good. It pays for itself in {months} months against the annual plan, and costs nothing after that",
-    annualDetail: "That’s {monthly} a month, charged {yearly} once a year",
-    annualNudge: "On the yearly plan it would be {price} a month",
-    mostChosen: "MOST CHOSEN",
-    freeName: "Free",
-    freeTagline: "Everything you need for a cleaner, snappier PC.",
-    freePriceNote: "Free forever, no expiry",
-    freeCta: "You’re on the Free plan",
-    freeCurrent: "Current plan",
-    proName: "Pro",
-    proTagline:
-      "Every tweak, including the ones that need admin rights and the ones you'd otherwise apply by hand in the registry.",
-    proCta: "Go Pro",
-    proCurrent: "Your plan",
-    manageBilling: "Manage subscription",
-    lifetimeOwned: "Pro is yours for good",
-    switchToLifetime: "Switch to lifetime",
-    proActiveNoBilling: "Pro is active on this account",
-    everythingInFree: "Everything in Free, plus:",
-    included: "Included",
-    reassurance:
-      "Cancel anytime. Every change stays one click away from being undone, even after you cancel.",
-    freeFeatures: [
-      "{count} Windows tweaks to review and apply",
-      "Live system monitor (CPU, memory, disk)",
-      "Startup programs manager",
-      "Password breach check",
-      "One-click PC scan and fix",
-      "Temporary file cleanup",
+    title: "Gratis per tutti",
+    intro:
+      "WinCraft è gratuito e open source: tutti gli strumenti inclusi, nessun abbonamento e nessuna funzione a pagamento.",
+    planName: "Tutto incluso",
+    planTagline: "Ogni strumento, ogni tweak, ogni funzione: nessuna restrizione.",
+    priceAmount: "$0",
+    priceNote: "per sempre",
+    features: [
+      "Tutti i tweak e le ottimizzazioni di sistema",
+      "Strumenti avanzati per gaming e privacy",
+      "Pulizia disco, deframmentazione e riparazione del sistema",
+      "Aggiornamento driver e diagnostica hardware",
+      "Sessioni di gioco e profili di monitoraggio",
+      "Purga della memoria Zero-Trace e distruzione sicura dei file",
+      "Tutti gli aggiornamenti futuri inclusi",
     ],
-    proFeatures: [
-      "Game Sessions: turbo turns itself on when you launch a game",
-      "Turbo Gaming preset and maximum priority for games",
-      "Advanced privacy: telemetry and activity history",
-      "Finds and removes duplicate files",
-      "Clears the Windows Update cache",
-      "Disables the indexing that keeps your disk busy",
-      "Every tweak and every future feature, included",
-    ],
-    lifetimeName: "Lifetime",
-    lifetimeTagline:
-      "Pay once. Every Pro feature for good, and whatever comes next before anyone else gets it.",
-    lifetimeCta: "Get Lifetime",
-    oneTimeBadge: "ONE-TIME PAYMENT",
-    everythingInPro: "Everything in Pro, plus:",
-    lifetimeExclusive: "Lifetime only",
-    lifetimeFeatures: [
-      "Early access to selected previews, when available",
-      "Every future release included — no renewal, ever",
-      "Priority support, answered by the developer",
-    ],
+    commitmentTitle: "Il nostro impegno",
+    commitmentBody:
+      "WinCraft è e resterà gratuito. Tutti devono poter usare strumenti che aiutano a capire e ottimizzare il proprio PC: niente costi nascosti, niente funzioni bloccate, niente abbonamenti.",
   },
   toggle: { on: "On", off: "Off" },
   driverBooster: {
@@ -3294,7 +3154,7 @@ const en: Strings = {
     error: "Update failed: {message}",
     checkFailed: "Update check failed: {message}",
   },
-  badges: { admin: "Admin", pro: "PRO", soon: "COMING SOON" },
+  badges: { admin: "Admin", soon: "COMING SOON" },
   emptyCategory: "No tweaks available in this category yet — more coming soon.",
   gameSessions: {
     title: "Game Sessions",
@@ -3560,15 +3420,6 @@ const en: Strings = {
     breached: "Found in {count} known breaches. Change it now, everywhere you use it.",
     error: "Couldn't check right now: check your connection and try again.",
   },
-  paywall: {
-    title: "Pro feature",
-    body: "This tool is available with WinCraft Pro. Compare plans and see what is included before choosing.",
-    unlock: "See plans & pricing",
-    notNow: "Not now",
-    priceLine:
-      "Lifetime: {lifetime} once, with no renewals. Or {annual} a year, or {monthly} a month.",
-    notConnectedToast: "Pro payment isn't wired up yet in this development build.",
-  },
   cleanupConfirm: {
     previewLoading: "Working out what will move to the Recycle Bin...",
     previewEmpty: "Nothing to clean - the folder is already empty.",
@@ -3648,8 +3499,7 @@ const en: Strings = {
     subtitle:
       "Updated every second while this page is open and WinCraft is in front. Nothing is measured in the background.",
     paused: "Paused",
-    pausedHint:
-      "Paused while WinCraft is in the background. It picks up again when you come back.",
+    pausedHint: "Paused while WinCraft is in the background. It picks up again when you come back.",
     measuring: "Measuring…",
     smooth: "Running smoothly",
     busy: "Busy",
@@ -3926,9 +3776,7 @@ const en: Strings = {
     account: "Account",
     plan: "Plan",
     planFree: "Free",
-    planPro: "Pro",
     viewPlan: "View your plan",
-    upgradeButton: "Upgrade to Pro",
     language: "Language",
     theme: "Themes",
     about: "About",
@@ -4797,69 +4645,25 @@ const fr: Strings = {
     clear: "Effacer",
   },
   pricing: {
-    eyebrow: "Tout débloquer",
-    title: "Choisissez jusqu’où pousser",
-    subtitle:
-      "Chaque modification enregistre l'état précédent : tout ce que vous essayez ici s'annule en un clic. Le gratuit couvre l'essentiel, Pro ouvre le reste.",
-    monthly: "Mensuel",
-    annual: "Annuel",
-    lifetime: "À vie",
-    saveBadge: "ÉCONOMISEZ {percent}%",
-    perMonth: "/mois",
-    perYear: "/an",
-    once: "paiement unique",
-    lifetimeDetail:
-      "Payé une fois, à vous pour toujours. Rentabilisé en {months} mois par rapport à l’abonnement annuel, et plus rien ensuite",
-    annualDetail: "Soit {monthly} par mois, prélevés {yearly} une fois par an",
-    annualNudge: "Avec l’offre annuelle, ce serait {price} par mois",
-    mostChosen: "LE PLUS CHOISI",
-    freeName: "Free",
-    freeTagline: "Tout le nécessaire pour un PC plus propre et plus réactif.",
-    freePriceNote: "Gratuit pour toujours, sans expiration",
-    freeCta: "Vous êtes sur l’offre Free",
-    freeCurrent: "Offre actuelle",
-    proName: "Pro",
-    proTagline:
-      "Tous les réglages, y compris ceux qui exigent des droits administrateur et ceux que vous feriez sinon à la main dans le registre.",
-    proCta: "Passer à Pro",
-    proCurrent: "Votre offre",
-    manageBilling: "Gérer l'abonnement",
-    lifetimeOwned: "Pro est à vous pour toujours",
-    switchToLifetime: "Passer au lifetime",
-    proActiveNoBilling: "Pro est actif sur ce compte",
-    everythingInFree: "Tout ce que contient Free, plus :",
-    included: "Inclus",
-    reassurance:
-      "Résiliable à tout moment. Chaque modification reste annulable en un clic, même après la résiliation.",
-    freeFeatures: [
-      "{count} réglages Windows à examiner et à appliquer",
-      "Moniteur système en temps réel (processeur, mémoire, disque)",
-      "Gestion des programmes au démarrage",
-      "Vérification des fuites de mot de passe",
-      "Analyse et correction du PC en un clic",
-      "Nettoyage des fichiers temporaires",
+    title: "Kostenlos für alle",
+    intro:
+      "WinCraft ist kostenlos und Open Source: alle Werkzeuge inklusive, kein Abo und keine Bezahlschranke.",
+    planName: "Alles inklusive",
+    planTagline: "Jedes Werkzeug, jeder Tweak, jede Funktion – ohne Einschränkungen.",
+    priceAmount: "$0",
+    priceNote: "für immer",
+    features: [
+      "Alle System-Tweaks und Optimierungen",
+      "Erweiterte Gaming- und Datenschutz-Werkzeuge",
+      "Datenaufräumung, Defragmentierung und Systemreparatur",
+      "Treiberupdates und Hardware-Diagnose",
+      "Game Sessions und Überwachungsprofile",
+      "Zero-Trace-Speicherbereinigung und sicheres Schreddern",
+      "Alle künftigen Updates inklusive",
     ],
-    proFeatures: [
-      "Game Sessions : le turbo s’active seul au lancement d’un jeu",
-      "Préréglage Turbo Gaming et priorité maximale aux jeux",
-      "Confidentialité avancée : télémétrie et historique d’activité",
-      "Trouve et supprime les fichiers en double",
-      "Vide le cache de Windows Update",
-      "Désactive l’indexation qui occupe le disque",
-      "Toutes les optimisations et fonctionnalités à venir, incluses",
-    ],
-    lifetimeName: "À vie",
-    lifetimeTagline:
-      "Un seul paiement. Tout Pro pour toujours, et chaque nouveauté avant tout le monde.",
-    lifetimeCta: "Passer à l'offre à vie",
-    oneTimeBadge: "PAIEMENT UNIQUE",
-    everythingInPro: "Tout ce que contient Pro, plus :",
-    lifetimeExclusive: "Exclusif à l'offre à vie",
-    lifetimeFeatures: [
-      "Accès anticipé à certaines versions préliminaires, selon leur disponibilité",
-      "Toutes les versions à venir incluses, sans jamais renouveler",
-      "Assistance prioritaire, assurée par le développeur",
-    ],
+    commitmentTitle: "Unser Versprechen",
+    commitmentBody:
+      "WinCraft ist und bleibt kostenlos. Jeder soll Werkzeuge nutzen können, die helfen, den eigenen PC zu verstehen und zu optimieren: keine versteckten Kosten, keine gesperrten Funktionen, keine Abos.",
   },
   toggle: { on: "Activé", off: "Désactivé" },
   driverBooster: {
@@ -4952,7 +4756,7 @@ const fr: Strings = {
     error: "Échec de la mise à jour : {message}",
     checkFailed: "Échec de la vérification des mises à jour : {message}",
   },
-  badges: { admin: "Admin", pro: "PRO", soon: "BIENTÔT" },
+  badges: { admin: "Admin", soon: "BIENTÔT" },
   emptyCategory: "Aucune optimisation disponible dans cette catégorie pour l'instant — à venir.",
   gameSessions: {
     title: "Game Sessions",
@@ -5230,16 +5034,6 @@ const fr: Strings = {
     breached:
       "Trouvé dans {count} fuites connues. Changez-le immédiatement, partout où vous l'utilisez.",
     error: "Impossible de vérifier pour le moment : vérifiez votre connexion et réessayez.",
-  },
-  paywall: {
-    title: "Fonction Pro",
-    body: "Cet outil est disponible avec WinCraft Pro. Comparez les offres et découvrez ce qu’elles incluent avant de choisir.",
-    unlock: "Voir les offres et tarifs",
-    notNow: "Pas maintenant",
-    priceLine:
-      "Lifetime : {lifetime} en une seule fois, sans renouvellement. Ou {annual} par an, ou {monthly} par mois.",
-    notConnectedToast:
-      "Le paiement Pro n'est pas encore connecté dans cette version de développement.",
   },
   cleanupConfirm: {
     previewLoading: "Calcul de ce qui sera déplacé vers la Corbeille...",
@@ -5601,9 +5395,7 @@ const fr: Strings = {
     account: "Compte",
     plan: "Forfait",
     planFree: "Gratuit",
-    planPro: "Pro",
     viewPlan: "Voir votre forfait",
-    upgradeButton: "Passer à Pro",
     language: "Langue",
     theme: "Thèmes",
     about: "À propos",
@@ -6476,68 +6268,26 @@ const es: Strings = {
     clear: "Borrar",
   },
   pricing: {
-    eyebrow: "Desbloquea todo",
-    title: "Elige cuánto quieres exprimirlo",
-    subtitle:
-      "Cada cambio guarda antes cómo estaba: lo que pruebes aquí se deshace en un clic. El gratuito cubre lo esencial; Pro abre el resto.",
-    monthly: "Mensual",
-    annual: "Anual",
-    lifetime: "De por vida",
-    saveBadge: "AHORRAS UN {percent}%",
-    perMonth: "/mes",
-    perYear: "/año",
-    once: "pago único",
-    lifetimeDetail:
-      "Pagas una vez y es tuyo. Se amortiza en {months} meses frente al plan anual, y a partir de ahí no pagas nada más",
-    annualDetail: "Son {monthly} al mes, con un cargo de {yearly} una vez al año",
-    annualNudge: "Con el plan anual serían {price} al mes",
-    mostChosen: "EL MÁS ELEGIDO",
-    freeName: "Free",
-    freeTagline: "Todo lo necesario para un PC más limpio y ágil.",
-    freePriceNote: "Gratis para siempre, sin caducidad",
-    freeCta: "Estás en el plan Free",
-    freeCurrent: "Plan actual",
-    proName: "Pro",
-    proTagline:
-      "Todos los ajustes, incluidos los que piden permisos de administrador y los que si no harías a mano en el registro.",
-    proCta: "Pasar a Pro",
-    proCurrent: "Tu plan",
-    manageBilling: "Gestionar suscripción",
-    lifetimeOwned: "Pro es tuyo para siempre",
-    switchToLifetime: "Cambiar a lifetime",
-    proActiveNoBilling: "Pro está activo en esta cuenta",
-    everythingInFree: "Todo lo que incluye Free, y además:",
-    included: "Incluido",
-    reassurance:
-      "Cancela cuando quieras. Cada cambio sigue siendo reversible con un clic, incluso tras cancelar.",
-    freeFeatures: [
-      "{count} ajustes de Windows para revisar y aplicar",
-      "Monitor del sistema en tiempo real (CPU, memoria, disco)",
-      "Gestión de los programas de inicio",
-      "Comprobación de filtraciones de contraseñas",
-      "Análisis del PC y corrección en un clic",
-      "Limpieza de archivos temporales",
+    title: "Gratis para todos",
+    intro:
+      "WinCraft es gratis y de código abierto: todas las herramientas incluidas, sin suscripción y sin funciones de pago.",
+    planName: "Todo incluido",
+    planTagline:
+      "Todas las herramientas, todos los ajustes, todas las funciones: sin restricciones.",
+    priceAmount: "$0",
+    priceNote: "para siempre",
+    features: [
+      "Todos los ajustes y optimizaciones del sistema",
+      "Herramientas avanzadas de gaming y privacidad",
+      "Limpieza de disco, desfragmentación y reparación del sistema",
+      "Actualización de controladores y diagnóstico del hardware",
+      "Sesiones de juego y perfiles de monitorización",
+      "Purga de memoria Zero-Trace y destrucción segura de archivos",
+      "Todas las actualizaciones futuras incluidas",
     ],
-    proFeatures: [
-      "Game Sessions: el turbo se activa solo al abrir un juego",
-      "Preset Turbo Gaming y prioridad máxima para los juegos",
-      "Privacidad avanzada: telemetría e historial de actividad",
-      "Encuentra y elimina archivos duplicados",
-      "Vacía la caché de Windows Update",
-      "Desactiva la indexación que mantiene ocupado el disco",
-      "Todos los ajustes y funciones futuras, incluidos",
-    ],
-    lifetimeName: "De por vida",
-    lifetimeTagline: "Un solo pago. Todo Pro para siempre, y cada novedad antes que nadie.",
-    lifetimeCta: "Comprar de por vida",
-    oneTimeBadge: "PAGO ÚNICO",
-    everythingInPro: "Todo lo que incluye Pro, más:",
-    lifetimeExclusive: "Solo de por vida",
-    lifetimeFeatures: [
-      "Acceso anticipado a versiones preliminares seleccionadas, cuando estén disponibles",
-      "Todas las versiones futuras incluidas, sin renovar nunca",
-      "Soporte prioritario, respondido por el desarrollador",
-    ],
+    commitmentTitle: "Nuestro compromiso",
+    commitmentBody:
+      "WinCraft es y seguirá siendo gratis. Todos deberían poder usar herramientas que ayuden a entender y optimizar su PC: sin costes ocultos, sin funciones bloqueadas, sin suscripciones.",
   },
   toggle: { on: "Activado", off: "Desactivado" },
   driverBooster: {
@@ -6627,7 +6377,7 @@ const es: Strings = {
     error: "Error al actualizar: {message}",
     checkFailed: "Error al comprobar actualizaciones: {message}",
   },
-  badges: { admin: "Admin", pro: "PRO", soon: "PRÓXIMAMENTE" },
+  badges: { admin: "Admin", soon: "PRÓXIMAMENTE" },
   emptyCategory: "Todavía no hay ajustes disponibles en esta categoría — próximamente.",
   gameSessions: {
     title: "Game Sessions",
@@ -6903,15 +6653,6 @@ const es: Strings = {
     breached:
       "Encontrada en {count} filtraciones conocidas. Cámbiala ya, en todos los sitios donde la uses.",
     error: "No se ha podido comprobar ahora: revisa tu conexión e inténtalo de nuevo.",
-  },
-  paywall: {
-    title: "Función Pro",
-    body: "Esta herramienta está disponible con WinCraft Pro. Compara los planes y consulta qué incluyen antes de elegir.",
-    unlock: "Ver planes y precios",
-    notNow: "Ahora no",
-    priceLine:
-      "Lifetime: {lifetime} en un solo pago, sin renovaciones. O {annual} al año, o {monthly} al mes.",
-    notConnectedToast: "El pago Pro todavía no está conectado en esta versión de desarrollo.",
   },
   cleanupConfirm: {
     previewLoading: "Calculando qué se moverá a la Papelera...",
@@ -7270,9 +7011,7 @@ const es: Strings = {
     account: "Cuenta",
     plan: "Plan",
     planFree: "Gratis",
-    planPro: "Pro",
     viewPlan: "Ver tu plan",
-    upgradeButton: "Pasar a Pro",
     language: "Idioma",
     theme: "Temas",
     about: "Acerca de",
@@ -7284,8 +7023,7 @@ const es: Strings = {
     photoFailed: "No se pudo usar esa imagen como foto de perfil.",
     support: "Soporte",
     reportIssue: "Notificar un problema",
-    aboutBody:
-      "WinCraft — ajustes del sistema con copia de seguridad y restauración automáticas.",
+    aboutBody: "WinCraft — ajustes del sistema con copia de seguridad y restauración automáticas.",
     close: "Cerrar",
   },
   auth: {
@@ -8150,68 +7888,25 @@ const de: Strings = {
     clear: "Löschen",
   },
   pricing: {
-    eyebrow: "Alles freischalten",
-    title: "Entscheide, wie weit du gehst",
-    subtitle:
-      "Jede Änderung sichert zuerst den vorherigen Stand - alles hier ist einen Klick vom Rückgängig entfernt. Kostenlos deckt das Wesentliche ab, Pro öffnet den Rest.",
-    monthly: "Monatlich",
-    annual: "Jährlich",
-    lifetime: "Lebenslang",
-    saveBadge: "{percent}% SPAREN",
-    perMonth: "/Monat",
-    perYear: "/Jahr",
-    once: "einmalig",
-    lifetimeDetail:
-      "Einmal bezahlt, für immer Ihres. Nach {months} Monaten ist es gegenüber dem Jahresplan bezahlt, danach kostet es nichts mehr",
-    annualDetail: "Das sind {monthly} pro Monat, einmal jährlich mit {yearly} abgebucht",
-    annualNudge: "Im Jahrestarif wären es {price} pro Monat",
-    mostChosen: "AM HÄUFIGSTEN GEWÄHLT",
-    freeName: "Free",
-    freeTagline: "Alles für einen saubereren, flotteren PC.",
-    freePriceNote: "Für immer kostenlos, ohne Ablauf",
-    freeCta: "Du nutzt den Free-Tarif",
-    freeCurrent: "Aktueller Tarif",
-    proName: "Pro",
-    proTagline:
-      "Alle Tweaks, auch die mit Administratorrechten und die, die du sonst von Hand in der Registry setzen würdest.",
-    proCta: "Zu Pro wechseln",
-    proCurrent: "Dein Tarif",
-    manageBilling: "Abo verwalten",
-    lifetimeOwned: "Pro gehört dir dauerhaft",
-    switchToLifetime: "Auf Lifetime wechseln",
-    proActiveNoBilling: "Pro ist in diesem Konto aktiv",
-    everythingInFree: "Alles aus Free, dazu:",
-    included: "Enthalten",
-    reassurance:
-      "Jederzeit kündbar. Jede Änderung bleibt mit einem Klick rückgängig zu machen, auch nach der Kündigung.",
-    freeFeatures: [
-      "{count} Windows-Tweaks zum Prüfen und Anwenden",
-      "Live-Systemmonitor (CPU, Arbeitsspeicher, Datenträger)",
-      "Verwaltung der Autostart-Programme",
-      "Passwort-Datenleck-Prüfung",
-      "PC-Scan und Behebung mit einem Klick",
-      "Bereinigung temporärer Dateien",
+    title: "Gratuit pour tous",
+    intro:
+      "WinCraft est gratuit et open source : tous les outils inclus, sans abonnement ni fonction payante.",
+    planName: "Tout est inclus",
+    planTagline: "Tous les outils, tous les réglages, toutes les fonctions : aucune restriction.",
+    priceAmount: "$0",
+    priceNote: "pour toujours",
+    features: [
+      "Tous les réglages et optimisations du système",
+      "Outils avancés de gaming et de confidentialité",
+      "Nettoyage du disque, défragmentation et réparation du système",
+      "Mises à jour des pilotes et diagnostic matériel",
+      "Game Sessions et profils de surveillance",
+      "Purge mémoire Zero-Trace et destruction sécurisée des fichiers",
+      "Toutes les mises à jour futures incluses",
     ],
-    proFeatures: [
-      "Game Sessions: Turbo aktiviert sich beim Spielstart von selbst",
-      "Turbo-Gaming-Preset und höchste Priorität für Spiele",
-      "Erweiterter Datenschutz: Telemetrie und Aktivitätsverlauf",
-      "Findet und entfernt doppelte Dateien",
-      "Leert den Windows-Update-Cache",
-      "Deaktiviert die Indizierung, die den Datenträger belastet",
-      "Jeder Tweak und jede künftige Funktion inklusive",
-    ],
-    lifetimeName: "Lebenslang",
-    lifetimeTagline: "Einmal zahlen. Alles aus Pro für immer, und jede Neuerung vor allen anderen.",
-    lifetimeCta: "Lebenslang kaufen",
-    oneTimeBadge: "EINMALZAHLUNG",
-    everythingInPro: "Alles aus Pro, plus:",
-    lifetimeExclusive: "Nur lebenslang",
-    lifetimeFeatures: [
-      "Früher Zugang zu ausgewählten Vorschauversionen, sofern verfügbar",
-      "Jede künftige Version inklusive, ohne jede Verlängerung",
-      "Bevorzugter Support, beantwortet vom Entwickler",
-    ],
+    commitmentTitle: "Notre engagement",
+    commitmentBody:
+      "WinCraft est et restera gratuit. Chacun doit pouvoir utiliser des outils qui aident à comprendre et à optimiser son PC : aucun coût caché, aucune fonction verrouillée, aucun abonnement.",
   },
   toggle: { on: "Ein", off: "Aus" },
   driverBooster: {
@@ -8303,7 +7998,7 @@ const de: Strings = {
     error: "Update fehlgeschlagen: {message}",
     checkFailed: "Update-Prüfung fehlgeschlagen: {message}",
   },
-  badges: { admin: "Admin", pro: "PRO", soon: "DEMNÄCHST" },
+  badges: { admin: "Admin", soon: "DEMNÄCHST" },
   emptyCategory: "In dieser Kategorie sind noch keine Optimierungen verfügbar — bald verfügbar.",
   gameSessions: {
     title: "Game Sessions",
@@ -8579,15 +8274,6 @@ const de: Strings = {
     breached:
       "In {count} bekannten Datenlecks gefunden. Ändere es sofort, überall wo du es verwendest.",
     error: "Konnte gerade nicht geprüft werden: Verbindung prüfen und erneut versuchen.",
-  },
-  paywall: {
-    title: "Pro-Funktion",
-    body: "Dieses Tool ist mit WinCraft Pro verfügbar. Vergleiche die Tarife und ihre Leistungen, bevor du dich entscheidest.",
-    unlock: "Tarife & Preise ansehen",
-    notNow: "Nicht jetzt",
-    priceLine:
-      "Lifetime: {lifetime} einmalig, ohne Verlängerung. Oder {annual} pro Jahr bzw. {monthly} pro Monat.",
-    notConnectedToast: "Die Pro-Zahlung ist in dieser Entwicklungsversion noch nicht angebunden.",
   },
   cleanupConfirm: {
     previewLoading: "Es wird berechnet, was in den Papierkorb verschoben wird...",
@@ -8951,9 +8637,7 @@ const de: Strings = {
     account: "Konto",
     plan: "Tarif",
     planFree: "Kostenlos",
-    planPro: "Pro",
     viewPlan: "Plan ansehen",
-    upgradeButton: "Auf Pro upgraden",
     language: "Sprache",
     theme: "Designs",
     about: "Info",
@@ -8965,8 +8649,7 @@ const de: Strings = {
     photoFailed: "Dieses Bild konnte nicht als Profilfoto verwendet werden.",
     support: "Support",
     reportIssue: "Ein Problem melden",
-    aboutBody:
-      "WinCraft — Systemoptimierungen mit automatischer Sicherung und Wiederherstellung.",
+    aboutBody: "WinCraft — Systemoptimierungen mit automatischer Sicherung und Wiederherstellung.",
     close: "Schließen",
   },
   auth: {
@@ -9831,69 +9514,26 @@ const pt: Strings = {
     clear: "Limpar",
   },
   pricing: {
-    eyebrow: "Desbloqueia tudo",
-    title: "Escolha até onde quer ir",
-    subtitle:
-      "Cada alteração guarda antes como estava: o que experimentar aqui desfaz-se num clique. O gratuito cobre o essencial; o Pro abre o resto.",
-    monthly: "Mensal",
-    annual: "Anual",
-    lifetime: "Vitalício",
-    saveBadge: "POUPE {percent}%",
-    perMonth: "/mês",
-    perYear: "/ano",
-    once: "pagamento único",
-    lifetimeDetail:
-      "Pague uma vez e fica seu. Compensa em {months} meses face ao plano anual e, a partir daí, não paga mais nada",
-    annualDetail: "Isso equivale a {monthly} por mês, cobrados {yearly} de uma vez por ano",
-    annualNudge: "No plano anual seria {price} por mês",
-    mostChosen: "MAIS ESCOLHIDO",
-    freeName: "Grátis",
-    freeTagline: "Tudo o que precisa para um PC mais limpo e ágil.",
-    freePriceNote: "Grátis para sempre, sem expirar",
-    freeCta: "Está no plano Grátis",
-    freeCurrent: "Plano atual",
-    proName: "Pro",
-    proTagline:
-      "Todos os ajustes, incluindo os que exigem privilégios de administrador e os que faria à mão no registo.",
-    proCta: "Subscrever o Pro",
-    proCurrent: "O seu plano",
-    manageBilling: "Gerir subscrição",
-    lifetimeOwned: "O Pro é seu para sempre",
-    switchToLifetime: "Mudar para o vitalício",
-    proActiveNoBilling: "O Pro está ativo nesta conta",
-    everythingInFree: "Tudo do Grátis, mais:",
-    included: "Incluído",
-    reassurance:
-      "Cancele quando quiser. Cada alteração continua a um clique de ser anulada, mesmo depois de cancelar.",
-    freeFeatures: [
-      "{count} ajustes do Windows para rever e aplicar",
-      "Monitor do sistema em tempo real (CPU, memória, disco)",
-      "Gestor de programas de arranque",
-      "Verificação de fugas de palavras-passe",
-      "Verificação e correção do PC com um clique",
-      "Limpeza de ficheiros temporários",
+    title: "Grátis para todos",
+    intro:
+      "O WinCraft é gratuito e de código aberto: todas as ferramentas incluídas, sem subscrição e sem funcionalidades pagas.",
+    planName: "Tudo incluído",
+    planTagline:
+      "Todas as ferramentas, todos os ajustes, todas as funcionalidades: sem restrições.",
+    priceAmount: "$0",
+    priceNote: "para sempre",
+    features: [
+      "Todos os ajustes e otimizações do sistema",
+      "Ferramentas avançadas de gaming e privacidade",
+      "Limpeza do disco, desfragmentação e reparação do sistema",
+      "Atualização de drivers e diagnóstico de hardware",
+      "Sessões de jogo e perfis de monitorização",
+      "Purga de memória Zero-Trace e destruição segura de ficheiros",
+      "Todas as atualizações futuras incluídas",
     ],
-    proFeatures: [
-      "Sessões de jogo: o turbo ativa-se sozinho ao iniciar um jogo",
-      "Preset Turbo Gaming e prioridade máxima para jogos",
-      "Privacidade avançada: telemetria e histórico de atividades",
-      "Encontra e remove ficheiros duplicados",
-      "Limpa a cache do Windows Update",
-      "Desativa a indexação que mantém o disco ocupado",
-      "Cada ajuste e cada funcionalidade futura, incluídos",
-    ],
-    lifetimeName: "Vitalício",
-    lifetimeTagline:
-      "Pague uma só vez. Todo o Pro para sempre, e cada novidade antes de toda a gente.",
-    lifetimeCta: "Comprar vitalício",
-    oneTimeBadge: "PAGAMENTO ÚNICO",
-    everythingInPro: "Tudo o que inclui o Pro, mais:",
-    lifetimeExclusive: "Só no vitalício",
-    lifetimeFeatures: [
-      "Acesso antecipado a versões de pré-visualização selecionadas, quando disponíveis",
-      "Todas as versões futuras incluídas, sem nunca renovar",
-      "Apoio prioritário, respondido pelo programador",
-    ],
+    commitmentTitle: "O nosso compromisso",
+    commitmentBody:
+      "O WinCraft é e continuará a ser gratuito. Todos devem poder usar ferramentas que ajudam a compreender e a otimizar o seu PC: sem custos escondidos, sem funcionalidades bloqueadas, sem subscrições.",
   },
   toggle: { on: "Ativado", off: "Desativado" },
   driverBooster: {
@@ -9983,7 +9623,7 @@ const pt: Strings = {
     error: "A atualização falhou: {message}",
     checkFailed: "Não foi possível procurar atualizações: {message}",
   },
-  badges: { admin: "Admin", pro: "PRO", soon: "EM BREVE" },
+  badges: { admin: "Admin", soon: "EM BREVE" },
   emptyCategory: "Ainda não há ajustes disponíveis nesta categoria — mais em breve.",
   gameSessions: {
     title: "Sessões de jogo",
@@ -10260,16 +9900,6 @@ const pt: Strings = {
     breached:
       "Encontrada em {count} fugas conhecidas. Mude-a agora, em todos os sítios onde a usa.",
     error: "Não foi possível verificar agora: confirme a sua ligação e tente novamente.",
-  },
-  paywall: {
-    title: "Funcionalidade Pro",
-    body: "Esta ferramenta está disponível com o WinCraft Pro. Compare os planos e veja o que incluem antes de escolher.",
-    unlock: "Ver planos e preços",
-    notNow: "Agora não",
-    priceLine:
-      "Vitalício: {lifetime} num único pagamento, sem renovações. Ou {annual} por ano, ou {monthly} por mês.",
-    notConnectedToast:
-      "O pagamento do Pro ainda não está configurado nesta versão de desenvolvimento.",
   },
   cleanupConfirm: {
     previewLoading: "A calcular o que irá para a Reciclagem...",
@@ -10629,9 +10259,7 @@ const pt: Strings = {
     account: "Conta",
     plan: "Plano",
     planFree: "Grátis",
-    planPro: "Pro",
     viewPlan: "Ver o seu plano",
-    upgradeButton: "Subscrever o Pro",
     language: "Idioma",
     theme: "Temas",
     about: "Sobre",

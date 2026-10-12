@@ -47,6 +47,16 @@ jobs:
       - name: TypeScript
         run: npx tsc --noEmit
 
+      # Lint and formatting were previously only enforced by `npm run check`,
+      # which the release workflow runs on tags — so a lint error or an
+      # unformatted file could sit on master until release day. They are cheap
+      # and deterministic; run them on every push like the other gates.
+      - name: ESLint
+        run: npm run lint
+
+      - name: Prettier
+        run: npm run format:check
+
       - name: Release verification regression tests
         run: node --test scripts/release-verification.test.mjs
 
@@ -65,6 +75,11 @@ jobs:
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           node scripts/test-ui-polish.mjs
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      # React components and frontend modules in jsdom. The script suites above
+      # cover the pure models; this is the only gate that renders a component.
+      - name: Component and module tests
+        run: npm test
 
       - name: Translations (keys + placeholders across all languages)
         run: npm run check:i18n
