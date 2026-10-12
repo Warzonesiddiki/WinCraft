@@ -19,7 +19,8 @@ device is sent in that check.
 ## Account data
 
 Creating an account is optional and is only required for account-based features
-such as a Pro subscription. When you register, our backend stores:
+such as the licence of the separate WinCraft Uninstaller. When you register, our
+backend stores:
 
 - Your **first name**, **last name**, **date of birth** and **email address**
 - Your password as a **bcrypt hash**; the plain password is never stored
@@ -29,9 +30,10 @@ such as a Pro subscription. When you register, our backend stores:
 - A session-revocation version used to invalidate existing sign-ins
 
 The same account signs you in to WinCraft, WinCraft Uninstaller and Tweaky
-Driver. Each app keeps its own sign-in sessions and its own paid plan; a
-subscription to one app does not unlock another. Changing or resetting your
-password applies to all three and signs you out of each.
+Driver. Each app keeps its own sign-in sessions and its own entitlement; a
+subscription or licence in one app does not unlock another, and WinCraft itself
+has no plan to buy. Changing or resetting your password applies to all three and
+signs you out of each.
 
 ## Information you choose to submit
 
@@ -114,7 +116,7 @@ data it collects and treats failures as closed rather than granting access.
 
 You can leave optional error reporting disabled, unsubscribe from newsletters,
 and request access, correction or deletion of your personal data. Use the
-private support form at https://pctweaker.app/support. Do not publish personal
+private support form at https://wincraft.app/support. Do not publish personal
 information in a public GitHub issue.
 
 Some payment or security records may need to be retained where required by law

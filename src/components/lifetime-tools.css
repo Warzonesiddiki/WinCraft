@@ -9,17 +9,6 @@
 .lifetime-tools > header {
   margin-bottom: 20px;
 }
-.lifetime-tools-tag {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  margin-bottom: 8px;
-  color: var(--app-accent);
-  font-size: 10px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.075em;
-}
 .lifetime-tools h2 {
   font-size: 21px;
   font-weight: 600;
@@ -30,22 +19,6 @@
   font-size: 12px;
   line-height: 1.65;
   margin-top: 7px;
-}
-.lifetime-tools-access {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  margin-bottom: 20px;
-  padding: 13px 15px;
-  background: var(--surface-2);
-  border-radius: 8px;
-}
-.lifetime-tools-access p {
-  flex: 1;
-  margin: 0;
-}
-.lifetime-tools-access button {
-  flex-shrink: 0;
 }
 .lifetime-tool-block {
   padding-block: 22px;
@@ -185,10 +158,6 @@
 @media (max-width: 900px) {
   .lifetime-tools {
     padding: 18px;
-  }
-  .lifetime-tools-access {
-    flex-direction: column;
-    align-items: start;
   }
   .lifetime-comparison {
     grid-template-columns: 1fr;

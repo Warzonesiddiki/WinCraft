@@ -711,7 +711,7 @@ pub fn before_after(app: tauri::AppHandle) -> Result<BeforeAfter, String> {
 /// A file on a local drive with one of `extensions`: no network share or
 /// mapped network drive (either would send this user's credentials to it), no
 /// device path, no alternate data stream, and nothing inside the app's own
-/// data folder (its journals and licence are not export targets). For files
+/// data folder, which is never an export target. For files
 /// the user picked in a save or open dialog.
 pub(crate) fn local_file(path: &str, extensions: &[&str]) -> Option<std::path::PathBuf> {
     let target = std::path::PathBuf::from(path);

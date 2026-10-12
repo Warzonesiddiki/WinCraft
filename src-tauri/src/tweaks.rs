@@ -112,7 +112,7 @@ pub fn all_tweaks() -> Vec<RegistryTweak> {
             value_name: "Win32PrioritySeparation",
             on_value: RegValue::Dword(38),
             requires_admin: true,
-            requires_pro: true,
+            requires_pro: false,
         },
         RegistryTweak {
             id: "disable_game_dvr",
@@ -136,7 +136,7 @@ pub fn all_tweaks() -> Vec<RegistryTweak> {
             value_name: "AllowTelemetry",
             on_value: RegValue::Dword(0),
             requires_admin: true,
-            requires_pro: true,
+            requires_pro: false,
         },
         RegistryTweak {
             id: "reset_advertising_id",
@@ -184,7 +184,7 @@ pub fn all_tweaks() -> Vec<RegistryTweak> {
             value_name: "HwSchMode",
             on_value: RegValue::Dword(2),
             requires_admin: true,
-            requires_pro: true,
+            requires_pro: false,
         },
         RegistryTweak {
             id: "network_throttling_index",
@@ -208,7 +208,7 @@ pub fn all_tweaks() -> Vec<RegistryTweak> {
             value_name: "SystemResponsiveness",
             on_value: RegValue::Dword(0),
             requires_admin: true,
-            requires_pro: true,
+            requires_pro: false,
         },
         RegistryTweak {
             id: "keep_kernel_in_ram",
@@ -220,7 +220,7 @@ pub fn all_tweaks() -> Vec<RegistryTweak> {
             value_name: "DisablePagingExecutive",
             on_value: RegValue::Dword(1),
             requires_admin: true,
-            requires_pro: true,
+            requires_pro: false,
         },
         RegistryTweak {
             id: "auto_end_frozen_tasks",
@@ -232,7 +232,7 @@ pub fn all_tweaks() -> Vec<RegistryTweak> {
             value_name: "AutoEndTasks",
             on_value: RegValue::Str("1".to_string()),
             requires_admin: false,
-            requires_pro: true,
+            requires_pro: false,
         },
         RegistryTweak {
             id: "instant_folder_loading",
@@ -244,7 +244,7 @@ pub fn all_tweaks() -> Vec<RegistryTweak> {
             value_name: "FolderType",
             on_value: RegValue::Str("NotSpecified".to_string()),
             requires_admin: false,
-            requires_pro: true,
+            requires_pro: false,
         },
         RegistryTweak {
             id: "taskbar_align_left",
@@ -340,7 +340,7 @@ pub fn all_tweaks() -> Vec<RegistryTweak> {
             value_name: "PowerThrottlingOff",
             on_value: RegValue::Dword(1),
             requires_admin: true,
-            requires_pro: true,
+            requires_pro: false,
         },
         RegistryTweak {
             id: "games_gpu_priority",
@@ -352,7 +352,7 @@ pub fn all_tweaks() -> Vec<RegistryTweak> {
             value_name: "GPU Priority",
             on_value: RegValue::Dword(8),
             requires_admin: true,
-            requires_pro: true,
+            requires_pro: false,
         },
         RegistryTweak {
             id: "disable_tailored_experiences",
@@ -486,7 +486,7 @@ pub fn all_tweaks() -> Vec<RegistryTweak> {
             value_name: "GlobalUserDisabled",
             on_value: RegValue::Dword(1),
             requires_admin: false,
-            requires_pro: true,
+            requires_pro: false,
         },
         RegistryTweak {
             id: "disable_delivery_optimization",
@@ -498,7 +498,7 @@ pub fn all_tweaks() -> Vec<RegistryTweak> {
             value_name: "DODownloadMode",
             on_value: RegValue::Dword(0),
             requires_admin: true,
-            requires_pro: true,
+            requires_pro: false,
         },
         RegistryTweak {
             id: "disable_copilot",
@@ -558,7 +558,7 @@ pub fn all_tweaks() -> Vec<RegistryTweak> {
             value_name: "DisableAIDataAnalysis",
             on_value: RegValue::Dword(1),
             requires_admin: true,
-            requires_pro: true,
+            requires_pro: false,
         },
         RegistryTweak {
             id: "global_timer_resolution",
@@ -570,7 +570,7 @@ pub fn all_tweaks() -> Vec<RegistryTweak> {
             value_name: "GlobalTimerResolutionRequests",
             on_value: RegValue::Dword(1),
             requires_admin: true,
-            requires_pro: true,
+            requires_pro: false,
         },
         RegistryTweak {
             id: "disable_memory_integrity",
@@ -582,7 +582,7 @@ pub fn all_tweaks() -> Vec<RegistryTweak> {
             value_name: "Enabled",
             on_value: RegValue::Dword(0),
             requires_admin: true,
-            requires_pro: true,
+            requires_pro: false,
         },
     ]
 }

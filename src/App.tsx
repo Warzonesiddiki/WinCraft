@@ -1,10 +1,9 @@
-import { orderSectionTweaks } from "./feature-order";
+import { tweaksForSection } from "./tweak-list-model";
 import { TweakyDriverPromoCard } from "./components/tweaky-driver-promo";
-import { NetworkCheckPanel } from "./components/diagnostics";
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, { Suspense, lazy, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { invoke } from "@tauri-apps/api/core";
 import { openUrl } from "@tauri-apps/plugin-opener";
-import { STRINGS, Lang, detectInitialLang, format, localeOf } from "./i18n";
+import { Lang, detectInitialLang, format, loadStrings, localeOf, stringsFor } from "./i18n";
 import { ThemeName, detectInitialTheme } from "./theme";
 import {
   API_BASE_URL,
@@ -34,51 +33,145 @@ import {
   HeartPulseIcon,
   ThermometerIcon,
 } from "./components/icons";
-import { Badge, Toggle, UpdateBanner } from "./components/ui";
-import {
-  BrowserCleanupCard,
-  CleanupCard,
-  ScheduledCleanupCard,
-  CleanupConfirmModal,
-  DiskToolsSection,
-  DnsFlushCard,
-  DuplicateFinder,
-  IpMaskCard,
-  LargeFileFinder,
-  PasswordBreachCheck,
-  RedaxaPromoCard,
-  UninstallerPromoCard,
-} from "./components/maintenance";
+import { UpdateBanner } from "./components/ui";
 import { AccountMenu } from "./components/account";
-import { TweakIcon } from "./components/tweak-icon";
-import { TechnicalDetails, TechnicalToggle } from "./components/technical";
-import { GameSessionsPanel, TurboBoostPanel } from "./components/gaming";
-import { X3dPanel } from "./components/x3d";
-import { ScanPanel } from "./components/scan";
-import { HealthPanel } from "./components/health";
-import { BeforeAfterPanel } from "./components/before-after";
-import { SystemRepairCard } from "./components/repair";
-import { LiveDashboard } from "./components/live-dashboard";
-import { PageBoundary } from "./components/page-boundary";
-import { AppCacheCard, CookieCleanerCard } from "./components/cleaners";
-import { HardwarePanel } from "./components/hardware";
-import { RamCleaner, SystemMonitor, useScheduledRamClean } from "./components/monitor";
-import { CrashReportsCard, DriftWatchToggle, UpdateDriftCard } from "./components/intelligence";
-import { ChangeHistory } from "./components/change-history";
-import { usePulseSamples } from "./components/command";
-import { ScheduledTaskManager, StartupManager } from "./components/startup";
-import { ProfilesPanel } from "./components/profiles";
-import { PricingPanel } from "./components/pricing";
-import { GamingHudCard, ZeroTraceCard } from "./components/pro";
-import { TitleBar } from "./components/titlebar";
+import { TweakRow } from "./components/tweak-row";
 import { CATEGORY_STYLE } from "./categories";
-import { Dashboard } from "./components/dashboard";
+import { ScanPanel } from "./components/scan";
+import { PageBoundary } from "./components/page-boundary";
+import { RamCleaner, SystemMonitor, useScheduledRamClean } from "./components/monitor";
+import { usePulseSamples } from "./components/command";
+import { TitleBar } from "./components/titlebar";
 import { CommandPalette, useCommandPaletteShortcut } from "./components/command-palette";
 import { OnboardingFlow, shouldShowOnboarding } from "./components/onboarding";
 import { WorkspaceSidebar } from "./components/workspace-sidebar";
-import { DebloatPanel } from "./components/debloat";
-import { AdvancedControlCard } from "./components/advanced-controls";
-import { CONFIGURABLE_TWEAK_IDS, buildName, isCurrentCatalogTweak } from "./catalog";
+import { CONFIGURABLE_TWEAK_IDS, isCurrentCatalogTweak } from "./catalog";
+// Every panel except the scan view is loaded when its section is opened, so the
+// window paints from an entry chunk that carries the shell and Scan instead of
+// all of them. Tauri serves the extra chunks from the app's own bundle, which
+// makes this a local file read; a chunk that ever fails to load is caught by
+// the PageBoundary the panel sits in, which offers a retry.
+const Dashboard = lazy(() =>
+  import("./components/dashboard").then((m) => ({ default: m.Dashboard })),
+);
+const BrowserCleanupCard = lazy(() =>
+  import("./components/maintenance").then((m) => ({ default: m.BrowserCleanupCard })),
+);
+const CleanupCard = lazy(() =>
+  import("./components/maintenance").then((m) => ({ default: m.CleanupCard })),
+);
+const ScheduledCleanupCard = lazy(() =>
+  import("./components/maintenance").then((m) => ({ default: m.ScheduledCleanupCard })),
+);
+const CleanupConfirmModal = lazy(() =>
+  import("./components/maintenance").then((m) => ({ default: m.CleanupConfirmModal })),
+);
+const DiskToolsSection = lazy(() =>
+  import("./components/maintenance").then((m) => ({ default: m.DiskToolsSection })),
+);
+const DnsFlushCard = lazy(() =>
+  import("./components/maintenance").then((m) => ({ default: m.DnsFlushCard })),
+);
+const DuplicateFinder = lazy(() =>
+  import("./components/maintenance").then((m) => ({ default: m.DuplicateFinder })),
+);
+const IpMaskCard = lazy(() =>
+  import("./components/maintenance").then((m) => ({ default: m.IpMaskCard })),
+);
+const LargeFileFinder = lazy(() =>
+  import("./components/maintenance").then((m) => ({ default: m.LargeFileFinder })),
+);
+const PasswordBreachCheck = lazy(() =>
+  import("./components/maintenance").then((m) => ({ default: m.PasswordBreachCheck })),
+);
+const RedaxaPromoCard = lazy(() =>
+  import("./components/maintenance").then((m) => ({ default: m.RedaxaPromoCard })),
+);
+const UninstallerPromoCard = lazy(() =>
+  import("./components/maintenance").then((m) => ({ default: m.UninstallerPromoCard })),
+);
+const HardwarePanel = lazy(() =>
+  import("./components/hardware").then((m) => ({ default: m.HardwarePanel })),
+);
+const HealthPanel = lazy(() =>
+  import("./components/health").then((m) => ({ default: m.HealthPanel })),
+);
+const LiveDashboard = lazy(() =>
+  import("./components/live-dashboard").then((m) => ({ default: m.LiveDashboard })),
+);
+const BeforeAfterPanel = lazy(() =>
+  import("./components/before-after").then((m) => ({ default: m.BeforeAfterPanel })),
+);
+const SystemRepairCard = lazy(() =>
+  import("./components/repair").then((m) => ({ default: m.SystemRepairCard })),
+);
+const AppCacheCard = lazy(() =>
+  import("./components/cleaners").then((m) => ({ default: m.AppCacheCard })),
+);
+const CookieCleanerCard = lazy(() =>
+  import("./components/cleaners").then((m) => ({ default: m.CookieCleanerCard })),
+);
+const CrashReportsCard = lazy(() =>
+  import("./components/intelligence").then((m) => ({ default: m.CrashReportsCard })),
+);
+const DriftWatchToggle = lazy(() =>
+  import("./components/intelligence").then((m) => ({ default: m.DriftWatchToggle })),
+);
+const UpdateDriftCard = lazy(() =>
+  import("./components/intelligence").then((m) => ({ default: m.UpdateDriftCard })),
+);
+const ChangeHistory = lazy(() =>
+  import("./components/change-history").then((m) => ({ default: m.ChangeHistory })),
+);
+const ScheduledTaskManager = lazy(() =>
+  import("./components/startup").then((m) => ({ default: m.ScheduledTaskManager })),
+);
+const StartupManager = lazy(() =>
+  import("./components/startup").then((m) => ({ default: m.StartupManager })),
+);
+const ProfilesPanel = lazy(() =>
+  import("./components/profiles").then((m) => ({ default: m.ProfilesPanel })),
+);
+const PricingPanel = lazy(() =>
+  import("./components/pricing").then((m) => ({ default: m.PricingPanel })),
+);
+const GamingHudCard = lazy(() =>
+  import("./components/pro").then((m) => ({ default: m.GamingHudCard })),
+);
+const ZeroTraceCard = lazy(() =>
+  import("./components/pro").then((m) => ({ default: m.ZeroTraceCard })),
+);
+const GameSessionsPanel = lazy(() =>
+  import("./components/gaming").then((m) => ({ default: m.GameSessionsPanel })),
+);
+const TurboBoostPanel = lazy(() =>
+  import("./components/gaming").then((m) => ({ default: m.TurboBoostPanel })),
+);
+const X3dPanel = lazy(() => import("./components/x3d").then((m) => ({ default: m.X3dPanel })));
+const NetworkCheckPanel = lazy(() =>
+  import("./components/diagnostics").then((m) => ({ default: m.NetworkCheckPanel })),
+);
+const DebloatPanel = lazy(() =>
+  import("./components/debloat").then((m) => ({ default: m.DebloatPanel })),
+);
+
+/** Stands in for a panel while its chunk loads: the shape of a panel rather
+ *  than a spinner, so the page does not jump when the real one arrives. It is
+ *  decorative - the wait is not actionable and is normally a frame or two. */
+function PanelSkeleton() {
+  return (
+    <div
+      className="tool-panel tool-card animate-card rounded-2xl border border-line bg-surface-1 p-5"
+      aria-hidden="true"
+    >
+      <div className="skeleton h-5 w-56" />
+      <div className="skeleton mt-4 h-4 w-full" />
+      <div className="skeleton mt-2 h-4 w-4/5" />
+      <div className="skeleton mt-6 h-40 w-full" />
+    </div>
+  );
+}
+
 import "./App.css";
 import "./desktop-refresh.css";
 
@@ -88,7 +181,19 @@ function App() {
   const [lang, setLangState] = useState<Lang>(
     () => (import.meta.env.DEV && (import.meta.env.VITE_START_LANG as Lang)) || detectInitialLang(),
   );
-  const s = STRINGS[lang];
+  // The words for the chosen language. `main.tsx` has already fetched the saved
+  // one, so the first paint is in the right language; picking another fetches
+  // its table and re-renders when it arrives.
+  const [s, setS] = useState(() => stringsFor(lang));
+  useEffect(() => {
+    let live = true;
+    void loadStrings(lang).then((table) => {
+      if (live) setS(table);
+    });
+    return () => {
+      live = false;
+    };
+  }, [lang]);
 
   function setLang(l: Lang) {
     setLangState(l);
@@ -117,14 +222,12 @@ function App() {
   const [auth, setAuth] = useState<AuthState>(() => {
     const email = readStoredEmail();
     const token = readToken();
-    // isPro/emailVerified start false and are corrected by refreshAccount()
-    // below as soon as it resolves — avoids briefly trusting a stale/forged
-    // local value.
+    // emailVerified starts false and is corrected by refreshAccount() below as
+    // soon as it resolves — avoids briefly trusting a stale/forged local value.
     return email && token
       ? {
           status: "authenticated",
           email,
-          isPro: false,
           emailVerified: false,
           plan: null,
           hasBilling: false,
@@ -132,9 +235,11 @@ function App() {
       : { status: "anonymous" };
   });
 
-  // WinCraft is now free for everyone — every feature is unlocked
-  // regardless of account or subscription state.
-  const isProUnlocked = true;
+  // WinCraft is free for everyone — every feature is unlocked regardless of
+  // account or subscription state. The account payload still carries an `isPro`
+  // flag, because the backend serves other products from the same tables, and
+  // the app no longer keeps it: there is no paid feature left for it to
+  // describe.
 
   // Re-reads the account from the backend. Called on mount (if already logged
   // in), right after login/register, and when the window regains focus.
@@ -161,7 +266,6 @@ function App() {
       adoptRenewedToken(res);
       const data = (await res.json()) as {
         email: string;
-        isPro: boolean;
         emailVerified: boolean;
         plan?: string | null;
         hasBilling?: boolean;
@@ -169,7 +273,6 @@ function App() {
       setAuth({
         status: "authenticated",
         email: data.email,
-        isPro: data.isPro,
         emailVerified: data.emailVerified,
         // Optional so a client that is newer than the deployed backend
         // degrades to hiding the billing button rather than showing one
@@ -177,28 +280,12 @@ function App() {
         plan: data.plan ?? null,
         hasBilling: data.hasBilling ?? false,
       });
-      // Fire-and-forget: refreshLicense() has its own error handling and
-      // must never block the UI's account status on a signing hiccup.
-      // Kept for compatibility: the Rust license store still reads it, but
-      // since require_pro() always succeeds, this is a no-op in practice.
-      void refreshLicense();
     } catch {
-      // Network hiccup: keep whatever Pro status we already had rather than
-      // dropping the user back to Free on a transient failure — but say so,
-      // since a silent failure here is indistinguishable from actually
-      // having lost Pro access (see: the account that looked like it had
-      // reverted to Free while the server still reported it as Pro).
+      // Network hiccup: keep the account state we already had rather than
+      // signing the user out on a transient failure — but say so, since a
+      // silent failure here is indistinguishable from the token expiring.
       pushToast("error", s.toasts.accountRefreshFailed);
     }
-  }
-
-  /**
-   * WinCraft is now free for everyone — no license check is needed.
-   * Kept as a no-op stub so call sites compile without changes and the
-   * function can be removed in a future cleanup pass.
-   */
-  async function refreshLicense() {
-    // No-op: require_pro() always succeeds on the Rust side.
   }
 
   // The server can hold every runtime adjustment to other apps for everyone
@@ -226,6 +313,10 @@ function App() {
   }, []);
 
   useEffect(() => {
+    // Mount-time account refresh. Its state updates land after the await, so
+    // this is the documented fetch-then-set pattern rather than a cascading
+    // render, which the rule cannot see through.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     refreshAccount();
     // Before this version the profile photo belonged to the computer rather
     // than to an account. Whoever is signed in as the app starts is the one
@@ -244,10 +335,6 @@ function App() {
   function logout() {
     clearSession();
     setAuth({ status: "anonymous" });
-    // Without this, a still-fresh cached Pro license would keep unlocking
-    // Pro tweaks for whoever uses the app next on this machine, for up to
-    // its grace period — including an anonymous session.
-    void invoke("clear_license").catch(() => {});
     // Same reasoning for the photo: a machine-wide leftover from before
     // per-account storage must not survive to be inherited by whoever signs
     // in next. Each account's own photo is untouched and waiting for them.
@@ -282,7 +369,6 @@ function App() {
     setAuth({
       status: "authenticated",
       email,
-      isPro: false,
       emailVerified: false,
       plan: null,
       hasBilling: false,
@@ -296,7 +382,7 @@ function App() {
   async function resendVerification() {
     if (!API_BASE_URL) throw new Error(s.auth.backendNotConfigured);
     const token = readToken();
-    if (!token) throw new Error(s.auth.loginRequiredForCheckout);
+    if (!token) throw new Error(s.auth.loginRequiredToResend);
     const res = await fetch(`${API_BASE_URL}/api/auth/resend-verification`, {
       method: "POST",
       headers: { Authorization: `Bearer ${token}` },
@@ -429,6 +515,8 @@ function App() {
   }
 
   useEffect(() => {
+    // Mount-time load; every setState in refresh() lands after its await.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     refresh().catch((e) => pushToast("error", String(e)));
   }, []);
 
@@ -446,10 +534,6 @@ function App() {
 
   async function toggle(tweak: TweakInfo) {
     const text = textFor(s.tweaks, tweak.id, tweak.name, tweak.description);
-    if (tweak.requires_pro && !isProUnlocked) {
-      void 0;
-      return;
-    }
     setBusyId(tweak.id);
     try {
       if (tweak.applied) {
@@ -461,19 +545,11 @@ function App() {
       }
       await refresh();
     } catch (e) {
-      // The Rust side re-verifies Pro independently of this screen's own
-      // gate above — see license.rs. In normal use that gate already stops
-      // a non-Pro user from getting here, so the only realistic way to hit
-      // this is a genuine subscriber whose cached proof of that went stale
-      // from being offline past the grace period. Rust's raw error message
-      // ("requires an active subscription") would be misleading for them —
-      // they have one — so this is worded around reconnecting instead.
-      const message = String(e);
-      if (message.startsWith("PRO_REQUIRED: ")) {
-        pushToast("error", s.toasts.licenseNeedsRefresh);
-      } else {
-        pushToast("error", friendlyError(message, s));
-      }
+      // Nothing here gates a tweak any more, so a refusal is the machine's
+      // own: an administrator prompt declined, a key this PC locks down, a
+      // value Windows writes back. `friendlyError` maps the markers Rust
+      // sends onto the sentence that explains the fix.
+      pushToast("error", friendlyError(e, s));
     } finally {
       setBusyId(null);
     }
@@ -563,40 +639,10 @@ function App() {
 
   const searching = query.trim().length > 0;
 
-  const visibleTweaks = useMemo(() => {
-    // Turbo Boost is deliberately excluded: it has its own dedicated card on
-    // the Gaming screen, so listing it again would show two controls for it.
-    const base = tweaks.filter((t) => t.id !== "turbo_boost");
-
-    // While searching, ignore the selected section and look everywhere —
-    // otherwise the user has to already know which category a tweak lives in,
-    // which is exactly what the search is there to avoid.
-    if (searching) {
-      const needle = query.trim().toLowerCase();
-      return base.filter((t) => {
-        const text = textFor(s.tweaks, t.id, t.name, t.description);
-        return (
-          text.name.toLowerCase().includes(needle) ||
-          text.description.toLowerCase().includes(needle)
-        );
-      });
-    }
-
-    if (
-      filter === "overview" ||
-      filter === "scan" ||
-      filter === "health" ||
-      filter === "hardware" ||
-      filter === "startup" ||
-      filter === "pricing" ||
-      filter === "profiles"
-    )
-      return [];
-
-    const inCategory = base.filter((t) => t.category === filter);
-
-    return orderSectionTweaks(inCategory, filter);
-  }, [tweaks, filter, query, searching, s]);
+  const visibleTweaks = useMemo(
+    () => tweaksForSection(tweaks, filter, query, s),
+    [tweaks, filter, query, s],
+  );
 
   const showCleanup = filter === "maintenance" && !searching;
   const showPrivacyExtras = filter === "privacy" && !searching;
@@ -617,9 +663,6 @@ function App() {
   const restorableCount = tweaks.filter(
     (t) => t.applied && !CONFIGURABLE_TWEAK_IDS.has(t.id),
   ).length;
-  // What the pricing page can honestly promise a Free user.
-  const freeTweakCount = catalogTweaks.filter((t) => !t.requires_pro).length;
-
   const currentLabel = CATEGORIES.find((c) => c.key === filter)?.label ?? "";
 
   // The title bar shows the machine as it is right now, from the same samples
@@ -651,7 +694,6 @@ function App() {
           s={s}
           items={CATEGORIES}
           active={filter}
-          isPro={isProUnlocked}
           showHistory={FEATURE_INTELLIGENCE}
           onNavigate={setFilter}
           onTip={async (quantity) => {
@@ -751,7 +793,6 @@ function App() {
                 onLogout={logout}
                 onResendVerification={resendVerification}
                 onForgotPassword={forgotPassword}
-                onUpgrade={() => void 0}
                 onViewPlan={() => setFilter("pricing")}
                 pushToast={pushToast}
               />
@@ -759,483 +800,303 @@ function App() {
 
             <div hidden={!showScan} className="workspace-view workspace-scan-view">
               <PageBoundary s={s} resetKey="scan">
-                <div id="scan-results">
-                  <ScanPanel
-                    s={s}
-                    lang={lang}
-                    isPro={isProUnlocked}
-                    onFixed={refresh}
-                    pushToast={pushToast}
-                    onNavigate={setFilter}
-                    onBusyChange={(busy) => {
-                      scanApplying.current = busy;
-                    }}
-                  />
-                  <TweakyDriverPromoCard s={s} />
-                </div>
+                <Suspense fallback={<PanelSkeleton />}>
+                  <div id="scan-results">
+                    <ScanPanel
+                      s={s}
+                      lang={lang}
+                      onFixed={refresh}
+                      pushToast={pushToast}
+                      onNavigate={setFilter}
+                      onBusyChange={(busy) => {
+                        scanApplying.current = busy;
+                      }}
+                    />
+                    <TweakyDriverPromoCard s={s} />
+                  </div>
+                </Suspense>
               </PageBoundary>
             </div>
 
             <div key={filter} className="workspace-view">
               <PageBoundary s={s} resetKey={filter}>
-                {showOverview && (
-                  <Dashboard
-                    s={s}
-                    lang={lang}
-                    tweaks={tweaks}
-                    samples={pulseSamples}
-                    onNavigate={setFilter}
-                    onScan={() => setFilter("scan")}
-                    onRestoreAll={restoreAll}
-                  />
-                )}
-
-                {showCleanup && (
-                  <>
-                    <RamCleaner
-                      s={s}
-                      samples={pulseSamples}
-                      autoMinutes={ramAutoMinutes}
-                      onChangeAuto={chooseRamAuto}
-                      auto={autoClean}
-                      pushToast={pushToast}
-                    />
-                    <ul className="maintenance-drive-tools">
-                      <DiskToolsSection
-                        s={s}
-                        isPro={isProUnlocked}
-                        onRequirePro={() => void 0}
-                        onToast={pushToast}
-                      />
-                    </ul>
-                    <SystemMonitor s={s} />
-                  </>
-                )}
-
-                {showHardware && (
-                  <HardwarePanel
-                    s={s}
-                    isPro={isProUnlocked}
-                    onRequirePro={() => void 0}
-                    pushToast={pushToast}
-                  />
-                )}
-
-                {showHealth && <LiveDashboard s={s} lang={lang} onNavigate={setFilter} />}
-                {showHealth && (
-                  <BeforeAfterPanel s={s} lang={lang} tweaks={tweaks} pushToast={pushToast} />
-                )}
-                {showHealth && (
-                  <SystemRepairCard
-                    s={s}
-                    isPro={isProUnlocked}
-                    onRequirePro={() => void 0}
-                    pushToast={pushToast}
-                  />
-                )}
-
-                {showHealth && (
-                  <HealthPanel
-                    title={s.healthPanel.title}
-                    subtitle={s.healthPanel.subtitle}
-                    refreshLabel={s.healthPanel.refresh}
-                    computeLabel={s.healthPanel.compute}
-                    computingLabel={s.healthPanel.computing}
-                    idleHint={s.healthPanel.idleHint}
-                    showMore={s.healthPanel.showMore}
-                    showLess={s.healthPanel.showLess}
-                    stages={[
-                      s.healthPanel.stageProfile,
-                      s.healthPanel.stageTweaks,
-                      s.healthPanel.stageSecurity,
-                      s.healthPanel.stageScoring,
-                    ]}
-                    verdicts={{
-                      excellent: s.healthPanel.verdictExcellent,
-                      good: s.healthPanel.verdictGood,
-                      fair: s.healthPanel.verdictFair,
-                      needsWork: s.healthPanel.verdictNeedsWork,
-                    }}
-                    change={{
-                      sinceLast: s.healthPanel.changeSinceLast,
-                      noChange: s.healthPanel.changeNone,
-                      firstRun: s.healthPanel.changeFirstRun,
-                      whyTitle: s.healthPanel.changeWhyTitle,
-                      contributes: s.healthPanel.changeContributes,
-                      structural: s.healthPanel.changeStructural,
-                      trend: s.healthPanel.changeTrend,
-                    }}
-                    categoryLabels={s.healthPanel.categories}
-                  />
-                )}
-
-                {showLedger && (
-                  <>
-                    {/* Above the ledger: a crash is the one thing on this screen
-                  that needs acting on, and it renders nothing at all when
-                  there are no reports. */}
-                    {/* Above the crash card: a reverted tweak is something the
-                  user can act on right now, and it renders nothing when
-                  nothing drifted. */}
-                    <DriftWatchToggle s={s} pushToast={pushToast} />
-                    <UpdateDriftCard
-                      s={s}
-                      tweaks={tweaks}
-                      onChanged={refresh}
-                      pushToast={pushToast}
-                    />
-                    <CrashReportsCard s={s} pushToast={pushToast} />
-                    <ChangeHistory
+                <Suspense fallback={<PanelSkeleton />}>
+                  {showOverview && (
+                    <Dashboard
                       s={s}
                       lang={lang}
                       tweaks={tweaks}
+                      samples={pulseSamples}
+                      onNavigate={setFilter}
+                      onScan={() => setFilter("scan")}
+                      onRestoreAll={restoreAll}
+                    />
+                  )}
+
+                  {showCleanup && (
+                    <>
+                      <RamCleaner
+                        s={s}
+                        samples={pulseSamples}
+                        autoMinutes={ramAutoMinutes}
+                        onChangeAuto={chooseRamAuto}
+                        auto={autoClean}
+                        pushToast={pushToast}
+                      />
+                      <ul className="maintenance-drive-tools">
+                        <DiskToolsSection s={s} onToast={pushToast} />
+                      </ul>
+                      <SystemMonitor s={s} />
+                    </>
+                  )}
+
+                  {showHardware && <HardwarePanel s={s} pushToast={pushToast} />}
+
+                  {showHealth && <LiveDashboard s={s} lang={lang} onNavigate={setFilter} />}
+                  {showHealth && (
+                    <BeforeAfterPanel s={s} lang={lang} tweaks={tweaks} pushToast={pushToast} />
+                  )}
+                  {showHealth && <SystemRepairCard s={s} pushToast={pushToast} />}
+
+                  {showHealth && (
+                    <HealthPanel
+                      title={s.healthPanel.title}
+                      subtitle={s.healthPanel.subtitle}
+                      refreshLabel={s.healthPanel.refresh}
+                      computeLabel={s.healthPanel.compute}
+                      computingLabel={s.healthPanel.computing}
+                      idleHint={s.healthPanel.idleHint}
+                      showMore={s.healthPanel.showMore}
+                      showLess={s.healthPanel.showLess}
+                      stages={[
+                        s.healthPanel.stageProfile,
+                        s.healthPanel.stageTweaks,
+                        s.healthPanel.stageSecurity,
+                        s.healthPanel.stageScoring,
+                      ]}
+                      verdicts={{
+                        excellent: s.healthPanel.verdictExcellent,
+                        good: s.healthPanel.verdictGood,
+                        fair: s.healthPanel.verdictFair,
+                        needsWork: s.healthPanel.verdictNeedsWork,
+                      }}
+                      change={{
+                        sinceLast: s.healthPanel.changeSinceLast,
+                        noChange: s.healthPanel.changeNone,
+                        firstRun: s.healthPanel.changeFirstRun,
+                        whyTitle: s.healthPanel.changeWhyTitle,
+                        contributes: s.healthPanel.changeContributes,
+                        structural: s.healthPanel.changeStructural,
+                        trend: s.healthPanel.changeTrend,
+                      }}
+                      categoryLabels={s.healthPanel.categories}
+                    />
+                  )}
+
+                  {showLedger && (
+                    <>
+                      {/* Above the ledger: a crash is the one thing on this screen
+                  that needs acting on, and it renders nothing at all when
+                  there are no reports. */}
+                      {/* Above the crash card: a reverted tweak is something the
+                  user can act on right now, and it renders nothing when
+                  nothing drifted. */}
+                      <DriftWatchToggle s={s} pushToast={pushToast} />
+                      <UpdateDriftCard
+                        s={s}
+                        tweaks={tweaks}
+                        onChanged={refresh}
+                        pushToast={pushToast}
+                      />
+                      <CrashReportsCard s={s} pushToast={pushToast} />
+                      <ChangeHistory
+                        s={s}
+                        lang={lang}
+                        tweaks={tweaks}
+                        onChanged={refresh}
+                        pushToast={pushToast}
+                      />
+                    </>
+                  )}
+
+                  {showStartup && <StartupManager s={s} pushToast={pushToast} />}
+
+                  {/* Keep operation state alive when navigating during a removal. */}
+                  <div hidden={filter !== "debloat" || searching}>
+                    <DebloatPanel
+                      lang={lang}
+                      active={filter === "debloat" && !searching}
+                      onNavigate={setFilter}
+                    />
+                  </div>
+
+                  {showStartup && <ScheduledTaskManager s={s} pushToast={pushToast} />}
+
+                  {showProfiles && (
+                    <ProfilesPanel
+                      s={s}
+                      lang={lang}
+                      tweaks={tweaks}
+                      authed={auth.status === "authenticated"}
+                      onRequireAuth={() => {
+                        pushToast("error", s.profiles.signInRequired);
+                        setAccountMenuOpen(true);
+                      }}
                       onChanged={refresh}
                       pushToast={pushToast}
                     />
-                  </>
-                )}
+                  )}
 
-                {showStartup && <StartupManager s={s} pushToast={pushToast} />}
+                  {showPricing && <PricingPanel s={s} />}
 
-                {/* Keep operation state alive when navigating during a removal. */}
-                <div hidden={filter !== "debloat" || searching}>
-                  <DebloatPanel
-                    lang={lang}
-                    active={filter === "debloat" && !searching}
-                    onNavigate={setFilter}
-                  />
-                </div>
+                  {showPrivacyExtras && (
+                    <>
+                      <ZeroTraceCard s={s} pushToast={pushToast} />
+                      <PasswordBreachCheck s={s} />
+                      <RedaxaPromoCard s={s} />
+                    </>
+                  )}
 
-                {showStartup && <ScheduledTaskManager s={s} pushToast={pushToast} />}
+                  {showGamingExtras && (
+                    <>
+                      <TurboBoostPanel
+                        s={s}
+                        applied={turboBoostApplied}
+                        onChanged={refresh}
+                        pushToast={pushToast}
+                      />
+                      <GameSessionsPanel s={s} />
+                    </>
+                  )}
 
-                {showProfiles && (
-                  <ProfilesPanel
-                    s={s}
-                    lang={lang}
-                    lifetimeOwned={true}
-                    onViewPlans={() => setFilter("pricing")}
-                    tweaks={tweaks}
-                    isPro={isProUnlocked}
-                    authed={auth.status === "authenticated"}
-                    onRequireAuth={() => {
-                      pushToast("error", s.profiles.signInRequired);
-                      setAccountMenuOpen(true);
-                    }}
-                    onRequirePro={() => void 0}
-                    onChanged={refresh}
-                    pushToast={pushToast}
-                  />
-                )}
-
-                {showPricing && (
-                  <PricingPanel
-                    s={s}
-                    lang={lang}
-                    isPro={isProUnlocked}
-                    heldPlan={auth.status === "authenticated" ? auth.plan : null}
-                    hasBilling={auth.status === "authenticated" && auth.hasBilling}
-                    freeTweakCount={freeTweakCount}
-                    onOpenLifetimeTools={() => setFilter("profiles")}
-                  />
-                )}
-
-                {showPrivacyExtras && (
-                  <>
-                    <ZeroTraceCard
-                      s={s}
-                      isPro={isProUnlocked}
-                      onRequirePro={() => void 0}
-                      pushToast={pushToast}
-                    />
-                    <PasswordBreachCheck s={s} />
-                    <RedaxaPromoCard s={s} />
-                  </>
-                )}
-
-                {showGamingExtras && (
-                  <>
-                    <TurboBoostPanel
-                      s={s}
-                      applied={turboBoostApplied}
-                      onChanged={refresh}
-                      pushToast={pushToast}
-                    />
-                    <GameSessionsPanel
-                      s={s}
-                      isPro={isProUnlocked}
-                      onRequirePro={() => void 0}
-                    />
-                  </>
-                )}
-
-                {/* On the UI screen: it is a panel the user places, sizes and
+                  {/* On the UI screen: it is a panel the user places, sizes and
               locks, which is the kind of thing that screen is for. Above the
               tweak list, like every other screen's headline card — below
               forty-odd rows nobody scrolled far enough to find it. */}
-                {filter === "ui" && !searching && (
-                  <GamingHudCard
-                    s={s}
-                    isPro={isProUnlocked}
-                    onRequirePro={() => void 0}
-                    pushToast={pushToast}
-                  />
-                )}
+                  {filter === "ui" && !searching && <GamingHudCard s={s} pushToast={pushToast} />}
 
-                <ul className="flex flex-col gap-3">
-                  {visibleTweaks.map((t, i) => {
-                    if (
-                      t.id === "ecoqos_rules" ||
-                      t.id === "limit_do_background_download" ||
-                      t.id === "monitor_refresh_profile"
-                    ) {
-                      return (
-                        <li
-                          key={t.id}
-                          data-tweak-id={t.id}
-                          data-priority={
-                            !searching && (filter === "performance" || filter === "gaming") && i < 3
-                          }
-                          className="animate-card section-tweak"
-                        >
-                          <AdvancedControlCard
-                            id={t.id}
-                            lang={lang}
-                            isPro={isProUnlocked}
-                            onRequirePro={() => {}}
-                            onChanged={refresh}
-                          />
-                        </li>
-                      );
-                    }
-                    const style = CATEGORY_STYLE[t.category];
-                    const text = textFor(s.tweaks, t.id, t.name, t.description);
-                    return (
-                      <li
+                  <ul className="flex flex-col gap-3">
+                    {visibleTweaks.map((t, i) => (
+                      <TweakRow
                         key={t.id}
-                        data-tweak-id={t.id}
-                        data-priority={
+                        tweak={t}
+                        index={i}
+                        priority={
                           !searching && (filter === "performance" || filter === "gaming") && i < 3
                         }
-                        style={{ animationDelay: `${i * 40}ms` }}
-                        className="animate-card section-tweak panel panel-hover group relative overflow-hidden p-4"
-                      >
-                        <div className="relative flex items-center gap-4">
-                          <div
-                            className="icon-module grid shrink-0 place-items-center"
-                            style={{ "--module-tint": style.tint } as React.CSSProperties}
-                          >
-                            <TweakIcon id={t.id} fallback={style.icon} />
-                          </div>
-                          <div className="min-w-0 flex-1">
-                            <div className="flex flex-wrap items-center gap-2">
-                              <h2 className="text-[15px] font-semibold tracking-[-0.01em] text-ink">
-                                {text.name}
-                              </h2>
-                              {/* The (i) is the door to the exact system change.
-                            A description can be argued with; a registry path
-                            can be checked in regedit, so it is one click away
-                            rather than buried in a FAQ. */}
-                              {t.changes.length > 0 ? (
-                                <TechnicalToggle
-                                  open={inspecting === t.id}
-                                  label={s.transparency.title}
-                                  hive={t.hive}
-                                  onClick={() => {
-                                    setInspecting(inspecting === t.id ? null : t.id);
-                                  }}
-                                />
-                              ) : (
-                                t.hive !== "—" && <Badge>{t.hive}</Badge>
-                              )}
-                              {t.requires_admin && <Badge kind="admin">{s.badges.admin}</Badge>}
-                              {t.requires_pro && <Badge kind="pro">{s.badges.pro}</Badge>}
-                              {(t.min_build || t.pro_edition || t.enterprise_edition) && (
-                                <Badge kind="muted">
-                                  {[
-                                    t.min_build
-                                      ? format(s.requirements.minBuild, {
-                                          version: buildName(t.min_build),
-                                        })
-                                      : null,
-                                    t.pro_edition ? s.requirements.proEdition : null,
-                                    t.enterprise_edition ? s.requirements.enterpriseEdition : null,
-                                  ]
-                                    .filter(Boolean)
-                                    .join(" · ")}
-                                </Badge>
-                              )}
-                            </div>
-                            <p className="mt-1 max-w-[52ch] text-[12.5px] leading-[1.55] text-ink-3">
-                              {text.description}
-                            </p>
-                            {t.unavailable && !t.applied && (
-                              <p className="mt-1.5 max-w-[52ch] text-[12px] leading-[1.5] text-warn">
-                                {t.unavailable === "windows_version"
-                                  ? format(s.requirements.unavailableVersion, {
-                                      version: buildName(t.min_build ?? 22000),
-                                    })
-                                  : t.unavailable === "windows_edition"
-                                    ? s.requirements.unavailableEdition
-                                    : t.unavailable === "windows_edition_enterprise"
-                                      ? s.requirements.unavailableEnterpriseEdition
-                                      : t.unavailable === "windows_protected"
-                                        ? s.requirements.windowsProtected
-                                        : s.requirements.notPresent}
-                              </p>
-                            )}
-                            {inspecting === t.id && (
-                              <TechnicalDetails changes={t.changes} s={s} previewId={t.id} />
-                            )}
-                          </div>
-                          <Toggle
-                            label={text.name}
-                            busyLabel={t.applied ? s.restore.running : s.profiles.applying}
-                            checked={t.applied}
-                            busy={busyId === t.id}
-                            disabled={!!t.unavailable && !t.applied}
-                            onClick={() => toggle(t)}
-                            s={s}
-                          />
-                        </div>
-                      </li>
-                    );
-                  })}
-
-                  {showGamingExtras && (
-                    <li>
-                      <X3dPanel s={s} pushToast={pushToast} />
-                      <NetworkCheckPanel s={s} tweaks={tweaks} />
-                    </li>
-                  )}
-
-                  {showPrivacyExtras && (
-                    <IpMaskCard
-                      s={s}
-                      onExplain={() => pushToast("error", s.ipMask.explainerToast)}
-                    />
-                  )}
-
-                  {showCleanup &&
-                    cleanupTargets.map((c) => (
-                      <CleanupCard
-                        key={c.id}
+                        open={inspecting === t.id}
+                        busy={busyId === t.id}
+                        lang={lang}
                         s={s}
-                        info={c}
-                        text={textFor(s.cleanup, c.id, c.name, c.description)}
-                        busy={busyId === c.id}
-                        isPro={isProUnlocked}
-                        onRequirePro={() => {}}
-                        onRun={(info) => setConfirmCleanup(info)}
+                        onToggle={toggle}
+                        onInspect={() => {
+                          setInspecting(inspecting === t.id ? null : t.id);
+                        }}
+                        onChanged={refresh}
                       />
                     ))}
 
-                  {showCleanup && (
-                    <ScheduledCleanupCard
-                      s={s}
-                      isPro={isProUnlocked}
-                      onRequirePro={() => void 0}
-                      onToast={pushToast}
-                    />
-                  )}
+                    {showGamingExtras && (
+                      <li>
+                        <X3dPanel s={s} pushToast={pushToast} />
+                        <NetworkCheckPanel s={s} tweaks={tweaks} />
+                      </li>
+                    )}
 
-                  {showCleanup && <DnsFlushCard s={s} onToast={pushToast} />}
+                    {showPrivacyExtras && (
+                      <IpMaskCard
+                        s={s}
+                        onExplain={() => pushToast("error", s.ipMask.explainerToast)}
+                      />
+                    )}
 
-                  {showCleanup && <BrowserCleanupCard s={s} onToast={pushToast} />}
+                    {showCleanup &&
+                      cleanupTargets.map((c) => (
+                        <CleanupCard
+                          key={c.id}
+                          s={s}
+                          info={c}
+                          text={textFor(s.cleanup, c.id, c.name, c.description)}
+                          busy={busyId === c.id}
+                          onRun={(info) => setConfirmCleanup(info)}
+                        />
+                      ))}
 
-                  {/* Directly under the browser cleaner it supersedes for cookies:
+                    {showCleanup && <ScheduledCleanupCard s={s} onToast={pushToast} />}
+
+                    {showCleanup && <DnsFlushCard s={s} onToast={pushToast} />}
+
+                    {showCleanup && <BrowserCleanupCard s={s} onToast={pushToast} />}
+
+                    {/* Directly under the browser cleaner it supersedes for cookies:
                 that card wipes the whole cookie file and signs the user out of
                 everything, which is why most people click it once. This one is
                 the version they can use every week. */}
-                  {showCleanup && (
-                    <CookieCleanerCard
-                      s={s}
-                      isPro={isProUnlocked}
-                      onRequirePro={() => void 0}
-                      onToast={pushToast}
-                    />
-                  )}
+                    {showCleanup && <CookieCleanerCard s={s} onToast={pushToast} />}
 
-                  {showCleanup && (
-                    <AppCacheCard
-                      s={s}
-                      isPro={isProUnlocked}
-                      onRequirePro={() => void 0}
-                      onToast={pushToast}
-                    />
-                  )}
+                    {showCleanup && <AppCacheCard s={s} onToast={pushToast} />}
 
-                  {showCleanup && (
-                    <DuplicateFinder
-                      s={s}
-                      isPro={isProUnlocked}
-                      onRequirePro={() => void 0}
-                      onToast={pushToast}
-                    />
-                  )}
+                    {showCleanup && <DuplicateFinder s={s} onToast={pushToast} />}
 
-                  {showCleanup && (
-                    <LargeFileFinder
-                      s={s}
-                      isPro={isProUnlocked}
-                      onRequirePro={() => void 0}
-                      onToast={pushToast}
-                    />
-                  )}
+                    {showCleanup && <LargeFileFinder s={s} onToast={pushToast} />}
 
-                  {showCleanup && <UninstallerPromoCard s={s} />}
+                    {showCleanup && <UninstallerPromoCard s={s} />}
 
-                  {/* "No tweaks in this category" only makes sense on a screen that
+                    {/* "No tweaks in this category" only makes sense on a screen that
                 IS a tweak category. It was an opt-out list of every other
                 section, which meant each new screen had to remember to add
                 itself — PC Health never did, and has been telling people it
                 had no tweaks coming soon ever since. Asking whether the
                 current filter is a real category cannot drift that way. */}
-                  {visibleTweaks.length === 0 &&
-                    (searching || Object.prototype.hasOwnProperty.call(CATEGORY_STYLE, filter)) &&
-                    !showCleanup &&
-                    !showPrivacyExtras &&
-                    !showScan &&
-                    !showStartup &&
-                    !showPricing && (
-                      <li className="animate-card rounded-2xl border border-dashed border-line p-10 text-center text-sm text-ink-3">
-                        {searching
-                          ? format(s.search.noResults, { query: query.trim() })
-                          : s.emptyCategory}
-                      </li>
-                    )}
-                </ul>
+                    {visibleTweaks.length === 0 &&
+                      (searching || Object.prototype.hasOwnProperty.call(CATEGORY_STYLE, filter)) &&
+                      !showCleanup &&
+                      !showPrivacyExtras &&
+                      !showScan &&
+                      !showStartup &&
+                      !showPricing && (
+                        <li className="animate-card rounded-2xl border border-dashed border-line p-10 text-center text-sm text-ink-3">
+                          {searching
+                            ? format(s.search.noResults, { query: query.trim() })
+                            : s.emptyCategory}
+                        </li>
+                      )}
+                  </ul>
 
-                {/* Only where a change can be applied: on Scan, Overview, Profiles,
+                  {/* Only where a change can be applied: on Scan, Overview, Profiles,
               Hardware, Startup and Plans the same sentence was noise. */}
-                {(Object.prototype.hasOwnProperty.call(CATEGORY_STYLE, filter) ||
-                  showCleanup ||
-                  showHealth) && (
-                  <p className="mx-auto mt-8 max-w-lg text-center text-xs leading-relaxed text-ink-3">
-                    {s.headerNote}
-                  </p>
-                )}
+                  {(Object.prototype.hasOwnProperty.call(CATEGORY_STYLE, filter) ||
+                    showCleanup ||
+                    showHealth) && (
+                    <p className="mx-auto mt-8 max-w-lg text-center text-xs leading-relaxed text-ink-3">
+                      {s.headerNote}
+                    </p>
+                  )}
+                </Suspense>
               </PageBoundary>
             </div>
           </div>
         </div>
       </main>
 
-      {confirmCleanup && (
-        <CleanupConfirmModal
-          s={s}
-          info={confirmCleanup}
-          displayName={
-            textFor(s.cleanup, confirmCleanup.id, confirmCleanup.name, confirmCleanup.description)
-              .name
-          }
-          onCancel={() => setConfirmCleanup(null)}
-          onConfirmAll={() => runCleanup(confirmCleanup)}
-          onConfirmSelected={(names) => runCleanupSelected(confirmCleanup, names)}
-        />
-      )}
+      <Suspense fallback={null}>
+        {confirmCleanup && (
+          <CleanupConfirmModal
+            s={s}
+            info={confirmCleanup}
+            displayName={
+              textFor(s.cleanup, confirmCleanup.id, confirmCleanup.name, confirmCleanup.description)
+                .name
+            }
+            onCancel={() => setConfirmCleanup(null)}
+            onConfirmAll={() => runCleanup(confirmCleanup)}
+            onConfirmSelected={(names) => runCleanupSelected(confirmCleanup, names)}
+          />
+        )}
+      </Suspense>
 
       {confirmRestore && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-6 backdrop-blur-sm">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-scrim/60 p-6 backdrop-blur-sm">
           <div className="animate-card w-full max-w-sm rounded-2xl border border-line bg-slate-900 p-6 shadow-2xl">
             <h3 className="text-lg font-bold text-ink">{s.restore.title}</h3>
             <p className="mt-2 text-sm leading-relaxed text-ink-3">
@@ -1257,23 +1118,29 @@ function App() {
         </div>
       )}
 
-      <CommandPalette
-        s={s}
-        tweaks={tweaks}
-        open={paletteOpen}
-        onClose={closePalette}
-        onNavigate={(section) => { setFilter(section); }}
-        onToggleTweak={(tweak) => toggle(tweak)}
-        onScan={() => setFilter("scan")}
-        onRestoreAll={restoreAll}
-        onOpenProfiles={() => setFilter("profiles")}
-      />
+      {paletteOpen && (
+        <CommandPalette
+          s={s}
+          tweaks={tweaks}
+          onClose={closePalette}
+          onNavigate={(section) => {
+            setFilter(section);
+          }}
+          onToggleTweak={(tweak) => toggle(tweak)}
+          onScan={() => setFilter("scan")}
+          onRestoreAll={restoreAll}
+          onOpenProfiles={() => setFilter("profiles")}
+        />
+      )}
 
       {showOnboarding && (
         <OnboardingFlow
           s={s}
           tweaks={tweaks}
-          onComplete={() => { setShowOnboarding(false); setFilter("scan"); }}
+          onComplete={() => {
+            setShowOnboarding(false);
+            setFilter("scan");
+          }}
           onSkip={() => setShowOnboarding(false)}
         />
       )}

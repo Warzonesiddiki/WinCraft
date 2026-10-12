@@ -7,6 +7,10 @@
  *   railway run node scripts/halloween-coupons.mjs --apply    # create what is missing
  *   railway run node scripts/halloween-coupons.mjs --verify-session
  *
+ * The three WinCraft coupons this script used to create belong to offers
+ * retired on 12 October, so they are no longer iterated or checked: leave them
+ * in Stripe, where nothing references them.
+ *
  * Reads STRIPE_SECRET_KEY and the STRIPE_PRICE_* variables from the
  * environment and never prints them. Coupon IDs and promo Price lookup keys
  * are fixed, so a rerun creates nothing twice. --verify-session opens one
@@ -96,8 +100,8 @@ for (const offer of PROMO.offers) {
     mode: offer.plan === "lifetime" ? "payment" : "subscription",
     line_items: [{ price: charge.lineItemPrice, quantity: 1 }],
     ...(charge.discounts ? { discounts: charge.discounts } : {}),
-    success_url: "https://pctweaker.app/checkout-success",
-    cancel_url: "https://pctweaker.app/checkout-cancel",
+    success_url: "https://wincraft.app/checkout-success",
+    cancel_url: "https://wincraft.app/checkout-cancel",
     expires_at: Math.floor(Date.now() / 1000) + LIFETIME_CHECKOUT_GRACE_SECONDS,
     metadata: { promo_verification: PROMO.id },
   });

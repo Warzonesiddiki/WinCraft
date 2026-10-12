@@ -93,13 +93,9 @@ function StopSearchButton({
 
 export function DuplicateFinder({
   s,
-  isPro,
-  onRequirePro,
   onToast,
 }: {
   s: Strings;
-  isPro: boolean;
-  onRequirePro: () => void;
   onToast: (kind: Toast["kind"], message: string) => void;
 }) {
   const [scanning, setScanning] = useState(false);
@@ -110,10 +106,6 @@ export function DuplicateFinder({
   const [deleting, setDeleting] = useState(false);
 
   async function scan() {
-    if (!isPro) {
-      onRequirePro();
-      return;
-    }
     const folder = await openFolderDialog({ directory: true, multiple: false });
     if (!folder || typeof folder !== "string") return;
     setScanning(true);
@@ -187,7 +179,6 @@ export function DuplicateFinder({
         <div className="tool-card-copy min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2">
             <h2 className="font-semibold text-ink">{s.duplicateFinder.title}</h2>
-            <Badge kind="pro">{s.badges.pro}</Badge>
           </div>
           <p className="mt-0.5 text-sm text-ink-3">{s.duplicateFinder.description}</p>
         </div>
@@ -257,23 +248,15 @@ export function DuplicateFinder({
 export function DiskOptimizeCard({
   s,
   drive,
-  isPro,
-  onRequirePro,
   onToast,
 }: {
   s: Strings;
   drive: string;
-  isPro: boolean;
-  onRequirePro: () => void;
   onToast: (kind: Toast["kind"], message: string) => void;
 }) {
   const [running, setRunning] = useState(false);
 
   async function run() {
-    if (!isPro) {
-      onRequirePro();
-      return;
-    }
     setRunning(true);
     try {
       const result = await invoke<DiskOptResult>("optimize_disk", { drive });
@@ -297,7 +280,6 @@ export function DiskOptimizeCard({
               {s.diskOptimize.title} <span className="font-normal text-ink-3">({drive})</span>
             </h2>
             <Badge kind="admin">{s.badges.admin}</Badge>
-            <Badge kind="pro">{s.badges.pro}</Badge>
           </div>
           <p className="mt-0.5 text-sm text-ink-3">
             {running ? s.diskOptimize.running : s.diskOptimize.description}
@@ -490,7 +472,7 @@ export function BrowserCleanupCard({
  *  blue warning box is how a download gets abandoned. "Learn more" opens the
  *  product page, tagged so the site can tell visits from the app apart. */
 const UNINSTALLER_PAGE_URL =
-  "https://pctweaker.app/uninstaller/?utm_source=pc-tweaker&utm_medium=app&utm_campaign=uninstaller-card";
+  "https://wincraft.app/uninstaller/?utm_source=pc-tweaker&utm_medium=app&utm_campaign=uninstaller-card";
 /** Version-less on purpose: GitHub resolves `releases/latest/download/<name>`
  *  only for an exact filename, so this points at the stable-named copy the
  *  uninstaller's release script publishes alongside the versioned one. A
@@ -603,13 +585,9 @@ export function RedaxaPromoCard({ s }: { s: Strings }) {
  *  once it's just sorted by size). */
 export function LargeFileFinder({
   s,
-  isPro,
-  onRequirePro,
   onToast,
 }: {
   s: Strings;
-  isPro: boolean;
-  onRequirePro: () => void;
   onToast: (kind: Toast["kind"], message: string) => void;
 }) {
   const [scanning, setScanning] = useState(false);
@@ -620,10 +598,6 @@ export function LargeFileFinder({
   const [deleting, setDeleting] = useState(false);
 
   async function scan() {
-    if (!isPro) {
-      onRequirePro();
-      return;
-    }
     const folder = await openFolderDialog({ directory: true, multiple: false });
     if (!folder || typeof folder !== "string") return;
     setScanning(true);
@@ -690,7 +664,6 @@ export function LargeFileFinder({
         <div className="tool-card-copy min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2">
             <h2 className="font-semibold text-ink">{s.largeFiles.title}</h2>
-            <Badge kind="pro">{s.badges.pro}</Badge>
           </div>
           <p className="mt-0.5 text-sm text-ink-3">{s.largeFiles.description}</p>
         </div>
@@ -752,24 +725,29 @@ export function LargeFileFinder({
  *  drive. Free — this is a trust-building diagnostic, not a premium action,
  *  and checked once on mount rather than on the fast system-monitor poll
  *  since drive health changes on the order of days, not seconds. */
+type DiskHealthState = {
+  drive: string;
+  health: DiskHealthInfo | null;
+  failed: boolean;
+};
+
 export function DiskHealthCard({ s, drive }: { s: Strings; drive: string }) {
-  const [health, setHealth] = useState<DiskHealthInfo | null>(null);
-  const [failed, setFailed] = useState(false);
+  // The reading carries the drive it belongs to, so a result for the previous
+  // drive is never shown against the new selection — switching drives reads as
+  // "loading" straight away without a state reset inside the effect.
+  const [state, setState] = useState<DiskHealthState>({ drive, health: null, failed: false });
   const [revision, setRevision] = useState(0);
+  const current = state.drive === drive ? state : { drive, health: null, failed: false };
+  const { health, failed } = current;
 
   useEffect(() => {
     let alive = true;
-    // Clear the previous drive's result immediately rather than leaving it on
-    // screen while the new one loads — otherwise switching drives briefly
-    // shows the wrong drive's health status attributed to the new selection.
-    setHealth(null);
-    setFailed(false);
     invoke<DiskHealthInfo>("disk_health", { drive })
       .then((v) => {
-        if (alive) setHealth(v);
+        if (alive) setState({ drive, health: v, failed: false });
       })
       .catch(() => {
-        if (alive) setFailed(true);
+        if (alive) setState({ drive, health: null, failed: true });
       });
     return () => {
       alive = false;
@@ -846,13 +824,9 @@ export function DiskHealthCard({ s, drive }: { s: Strings; drive: string }) {
  */
 export function DiskToolsSection({
   s,
-  isPro,
-  onRequirePro,
   onToast,
 }: {
   s: Strings;
-  isPro: boolean;
-  onRequirePro: () => void;
   onToast: (kind: Toast["kind"], message: string) => void;
 }) {
   const [drives, setDrives] = useState<DriveInfo[] | null>(null);
@@ -930,13 +904,7 @@ export function DiskToolsSection({
       )}
       <ul className="drive-workspace-actions">
         <DiskHealthCard s={s} drive={selected} />
-        <DiskOptimizeCard
-          s={s}
-          drive={selected}
-          isPro={isPro}
-          onRequirePro={onRequirePro}
-          onToast={onToast}
-        />
+        <DiskOptimizeCard s={s} drive={selected} onToast={onToast} />
         {/* Keep detailed optimization available without crowding the main action.
           Secure Defrag retains its existing HDD/SSD checks and live progress. */}
         {/* Keyed by drive so switching disks remounts the card. The alternative
@@ -951,8 +919,6 @@ export function DiskToolsSection({
               s={s}
               drive={selected}
               mediaType={drives?.find((d) => d.letter === selected)?.media_type ?? "Unknown"}
-              isPro={isPro}
-              onRequirePro={onRequirePro}
               pushToast={onToast}
             />
           </details>
@@ -967,20 +933,15 @@ export function CleanupCard({
   info,
   text,
   busy,
-  isPro,
-  onRequirePro,
   onRun,
 }: {
   s: Strings;
   info: CleanupInfo;
   text: { name: string; description: string };
   busy: boolean;
-  isPro: boolean;
-  onRequirePro: () => void;
   onRun: (info: CleanupInfo) => void;
 }) {
   const style = CATEGORY_STYLE.maintenance;
-  const locked = info.requires_pro && !isPro;
 
   return (
     <li className="tool-panel tool-card tool-cleanup-card animate-card group relative overflow-hidden rounded-2xl border border-line bg-surface-1 p-4 transition-all duration-200 hover:border-line-2 hover:bg-surface-2">
@@ -995,13 +956,12 @@ export function CleanupCard({
           <div className="flex flex-wrap items-center gap-2">
             <h2 className="font-semibold text-ink">{text.name}</h2>
             {info.requires_admin && <Badge kind="admin">{s.badges.admin}</Badge>}
-            {info.requires_pro && <Badge kind="pro">{s.badges.pro}</Badge>}
           </div>
           <p className="mt-0.5 text-sm text-ink-3">{text.description}</p>
         </div>
         <button
           disabled={busy}
-          onClick={() => (locked ? onRequirePro() : onRun(info))}
+          onClick={() => onRun(info)}
           className="tool-primary-action tool-card-action"
         >
           {busy ? s.cleanupRunning : s.cleanupButton}
@@ -1250,17 +1210,13 @@ export function CleanupConfirmModal({
 
 /** The weekly temporary-file cleanup: a logon task with the user's own rights
  *  that moves only files untouched for a day, waits while a game is running,
- *  and never touches memory. Turning it on needs Pro; turning it off never
- *  does. */
+ *  and never touches memory. Off until it is asked for, and reversible from
+ *  this same switch. */
 export function ScheduledCleanupCard({
   s,
-  isPro,
-  onRequirePro,
   onToast,
 }: {
   s: Strings;
-  isPro: boolean;
-  onRequirePro: () => void;
   onToast: (kind: "success" | "error", message: string) => void;
 }) {
   const [on, setOn] = useState<boolean | null>(null);
@@ -1274,10 +1230,6 @@ export function ScheduledCleanupCard({
 
   async function toggle() {
     if (on === null || busy) return;
-    if (!on && !isPro) {
-      onRequirePro();
-      return;
-    }
     setBusy(true);
     try {
       setOn(await invoke<boolean>("set_scheduled_cleanup", { enabled: !on }));
@@ -1297,7 +1249,6 @@ export function ScheduledCleanupCard({
         <div className="tool-card-copy min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2">
             <h2 className="font-semibold text-ink">{s.scheduledCleanup.title}</h2>
-            <Badge kind="pro">{s.badges.pro}</Badge>
           </div>
           <p className="mt-0.5 text-sm text-ink-3">{s.scheduledCleanup.body}</p>
         </div>

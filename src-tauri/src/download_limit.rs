@@ -582,10 +582,10 @@ mod tests {
     #[test]
     fn the_shared_funnel_restores_it_and_never_applies_it() {
         let m = Machine::new();
-        let refused = crate::apply_by_id_inner(&m.store, &m.dir, TWEAK_ID).unwrap_err();
-        // The panel-only refusal itself, not the licence gate behind it.
+        let refused = crate::apply_by_id_inner(&m.store, TWEAK_ID).unwrap_err();
+        // The panel-only refusal itself: the shared funnel sends this one to
+        // the panel rather than writing a default cap.
         assert!(refused.contains("dedicated panel"), "{refused}");
-        assert!(!refused.starts_with(crate::PRO_REQUIRED_PREFIX));
         assert!(m.journal().is_none());
         assert_eq!(m.registry.mutations.get(), 0);
         configure(&m.store, 500).unwrap();

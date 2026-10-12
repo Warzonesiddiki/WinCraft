@@ -1,7 +1,7 @@
 // Shared non-visual helpers: config, session, error reporting, formatting.
 import { getVersion } from "@tauri-apps/api/app";
 import { invoke } from "@tauri-apps/api/core";
-import { format, Lang, Strings, localeOf } from "./i18n";
+import { format, Strings } from "./i18n";
 import { DriverAudit } from "./types";
 
 // The first-party Cloudflare hostname is the stable production endpoint.
@@ -34,7 +34,7 @@ export function reportError(message: string) {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-      app: "pctweaker",
+      app: "wincraft",
       appVersion: cachedAppVersion,
       message: message.slice(0, 500),
     }),
@@ -59,7 +59,10 @@ export function formatNumber(value: number, digits = 0): string {
 }
 
 export function formatBytes(bytes: number): string {
-  if (bytes <= 0) return `${formatNumber(0)} MB`;
+  // A missing figure is shown as zero rather than "NaN GB": callers pass
+  // counters straight from a command result, and one absent field should not
+  // put nonsense on screen.
+  if (!Number.isFinite(bytes) || bytes <= 0) return `${formatNumber(0)} MB`;
   const mb = bytes / (1024 * 1024);
   if (mb < 1024) return `${formatNumber(mb, 1)} MB`;
   return `${formatNumber(mb / 1024, 2)} GB`;
@@ -177,41 +180,6 @@ export function ramIntervalLabel(minutes: number, s: Strings): string {
   if (minutes === 0) return s.ram.autoOff;
   const text = minutes < 60 ? `${minutes} min` : `${minutes / 60} h`;
   return format(s.ram.autoEvery, { interval: text });
-}
-
-// Pro pricing, in EUR. Kept here so the displayed price, the "you save X%"
-// badge and the per-month equivalent are all derived from the same two
-// numbers — a hardcoded badge that drifts from the real price is the kind of
-// thing that turns into a refund request.
-/** The plans checkout accepts. Mirrors the backend's own map in
- *  `backend/src/routes/stripe.ts`, which routes lifetime to a one-time
- *  payment rather than a subscription. */
-export type ProPlan = "monthly" | "annual" | "lifetime";
-
-export const PRICE_MONTHLY = 7.99;
-
-export const PRICE_ANNUAL = 59.99;
-
-/** Paid once, never again. Priced above a year and below two: the point is to
- *  be obviously cheaper than subscribing indefinitely without being cheaper
- *  than a single year, which would cannibalise the annual plan outright. */
-export const PRICE_LIFETIME = 99;
-
-/** How many months of the annual plan the lifetime price is worth — the one
- *  number that makes the offer legible. Derived rather than written down, so
- *  it cannot drift out of step with the prices above. */
-export const LIFETIME_BREAK_EVEN_MONTHS = Math.round(PRICE_LIFETIME / (PRICE_ANNUAL / 12));
-
-export const savingsPercent = Math.round((1 - PRICE_ANNUAL / (PRICE_MONTHLY * 12)) * 100);
-
-export function money(amount: number, lang: Lang): string {
-  return new Intl.NumberFormat(localeOf(lang), {
-    style: "currency",
-    currency: "EUR",
-    // €49.50, never €49.5: whole euros stay short, anything else shows cents.
-    minimumFractionDigits: Number.isInteger(Math.round(amount * 100) / 100) ? 0 : 2,
-    maximumFractionDigits: 2,
-  }).format(amount);
 }
 
 export function formatEpochDate(epochSeconds: string): string {

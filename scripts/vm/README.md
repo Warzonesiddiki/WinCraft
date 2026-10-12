@@ -26,32 +26,10 @@ accepts the Start Recommended policy; Windows 10 refuses Paint AI, Notepad
 AI, End task, the drag tray, Widgets and Start Recommended; the AI
 Components Host control is offered only where `WSAIFabricSvc` exists.
 
-## Automated run (no licence, no clicks)
-
-Build a debug test build on the development PC; the feature that unlocks
-Pro for tests exists only in debug builds, and a release build that enables
-it does not compile (`scripts/check-no-test-pro.mjs` also refuses any release
-binary that carries it):
-
-    npm run tauri build -- --debug --no-bundle --features test-pro
-
-Copy `src-tauri\target\debug\WinCraft.exe`, this folder and
-`src\components\starter-presets.mjs` (next to `run-auto.ps1`) into the VM,
-then in an elevated PowerShell as the user being tested:
-
-    .\run-auto.ps1 -TestBuild 'C:\test\WinCraft.exe'
-
-It records the baseline, applies all 15 controls through the app's own apply
-funnel, checks them, restores them and checks the restore. Unsupported
-controls are refused by the build and must read N/A (untouched). Then it
-applies and restores each starter profile on its own; on every restore the
-build reads back each registry value it recorded before applying and fails
-on any difference (`results\*-profile-*.log`).
-
 ## Manual procedure (each VM, about 15 minutes)
 
-1. Take a VM checkpoint. Install the WinCraft build under test and sign in
-   with a Pro licence (11 of the 15 controls are Pro).
+1. Take a VM checkpoint. Install the WinCraft build under test. There is no
+   licence to sign in with and no locked control: all 15 controls apply.
 2. In a normal, non-elevated PowerShell as the same user:
    `.\verify-tweaks.ps1 -Phase Baseline`
 3. In WinCraft, search each control by name and apply it. Unsupported ones
@@ -95,11 +73,9 @@ control (it now sets Manual rather than Disabled for this reason), and that
 
 ## Debloat check (non-elevated)
 
-In a normal PowerShell as the test user, from a clean snapshot:
-
-    .\run-debloat.ps1 -TestBuild 'C:\test\WinCraft.exe'
-
-It removes Solitaire, Microsoft News and Feedback Hub through the app's own
-removal path (identity checks, journal, verification) and checks with
-`Get-AppxPackage` that they are gone. The exit code is the number of those
-apps still installed. Reinstalling is a Store action; revert the snapshot.
+In a normal PowerShell as the test user, from a clean snapshot: open WinCraft's
+Debloat panel, remove Solitaire, Microsoft News and Feedback Hub through the
+app's own removal path (identity checks, journal, verification), then confirm
+with `Get-AppxPackage` that they are gone and with the panel's own receipt that
+each removal is reported as verified. Reinstalling is a Store action; revert the
+snapshot afterwards.

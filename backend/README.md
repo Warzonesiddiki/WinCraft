@@ -9,7 +9,7 @@ return a clear 503 instead of crashing, so you can deploy incrementally.
 
 | Method | Path                            | Auth   | Notes                                              |
 |--------|----------------------------------|--------|-----------------------------------------------------|
-| GET/HEAD | `/`                           | —      | Permanent redirect to `https://pctweaker.app/`; query parameters are not forwarded |
+| GET/HEAD | `/`                           | —      | Permanent redirect to `https://wincraft.app/`; query parameters are not forwarded |
 | GET    | `/health`                        | —      | `{ ok: true }` — process liveness only              |
 | POST   | `/api/auth/register`             | —      | `{ email, password }` → `{ token }`, sends verification email |
 | POST   | `/api/auth/login`                | —      | `{ email, password }` → `{ token }`                 |
@@ -77,7 +77,7 @@ Never use `pgmem` outside of local testing — data doesn't persist across resta
    set it by hand.
 3. **Set the remaining environment variables** on the service (Railway →
    Variables): `JWT_SECRET` (generate with `openssl rand -hex 32`),
-   `APP_URL=https://api.pctweaker.app` (needed for email links), `CORS_ORIGINS`,
+   `APP_URL=https://api.wincraft.app` (needed for email links), `CORS_ORIGINS`,
    `RESEND_API_KEY`/`MAIL_FROM` (for real verification/reset emails — without
    this, the server logs the email content instead of sending it; use Resend
    rather than `SMTP_*` on Railway, since it blocks outbound SMTP ports),
@@ -92,7 +92,7 @@ Never use `pgmem` outside of local testing — data doesn't persist across resta
 
    For the website's support form and reviews section, also set:
    `SUPPORT_EMAIL` (where support requests are delivered — defaults to the
-   product alias support@pctweaker.app; it is never exposed to any client) and `ADMIN_TOKEN`
+   product alias support@wincraft.app; it is never exposed to any client) and `ADMIN_TOKEN`
    (a long random string; without it the rating moderation endpoints stay
    closed and answer 404). Only the star rating is public — written feedback
    is emailed to `SUPPORT_EMAIL` and never rendered on the site, which is why
@@ -111,7 +111,7 @@ Never use `pgmem` outside of local testing — data doesn't persist across resta
    separate migration step needed.
 5. Once deployed, rebuild the desktop app pointing at the new URL:
    ```bash
-   VITE_API_BASE_URL=https://api.pctweaker.app npm run build
+   VITE_API_BASE_URL=https://api.wincraft.app npm run build
    ```
    (set in `pc-tweaker-app/` root, not here in `backend/`).
 
@@ -124,7 +124,7 @@ Never use `pgmem` outside of local testing — data doesn't persist across resta
    into `STRIPE_SECRET_KEY`. Never put this in the desktop app — it only
    belongs on this server.
 3. Dashboard → Developers → Webhooks → add endpoint
-   `https://api.pctweaker.app/api/stripe-webhook`, subscribe to
+   `https://api.wincraft.app/api/stripe-webhook`, subscribe to
    `checkout.session.completed`, copy the signing secret (`whsec_...`) into
    `STRIPE_WEBHOOK_SECRET`.
 4. Test with card `4242 4242 4242 4242`, any future date, any CVC, while

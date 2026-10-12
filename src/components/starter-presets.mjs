@@ -65,7 +65,7 @@ export const STARTER_PRESETS = [
   },
 ];
 
-export function presetSelection(preset, tweaks, selected, isPro) {
+export function presetSelection(preset, tweaks, selected) {
   const catalog = new Map(tweaks.map((t) => [t.id, t]));
   const chosen = new Set(selected);
   const available = preset.tweaks.flatMap((item) => {
@@ -78,7 +78,6 @@ export function presetSelection(preset, tweaks, selected, isPro) {
     available,
     missing: preset.tweaks.filter((t) => !catalog.has(t.id)).map((t) => t.id),
     pending,
-    locked: pending.filter((t) => t.requires_pro && !isPro),
     unsupported: available.filter((t) => t.unavailable).map((t) => t.id),
   };
 }

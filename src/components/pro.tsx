@@ -33,15 +33,11 @@ export function SecureDefragCard({
   s,
   drive,
   mediaType,
-  isPro,
-  onRequirePro,
   pushToast,
 }: {
   s: Strings;
   drive: string;
   mediaType: string;
-  isPro: boolean;
-  onRequirePro: () => void;
   pushToast: (kind: Toast["kind"], message: string) => void;
 }) {
   const [running, setRunning] = useState(false);
@@ -63,10 +59,6 @@ export function SecureDefragCard({
   const willDefrag = mediaType === "HDD";
 
   async function run() {
-    if (!isPro) {
-      onRequirePro();
-      return;
-    }
     setRunning(true);
     setOutcome(null);
     setProgress(null);
@@ -90,7 +82,6 @@ export function SecureDefragCard({
         <div className="flex flex-wrap items-center gap-2">
           <h3 className="font-semibold text-ink">{s.secureDefrag.title}</h3>
           <Badge kind="admin">{s.badges.admin}</Badge>
-          <Badge kind="pro">{s.badges.pro}</Badge>
         </div>
         <Badge>
           {drive} · {mediaType}
@@ -191,13 +182,9 @@ export function SecureDefragCard({
  */
 export function ZeroTraceCard({
   s,
-  isPro,
-  onRequirePro,
   pushToast,
 }: {
   s: Strings;
-  isPro: boolean;
-  onRequirePro: () => void;
   pushToast: (kind: Toast["kind"], message: string) => void;
 }) {
   const [purging, setPurging] = useState(false);
@@ -206,10 +193,6 @@ export function ZeroTraceCard({
   const [shred, setShred] = useState<ShredResult | null>(null);
 
   async function runPurge() {
-    if (!isPro) {
-      onRequirePro();
-      return;
-    }
     setPurging(true);
     setPurge(null);
     try {
@@ -222,10 +205,6 @@ export function ZeroTraceCard({
   }
 
   async function runShred() {
-    if (!isPro) {
-      onRequirePro();
-      return;
-    }
     const picked = await openFileDialog({ multiple: true });
     if (!picked) return;
     const paths = Array.isArray(picked) ? picked : [picked];
@@ -256,7 +235,6 @@ export function ZeroTraceCard({
     <div className="tool-panel tool-card tool-zero-trace-card mb-6 rounded-2xl border border-line bg-surface-1 p-5">
       <div className="tool-card-head flex flex-wrap items-center gap-2">
         <h2 className="font-semibold text-ink">{s.zeroTrace.title}</h2>
-        <Badge kind="pro">{s.badges.pro}</Badge>
       </div>
       <p className="mt-1 text-sm leading-relaxed text-ink-3">{s.zeroTrace.subtitle}</p>
 
@@ -347,13 +325,9 @@ export function ZeroTraceCard({
  */
 export function GamingHudCard({
   s,
-  isPro,
-  onRequirePro,
   pushToast,
 }: {
   s: Strings;
-  isPro: boolean;
-  onRequirePro: () => void;
   pushToast: (kind: Toast["kind"], message: string) => void;
 }) {
   const [open, setOpen] = useState(false);
@@ -423,10 +397,6 @@ export function GamingHudCard({
   }
 
   async function toggleFps() {
-    if (!isPro) {
-      onRequirePro();
-      return;
-    }
     if (busy.current) return;
     busy.current = true;
     try {
@@ -461,10 +431,6 @@ export function GamingHudCard({
   }
 
   async function toggle() {
-    if (!isPro) {
-      onRequirePro();
-      return;
-    }
     if (busy.current) return;
     busy.current = true;
     try {
@@ -494,7 +460,6 @@ export function GamingHudCard({
         <div className="tool-card-copy min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2">
             <h2 className="text-[13.5px] font-semibold text-ink">{s.hud.title}</h2>
-            <Badge kind="pro">{s.badges.pro}</Badge>
           </div>
           <p className="mt-0.5 text-[12px] leading-relaxed text-ink-3">{s.hud.subtitle}</p>
           <p className="mt-1 text-[11px] leading-relaxed text-ink-3">{s.hud.fpsAbout}</p>
@@ -580,13 +545,9 @@ export function GamingHudCard({
  */
 export function DriverBoosterCard({
   s,
-  isPro,
-  onRequirePro,
   pushToast,
 }: {
   s: Strings;
-  isPro: boolean;
-  onRequirePro: () => void;
   pushToast: (kind: Toast["kind"], message: string) => void;
 }) {
   const [audit, setAudit] = useState<DriverAudit | null>(null);
@@ -601,10 +562,6 @@ export function DriverBoosterCard({
   );
 
   async function scan() {
-    if (!isPro) {
-      onRequirePro();
-      return;
-    }
     setScanning(true);
     setSelected(new Set());
     try {
@@ -682,7 +639,6 @@ export function DriverBoosterCard({
         <div className="tool-card-copy min-w-0">
           <div className="flex flex-wrap items-center gap-2">
             <h3 className="font-semibold text-ink">{s.driverBooster.title}</h3>
-            <Badge kind="pro">{s.badges.pro}</Badge>
           </div>
           <p className="mt-1 max-w-xl text-[12.5px] leading-relaxed text-ink-3">
             {s.driverBooster.subtitle}

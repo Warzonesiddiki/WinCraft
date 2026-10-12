@@ -32,7 +32,10 @@ test("registration and reset reject oversized passwords before database work", a
       status(value) { status = value; return this; },
       json(value) { body = value; return this; },
     };
-    await layer.route.stack[0].handle({
+    // The route's own middleware (auth + per-endpoint rate limiters) sits in
+    // front of the handler, so the validation logic under test is the LAST
+    // entry. Indexing [0] here would call a limiter with no `next`.
+    await layer.route.stack.at(-1).handle({
       body: { email: "person@example.com", password: "é".repeat(37), newPassword: "é".repeat(37), token: "test-only" },
       get() { return "application/json"; },
     }, response);
@@ -59,7 +62,10 @@ test("registration accepts only real past dates of birth and bounded names", asy
   const layer = router.stack.find((entry) => entry.route?.path === "/register" && entry.route.methods.post);
   let status;
   const response = { status(value) { status = value; return this; }, json() { return this; } };
-  await layer.route.stack[0].handle({ body: {
+  // The route's own middleware (auth + per-endpoint rate limiters) sits in
+    // front of the handler, so the validation logic under test is the LAST
+    // entry. Indexing [0] here would call a limiter with no `next`.
+    await layer.route.stack.at(-1).handle({ body: {
     email: "person@example.com", password: "a".repeat(12), firstName: "x".repeat(101), lastName: "Doe", dateOfBirth: "1990-05-17",
   } }, response);
   assert.equal(status, 400);

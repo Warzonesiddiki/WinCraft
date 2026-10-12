@@ -2,8 +2,8 @@ import { useId, useRef, useState } from "react";
 import { invoke } from "@tauri-apps/api/core";
 import type { Lang, Strings } from "../i18n";
 import type { TweakInfo, TweakProfile } from "../types";
-import { PRICING_COPY } from "./pricing-copy";
-import { CrownIcon, LayersIcon } from "./icons";
+import { PROFILE_TOOLS_COPY } from "./profile-tools-copy";
+import { LayersIcon } from "./icons";
 import "./lifetime-tools.css";
 import "./workspace-panels.css";
 
@@ -27,8 +27,6 @@ const LABELS: Record<Lang, readonly string[]> = {
     "Only in B",
     "No settings in this group.",
     "Save at least two profiles to compare them.",
-    "Included exclusively with Lifetime. Your existing profile tools stay available.",
-    "View Lifetime",
     "Include this comparison in the report",
     "Preview report",
     "Export Markdown",
@@ -50,8 +48,6 @@ const LABELS: Record<Lang, readonly string[]> = {
     "Solo in B",
     "Nessuna impostazione in questo gruppo.",
     "Salva almeno due profili per confrontarli.",
-    "Incluso esclusivamente con Lifetime. Gli strumenti per i profili già disponibili rimangono accessibili.",
-    "Scopri Lifetime",
     "Includi questo confronto nel report",
     "Anteprima report",
     "Esporta Markdown",
@@ -73,8 +69,6 @@ const LABELS: Record<Lang, readonly string[]> = {
     "Uniquement dans B",
     "Aucun réglage dans ce groupe.",
     "Enregistrez au moins deux profils pour les comparer.",
-    "Inclus exclusivement avec l'offre à vie. Vos outils de profil existants restent disponibles.",
-    "Voir l'offre à vie",
     "Inclure cette comparaison dans le rapport",
     "Aperçu du rapport",
     "Exporter en Markdown",
@@ -96,8 +90,6 @@ const LABELS: Record<Lang, readonly string[]> = {
     "Solo en B",
     "No hay ajustes en este grupo.",
     "Guarda al menos dos perfiles para compararlos.",
-    "Incluido exclusivamente con Lifetime. Tus herramientas de perfiles existentes siguen disponibles.",
-    "Ver Lifetime",
     "Incluir esta comparación en el informe",
     "Vista previa del informe",
     "Exportar Markdown",
@@ -119,8 +111,6 @@ const LABELS: Record<Lang, readonly string[]> = {
     "Nur in B",
     "Keine Einstellungen in dieser Gruppe.",
     "Speichere mindestens zwei Profile für einen Vergleich.",
-    "Exklusiv in Lifetime enthalten. Deine bisherigen Profilwerkzeuge bleiben verfügbar.",
-    "Lifetime ansehen",
     "Diesen Vergleich in den Bericht aufnehmen",
     "Berichtsvorschau",
     "Markdown exportieren",
@@ -142,8 +132,6 @@ const LABELS: Record<Lang, readonly string[]> = {
     "Apenas em B",
     "Sem definições neste grupo.",
     "Guarde pelo menos dois perfis para os comparar.",
-    "Incluído exclusivamente com Lifetime. As ferramentas de perfis existentes continuam disponíveis.",
-    "Ver Lifetime",
     "Incluir esta comparação no relatório",
     "Pré-visualizar relatório",
     "Exportar Markdown",
@@ -162,17 +150,13 @@ export function LifetimeTools({
   lang,
   profiles,
   tweaks,
-  owned,
-  onViewPlans,
 }: {
   s: Strings;
   lang: Lang;
   profiles: TweakProfile[];
   tweaks: TweakInfo[];
-  owned: boolean;
-  onViewPlans: () => void;
 }) {
-  const copy = PRICING_COPY[lang];
+  const copy = PROFILE_TOOLS_COPY[lang];
   const l = LABELS[lang];
   const id = useId();
   const [left, setLeft] = useState("");
@@ -205,7 +189,7 @@ export function LifetimeTools({
     setError(null);
   }
   async function run(action: "compare" | "preview" | "export") {
-    if (!owned || pending.current || (action === "compare" && !validSelection)) return;
+    if (pending.current || (action === "compare" && !validSelection)) return;
     pending.current = true;
     setBusy(action);
     setError(null);
@@ -241,21 +225,9 @@ export function LifetimeTools({
   return (
     <section className="lifetime-tools" aria-labelledby={`${id}-heading`}>
       <header>
-        <span className="lifetime-tools-tag">
-          <CrownIcon className="h-3.5 w-3.5" />
-          {s.pricing.lifetimeExclusive}
-        </span>
         <h2 id={`${id}-heading`}>{copy.openTools}</h2>
         <p>{copy.notBenchmark}</p>
       </header>
-      {!owned && (
-        <div className="lifetime-tools-access">
-          <p>{l[9]}</p>
-          <button onClick={onViewPlans} className="workspace-button workspace-button-primary">
-            {l[10]}
-          </button>
-        </div>
-      )}
       <article className="lifetime-tool-block">
         <h3>
           <LayersIcon className="h-4 w-4" />
@@ -270,10 +242,10 @@ export function LifetimeTools({
               <select
                 id={`${id}-${side}`}
                 value={side === "left" ? left : right}
-                disabled={!owned || busy !== null || profiles.length < 2}
+                disabled={busy !== null || profiles.length < 2}
                 onChange={(e) => select(side, e.target.value)}
               >
-                <option value="">{l[19]}</option>
+                <option value="">{l[17]}</option>
                 {profiles.map((p) => (
                   <option key={p.name} value={p.name}>
                     {p.name}
@@ -285,7 +257,7 @@ export function LifetimeTools({
         </div>
         <button
           className="workspace-button workspace-button-secondary"
-          disabled={!owned || busy !== null || !validSelection}
+          disabled={busy !== null || !validSelection}
           aria-busy={busy === "compare"}
           onClick={() => void run("compare")}
         >
@@ -315,7 +287,7 @@ export function LifetimeTools({
             ))}
             {currentComparison.unknown_left_count + currentComparison.unknown_right_count > 0 && (
               <p className="lifetime-unknown">
-                {l[16]}: A {currentComparison.unknown_left_count}, B{" "}
+                {l[14]}: A {currentComparison.unknown_left_count}, B{" "}
                 {currentComparison.unknown_right_count}.
               </p>
             )}
@@ -338,32 +310,32 @@ export function LifetimeTools({
                 setSaved(false);
               }}
             />
-            {l[11]}
+            {l[9]}
           </label>
         )}
         <div className="lifetime-tool-actions">
           <button
             className="workspace-button workspace-button-secondary"
-            disabled={!owned || busy !== null}
+            disabled={busy !== null}
             onClick={() => void run("preview")}
           >
-            {busy === "preview" ? l[3] : l[12]}
+            {busy === "preview" ? l[3] : l[10]}
           </button>
           <button
             className="workspace-button workspace-button-primary"
-            disabled={!owned || busy !== null || !report}
+            disabled={busy !== null || !report}
             onClick={() => void run("export")}
           >
-            {busy === "export" ? l[3] : l[13]}
+            {busy === "export" ? l[3] : l[11]}
           </button>
         </div>
         <p className="lifetime-tool-hint">
-          {l[17]} {l[18]} {!report && l[20]}
+          {l[15]} {l[16]} {!report && l[18]}
         </p>
         {report && (
           <div className="lifetime-report-preview">
-            <button onClick={() => setReport(null)}>{l[15]}</button>
-            <pre tabIndex={0} aria-label={l[12]}>
+            <button onClick={() => setReport(null)}>{l[13]}</button>
+            <pre tabIndex={0} aria-label={l[10]}>
               {report}
             </pre>
           </div>
@@ -376,7 +348,7 @@ export function LifetimeTools({
       )}
       {saved && (
         <p className="lifetime-tool-success" role="status">
-          {l[14]}
+          {l[12]}
         </p>
       )}
     </section>

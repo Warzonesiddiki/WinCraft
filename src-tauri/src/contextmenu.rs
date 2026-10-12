@@ -212,7 +212,7 @@ mod tests {
     fn the_override_round_trips_through_the_funnel() {
         let registry = install();
         let fixture = Fixture::new();
-        crate::apply_by_id_inner(&fixture.store, &fixture.dir, TWEAK_ID).unwrap();
+        crate::apply_by_id_inner(&fixture.store, TWEAK_ID).unwrap();
         assert_eq!(
             override_value(&registry),
             Some(Stored::Value(RegValue::Str(String::new())))

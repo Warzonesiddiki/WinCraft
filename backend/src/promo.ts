@@ -1,58 +1,91 @@
 import { LIFETIME_CHECKOUT_GRACE_SECONDS } from "./lifetime-offer";
 
 /**
- * Halloween 2026: half the lawful reference price on every paid plan, from
- * 10 October to 23:59:59 on 6 November (Europe/Rome). Owner decisions of
- * 10 October 2026: a real -50% on the struck price, rounded down to X.99.
+ * Halloween 2026: half the lawful reference price, from 10 October to 23:59:59
+ * on 6 November (Europe/Rome). Owner decisions of 10 October 2026: a real -50%
+ * on the struck price, rounded down to X.99.
+ *
+ * The three WinCraft offers that opened this campaign were retired on
+ * 12 October, when the app became free and stopped selling plans: what is left
+ * is the Uninstaller's. Nothing was deleted in Stripe — see the last paragraph.
  *
  * `reference` is the price that may be struck through. EU law (Omnibus
  * Directive, art. 17-bis Codice del consumo) allows only the LOWEST price
  * charged to the public in the 30 days before the reduction starts, and the
- * percentage shown is measured against it. Reconstructed from live Stripe
- * Checkout Sessions and the price changes of 14 September:
- *   - Lifetime  €89.99 until 11 Sep 08:24 UTC, €79.99 (48-hour campaign, then
- *               still configured) until 14 Sep 02:06 UTC, €99 since.
- *   - Annual    €59 until 14 Sep 02:03 UTC, €49.99 configured until 02:19 UTC
- *               that night, €59.99 since.
- *   - Monthly   €9.99 until 14 Sep 02:03 UTC, €7.99 since.
- *   - Uninstaller standard €9.99 since 19 Aug.
- * The offer began on 10 October, so the references are €79.99, €49.99, €7.99
- * and €9.99 (test/promo.test.mjs recomputes this from the history above), and
- * they stay fixed for the whole promotion. Each promo price is the highest
- * X.99 at or below half its reference.
+ * percentage shown is measured against it. The Uninstaller's standard price has
+ * been €9.99 since 19 August (reconstructed from live Stripe Checkout Sessions),
+ * so €9.99 is the reference and €4.99 the offer. The loyalty price is already
+ * €4.99 and is not discounted twice.
  *
- * How the price is charged: subscriptions get a once-only coupon, so the
- * plan still renews at its regular price and Stripe says so. Lifetime is
- * sold at its own one-time Price instead of a coupon, so the Stripe page shows
- * €39.99 and not "€99 minus €59.01". STRIPE_PRICE_LIFETIME_PROMO must stay
- * configured after the offer: refunds of those purchases are matched by it.
+ * If WinCraft ever runs a promotion again, its lawful reference is NOT its list
+ * price: the plans sold at €39.99 lifetime, €24.99 annual and €3.99 monthly
+ * during the October offer, so until about 6 December those are the prices a new
+ * reduction has to be measured against — they are the lowest charged to the
+ * public in the previous 30 days. The price history behind them, from live
+ * Checkout Sessions and the configuration changes of 14 September:
+ *   - Lifetime  €89.99 until 11 Sep 08:24 UTC, €79.99 (48-hour campaign) until
+ *               14 Sep 02:06 UTC, €99 since; €39.99 during the offer.
+ *   - Annual    €59 until 14 Sep 02:03 UTC, €59.99 since; €24.99 during.
+ *   - Monthly   €9.99 until 14 Sep 02:03 UTC, €7.99 since; €3.99 during.
+ * test/promo.test.mjs recomputes the Uninstaller's reference from the same kind
+ * of history.
  *
- * Next promotions: until about 6 December the lowest prices of the previous
- * 30 days are these promo prices, so a Black Friday reduction must strike
- * them. Live checks opened by halloween-coupons.mjs carry
- * metadata.promo_verification and are not prices offered to anyone. Coupons
- * cannot be edited: a different amount or end date needs new coupon IDs, and
- * no STRIPE_PRICE_* may change during the window. Unused earlier coupons
- * "halloween-2026-*" and "halloween50-2026-*" are referenced by nothing.
+ * How the price is charged: a subscription gets a once-only coupon, so the plan
+ * still renews at its regular price and Stripe says so.
+ *
+ * Left configured in Stripe after the retirement, because deleting them would
+ * change what past payments mean: the WinCraft coupons
+ * `halloween50r-2026-wincraft-*`, referenced by nothing now, and the one-time
+ * Lifetime promo Price in `STRIPE_PRICE_LIFETIME_PROMO`, which the webhook still
+ * resolves to attribute the €39.99 Lifetime purchases sold under the offer — it
+ * must stay configured. Unused earlier coupons `halloween-2026-*` and
+ * `halloween50-2026-*` are referenced by nothing either.
  *
  * Every amount is in euro cents and excludes VAT, like the Stripe Prices.
  */
-export const PROMO = {
+/** A subscription is discounted by a once-only coupon; a plan sold once (a
+ *  lifetime tier) gets its own Price instead, so the Stripe page shows the
+ *  amount actually paid and not "€99 minus €59.01". An offer is one or the
+ *  other, never both. The WinCraft lifetime offer that used the second shape was
+ *  retired with the rest of the campaign, and the shape stays: the webhook still
+ *  resolves that Price to attribute the purchases it already sold. */
+type CouponOffer = {
+  product: string;
+  plan: string;
+  priceEnv: string;
+  couponEnv: string;
+  regular: number;
+  reference: number;
+  price: number;
+};
+type PromoPriceOffer = {
+  product: string;
+  plan: string;
+  priceEnv: string;
+  promoPriceEnv: string;
+  regular: number;
+  reference: number;
+  price: number;
+};
+type Offer = CouponOffer | PromoPriceOffer;
+
+export const PROMO: {
+  id: string;
+  startsAt: string;
+  endsAt: string;
+  offers: readonly Offer[];
+} = {
   id: "halloween50r-2026",
   // The first go-live; the offer runs while its coupons and prices are configured.
   startsAt: "2026-10-10T00:00:00.000Z",
   // Exclusive: the last second on sale is 23:59:59 on 6 November, Rome (CET).
   endsAt: "2026-11-06T23:00:00.000Z",
   offers: [
-    { product: "wincraft", plan: "monthly", priceEnv: "STRIPE_PRICE_MONTHLY", couponEnv: "STRIPE_COUPON_HALLOWEEN_MONTHLY", regular: 799, reference: 799, price: 399 },
-    { product: "wincraft", plan: "annual", priceEnv: "STRIPE_PRICE_ANNUAL", couponEnv: "STRIPE_COUPON_HALLOWEEN_ANNUAL", regular: 5999, reference: 4999, price: 2499 },
-    { product: "wincraft", plan: "lifetime", priceEnv: "STRIPE_PRICE_LIFETIME", promoPriceEnv: "STRIPE_PRICE_LIFETIME_PROMO", regular: 9900, reference: 7999, price: 3999 },
     // Standard price only: the loyalty price (€4.99) already equals the promo price and is not discounted twice.
     { product: "uninstaller", plan: "annual", priceEnv: "STRIPE_PRICE_UNINSTALLER_ANNUAL", couponEnv: "STRIPE_COUPON_HALLOWEEN_UNINSTALLER", regular: 999, reference: 999, price: 499 },
   ],
-} as const;
+};
 
-type Offer = (typeof PROMO.offers)[number];
 /** The variable that makes an offer chargeable: its coupon, or its own Price. */
 const chargeEnv = (offer: Offer): string => ("couponEnv" in offer ? offer.couponEnv : offer.promoPriceEnv);
 

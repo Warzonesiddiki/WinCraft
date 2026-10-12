@@ -5,11 +5,17 @@ import { fileURLToPath } from "node:url";
 // files, fake operations, the in-memory registry and power backends, or (for
 // core steering) CPU sets on the test process itself. The complete
 // integration suite belongs in a VM.
+//
+// Every entry names a test that exists, and the run below fails if a filter
+// matches nothing: that is how a deleted module is meant to surface here. Three
+// entries pointed at licence tests — `license::tests`, whose module Batch AE
+// removed, and two `tests::a_*_license_*` names, one deleted with the gate it
+// proved (Batch AB) and one that had never existed in this repository, which had
+// kept this script red since the check below was added.
 const filters = [
   "ipc_tests",
   "rollback::tests",
   "game_sessions::tests",
-  "license::tests",
   "lifetime_tools::tests",
   "power_tuning::tests",
   "dns::tests",
@@ -25,8 +31,6 @@ const filters = [
   "diagnostics::dpc::tests",
   "diagnostics::network_verify::tests",
   "engine::dynamic_session::tests",
-  "tests::a_free_tweak_is_never_blocked_by_the_license_check",
-  "tests::a_pro_tweak_is_refused_with_no_cached_license",
   "tests::duplicate_batch_ids_execute_only_once_and_keep_input_order",
 ];
 

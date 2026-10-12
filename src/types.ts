@@ -4,10 +4,11 @@ export type AuthState =
   | {
       status: "authenticated";
       email: string;
-      isPro: boolean;
       emailVerified: boolean;
       /** The plan the entitlement came from, or null when Pro was granted
-       *  directly rather than bought. */
+       *  directly rather than bought. Nothing in the app reads it any more:
+       *  every feature is free — it is kept because the backend still serves
+       *  other products from the same tables. */
       plan: string | null;
       /** Whether a Stripe customer exists for this account. Pro without one
        *  has nothing a billing portal could show. */

@@ -1,5 +1,5 @@
 import { Component, type ErrorInfo, type ReactNode } from "react";
-import { STRINGS, type Strings } from "../i18n";
+import { stringsFor, type Strings } from "../i18n";
 
 /**
  * Keeps one page's failure inside that page. Without it, an exception while
@@ -36,7 +36,7 @@ export class PageBoundary extends Component<
   render() {
     const { error } = this.state;
     if (!error) return this.props.children;
-    const t = this.props.s?.pageError ?? STRINGS.en.pageError;
+    const t = this.props.s?.pageError ?? stringsFor("en").pageError;
     const app = this.props.scope === "app";
     return (
       <section

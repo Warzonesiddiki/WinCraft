@@ -198,7 +198,6 @@ pub fn priority_rules_add(
     priority: Priority,
 ) -> Result<PriorityRule, String> {
     let dir = crate::store_for_dir(&app)?;
-    crate::require_pro(&dir)?;
     let (path, key) = selected_executable(&path)?;
     let _guard = LOCK.lock().map_err(|e| e.to_string())?;
     let mut config = load_config(&dir)?;
@@ -233,7 +232,6 @@ pub fn priority_rules_set_priority(
     priority: Priority,
 ) -> Result<(), String> {
     let dir = crate::store_for_dir(&app)?;
-    crate::require_pro(&dir)?;
     let _guard = LOCK.lock().map_err(|e| e.to_string())?;
     let mut config = load_config(&dir)?;
     let key = path_key(&path);
@@ -262,9 +260,6 @@ pub fn priority_rules_remove(app: tauri::AppHandle, path: String) -> Result<(), 
 #[tauri::command]
 pub fn priority_rules_set_enabled(app: tauri::AppHandle, enabled: bool) -> Result<(), String> {
     let dir = crate::store_for_dir(&app)?;
-    if enabled {
-        crate::require_pro(&dir)?;
-    }
     let _guard = LOCK.lock().map_err(|e| e.to_string())?;
     let mut config = load_config(&dir)?;
     config.enabled = enabled;
@@ -473,10 +468,7 @@ fn tick(
         return Ok(status);
     }
     let config = load_config(dir)?;
-    let active = config.enabled
-        && !shutting_down
-        && !SHUTTING_DOWN.load(Ordering::SeqCst)
-        && crate::require_pro(dir).is_ok();
+    let active = config.enabled && !shutting_down && !SHUTTING_DOWN.load(Ordering::SeqCst);
     let table = crate::process_guard::processes()?;
     let alive =
         |pid: u32, creation: u64| table.iter().any(|p| p.pid == pid && p.created == creation);

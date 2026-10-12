@@ -277,26 +277,6 @@
   order: -1;
 }
 .scan-optional-intro,
-.scan-locked-results > p {
-  color: var(--text-secondary);
-  font-size: 13px;
-  line-height: 1.6;
-  margin-bottom: 16px;
-}
-.scan-locked-results {
-  padding: 18px;
-  border: 1px solid var(--scan-line);
-  border-radius: 12px;
-  margin-top: 12px;
-}
-.scan-locked-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  padding-top: 12px;
-  font-size: 13px;
-}
 .scan-hero[data-complete="true"] {
   grid-template-columns: minmax(0, 1fr);
 }

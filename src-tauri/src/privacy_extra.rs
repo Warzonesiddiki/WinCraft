@@ -16,7 +16,7 @@ pub fn activity_history_info() -> PrivacyInfo {
         name: "Disable activity history (Windows Timeline)",
         description: "Stops Windows from recording, storing and sending Microsoft the history of the apps and documents you use, through system policy.",
         requires_admin: true,
-        requires_pro: true,
+        requires_pro: false,
     }
 }
 
@@ -94,7 +94,7 @@ pub fn typing_personalization_info() -> PrivacyInfo {
         name: "Stop Windows learning how you type",
         description: "Windows builds a personal dictionary from what you type and handwrite — including in password managers, chat windows and search boxes — and syncs it to your Microsoft account to improve its suggestions. This turns off both the text and the handwriting collection.",
         requires_admin: false,
-        requires_pro: true,
+        requires_pro: false,
     }
 }
 

@@ -87,27 +87,19 @@ export function ProfileRow({
 export function ProfilesPanel({
   s,
   lang,
-  lifetimeOwned,
-  onViewPlans,
   tweaks,
-  isPro,
   authed,
   onRequireAuth,
-  onRequirePro,
   onChanged,
   pushToast,
 }: {
   s: Strings;
   lang: Lang;
-  lifetimeOwned: boolean;
-  onViewPlans: () => void;
   tweaks: TweakInfo[];
-  isPro: boolean;
   /** Saving/loading a configuration is an account feature — free or Pro,
    *  but never anonymous, so a profile can always be tied back to a customer. */
   authed: boolean;
   onRequireAuth: () => void;
-  onRequirePro: () => void;
   onChanged: () => Promise<void>;
   pushToast: (kind: Toast["kind"], message: string) => void;
 }) {
@@ -176,21 +168,11 @@ export function ProfilesPanel({
   /**
    * Applies a profile's tweaks.
    *
-   * The Pro check is done against this app's own tweak list, not against
-   * anything in the file — otherwise a shared profile would be a way to hand
-   * someone the paid tweaks for free.
+   * The ids are resolved against this app's own tweak list, not taken from the
+   * file, so an edited profile cannot name a control this build does not have.
    */
   async function applyProfile(profile: TweakProfile) {
     if (applyingProfile.current || saving) return;
-    const locked = profile.tweaks.filter((id) => {
-      const t = tweaks.find((x) => x.id === id);
-      return t?.requires_pro && !isPro;
-    });
-    if (locked.length > 0 && !isPro) {
-      onRequirePro();
-      return;
-    }
-
     applyingProfile.current = true;
     setBusy(profile.name);
     // Switches that apply only on their own are left out of every profile.
@@ -206,12 +188,7 @@ export function ProfilesPanel({
       // without one.
       const after = await invoke<TweakInfo[]>("list_tweaks");
       await onChanged();
-      failures.forEach((f) =>
-        pushToast(
-          "error",
-          f.includes("PRO_REQUIRED: ") ? s.toasts.licenseNeedsRefresh : friendlyError(f, s),
-        ),
-      );
+      failures.forEach((f) => pushToast("error", friendlyError(f, s)));
       // Only what this apply turned on: tweaks that were already on are not
       // counted again.
       const done = ids.filter(
@@ -230,7 +207,9 @@ export function ProfilesPanel({
   async function exportProfile(profile: TweakProfile) {
     try {
       const path = await saveFileDialog({
-        defaultPath: `${profile.name || "pctweaker"}.pctweaker.json`,
+        // New exports are named after WinCraft; importing is by extension, so
+        // profiles saved under the old `.pctweaker.json` name still load.
+        defaultPath: `${profile.name || "wincraft"}.wincraft.json`,
         filters: [{ name: "WinCraft profile", extensions: ["json"] }],
       });
       if (!path) return;
@@ -292,7 +271,6 @@ export function ProfilesPanel({
         s={s}
         lang={lang}
         tweaks={tweaks}
-        isPro={isPro}
         busy={busy !== null || saving}
         onApply={applyProfile}
       />
@@ -385,14 +363,7 @@ export function ProfilesPanel({
           </div>
         ) : null}
       </section>
-      <LifetimeTools
-        s={s}
-        lang={lang}
-        profiles={saved}
-        tweaks={tweaks}
-        owned={lifetimeOwned}
-        onViewPlans={onViewPlans}
-      />
+      <LifetimeTools s={s} lang={lang} profiles={saved} tweaks={tweaks} />
     </div>
   );
 }

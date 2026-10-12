@@ -339,8 +339,8 @@ fn registry_ids() -> Vec<&'static str> {
     ids
 }
 
-/// The dispatch `apply_by_id_inner` performs, minus the licence gate, so the
-/// logic of Pro tweaks is covered too. The gate has its own test below.
+/// The dispatch `apply_by_id_inner` performs, called directly so a test can
+/// start from an adapter without going through the funnel's journal.
 fn apply_direct(store: &RollbackStore, id: &str) -> Result<(), String> {
     use crate::everyday;
     match id {
@@ -611,30 +611,25 @@ fn overlapping_tweaks_are_refused_before_their_first_write() {
     }
 }
 
-/// The licence gate in the real funnel: a Free user gets every free tweak and
-/// round-trips it; every Pro tweak is refused before anything is written.
+/// The real funnel over every registry tweak in the catalogue: each one applies
+/// and then undoes, leaving nothing behind. This used to be two loops, one per
+/// half of the catalogue, and the Pro half could not be reached — the predicate
+/// behind it had already been made to return `false`, so the refusal the test
+/// asserted was unreachable. What it pins now is what it was really measuring:
+/// the funnel dispatches every id and `rollback_by_id_inner` puts every value
+/// back.
 #[test]
-fn the_apply_funnel_lets_free_tweaks_through_and_stops_pro_ones_before_writing() {
-    let mut free = 0;
-    let mut pro = 0;
+fn the_apply_funnel_applies_every_registry_tweak_and_takes_it_back() {
+    let mut applied = 0;
     for id in registry_ids() {
         let registry = install();
         let fixture = Fixture::new();
-        let result = crate::apply_by_id_inner(&fixture.store, &fixture.dir, id);
-        if crate::requires_pro_for(id) {
-            pro += 1;
-            let error = result.unwrap_err();
-            assert!(error.starts_with(crate::PRO_REQUIRED_PREFIX), "{id}: {error}");
-            assert_eq!(registry.mutations.get(), 0, "{id} wrote before the gate");
-            assert!(!fixture.store.is_applied(id));
-        } else {
-            free += 1;
-            result.unwrap_or_else(|e| panic!("{id}: {e}"));
-            crate::rollback_by_id_inner(&fixture.store, id).unwrap();
-            assert!(registry.dump().is_empty(), "{id}");
-        }
+        crate::apply_by_id_inner(&fixture.store, id).unwrap_or_else(|e| panic!("{id}: {e}"));
+        crate::rollback_by_id_inner(&fixture.store, id).unwrap();
+        assert!(registry.dump().is_empty(), "{id}");
+        applied += 1;
     }
-    assert!(free > 0 && pro > 0, "free {free}, pro {pro}");
+    assert!(applied > 0, "the catalogue has no registry tweaks");
 }
 
 #[test]

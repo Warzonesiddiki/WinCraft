@@ -161,7 +161,7 @@
   font-size: 12px;
   color: var(--text-muted);
 }
-.ba-between h4 {
+.ba-between h3 {
   margin: 0 0 6px;
   font-size: 12px;
   font-weight: 650;
@@ -360,7 +360,7 @@
   justify-content: space-between;
   gap: 10px 16px;
 }
-.ba-boot-head h4 {
+.ba-boot-head h3 {
   margin: 0 0 3px;
   font-size: 13px;
   font-weight: 650;

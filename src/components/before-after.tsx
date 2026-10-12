@@ -595,7 +595,7 @@ function BeforeAfterContent({ s, lang, tweaks, pushToast }: PanelProps) {
           </div>
 
           <div className="ba-between">
-            <h4>{c.changesBetween}</h4>
+            <h3>{c.changesBetween}</h3>
             {between.length === 0 ? (
               <p>{c.changesNone}</p>
             ) : (
@@ -641,7 +641,7 @@ function BeforeAfterContent({ s, lang, tweaks, pushToast }: PanelProps) {
         <div className="ba-boot">
           <div className="ba-boot-head">
             <div>
-              <h4>{c.bootTitle}</h4>
+              <h3>{c.bootTitle}</h3>
               <p>{c.bootHelp}</p>
             </div>
             <button

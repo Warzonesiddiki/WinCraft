@@ -617,7 +617,9 @@ export function ThermalsPanel({
 
     tick();
     loadPower();
-    const id = window.setInterval(() => { if (!document.hidden) tick(); }, POLL_MS);
+    const id = window.setInterval(() => {
+      if (!document.hidden) tick();
+    }, POLL_MS);
     return () => {
       alive = false;
       window.clearInterval(id);
@@ -1332,13 +1334,9 @@ export function DriversPanel({
 
 export function HardwarePanel({
   s,
-  isPro,
-  onRequirePro,
   pushToast,
 }: {
   s: Strings;
-  isPro: boolean;
-  onRequirePro: () => void;
   pushToast: (kind: "success" | "error", message: string) => void;
 }) {
   // This is the heaviest screen in the app: two panels that each fire their
@@ -1373,12 +1371,7 @@ export function HardwarePanel({
           <TweakyDriverPromoCard s={s} />
           {/* Sits under the audit it reads from: the audit answers "how old
               are my drivers", this answers "open the pages for the old ones". */}
-          <DriverBoosterCard
-            s={s}
-            isPro={isPro}
-            onRequirePro={onRequirePro}
-            pushToast={pushToast}
-          />
+          <DriverBoosterCard s={s} pushToast={pushToast} />
         </>
       ) : (
         // A placeholder of roughly the right height, so the panels do not

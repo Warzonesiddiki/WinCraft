@@ -29,7 +29,7 @@ pub fn info() -> NetLatencyInfo {
         name: "TCP acknowledgments and packet buffering",
         description: "Sets TcpAckFrequency and TCPNoDelay to 1 on the adapter that carries the route to the internet. This targets TCP behavior; UDP traffic is unaffected. Windows and application support vary, so lower game latency is not guaranteed (HKLM, administrator rights required).",
         requires_admin: true,
-        requires_pro: true,
+        requires_pro: false,
     }
 }
 

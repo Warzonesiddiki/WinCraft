@@ -414,11 +414,9 @@ pub fn scan_app_caches(app: tauri::AppHandle) -> Result<Vec<CacheGroup>, String>
 #[cfg(windows)]
 #[tauri::command(async)]
 pub fn clean_app_caches(
-    app: tauri::AppHandle,
+    _app: tauri::AppHandle,
     ids: Vec<String>,
 ) -> Result<CacheCleanResult, String> {
-    let dir = crate::store_for_dir(&app)?;
-    crate::require_pro(&dir)?;
     let result = clean(&ids);
     crate::audit::record(
         "app-cache-clean",

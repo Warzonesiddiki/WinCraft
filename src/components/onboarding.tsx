@@ -117,7 +117,7 @@ export function OnboardingFlow({
   const stepIndex = { welcome: 0, scan: 1, apply: 2, done: 3 }[step];
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 backdrop-blur-md">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-scrim/70 backdrop-blur-md">
       <div className="relative w-full max-w-md overflow-hidden rounded-3xl border border-line bg-surface-1 p-8 shadow-2xl">
         {/* Progress dots */}
         <div className="mb-8 flex items-center justify-center gap-2">
@@ -125,7 +125,11 @@ export function OnboardingFlow({
             <div
               key={i}
               className={`h-1.5 rounded-full transition-all duration-300 ${
-                i === stepIndex ? "w-6 bg-accent" : i < stepIndex ? "w-1.5 bg-accent/40" : "w-1.5 bg-line-2"
+                i === stepIndex
+                  ? "w-6 bg-accent"
+                  : i < stepIndex
+                    ? "w-1.5 bg-accent/40"
+                    : "w-1.5 bg-line-2"
               }`}
             />
           ))}
@@ -138,16 +142,12 @@ export function OnboardingFlow({
               <div className="mb-6 grid h-16 w-16 place-items-center rounded-2xl bg-accent-soft text-3xl">
                 🛠️
               </div>
-              <h1 className="text-2xl font-bold tracking-tight text-ink">
-                Welcome to WinCraft
-              </h1>
+              <h1 className="text-2xl font-bold tracking-tight text-ink">Welcome to WinCraft</h1>
               <p className="mt-3 max-w-xs text-sm leading-relaxed text-ink-3">
-                Your PC, your rules. WinCraft gives you full control over
-                Windows settings with one-click tweaks and instant rollback.
+                Your PC, your rules. WinCraft gives you full control over Windows settings with
+                one-click tweaks and instant rollback.
               </p>
-              <p className="mt-2 text-xs text-ink-3">
-                Free and open source. No account required.
-              </p>
+              <p className="mt-2 text-xs text-ink-3">Free and open source. No account required.</p>
             </div>
           )}
 
@@ -163,7 +163,11 @@ export function OnboardingFlow({
                 )}
               </div>
               <h2 className="text-xl font-bold tracking-tight text-ink">
-                {scanning ? "Scanning your system…" : scanDone ? "Scan complete" : "Quick system scan"}
+                {scanning
+                  ? "Scanning your system…"
+                  : scanDone
+                    ? "Scan complete"
+                    : "Quick system scan"}
               </h2>
               <p className="mt-3 max-w-xs text-sm leading-relaxed text-ink-3">
                 {scanning
@@ -186,9 +190,7 @@ export function OnboardingFlow({
           {step === "apply" && (
             <div>
               <div className="mb-5 text-center">
-                <h2 className="text-xl font-bold tracking-tight text-ink">
-                  Recommended for you
-                </h2>
+                <h2 className="text-xl font-bold tracking-tight text-ink">Recommended for you</h2>
                 <p className="mt-2 text-sm text-ink-3">
                   Tap any tweak to apply it. You can undo these anytime.
                 </p>
@@ -244,7 +246,11 @@ export function OnboardingFlow({
                   : "Explore the full app to discover more ways to optimize your PC."}
               </p>
               <p className="mt-2 text-xs text-ink-3">
-                Tip: Press <kbd className="rounded border border-line bg-surface-2 px-1 py-0.5 text-[10px] font-semibold">Ctrl+K</kbd> anywhere to search.
+                Tip: Press{" "}
+                <kbd className="rounded border border-line bg-surface-2 px-1 py-0.5 text-[10px] font-semibold">
+                  Ctrl+K
+                </kbd>{" "}
+                anywhere to search.
               </p>
             </div>
           )}

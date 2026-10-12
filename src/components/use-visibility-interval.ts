@@ -11,12 +11,16 @@ import { useEffect, useRef } from "react";
  *
  * Returns nothing — the interval is managed entirely by the hook.
  */
-export function useVisibilityInterval(
-  callback: () => void,
-  intervalMs: number,
-) {
+export function useVisibilityInterval(callback: () => void, intervalMs: number) {
+  // The latest callback is kept in a ref so the interval below is not torn
+  // down and re-created on every render, while still calling the freshest
+  // closure. The assignment lives in an effect: writing to a ref during
+  // render makes the value the interval reads depend on render timing.
   const callbackRef = useRef(callback);
-  callbackRef.current = callback;
+
+  useEffect(() => {
+    callbackRef.current = callback;
+  }, [callback]);
 
   useEffect(() => {
     if (intervalMs <= 0) return;

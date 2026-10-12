@@ -7,7 +7,7 @@
 //! four updaters and a telemetry uploader at every logon.
 //!
 //! Two rules keep this from becoming a way to break Windows:
-//!   * anything under `\Microsoft\` is not listed at all â€” those tasks are the
+//!   * anything under `\Microsoft\` is not listed at all — those tasks are the
 //!     operating system servicing itself, and a list you can disable things
 //!     from is not the place to put them;
 //!   * a task's state is read from its XML definition rather than from
@@ -30,7 +30,7 @@ pub struct TaskEntry {
     pub command: String,
     pub author: String,
     pub enabled: bool,
-    /// "logon" or "boot" â€” the only two kinds listed. A task on a daily
+    /// "logon" or "boot" — the only two kinds listed. A task on a daily
     /// schedule is not a startup item and does not belong on this screen.
     pub trigger: String,
     /// Machine-scope tasks need administrator rights to change.
@@ -157,7 +157,7 @@ pub(crate) fn parse_task(path: &str, xml: &str) -> Option<TaskEntry> {
 
     let settings = section(xml, "Settings").unwrap_or("");
     // An absent `<Enabled>` in Settings means the schema default, which is
-    // enabled â€” the same reading Task Scheduler itself applies.
+    // enabled — the same reading Task Scheduler itself applies.
     let enabled = tag_text(settings, "Enabled")
         .map(|v| v.eq_ignore_ascii_case("true"))
         .unwrap_or(true);
@@ -215,7 +215,7 @@ mod imp {
     /// user cannot read makes the whole query exit non-zero while still
     /// printing every task it *could* read, and throwing that away would show
     /// an empty list on exactly the machines that most need one. A *change*
-    /// gets the strict reading â€” reporting "disabled" for a call that was
+    /// gets the strict reading — reporting "disabled" for a call that was
     /// denied is the one failure this screen must never have.
     fn schtasks(args: &[&str], tolerate_partial: bool) -> Result<Vec<u8>, String> {
         let output = crate::system_tools::run("schtasks", |tool| {
@@ -304,7 +304,7 @@ pub fn list_scheduled_tasks() -> Vec<TaskEntry> {
     entries
 }
 
-/// `<path>|<0|1>` â€” the path is taken as the tail so task names containing a
+/// `<path>|<0|1>` — the path is taken as the tail so task names containing a
 /// pipe still round-trip through the elevated relaunch intact.
 pub fn build_task_payload(path: &str, enabled: bool) -> String {
     format!("{}|{}", if enabled { 1 } else { 0 }, path)

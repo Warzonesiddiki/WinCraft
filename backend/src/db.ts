@@ -20,10 +20,33 @@ if (connectionString === "pgmem") {
   const { Pool: MemPool } = mem.adapters.createPg();
   pool = new MemPool();
 } else if (connectionString) {
+  // Managed Postgres presents a certificate from the provider's own CA, which
+  // the default trust store does not know, so an unverified connection was the
+  // only way to connect out of the box. When DATABASE_CA holds that CA — the
+  // PEM itself or the path to it — verify the server instead of trusting any
+  // certificate. `sslmode=require` in DATABASE_URL is honoured by `pg` on top.
+  const ca = databaseCa();
   pool = new Pool({
     connectionString,
-    ssl: connectionString.includes("localhost") ? false : { rejectUnauthorized: false },
+    ssl: connectionString.includes("localhost")
+      ? false
+      : ca
+        ? { ca, rejectUnauthorized: true }
+        : { rejectUnauthorized: false },
   });
+}
+
+/** Reads DATABASE_CA as PEM contents or as a path to a PEM file. */
+function databaseCa(): string | undefined {
+  const value = process.env.DATABASE_CA?.trim();
+  if (!value) return undefined;
+  if (value.includes("BEGIN CERTIFICATE")) return value;
+  try {
+    return require("fs").readFileSync(value, "utf8") as string;
+  } catch (err) {
+    console.error("DATABASE_CA could not be read, continuing without verification:", err);
+    return undefined;
+  }
 }
 
 async function initSchema(): Promise<void> {
@@ -207,6 +230,24 @@ async function initSchema(): Promise<void> {
       updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
       PRIMARY KEY (user_id, product)
     );
+  `);
+
+  // The WinCraft rename changed this table's product id from "pctweaker" to
+  // "wincraft". Existing rows still carry the old id, and a product id is not
+  // cosmetic here: lookups, refund matching and the loyalty discount all key
+  // off it, so a row left under the old name reads as "no entitlement". The
+  // alias in products.ts keeps such rows working, and this rewrites them so
+  // there is exactly one row per (user, product). Idempotent, so it is safe on
+  // every boot; the DELETE first avoids a primary-key clash for the (rare)
+  // account that already holds both names.
+  await pool.query(`
+    DELETE FROM entitlements
+     WHERE product = 'pctweaker'
+       AND user_id IN (SELECT user_id FROM entitlements WHERE product = 'wincraft');
+  `);
+  await pool.query(`
+    UPDATE entitlements SET product = 'wincraft', updated_at = now()
+     WHERE product = 'pctweaker';
   `);
 
   // One row per website download click that arrived from a tagged social

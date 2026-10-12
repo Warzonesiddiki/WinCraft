@@ -51,7 +51,7 @@ pub fn core_parking_info() -> GamingInfo {
         name: "Disable core parking",
         description: "Stops Windows parking idle CPU cores while plugged in, so a core does not have to be woken before it can service input or a sudden burst of work. Applied to the mains profile only — on battery, parking is what it is there for. The plan's previous value is recorded and restored exactly on rollback (requires administrator rights).",
         requires_admin: true,
-        requires_pro: true,
+        requires_pro: false,
     }
 }
 

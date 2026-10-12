@@ -62,7 +62,7 @@ export const GUIDE_FAQS: Record<string, readonly GuideFaq[]> = {
     },
     {
       q: "Is WinCraft free?",
-      a: "Yes. The Free plan needs no account and includes the controls listed on the home page as free; Pro adds the remaining controls and tools. The optimizations described on this page apply the same settings on either plan.",
+      a: "Yes. There is one plan, it is free, and no account is needed: every control in the catalogue is included, and the optimizations described on this page apply the same settings for everyone.",
     },
     {
       q: "Does it work on Windows 10 as well as Windows 11?",

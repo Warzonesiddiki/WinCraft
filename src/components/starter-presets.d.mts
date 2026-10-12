@@ -9,11 +9,9 @@ export function presetSelection(
   preset: StarterPreset,
   tweaks: TweakInfo[],
   selected: string[],
-  isPro: boolean,
 ): {
   available: TweakInfo[];
   missing: string[];
   pending: TweakInfo[];
-  locked: TweakInfo[];
   unsupported: string[];
 };

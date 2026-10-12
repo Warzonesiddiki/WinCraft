@@ -98,18 +98,6 @@ pub(crate) fn executable_key(path: &str) -> Option<String> {
     normalized_executable_path(resolved.as_deref().and_then(Path::to_str).unwrap_or(path))
 }
 
-/// Activation and additions require Pro. Removal and disabling are recovery
-/// operations and must remain available after a subscription expires.
-fn authorize_configuration_change(
-    requires_pro: bool,
-    check_pro: impl FnOnce() -> Result<(), String>,
-) -> Result<(), String> {
-    if requires_pro {
-        check_pro()?;
-    }
-    Ok(())
-}
-
 #[tauri::command]
 pub fn list_game_sessions(app: tauri::AppHandle) -> Result<Vec<GameView>, String> {
     let dir = crate::store_for_dir(&app)?;
@@ -130,7 +118,6 @@ pub fn game_sessions_enabled(app: tauri::AppHandle) -> Result<bool, String> {
 #[tauri::command]
 pub fn set_game_sessions_enabled(app: tauri::AppHandle, enabled: bool) -> Result<(), String> {
     let dir = crate::store_for_dir(&app)?;
-    authorize_configuration_change(enabled, || crate::require_pro(&dir))?;
     let _guard = CONFIG_LOCK.lock().map_err(|e| e.to_string())?;
     let mut config = load_config(&dir);
     config.enabled = enabled;
@@ -140,7 +127,6 @@ pub fn set_game_sessions_enabled(app: tauri::AppHandle, enabled: bool) -> Result
 #[tauri::command]
 pub fn add_game_session(app: tauri::AppHandle, path: String) -> Result<GameView, String> {
     let dir = crate::store_for_dir(&app)?;
-    authorize_configuration_change(true, || crate::require_pro(&dir))?;
     let requested = PathBuf::from(&path);
     if !requested.is_absolute() || !requested.is_file() {
         return Err("select an existing executable using its full path".to_string());
@@ -178,7 +164,6 @@ pub(crate) fn core_steering_enabled(dir: &Path) -> bool {
 #[tauri::command]
 pub fn set_core_steering(app: tauri::AppHandle, enabled: bool) -> Result<(), String> {
     let dir = crate::store_for_dir(&app)?;
-    authorize_configuration_change(enabled, || crate::require_pro(&dir))?;
     let _guard = CONFIG_LOCK.lock().map_err(|e| e.to_string())?;
     let mut config = load_config(&dir);
     config.core_steering = enabled;
@@ -406,14 +391,10 @@ impl SessionState {
 
 struct NativeBackend<'a> {
     store: &'a RollbackStore,
-    dir: &'a Path,
 }
 
 impl SessionBackend for NativeBackend<'_> {
     fn apply(&mut self, owner: &str) -> Result<bool, String> {
-        // This gate also runs when the entire application is already elevated.
-        // The helper repeats it after UAC, immediately before system writes.
-        crate::require_pro(self.dir)?;
         apply_turbo_elevated_if_needed(self.store, owner)
     }
 
@@ -655,7 +636,6 @@ pub fn spawn_watcher(app: tauri::AppHandle) {
                 .find(|p| p.pid == std::process::id())
                 .map(|p| p.started_at)
                 .unwrap_or(0);
-            let pro = crate::require_pro(&dir).is_ok();
             // While a protected game runs, steering is frozen: nothing new is
             // steered and nothing steered is touched until the game is gone.
             let paused = crate::process_guard::paused(&dir);
@@ -677,8 +657,7 @@ pub fn spawn_watcher(app: tauri::AppHandle) {
                     })
                     .cloned()
                     .collect();
-                let allowed =
-                    config.enabled && config.core_steering && !steerable.is_empty() && pro;
+                let allowed = config.enabled && config.core_steering && !steerable.is_empty();
                 steering.tick(&store, allowed, &steerable, &processes, watcher_start);
             }
             if !recovery_checked {
@@ -700,7 +679,7 @@ pub fn spawn_watcher(app: tauri::AppHandle) {
                     }
                 }
             }
-            let allowed = config.enabled && !config.games.is_empty() && pro;
+            let allowed = config.enabled && !config.games.is_empty();
             // A failed process enumeration is not evidence that a game exited.
             // Explicit disable/removal/expiry can still restore our own state.
             if allowed && !refreshed {
@@ -714,10 +693,7 @@ pub fn spawn_watcher(app: tauri::AppHandle) {
             } else {
                 None
             };
-            let mut backend = NativeBackend {
-                store: &store,
-                dir: &dir,
-            };
+            let mut backend = NativeBackend { store: &store };
             match state.tick(allowed, matched, &mut backend, || {
                 new_owner_token(watcher_start)
             }) {
@@ -738,7 +714,6 @@ pub fn spawn_watcher(app: tauri::AppHandle) {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use std::cell::Cell;
 
     #[derive(Default)]
     struct MockBackend {
@@ -894,7 +869,7 @@ mod tests {
     }
 
     #[test]
-    fn expired_pro_cannot_start_but_can_end_a_session() {
+    fn a_disallowed_session_cannot_start_but_can_end() {
         let mut state = SessionState::default();
         let mut backend = MockBackend::default();
         assert!(state
@@ -907,19 +882,6 @@ mod tests {
             .tick(false, Some(game()), &mut backend, owner)
             .unwrap();
         assert_eq!(backend.restore_calls, 1);
-    }
-
-    #[test]
-    fn enable_and_add_require_pro_but_disable_does_not_check_it() {
-        let checked = Cell::new(0);
-        let denied = || {
-            checked.set(checked.get() + 1);
-            Err("PRO_REQUIRED".to_string())
-        };
-        assert!(authorize_configuration_change(true, denied).is_err());
-        assert!(authorize_configuration_change(true, denied).is_err());
-        assert!(authorize_configuration_change(false, denied).is_ok());
-        assert_eq!(checked.get(), 2);
     }
 
     #[test]
@@ -1018,7 +980,7 @@ mod tests {
     }
 
     #[test]
-    fn startup_cleanup_survives_failure_and_does_not_require_pro() {
+    fn startup_cleanup_survives_failure() {
         let mut state = SessionState::CleanupPending { owner: owner() };
         let mut backend = MockBackend {
             snapshot_owner: Some(owner()),

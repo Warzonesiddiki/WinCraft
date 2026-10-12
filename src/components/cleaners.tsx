@@ -14,27 +14,22 @@ import {
   Toast,
 } from "../types";
 import { GlobeIcon, TrashIcon } from "./icons";
-import { Badge } from "./ui";
 
 const CATEGORY_ORDER: CacheCategory[] = ["shaders", "launchers", "apps", "dev", "windows"];
 
 /**
  * Caches belonging to programs other than Windows.
  *
- * Scanning is free and cleaning is not, on purpose: the number this produces
- * is the honest argument for the upgrade, and charging to find out whether
- * there is anything to reclaim would be charging for the question rather than
- * the answer.
+ * Scan first, delete second: nothing is removed until the user sees what each
+ * program is holding and which rows they want gone. Everything listed is
+ * rebuilt by the program that wrote it, which is why the scan can promise that
+ * removing all of it is safe.
  */
 export function AppCacheCard({
   s,
-  isPro,
-  onRequirePro,
   onToast,
 }: {
   s: Strings;
-  isPro: boolean;
-  onRequirePro: () => void;
   onToast: (kind: Toast["kind"], message: string) => void;
 }) {
   const [groups, setGroups] = useState<CacheGroup[] | null>(null);
@@ -67,10 +62,6 @@ export function AppCacheCard({
   }
 
   async function clean() {
-    if (!isPro) {
-      onRequirePro();
-      return;
-    }
     setCleaning(true);
     try {
       const result = await invoke<CacheCleanResult>("clean_app_caches", {
@@ -131,7 +122,6 @@ export function AppCacheCard({
               className="tool-secondary-action"
             >
               {cleaning ? s.appCache.cleaning : s.appCache.cleanButton}
-              {!isPro && <Badge kind="pro">{s.badges.pro}</Badge>}
             </button>
             <span className="text-xs text-ink-3">
               {format(s.appCache.selectedTotal, { size: formatBytes(selectedBytes) })}
@@ -208,13 +198,9 @@ export function AppCacheCard({
  */
 export function CookieCleanerCard({
   s,
-  isPro,
-  onRequirePro,
   onToast,
 }: {
   s: Strings;
-  isPro: boolean;
-  onRequirePro: () => void;
   onToast: (kind: Toast["kind"], message: string) => void;
 }) {
   const [scans, setScans] = useState<CookieScan[] | null>(null);
@@ -231,10 +217,6 @@ export function CookieCleanerCard({
   }, []);
 
   async function scan() {
-    if (!isPro) {
-      onRequirePro();
-      return;
-    }
     setScanning(true);
     try {
       setScans(await invoke<CookieScan[]>("scan_cookies"));
@@ -303,7 +285,6 @@ export function CookieCleanerCard({
       <div className="tool-control-group mt-4 flex flex-wrap items-center gap-2">
         <button onClick={() => void scan()} disabled={scanning} className="tool-primary-action">
           {scanning ? s.cookieCleaner.scanning : s.cookieCleaner.scanButton}
-          {!isPro && <Badge kind="pro">{s.badges.pro}</Badge>}
         </button>
         <button
           onClick={() => setShowList((v) => !v)}

@@ -58,8 +58,7 @@ const en = {
   exportPdf: "PDF (print)",
   exported: "History saved.",
   compareTitle: "Now compared with before WinCraft",
-  compareBody:
-    "Every change WinCraft is keeping in effect, with the value Windows had before it.",
+  compareBody: "Every change WinCraft is keeping in effect, with the value Windows had before it.",
   compareEmpty:
     "WinCraft is not keeping any change in effect: these settings are as Windows had them.",
   undoAll: "Undo all ({count})",
@@ -138,8 +137,7 @@ const it: Copy = {
   exportPdf: "PDF (stampa)",
   exported: "Cronologia salvata.",
   compareTitle: "Ora rispetto a prima di WinCraft",
-  compareBody:
-    "Ogni modifica che WinCraft mantiene attiva, con il valore che Windows aveva prima.",
+  compareBody: "Ogni modifica che WinCraft mantiene attiva, con il valore che Windows aveva prima.",
   compareEmpty:
     "WinCraft non mantiene attiva nessuna modifica: queste impostazioni sono come le aveva Windows.",
   undoAll: "Annulla tutto ({count})",
@@ -445,8 +443,7 @@ const pt: Copy = {
   exportPdf: "PDF (imprimir)",
   exported: "Histórico guardado.",
   compareTitle: "Agora em comparação com antes do WinCraft",
-  compareBody:
-    "Cada alteração que o WinCraft mantém ativa, com o valor que o Windows tinha antes.",
+  compareBody: "Cada alteração que o WinCraft mantém ativa, com o valor que o Windows tinha antes.",
   compareEmpty:
     "O WinCraft não mantém nenhuma alteração ativa: estas definições estão como o Windows as tinha.",
   undoAll: "Anular tudo ({count})",

@@ -1,6 +1,7 @@
 import { getPool } from "./db";
 import { EMAIL_MUTED_TEXT, emailShell, escapeHtml } from "./emails/layout";
 import { listUnsubscribeHeaders, unsubscribeUrl } from "./routes/newsletter";
+import { canonicalProduct } from "./products";
 
 /** An expired Checkout Session, reduced to what the reminder needs. */
 export type ExpiredCheckout = {
@@ -31,7 +32,9 @@ export async function remindAbandonedLifetime(
   const cutoff = new Date(now.getTime() - COOLDOWN_MS);
   let sent = 0;
   for (const session of sessions) {
-    if (session.mode !== "payment" || session.plan !== "lifetime" || session.product !== "wincraft") continue;
+    // Canonical id, not the raw one: sessions created before the WinCraft
+    // rename carry "pctweaker" and are still abandoned Lifetime checkouts.
+    if (session.mode !== "payment" || session.plan !== "lifetime" || canonicalProduct(session.product) !== "wincraft") continue;
     if (!session.userId || !/^\d+$/.test(session.userId)) continue;
     const { rows } = await db.query(
       "SELECT email, first_name FROM users WHERE id = $1 AND email_verified AND NOT is_pro",

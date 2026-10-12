@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
+import { ORIGIN, ORIGIN_PATTERN } from "./site-origin.mjs";
 
 const dist = new URL("../dist/", import.meta.url);
 const sitemap = await readFile(new URL("sitemap.xml", dist), "utf8");
@@ -15,7 +16,7 @@ const titles = new Set();
 const descriptions = new Set();
 
 for (const url of urls) {
-  assert.equal(url.origin, "https://pctweaker.app");
+  assert.equal(url.origin, ORIGIN);
   assert.ok(url.pathname.endsWith("/"), `Sitemap URL must be the trailing-slash form: ${url}`);
   const html = await readFile(new URL(`${url.pathname.slice(1)}index.html`, dist), "utf8");
 
@@ -84,7 +85,7 @@ const uninstaller = await readFile(new URL("uninstaller/index.html", dist), "utf
 assert.ok(uninstaller.includes("it attempts to create a Windows restore point"), "Restore-point creation must not be guaranteed");
 assert.ok(uninstaller.includes("can fail or be skipped"), "Restore-point limits must be visible");
 assert.ok(!uninstaller.includes("a restore point taken first"), "Metadata must not promise a restore point");
-for (const [value, label] of [[46, "CONTROLS INCLUDED FREE"], [81, "CONTROLS IN THIS RELEASE"], [1, "PLACE TO REVIEW &amp; RESTORE"]]) {
+for (const [value, label] of [[81, "CONTROLS IN THIS RELEASE"], [1, "PLACE TO REVIEW &amp; RESTORE"]]) {
   assert.match(home, new RegExp(`<span>${value}</span>[\\s\\S]{0,500}${label}`), `Stat must render its real value in the initial HTML: ${label}`);
 }
 const app = JSON.parse(
@@ -92,13 +93,23 @@ const app = JSON.parse(
 );
 assert.ok(app.softwareVersion, "Software version must be populated");
 assert.equal(app["@type"], "SoftwareApplication");
-// Prices are a factual claim about what a visitor will be charged. Keep them
-// pinned to the plans the pricing section and the FAQ actually state.
+// Prices are a factual claim about what a visitor will be charged, so they are
+// pinned to the plans the page actually states - and the page states one: free.
+// The three paid offers that used to be listed here were the last place on the
+// home page still selling a tier the desktop app does not enforce, and a
+// structured-data claim is the kind that gets quoted without the page around it.
 assert.deepEqual(
-  app.offers.map((offer) => offer.price).sort(),
-  ["0", "59.99", "7.99", "99"].sort(),
+  app.offers.map((offer) => offer.price),
+  ["0"],
   "SoftwareApplication offers must match the published pricing",
 );
+assert.equal(app.offers[0].name, "Free", "The one offer must be the free one");
+// The negative half of the same claim: no paid price may reappear on the home
+// page without this failing. EUR 0 is the price; the Uninstaller page keeps its
+// own, which is a different product on its own page.
+for (const price of ["\u20ac59.99", "\u20ac7.99", "\u20ac99", "\u20ac39.99", "\u20ac49.99"]) {
+  assert.ok(!home.includes(price), `Home page must not advertise a paid plan: ${price}`);
+}
 const uninstallerApp = [...uninstaller.matchAll(/<script type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/g)]
   .map((match) => JSON.parse(match[1]))
   .find((item) => item["@type"] === "SoftwareApplication");
@@ -123,7 +134,15 @@ assert.ok(
 );
 
 const robots = await readFile(new URL("robots.txt", dist), "utf8");
-assert.match(robots, /Sitemap:\s*https:\/\/pctweaker\.app\/sitemap\.xml/, "robots.txt must point at the sitemap");
+assert.match(robots, new RegExp(`Sitemap:\\s*${ORIGIN_PATTERN}/sitemap\\.xml`), "robots.txt must point at the sitemap");
 assert.match(robots, /^\s*Allow:\s*\/$/m, "robots.txt must allow crawling");
+
+// CNAME is what decides where GitHub Pages answers. If it disagrees with the
+// origin every canonical is built from, the pages point at a host that is not
+// serving them - the same class of drift this file exists to catch, and the one
+// part of the origin story that lives in a deployment setting rather than in
+// src/seo.ts.
+const cname = (await readFile(new URL("CNAME", dist), "utf8")).trim();
+assert.equal(cname, new URL(ORIGIN).host, "the shipped CNAME must be the site's host");
 
 console.log(`SEO checks passed for ${urls.length} sitemap routes, robots.txt and the 404 page.`);

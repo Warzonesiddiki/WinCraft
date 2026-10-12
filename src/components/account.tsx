@@ -12,7 +12,7 @@ import {
   writeAvatar,
 } from "../lib";
 import { AuthState, ProcessGuardStatus } from "../types";
-import { CheckIcon, CrownIcon } from "./icons";
+import { CheckIcon, GemIcon } from "./icons";
 import { Avatar } from "./ui";
 import "./account-menu.css";
 
@@ -70,7 +70,7 @@ export function AuthSection({
         <span
           aria-hidden
           className="pointer-events-none absolute -right-8 -top-10 h-24 w-24 rounded-full opacity-20 blur-2xl"
-          style={{ background: auth.isPro ? "#fbbf24" : "var(--app-accent)" }}
+          style={{ background: "var(--app-accent)" }}
         />
         <div className="relative flex items-center gap-3">
           {/* Clicking the avatar itself opens the photo picker — the picture
@@ -83,7 +83,7 @@ export function AuthSection({
             aria-label={s.menu.changePhoto}
             className="group relative shrink-0 rounded-full transition-transform hover:scale-105"
           >
-            <Avatar email={auth.email} isPro={auth.isPro} photo={avatar} />
+            <Avatar email={auth.email} photo={avatar} />
             <span className="pointer-events-none absolute inset-[2px] grid place-items-center rounded-full bg-black/55 opacity-0 transition-opacity group-hover:opacity-100">
               <svg viewBox="0 0 24 24" fill="none" className="h-4 w-4 text-white">
                 <path
@@ -346,7 +346,6 @@ export function AccountMenu({
   onLogout,
   onResendVerification,
   onForgotPassword,
-  onUpgrade,
   onViewPlan,
   pushToast,
 }: {
@@ -371,9 +370,7 @@ export function AccountMenu({
   onLogout: () => void;
   onResendVerification: () => Promise<void>;
   onForgotPassword: (email: string) => Promise<void>;
-  onUpgrade: () => void;
-  /** Opens the plans screen. Same destination for both tiers: a Free
-   *  account is comparing, a Pro account is checking what it pays for. */
+  /** Opens the plans screen, which now states the one plan there is. */
   onViewPlan: () => void;
   pushToast: (kind: "success" | "error", message: string) => void;
 }) {
@@ -385,7 +382,6 @@ export function AccountMenu({
     setInternalOpen(next);
   };
   const [errReports, setErrReports] = useState(() => errorReportsEnabled());
-  const isPro = auth.status === "authenticated" && auth.isPro;
 
   // Device-local profile photo, kept as a file by the Rust side; there is no
   // upload — see fileToAvatarDataUrl in lib.ts and src-tauri/src/avatar.rs.
@@ -505,7 +501,7 @@ export function AccountMenu({
         aria-expanded={open}
       >
         {auth.status === "authenticated" ? (
-          <Avatar email={auth.email} isPro={isPro} photo={avatar} size="sm" />
+          <Avatar email={auth.email} photo={avatar} size="sm" />
         ) : (
           <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5">
             <circle cx="12" cy="8" r="3.2" stroke="currentColor" strokeWidth="1.6" />
@@ -559,17 +555,16 @@ export function AccountMenu({
             />
             <div className="account-plan-row">
               <span>
-                <CrownIcon className="h-4 w-4" />
-                {isPro ? s.menu.planPro : s.menu.planFree}
+                <GemIcon className="h-4 w-4" />
+                {s.menu.planFree}
               </span>
               <button
                 onClick={() => {
                   setOpen(false);
-                  if (isPro) onViewPlan();
-                  else onUpgrade();
+                  onViewPlan();
                 }}
               >
-                {isPro ? s.menu.viewPlan : s.menu.upgradeButton} <span aria-hidden="true">↗</span>
+                {s.menu.viewPlan} <span aria-hidden="true">↗</span>
               </button>
             </div>
             <details name="account-settings" className="account-setting">
@@ -673,7 +668,7 @@ export function AccountMenu({
             </details>
             <button
               className="account-support"
-              onClick={() => void openUrl("https://pctweaker.app/support")}
+              onClick={() => void openUrl("https://wincraft.app/support")}
             >
               {s.menu.reportIssue}
               <span aria-hidden="true">↗</span>

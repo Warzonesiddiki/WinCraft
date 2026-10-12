@@ -13,11 +13,13 @@ const { validateUpload } = require("./quality-gate");
 // Default CTA when the .json does not specify "ctaComment" - requested
 // 2026-07-29: a direct funnel to the tool/link in a comment (not "pinned",
 // the API does not allow that - see the note in lib.js::postComment).
-// Official pctweaker.app link (2026-08-22, explicitly requested): it used to
-// point at the GitHub repo rather than the product's own site - the same fix
-// was applied in parallel on Instagram (instagram-upload/lib.js) and X.
+// Official product link: the owner asked on 2026-08-22 for the product's own
+// site rather than the GitHub repo, and on 2026-10-12 confirmed that
+// wincraft.app is the live one - the domain was pctweaker.app until the rename.
+// The same change was applied in parallel on Instagram
+// (instagram-upload/lib.js) and X.
 const DEFAULT_CTA_COMMENT =
-  "Try WinCraft for free \u{1F447}\nhttps://pctweaker.app";
+  "Try WinCraft for free \u{1F447}\nhttps://wincraft.app";
 
 const ROOT = path.join(__dirname, "..");
 const QUEUE_DIR = path.join(ROOT, "to-publish");

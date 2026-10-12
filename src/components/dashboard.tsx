@@ -4,6 +4,7 @@ import { type Lang, type Strings } from "../i18n";
 import type { Section, TweakInfo } from "../types";
 import { textFor } from "../lib";
 import { type PulseSample } from "./command";
+import { Badge } from "./ui";
 
 /* ==========================================================================
    Widget system: each widget is a self-contained card that can be rearranged.
@@ -12,12 +13,7 @@ import { type PulseSample } from "./command";
    ========================================================================== */
 
 type WidgetId =
-  | "stats"
-  | "quick-actions"
-  | "applied-tweaks"
-  | "next-step"
-  | "recent-activity"
-  | "health-score";
+  "stats" | "quick-actions" | "applied-tweaks" | "next-step" | "recent-activity" | "health-score";
 
 type WidgetDef = {
   id: WidgetId;
@@ -59,12 +55,7 @@ function saveLayout(order: WidgetId[]) {
 
 /* ---- Stats Widget -------------------------------------------------------- */
 
-function StatsWidget({
-  samples,
-}: {
-  s: Strings;
-  samples: PulseSample[];
-}) {
+function StatsWidget({ samples }: { s: Strings; samples: PulseSample[] }) {
   const latest = samples.length > 0 ? samples[samples.length - 1] : null;
 
   const readings = [
@@ -72,18 +63,24 @@ function StatsWidget({
       label: "CPU",
       value: latest ? `${Math.round(latest.cpu)}%` : "—",
       pct: latest?.cpu ?? 0,
-      color: (latest?.cpu ?? 0) > 80 ? "var(--danger)" : (latest?.cpu ?? 0) > 60 ? "var(--warning)" : "var(--success)",
+      color:
+        (latest?.cpu ?? 0) > 80
+          ? "var(--danger)"
+          : (latest?.cpu ?? 0) > 60
+            ? "var(--warning)"
+            : "var(--success)",
     },
     {
       label: "RAM",
-      value: latest && latest.ramTotal > 0
-        ? `${Math.round((latest.ramUsed / latest.ramTotal) * 100)}%`
-        : "—",
+      value:
+        latest && latest.ramTotal > 0
+          ? `${Math.round((latest.ramUsed / latest.ramTotal) * 100)}%`
+          : "—",
       pct: latest && latest.ramTotal > 0 ? (latest.ramUsed / latest.ramTotal) * 100 : 0,
       color:
-        latest && latest.ramTotal > 0 && (latest.ramUsed / latest.ramTotal) > 0.85
+        latest && latest.ramTotal > 0 && latest.ramUsed / latest.ramTotal > 0.85
           ? "var(--danger)"
-          : latest && latest.ramTotal > 0 && (latest.ramUsed / latest.ramTotal) > 0.7
+          : latest && latest.ramTotal > 0 && latest.ramUsed / latest.ramTotal > 0.7
             ? "var(--warning)"
             : "var(--success)",
     },
@@ -97,7 +94,14 @@ function StatsWidget({
           <div key={r.label} className="flex flex-col items-center">
             <div className="relative h-16 w-16">
               <svg viewBox="0 0 36 36" className="h-full w-full -rotate-90">
-                <circle cx="18" cy="18" r="15.9" fill="none" stroke="var(--border-subtle)" strokeWidth="2.5" />
+                <circle
+                  cx="18"
+                  cy="18"
+                  r="15.9"
+                  fill="none"
+                  stroke="var(--border-subtle)"
+                  strokeWidth="2.5"
+                />
                 <circle
                   cx="18"
                   cy="18"
@@ -153,7 +157,9 @@ function QuickActionsWidget({
             onClick={a.onClick}
             className="flex items-center gap-2.5 rounded-xl border border-line bg-surface-2 p-3 text-left transition-all hover:border-accent/30 hover:bg-surface-hover"
           >
-            <span className="text-lg" aria-hidden="true">{a.icon}</span>
+            <span className="text-lg" aria-hidden="true">
+              {a.icon}
+            </span>
             <span className="text-[12px] font-semibold text-ink">{a.label}</span>
           </button>
         ))}
@@ -164,13 +170,7 @@ function QuickActionsWidget({
 
 /* ---- Applied Tweaks Widget ----------------------------------------------- */
 
-function AppliedTweaksWidget({
-  s,
-  tweaks,
-}: {
-  s: Strings;
-  tweaks: TweakInfo[];
-}) {
+function AppliedTweaksWidget({ s, tweaks }: { s: Strings; tweaks: TweakInfo[] }) {
   const applied = tweaks.filter((t) => t.applied);
   const maxShow = 5;
   const shown = applied.slice(0, maxShow);
@@ -180,9 +180,7 @@ function AppliedTweaksWidget({
     <div className="dashboard-widget" data-widget="applied-tweaks">
       <div className="flex items-center justify-between">
         <h3 className="widget-title">Applied Settings</h3>
-        <span className="rounded-full bg-accent-soft px-2 py-0.5 text-[10px] font-bold text-accent">
-          {applied.length} active
-        </span>
+        <Badge kind="accent">{applied.length} active</Badge>
       </div>
       {applied.length === 0 ? (
         <p className="py-4 text-center text-sm text-ink-3">
@@ -198,11 +196,7 @@ function AppliedTweaksWidget({
               </span>
             </li>
           ))}
-          {more > 0 && (
-            <li className="px-2 text-[11px] text-ink-3">
-              +{more} more
-            </li>
-          )}
+          {more > 0 && <li className="px-2 text-[11px] text-ink-3">+{more} more</li>}
         </ul>
       )}
     </div>
@@ -223,35 +217,38 @@ function NextStepWidget({
   const total = tweaks.length;
 
   // Decide the best next step based on current state
-  const suggestion = appliedCount === 0
-    ? {
-        title: "Run your first scan",
-        description: "Find settings that could improve your PC's performance and privacy.",
-        action: "Open Scan",
-        icon: "🔍",
-        onClick: () => onNavigate("scan"),
-      }
-    : appliedCount < 5
+  const suggestion =
+    appliedCount === 0
       ? {
-          title: "Explore more tweaks",
-          description: `You have ${appliedCount} of ${total} tweaks applied. Discover more in Performance and Privacy.`,
-          action: "Browse Performance",
-          icon: "⚡",
-          onClick: () => onNavigate("performance"),
+          title: "Run your first scan",
+          description: "Find settings that could improve your PC's performance and privacy.",
+          action: "Open Scan",
+          icon: "🔍",
+          onClick: () => onNavigate("scan"),
         }
-      : {
-          title: "Save your setup as a profile",
-          description: "Lock in your configuration so you can restore it anytime or share it.",
-          action: "Open Profiles",
-          icon: "📁",
-          onClick: () => onNavigate("profiles"),
-        };
+      : appliedCount < 5
+        ? {
+            title: "Explore more tweaks",
+            description: `You have ${appliedCount} of ${total} tweaks applied. Discover more in Performance and Privacy.`,
+            action: "Browse Performance",
+            icon: "⚡",
+            onClick: () => onNavigate("performance"),
+          }
+        : {
+            title: "Save your setup as a profile",
+            description: "Lock in your configuration so you can restore it anytime or share it.",
+            action: "Open Profiles",
+            icon: "📁",
+            onClick: () => onNavigate("profiles"),
+          };
 
   return (
     <div className="dashboard-widget" data-widget="next-step">
       <h3 className="widget-title">Suggested Next</h3>
       <div className="mt-2 flex items-start gap-3 rounded-xl border border-line bg-surface-2 p-4">
-        <span className="text-2xl" aria-hidden="true">{suggestion.icon}</span>
+        <span className="text-2xl" aria-hidden="true">
+          {suggestion.icon}
+        </span>
         <div className="min-w-0 flex-1">
           <p className="text-[13px] font-semibold text-ink">{suggestion.title}</p>
           <p className="mt-1 text-[11px] leading-relaxed text-ink-3">{suggestion.description}</p>
@@ -270,14 +267,15 @@ function NextStepWidget({
 /* ---- Recent Activity Widget ---------------------------------------------- */
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-function RecentActivityWidget(_props: {
-  s: Strings;
-  lang: Lang;
-}) {
-  const [entries, setEntries] = useState<{ id: string; label: string; at: string; kind: string }[]>([]);
+function RecentActivityWidget(_props: { s: Strings; lang: Lang }) {
+  const [entries, setEntries] = useState<{ id: string; label: string; at: string; kind: string }[]>(
+    [],
+  );
 
   useEffect(() => {
-    invoke<{ id: string; label: string; at: string; kind: string }[]>("recent_history", { limit: 5 })
+    invoke<{ id: string; label: string; at: string; kind: string }[]>("recent_history", {
+      limit: 5,
+    })
       .then(setEntries)
       .catch(() => setEntries([]));
   }, []);
@@ -286,14 +284,14 @@ function RecentActivityWidget(_props: {
     <div className="dashboard-widget" data-widget="recent-activity">
       <h3 className="widget-title">Recent Activity</h3>
       {entries.length === 0 ? (
-        <p className="py-4 text-center text-sm text-ink-3">
-          Your activity log starts here.
-        </p>
+        <p className="py-4 text-center text-sm text-ink-3">Your activity log starts here.</p>
       ) : (
         <ul className="mt-2 flex flex-col gap-1.5">
           {entries.map((e, i) => (
             <li key={i} className="flex items-center gap-2 rounded-lg px-2 py-1.5">
-              <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${e.kind === "apply" ? "bg-ok" : "bg-warn"}`} />
+              <span
+                className={`h-1.5 w-1.5 shrink-0 rounded-full ${e.kind === "apply" ? "bg-ok" : "bg-warn"}`}
+              />
               <span className="min-w-0 flex-1 truncate text-[12px] text-ink">{e.label}</span>
               <span className="shrink-0 text-[10px] text-ink-3">{e.at}</span>
             </li>
@@ -333,7 +331,14 @@ function HealthScoreWidget(_props: { s: Strings }) {
       <div className="flex items-center justify-center py-4">
         <div className="relative h-24 w-24">
           <svg viewBox="0 0 36 36" className="h-full w-full -rotate-90">
-            <circle cx="18" cy="18" r="15.9" fill="none" stroke="var(--border-subtle)" strokeWidth="2" />
+            <circle
+              cx="18"
+              cy="18"
+              r="15.9"
+              fill="none"
+              stroke="var(--border-subtle)"
+              strokeWidth="2"
+            />
             {score !== null && (
               <circle
                 cx="18"
@@ -349,10 +354,11 @@ function HealthScoreWidget(_props: { s: Strings }) {
             )}
           </svg>
           <div className="absolute inset-0 flex flex-col items-center justify-center">
-            <span className="text-xl font-bold text-ink">
-              {score !== null ? score : "—"}
-            </span>
-            <span className="text-[9px] font-semibold uppercase tracking-wider" style={{ color: verdict.color }}>
+            <span className="text-xl font-bold text-ink">{score !== null ? score : "—"}</span>
+            <span
+              className="text-[9px] font-semibold uppercase tracking-wider"
+              style={{ color: verdict.color }}
+            >
               {verdict.label}
             </span>
           </div>
@@ -389,26 +395,28 @@ export function Dashboard({
   const [dragId, setDragId] = useState<WidgetId | null>(null);
   const [dragOverId, setDragOverId] = useState<WidgetId | null>(null);
 
-  const reorder = useCallback(
-    (from: WidgetId, to: WidgetId) => {
-      setLayout((prev) => {
-        const next = [...prev];
-        const fromIdx = next.indexOf(from);
-        const toIdx = next.indexOf(to);
-        if (fromIdx < 0 || toIdx < 0) return prev;
-        next.splice(fromIdx, 1);
-        next.splice(toIdx, 0, from);
-        saveLayout(next);
-        return next;
-      });
-    },
-    [],
-  );
+  const reorder = useCallback((from: WidgetId, to: WidgetId) => {
+    setLayout((prev) => {
+      const next = [...prev];
+      const fromIdx = next.indexOf(from);
+      const toIdx = next.indexOf(to);
+      if (fromIdx < 0 || toIdx < 0) return prev;
+      next.splice(fromIdx, 1);
+      next.splice(toIdx, 0, from);
+      saveLayout(next);
+      return next;
+    });
+  }, []);
 
   const widgetMap: Record<WidgetId, React.ReactNode> = {
     stats: <StatsWidget s={s} samples={samples} />,
     "quick-actions": (
-      <QuickActionsWidget s={s} onNavigate={onNavigate} onScan={onScan} onRestoreAll={onRestoreAll} />
+      <QuickActionsWidget
+        s={s}
+        onNavigate={onNavigate}
+        onScan={onScan}
+        onRestoreAll={onRestoreAll}
+      />
     ),
     "applied-tweaks": <AppliedTweaksWidget s={s} tweaks={tweaks} />,
     "next-step": <NextStepWidget s={s} tweaks={tweaks} onNavigate={onNavigate} />,
@@ -469,7 +477,9 @@ export function Dashboard({
             className={`transition-all ${
               customizing ? "cursor-grab active:cursor-grabbing" : ""
             } ${dragId === id ? "opacity-40" : ""} ${
-              dragOverId === id && dragId !== id ? "ring-2 ring-accent ring-offset-2 ring-offset-app" : ""
+              dragOverId === id && dragId !== id
+                ? "ring-2 ring-accent ring-offset-2 ring-offset-app"
+                : ""
             }`}
           >
             {customizing && (

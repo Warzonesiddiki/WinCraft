@@ -5,7 +5,7 @@ pub struct StartupEntry {
     pub icon_data_url: Option<String>,
     pub name: String,
     pub command: String,
-    /// "HKCU" or "HKLM" â€” HKLM entries are machine-wide and need admin to change.
+    /// "HKCU" or "HKLM" — HKLM entries are machine-wide and need admin to change.
     pub scope: String,
     /// Which of the three places Windows starts things from this entry lives
     /// in: `run`, `run32` or `folder`. Needed as well as `scope` because each
@@ -34,7 +34,7 @@ pub struct StartupEntry {
 /// (`"C:\...\app.exe" --silent`), an unquoted path with spaces, a bare
 /// `rundll32.exe ...`, and paths built from environment variables. Anything
 /// this cannot resolve to a concrete path returns `None`, which callers treat
-/// as "present" â€” the parser is only ever allowed to make a row *more*
+/// as "present" — the parser is only ever allowed to make a row *more*
 /// visible, never to hide one.
 pub(crate) fn extract_exe_path(command: &str) -> Option<std::path::PathBuf> {
     let command = command.trim();
@@ -125,7 +125,7 @@ const RUN32_PATH: &str = r"Software\WOW6432Node\Microsoft\Windows\CurrentVersion
 const APPROVED_RUN32_PATH: &str =
     r"Software\Microsoft\Windows\CurrentVersion\Explorer\StartupApproved\Run32";
 
-/// The Startup *folder* â€” the one `shell:startup` opens. Explorer, not the
+/// The Startup *folder* — the one `shell:startup` opens. Explorer, not the
 /// registry, runs these, but it checks the same style of approval value first,
 /// keyed by the shortcut's file name.
 const APPROVED_FOLDER_PATH: &str =
@@ -196,7 +196,7 @@ fn now_unix_secs() -> u64 {
         .unwrap_or(0)
 }
 
-/// `<scope>|<location>|<0|1>|<name>` â€” the name is taken as the rest of the
+/// `<scope>|<location>|<0|1>|<name>` — the name is taken as the rest of the
 /// string so program names containing `|` still round-trip intact.
 fn parse_payload(payload: &str) -> Result<(String, String, bool, String), String> {
     let mut parts = payload.splitn(4, '|');
@@ -285,7 +285,7 @@ mod imp {
     /// The shortcut is reported by its own path rather than by the program it
     /// points at: reading a `.lnk` target needs COM, and the file path is
     /// enough both to identify the entry and to show the user where it lives.
-    /// Nothing here can be orphaned the way a `Run` value can â€” the file was
+    /// Nothing here can be orphaned the way a `Run` value can — the file was
     /// just enumerated, so it exists by definition.
     fn collect_folder(scope: &str, out: &mut Vec<StartupEntry>) {
         let Some(dir) = startup_folder(scope) else {
@@ -446,7 +446,7 @@ mod tests {
 
     /// The shapes actually found in a real `Run` key. Getting any of these
     /// wrong means either hiding software that genuinely starts at boot, or
-    /// leaving dead entries on screen â€” the two failure modes this parser
+    /// leaving dead entries on screen — the two failure modes this parser
     /// exists to sit between.
     #[test]
     fn the_executable_is_extracted_from_every_command_shape() {

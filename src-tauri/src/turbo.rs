@@ -16,7 +16,7 @@ pub fn info() -> TurboInfo {
         name: "Turbo Gaming",
         description: "Preset: disables Game DVR, switches the power plan to High performance, and optimizes CPU priority (requires administrator rights).",
         requires_admin: true,
-        requires_pro: true,
+        requires_pro: false,
     }
 }
 

@@ -176,20 +176,6 @@ export function UndoIcon({ className }: { className?: string }) {
   );
 }
 
-export function CrownIcon({ className }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" className={className}>
-      <path
-        d="M3 8.5l3.6 2.7L12 4.5l5.4 6.7L21 8.5 19.2 19H4.8L3 8.5Z"
-        fill="currentColor"
-        stroke="currentColor"
-        strokeWidth="1.4"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
-
 export function SparkIcon({ className }: { className?: string }) {
   return (
     <svg viewBox="0 0 24 24" fill="none" className={className}>
@@ -277,7 +263,7 @@ export function LayersIcon({ className }: { className?: string }) {
   );
 }
 
-/** Faceted gem for the Plans tab: value, without borrowing the Pro crown. */
+/** Faceted gem for the Plans tab: value, without borrowing a crown. */
 export function GemIcon({ className }: { className?: string }) {
   return (
     <svg viewBox="0 0 24 24" fill="none" className={className}>

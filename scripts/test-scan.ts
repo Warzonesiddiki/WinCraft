@@ -70,7 +70,7 @@ test("all native reads report monotonic real progress; failures stay unknown", a
     () => {},
   );
   assert.equal(failed.unavailable.length, SCAN_PROBES.length);
-  assert.deepEqual(recommendedTweaks(failed, true), []);
+  assert.deepEqual(recommendedTweaks(failed), []);
 });
 test("new checks offer genuine review items without turning optional apps or tasks into defects", () => {
   const r = report({
@@ -93,12 +93,12 @@ test("new checks offer genuine review items without turning optional apps or tas
       ["efficiency", true, "performance"],
     ],
   );
-  assert.deepEqual(recommendedTweaks(r, true), []);
+  assert.deepEqual(recommendedTweaks(r), []);
   assert.equal(rows[0].evidence, "Updater");
   assert.equal(rows[1].evidence, "Weather");
   assert.deepEqual(scanObservations(report({ eco: { enabled: false, blocked_global: true } })), []);
 });
-test("fixes require supported hardware advice and respect tiers and dedicated controls", () => {
+test("fixes require supported hardware advice and exclude dedicated controls", () => {
   const tweaks = [
     tweak("ok"),
     tweak("paid", { requires_pro: true }),
@@ -117,15 +117,13 @@ test("fixes require supported hardware advice and respect tiers and dedicated co
       reason_key: null,
     })),
   });
+  // WinCraft is free: `requires_pro` is catalogue metadata now, not a gate, so
+  // the tweak that used to need a licence is offered like any other.
   assert.deepEqual(
-    recommendedTweaks(r, false).map((t) => t.id),
-    ["ok"],
-  );
-  assert.deepEqual(
-    recommendedTweaks(r, true).map((t) => t.id),
+    recommendedTweaks(r).map((t) => t.id),
     ["ok", "paid"],
   );
-  assert.deepEqual(recommendedTweaks({ ...r, advice: null }, true), []);
+  assert.deepEqual(recommendedTweaks({ ...r, advice: null }), []);
 });
 test("neutral scan settings stay review-only and cannot leak into Fix all", () => {
   const tweaks = [
@@ -155,7 +153,7 @@ test("neutral scan settings stay review-only and cannot leak into Fix all", () =
     optionalScanTweaks(r).map((t) => t.id),
     ["neutral", "paid"],
   );
-  assert.deepEqual(recommendedTweaks(r, true), []);
+  assert.deepEqual(recommendedTweaks(r), []);
   assert.deepEqual(optionalScanTweaks({ ...r, advice: null }), []);
   assert.deepEqual(optionalScanTweaks({ ...r, ids: null }), []);
 });
@@ -218,7 +216,6 @@ test("Fix all revalidates eligibility, applies once and verifies actual state in
       throw Error(cmd);
     },
     r,
-    true,
     ["ok", "ok", "fails", "changed", "injected"],
   );
   assert.equal(writes, 1);
@@ -259,7 +256,6 @@ test("failed eligibility read never writes; failed verification never reports su
       throw Error(cmd);
     },
     r,
-    true,
     ["ok"],
   );
   assert.deepEqual(result.fixed, []);

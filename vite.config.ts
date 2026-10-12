@@ -15,6 +15,11 @@ export default defineConfig(async () => ({
   // this, `overlay.html` is not emitted by the production build and the HUD
   // window opens blank in the shipped app while working fine in dev.
   build: {
+    // Only JavaScript is split by the lazy panels in App.tsx. Keeping the CSS
+    // in one stylesheet leaves the cascade exactly as it was when every panel
+    // was imported eagerly: a per-chunk stylesheet would load later in the
+    // document and could win a specificity tie it used to lose.
+    cssCodeSplit: false,
     rollupOptions: {
       input: {
         main: "index.html",

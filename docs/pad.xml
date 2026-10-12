@@ -17,15 +17,15 @@
     <Contact_Info>
       <Author_First_Name>Aurelio</Author_First_Name>
       <Author_Last_Name>Avila</Author_Last_Name>
-      <Author_Email>support@pctweaker.app</Author_Email>
+      <Author_Email>support@wincraft.app</Author_Email>
       <Contact_First_Name>Aurelio</Contact_First_Name>
       <Contact_Last_Name>Avila</Contact_Last_Name>
-      <Contact_Email>support@pctweaker.app</Contact_Email>
+      <Contact_Email>support@wincraft.app</Contact_Email>
     </Contact_Info>
     <Support_Info>
-      <Sales_Email>support@pctweaker.app</Sales_Email>
-      <Support_Email>support@pctweaker.app</Support_Email>
-      <General_Email>support@pctweaker.app</General_Email>
+      <Sales_Email>support@wincraft.app</Sales_Email>
+      <Support_Email>support@wincraft.app</Support_Email>
+      <General_Email>support@wincraft.app</General_Email>
       <Sales_Phone></Sales_Phone>
       <Support_Phone></Support_Phone>
       <General_Phone></General_Phone>
@@ -34,9 +34,9 @@
   </Company_Info>
   <Program_Info>
     <Program_Name>WinCraft</Program_Name>
-    <Program_Version>1.16.1</Program_Version>
+    <Program_Version>1.18.1</Program_Version>
     <Program_Release_Month>10</Program_Release_Month>
-    <Program_Release_Day>07</Program_Release_Day>
+    <Program_Release_Day>11</Program_Release_Day>
     <Program_Release_Year>2026</Program_Release_Year>
     <Program_Cost_Dollars></Program_Cost_Dollars>
     <Program_Cost_Other_Code></Program_Cost_Other_Code>
@@ -47,20 +47,20 @@
     <Program_OS_Support>WinOther</Program_OS_Support>
     <Program_Language>English</Program_Language>
     <File_Info>
-      <File_Size_Bytes>5886712</File_Size_Bytes>
-      <File_Size_K>5748.74</File_Size_K>
-      <File_Size_MB>5.61</File_Size_MB>
+      <File_Size_Bytes>6150688</File_Size_Bytes>
+      <File_Size_K>6006.53</File_Size_K>
+      <File_Size_MB>5.87</File_Size_MB>
     </File_Info>
     <Expire_Info>
       <Has_Expire_Info>N</Has_Expire_Info>
       <Expire_Count></Expire_Count>
       <Expire_Based_On></Expire_Based_On>
-      <Expire_Other_Info>Paid access and trial eligibility follow the official plan and checkout.</Expire_Other_Info>
+      <Expire_Other_Info>No expiry: every control and tool is included, with no subscription or licence key.</Expire_Other_Info>
       <Expire_Month></Expire_Month>
       <Expire_Day></Expire_Day>
       <Expire_Year></Expire_Year>
     </Expire_Info>
-    <Program_Change_Info>WinCraft 1.16.1 is a routine maintenance update.</Program_Change_Info>
+    <Program_Change_Info>WinCraft 1.18.1 adds a measured Before &amp; After comparison, a change history that can be filtered, exported and undone by session, starter profiles, and Debloat facts about how each app is really used.</Program_Change_Info>
     <Program_Category_Class>System Utilities::System Maintenance</Program_Category_Class>
     <Program_Specific_Category></Program_Specific_Category>
     <Program_System_Requirements>Windows 10/11 x64; internet for accounts, updates and supported online features.</Program_System_Requirements>
@@ -70,21 +70,21 @@
       <Keywords>Windows tuning,Windows privacy,PC maintenance,gaming settings,restore settings,WinCraft,Aurelio Avila</Keywords>
       <Char_Desc_45>Windows tuning, privacy and maintenance.</Char_Desc_45>
       <Char_Desc_80>Review Windows tuning, privacy and maintenance settings before applying changes.</Char_Desc_80>
-      <Char_Desc_250>Review Windows tuning, privacy and maintenance settings before applying changes. By Aurelio Avila. Current signed Windows download; free and paid access are documented officially.</Char_Desc_250>
+      <Char_Desc_250>Review Windows tuning, privacy and maintenance settings before applying changes. By Aurelio Avila. Signed Windows download; every control and tool is included, free.</Char_Desc_250>
       <Char_Desc_450>Review Windows tuning, privacy and maintenance settings before applying changes. By Aurelio Avila. Review limitations and access requirements on the official product page. Windows downloads are publisher-signed and timestamped; signing is not a safety guarantee. Screenshots show the app and may reflect an earlier release.</Char_Desc_450>
-      <Char_Desc_2000>WinCraft by Aurelio Avila brings Windows tuning, privacy settings and maintenance tools into one desktop app. Review the effect and trade-offs before applying a setting. Restore controls cover supported settings; cleanup, repair and driver operations have different recovery limits. Core tools are free without an account; advanced Pro tools are paid. No universal FPS or performance gain is promised. Official Windows binaries are signed and timestamped. Code signing identifies the publisher and detects changes; it does not guarantee security or eliminate SmartScreen warnings.</Char_Desc_2000>
+      <Char_Desc_2000>WinCraft by Aurelio Avila brings Windows tuning, privacy settings and maintenance tools into one desktop app. Review the effect and trade-offs before applying a setting. Restore controls cover supported settings; cleanup, repair and driver operations have different recovery limits. Every control and tool is included, free and without an account. No universal FPS or performance gain is promised. Official Windows binaries are signed and timestamped. Code signing identifies the publisher and detects changes; it does not guarantee security or eliminate SmartScreen warnings.</Char_Desc_2000>
     </English>
   </Program_Descriptions>
   <Web_Info>
     <Application_URLs>
-      <Application_Info_URL>https://pctweaker.app/</Application_Info_URL>
+      <Application_Info_URL>https://wincraft.app/</Application_Info_URL>
       <Application_Order_URL></Application_Order_URL>
       <Application_Screenshot_URL>https://raw.githubusercontent.com/AurelioAvila/pc-tweaker-app/master/docs/screenshots/pc-tweaker-1.16-overview.png</Application_Screenshot_URL>
       <Application_Icon_URL>https://raw.githubusercontent.com/AurelioAvila/pc-tweaker-app/master/src-tauri/icons/32x32.png</Application_Icon_URL>
       <Application_XML_File_URL>https://raw.githubusercontent.com/AurelioAvila/pc-tweaker-app/master/docs/pad.xml</Application_XML_File_URL>
     </Application_URLs>
     <Download_URLs>
-      <Primary_Download_URL>https://github.com/AurelioAvila/pc-tweaker-app/releases/download/v1.16.1/pc-tweaker-app_1.16.1_x64-setup.exe</Primary_Download_URL>
+      <Primary_Download_URL>https://github.com/AurelioAvila/pc-tweaker-app/releases/download/v1.18.1/pc-tweaker-app_1.18.1_x64-setup.exe</Primary_Download_URL>
       <Secondary_Download_URL></Secondary_Download_URL>
       <Additional_Download_URL_1></Additional_Download_URL_1>
       <Additional_Download_URL_2></Additional_Download_URL_2>

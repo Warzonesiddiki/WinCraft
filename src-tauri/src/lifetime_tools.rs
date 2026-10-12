@@ -1,7 +1,6 @@
 //! Additive Lifetime tools. Both consume saved configuration data; neither
 //! applies a tweak, restores a snapshot, or measures system performance.
 
-use crate::license::{LicensePayload, LicenseStore};
 use crate::profiles::TweakProfile;
 use crate::TweakInfo;
 use serde::{Deserialize, Serialize};
@@ -34,22 +33,6 @@ pub struct ProfileComparison {
     // values without copying that text into the UI or a portable report.
     pub unknown_left_count: usize,
     pub unknown_right_count: usize,
-}
-
-fn is_lifetime(payload: &LicensePayload) -> bool {
-    payload.is_pro && payload.plan.as_deref() == Some("lifetime")
-}
-
-fn require_lifetime(app_data: &Path) -> Result<(), String> {
-    let allowed = LicenseStore::new(app_data.to_path_buf())
-        .verified_fresh_payload()
-        .as_ref()
-        .is_some_and(is_lifetime);
-    if allowed {
-        Ok(())
-    } else {
-        Err("These tools require a verified WinCraft Lifetime license. Connect to the internet and refresh your license in Account.".into())
-    }
 }
 
 fn is_link(metadata: &fs::Metadata) -> bool {
@@ -204,7 +187,6 @@ pub fn compare_lifetime_profiles(
     right_name: String,
 ) -> Result<ProfileComparison, String> {
     let app_data = crate::store_for_dir(&app)?;
-    require_lifetime(&app_data)?;
     let catalog = crate::list_tweaks(app)?;
     comparison_from_saved(
         &app_data,
@@ -301,7 +283,6 @@ pub fn preview_lifetime_report(
     comparison: Option<ComparisonRequest>,
 ) -> Result<String, String> {
     let app_data = crate::store_for_dir(&app)?;
-    require_lifetime(&app_data)?;
     generate_report(&app, &app_data, comparison.as_ref())
 }
 
@@ -345,7 +326,6 @@ pub fn save_lifetime_report(
     comparison: Option<ComparisonRequest>,
 ) -> Result<bool, String> {
     let app_data = crate::store_for_dir(&app)?;
-    require_lifetime(&app_data)?;
     // Validate the current records and profile selection before showing a
     // dialog. Regenerate after selection so the export uses current data.
     generate_report(&app, &app_data, comparison.as_ref())?;
@@ -361,9 +341,6 @@ pub fn save_lifetime_report(
     let Some(selection) = dialog.blocking_save_file() else {
         return Ok(false);
     };
-    // The account may have signed out or its cached license may have expired
-    // while the dialog was open. Never rely on the earlier entitlement check.
-    require_lifetime(&app_data)?;
     let path = selection
         .into_path()
         .map_err(|_| "Choose a local Markdown file for this report.".to_string())?;
@@ -438,41 +415,6 @@ mod tests {
     }
 
     #[test]
-    fn subscriptions_and_free_accounts_do_not_receive_lifetime_tools() {
-        let mut payload = LicensePayload {
-            user_id: "not-exported".into(),
-            is_pro: true,
-            plan: Some("lifetime".into()),
-            product: Some("pctweaker".into()),
-            issued_at: 1,
-            expires_at: None,
-        };
-        assert!(is_lifetime(&payload));
-        for plan in [
-            None,
-            Some("monthly"),
-            Some("yearly"),
-            Some("annual"),
-            Some("Lifetime"),
-            Some("lifetime "),
-        ] {
-            payload.plan = plan.map(str::to_string);
-            assert!(!is_lifetime(&payload));
-        }
-        payload.plan = Some("lifetime".into());
-        payload.is_pro = false;
-        assert!(!is_lifetime(&payload));
-    }
-
-    #[test]
-    fn a_forged_or_missing_cached_lifetime_license_is_denied() {
-        let directory = TempDirectory::new();
-        assert!(require_lifetime(&directory.0).is_err());
-        fs::write(directory.0.join("license.json"), r#"{"payloadJson":"{\"userId\":\"local\",\"isPro\":true,\"plan\":\"lifetime\",\"product\":\"pctweaker\",\"issuedAt\":1800000000}","signature":"forged"}"#).unwrap();
-        assert!(require_lifetime(&directory.0).is_err());
-    }
-
-    #[test]
     fn comparison_is_sorted_deduplicated_and_omits_unknown_text() {
         let compared = compare_profiles(
             &profile(
@@ -530,14 +472,14 @@ mod tests {
     #[test]
     fn traversal_and_filename_collisions_cannot_select_other_files() {
         let directory = TempDirectory::new();
-        let path = saved_profile_path(&directory.0, "../../license").unwrap();
+        let path = saved_profile_path(&directory.0, "../../secret").unwrap();
         assert_eq!(path.parent(), Some(directory.0.join("profiles").as_path()));
         fs::write(
-            directory.0.join("license.json"),
-            serde_json::to_vec(&profile("../../license", &["alpha"])).unwrap(),
+            directory.0.join("secret.json"),
+            serde_json::to_vec(&profile("../../secret", &["alpha"])).unwrap(),
         )
         .unwrap();
-        assert!(read_saved_profile(&directory.0, "../../license").is_err());
+        assert!(read_saved_profile(&directory.0, "../../secret").is_err());
         save_fixture(&directory.0, &profile("Gaming/2026", &["alpha"]));
         assert!(read_saved_profile(&directory.0, "Gaming:2026").is_err());
         assert!(saved_profile_path(&directory.0, "").is_err());

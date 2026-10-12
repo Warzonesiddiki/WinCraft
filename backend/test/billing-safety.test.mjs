@@ -204,9 +204,11 @@ test("a late uninstaller update cannot re-grant a cancelled subscription, nor an
 });
 
 test("product evidence rejects conflicting or ambiguous subscriptions", () => {
-  const catalogue = { price_pc: "pctweaker", price_other: "uninstaller" };
-  assert.equal(billingProductFromEvidence({}, ["price_pc"], catalogue), "pctweaker");
+  const catalogue = { price_pc: "wincraft", price_other: "uninstaller" };
+  assert.equal(billingProductFromEvidence({}, ["price_pc"], catalogue), "wincraft");
   assert.equal(billingProductFromEvidence({}, ["price_unknown"], catalogue), null);
+  // "pctweaker" is the pre-rename id for WinCraft, so it still conflicts
+  // with an Uninstaller price instead of looking like an unknown product.
   assert.equal(billingProductFromEvidence({ product: "pctweaker" }, ["price_other"], catalogue), null);
   assert.equal(billingProductFromEvidence({ product: "unknown" }, ["price_pc"], catalogue), null);
   assert.equal(billingProductFromEvidence({}, ["price_pc", "price_other"], catalogue), null);

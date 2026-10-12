@@ -85,9 +85,10 @@ test("checkout access requires a settled payment state", () => {
 });
 
 test("unknown product metadata fails closed while missing legacy metadata remains WinCraft", () => {
-  assert.equal(productFromMetadata(undefined), "pctweaker");
-  assert.equal(productFromMetadata({}), "pctweaker");
-  assert.equal(productFromMetadata({ product: "pctweaker" }), "pctweaker");
+  assert.equal(productFromMetadata(undefined), "wincraft");
+  assert.equal(productFromMetadata({}), "wincraft");
+  // A pre-rename id now resolves to the product it belongs to.
+  assert.equal(productFromMetadata({ product: "pctweaker" }), "wincraft");
   assert.equal(productFromMetadata({ product: "uninstaller" }), "uninstaller");
   assert.equal(productFromMetadata({ product: "future-product" }), null);
   assert.equal(productFromMetadata({ product: "__proto__" }), null);

@@ -21,7 +21,7 @@ export type ThemeName =
  *
  * It used to be a *pair* rendered as a hard 50/50 diagonal, which read as a
  * dot someone had sliced in half rather than as a colour choice, and didn't
- * match the solid dots on pctweaker.app.
+ * match the solid dots on wincraft.app.
  *
  * The count is deliberately 14: the picker lays these out 7 per row, so 12
  * left two visibly empty slots dangling under the second row.
