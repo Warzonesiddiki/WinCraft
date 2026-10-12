@@ -48,17 +48,18 @@ Nothing is claimed at 99. The remaining gaps are listed under
 
 ## Batch log
 
-> **History note — how to read commit ids here.** The sandbox re-clones this
-> repository **at the start of every turn**, at the session's base commit
-> (`fb97d48`), shallow and without the previous turns' objects. The working tree
-> is snapshotted and does survive, so every file a batch produced is present and
-> is re-committed at the end of the turn that made it; but a commit id quoted
-> from an earlier turn will not resolve in a later one (`git cat-file` on one
-> fails, and `git reflog` shows a single `clone:` line). This document, which is
-> the working tree's own copy, is therefore the durable per-batch record — treat
-> the commit hashes as per-turn labels, not as stable references. Nothing has
-> been lost: the plan is written as the source of truth precisely so that the
-> history granularity does not carry the evidence.
+> **History note — how to read commit ids here.** The sandbox restores this
+> repository at the start of each turn by cloning the branch again, and only the
+> most recent umbrella commits come back with it. Measured at the end of Batch R:
+> the A–Q and A–R commits resolve (`git cat-file -t` succeeds), while every
+> per-batch id from Batches M–Q fails — `git reflog` shows a fresh `clone:` line
+> followed by the turn's own commit. The **working tree** is snapshotted and does
+> survive, so every file a batch produced is present, and it is re-committed at
+> the end of each turn. This document is the durable per-batch record, written as
+> the source of truth precisely so the history granularity does not carry the
+> evidence: treat commit hashes as per-turn labels. Nothing has been pushed —
+> `git ls-remote origin` lists `master`, the earlier session branch and
+> `refs/pull/1/head`, but **not** `arena/c156110b-pc-tweaker-app`.
 
 ### Batch A — repository hygiene and gates (done)
 
