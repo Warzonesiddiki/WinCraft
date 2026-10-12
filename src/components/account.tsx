@@ -70,7 +70,7 @@ export function AuthSection({
         <span
           aria-hidden
           className="pointer-events-none absolute -right-8 -top-10 h-24 w-24 rounded-full opacity-20 blur-2xl"
-          style={{ background: auth.isPro ? "#fbbf24" : "var(--app-accent)" }}
+          style={{ background: "var(--app-accent)" }}
         />
         <div className="relative flex items-center gap-3">
           {/* Clicking the avatar itself opens the photo picker — the picture
@@ -83,7 +83,7 @@ export function AuthSection({
             aria-label={s.menu.changePhoto}
             className="group relative shrink-0 rounded-full transition-transform hover:scale-105"
           >
-            <Avatar email={auth.email} isPro={auth.isPro} photo={avatar} />
+            <Avatar email={auth.email} photo={avatar} />
             <span className="pointer-events-none absolute inset-[2px] grid place-items-center rounded-full bg-black/55 opacity-0 transition-opacity group-hover:opacity-100">
               <svg viewBox="0 0 24 24" fill="none" className="h-4 w-4 text-white">
                 <path
@@ -382,7 +382,6 @@ export function AccountMenu({
     setInternalOpen(next);
   };
   const [errReports, setErrReports] = useState(() => errorReportsEnabled());
-  const isPro = auth.status === "authenticated" && auth.isPro;
 
   // Device-local profile photo, kept as a file by the Rust side; there is no
   // upload — see fileToAvatarDataUrl in lib.ts and src-tauri/src/avatar.rs.
@@ -502,7 +501,7 @@ export function AccountMenu({
         aria-expanded={open}
       >
         {auth.status === "authenticated" ? (
-          <Avatar email={auth.email} isPro={isPro} photo={avatar} size="sm" />
+          <Avatar email={auth.email} photo={avatar} size="sm" />
         ) : (
           <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5">
             <circle cx="12" cy="8" r="3.2" stroke="currentColor" strokeWidth="1.6" />

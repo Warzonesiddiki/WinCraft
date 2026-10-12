@@ -62,7 +62,6 @@ npm run check:i18n                    # every key exists in all six locales
 npm run check:i18n-quality            # no English left in another locale
 npm run check:public-counts
 npm run check:design-tokens
-npm run check:no-test-pro
 npm test                              # frontend modules + components (jsdom)
 npm run test:coverage                 # the same suite with the coverage ratchet
 node scripts/test-scan.mjs            # then every other scripts/test-*.mjs

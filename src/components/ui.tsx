@@ -5,7 +5,6 @@ import { check as checkForUpdate, type Update } from "@tauri-apps/plugin-updater
 import { relaunch } from "@tauri-apps/plugin-process";
 import { format, Strings } from "../i18n";
 import { Toast } from "../types";
-import { CrownIcon } from "./icons";
 
 /**
  * The app's only badge. Pro, Admin, registry hive, requirements, Soon and
@@ -158,17 +157,13 @@ export function Toggle({
  * inside a ring tinted from the address itself, so two different accounts are
  * still visually distinct without pretending a mailbox prefix is a name.
  *
- * Pro accounts get the gold treatment used everywhere else in the app, so the
- * thing you paid for is visible the moment the menu opens.
  */
 export function Avatar({
   email,
-  isPro,
   photo = null,
   size = "md",
 }: {
   email: string;
-  isPro: boolean;
   /** Device-local photo (data URL). Replaces the glyph, keeps rim + badge. */
   photo?: string | null;
   /** `sm` is the header trigger, `md` the one inside the menu. A real size
@@ -180,8 +175,6 @@ export function Avatar({
 }) {
   const box = size === "sm" ? "h-9 w-9" : "h-11 w-11";
   const glyph = size === "sm" ? "h-4 w-4" : "h-5 w-5";
-  const badge = size === "sm" ? "h-3.5 w-3.5" : "h-[18px] w-[18px]";
-  const crown = size === "sm" ? "h-2 w-2" : "h-2.5 w-2.5";
   // Stable hue per address: same account, same colour, every launch.
   const hue = useMemo(() => {
     let acc = 0;
@@ -196,19 +189,13 @@ export function Avatar({
       <span
         aria-hidden
         className="avatar-halo"
-        style={
-          {
-            "--halo-color": isPro ? "rgb(245 158 11 / 0.75)" : `hsl(${hue} 85% 60% / 0.7)`,
-          } as React.CSSProperties
-        }
+        style={{ "--halo-color": `hsl(${hue} 85% 60% / 0.7)` } as React.CSSProperties}
       />
       <span
         aria-hidden
         className="avatar-ring absolute inset-0 rounded-full"
         style={{
-          background: isPro
-            ? "conic-gradient(from 200deg, #fde68a, #f59e0b, #fbbf24, #fde68a)"
-            : `conic-gradient(from 200deg, hsl(${hue} 80% 62%), hsl(${(hue + 60) % 360} 80% 55%), hsl(${hue} 80% 62%))`,
+          background: `conic-gradient(from 200deg, hsl(${hue} 80% 62%), hsl(${(hue + 60) % 360} 80% 55%), hsl(${hue} 80% 62%))`,
         }}
       />
       {/* Inner disc knocks a hole in the ring so the gradient reads as a rim
@@ -238,22 +225,12 @@ export function Avatar({
           />
         </svg>
       )}
-      {/* Pro already has a crown; stacking a second mark on the same corner
-          would say the same thing twice. A signed-in Free account gets the
-          micro-LED instead, so every state carries one status mark. */}
-      {isPro ? (
-        <span
-          className={`absolute -bottom-0.5 -right-0.5 grid ${badge} place-items-center rounded-full bg-slate-900 ring-1 ring-amber-400/50`}
-        >
-          <CrownIcon className={`${crown} text-amber-300`} />
-        </span>
-      ) : (
-        <span
-          aria-hidden
-          className="icon-led !right-0 !top-0"
-          style={{ "--led-color": "var(--accent)" } as React.CSSProperties}
-        />
-      )}
+      {/* One status mark, always: the micro-LED on the rim. */}
+      <span
+        aria-hidden
+        className="icon-led !right-0 !top-0"
+        style={{ "--led-color": "var(--accent)" } as React.CSSProperties}
+      />
     </span>
   );
 }

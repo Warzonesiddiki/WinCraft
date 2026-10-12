@@ -222,14 +222,12 @@ function App() {
   const [auth, setAuth] = useState<AuthState>(() => {
     const email = readStoredEmail();
     const token = readToken();
-    // isPro/emailVerified start false and are corrected by refreshAccount()
-    // below as soon as it resolves — avoids briefly trusting a stale/forged
-    // local value.
+    // emailVerified starts false and is corrected by refreshAccount() below as
+    // soon as it resolves — avoids briefly trusting a stale/forged local value.
     return email && token
       ? {
           status: "authenticated",
           email,
-          isPro: false,
           emailVerified: false,
           plan: null,
           hasBilling: false,
@@ -238,9 +236,10 @@ function App() {
   });
 
   // WinCraft is free for everyone — every feature is unlocked regardless of
-  // account or subscription state. The account still carries an `isPro` flag
-  // because the backend serves other products from the same table; nothing in
-  // the UI reads it any more.
+  // account or subscription state. The account payload still carries an `isPro`
+  // flag, because the backend serves other products from the same tables, and
+  // the app no longer keeps it: there is no paid feature left for it to
+  // describe.
 
   // Re-reads the account from the backend. Called on mount (if already logged
   // in), right after login/register, and when the window regains focus.
@@ -267,7 +266,6 @@ function App() {
       adoptRenewedToken(res);
       const data = (await res.json()) as {
         email: string;
-        isPro: boolean;
         emailVerified: boolean;
         plan?: string | null;
         hasBilling?: boolean;
@@ -275,7 +273,6 @@ function App() {
       setAuth({
         status: "authenticated",
         email: data.email,
-        isPro: data.isPro,
         emailVerified: data.emailVerified,
         // Optional so a client that is newer than the deployed backend
         // degrades to hiding the billing button rather than showing one
@@ -340,10 +337,6 @@ function App() {
   function logout() {
     clearSession();
     setAuth({ status: "anonymous" });
-    // Without this, a still-fresh cached Pro license would keep unlocking
-    // Pro tweaks for whoever uses the app next on this machine, for up to
-    // its grace period — including an anonymous session.
-    void invoke("clear_license").catch(() => {});
     // Same reasoning for the photo: a machine-wide leftover from before
     // per-account storage must not survive to be inherited by whoever signs
     // in next. Each account's own photo is untouched and waiting for them.
@@ -378,7 +371,6 @@ function App() {
     setAuth({
       status: "authenticated",
       email,
-      isPro: false,
       emailVerified: false,
       plan: null,
       hasBilling: false,

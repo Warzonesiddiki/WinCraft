@@ -18,7 +18,7 @@ and which boundaries the code is not allowed to cross.
               ▼                                     ▼
       %APPDATA%/<app identifier>              backend/  Express + PostgreSQL + Stripe
       journal, profiles, history,             routes/auth, account, license, entitlements,
-      HUD placement, avatars, license.json    stripe, offers, downloads, reviews,
+      HUD placement, avatars                  stripe, offers, downloads, reviews,
                                               newsletter, support, error-reports, flags
 ```
 

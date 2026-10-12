@@ -159,11 +159,14 @@ jobs:
       - name: Starter profiles selection and catalog validation
         run: node scripts/test-starter-presets.mjs
 
-      - name: The Pro unlock of VM test builds stays out of release configuration
-        run: node scripts/check-no-test-pro.mjs --self-test
-
       - name: Rust unit tests
         run: npm run check:rust
+
+      # The list names the tests the suite runs in isolation; the script fails if
+      # a filter matches nothing, so it is what notices a renamed or deleted
+      # module. It ran nowhere before this step existed.
+      - name: Isolated native policy tests
+        run: npm run check:native-policy
 
       # Hosted Windows runners are administrators, so a real kernel trace
       # session can start there. The live network test stays out: Azure

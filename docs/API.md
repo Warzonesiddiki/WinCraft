@@ -160,9 +160,8 @@ Commands are grouped by area (every name below is in `APP_COMMANDS`):
   `delete_profile`, `read_profile_file`, `write_profile_file`, `export_profile`,
   `import_profile`, `save_history_export`, `save_report_png`,
   `compare_lifetime_profiles`, `preview_lifetime_report`, `save_lifetime_report`
-- **License and updates** — `license_status`, `save_license`, `clear_license`,
-  `search_driver_updates`, `install_driver_updates`, `open_windows_update`,
-  `reboot_now`
+- **Updates** — `search_driver_updates`, `install_driver_updates`,
+  `open_windows_update`, `reboot_now`
 - **HUD and window** — `hud_snapshot`, `hud_is_open`, `hud_is_compact`,
   `open_hud_overlay`, `close_hud_overlay`, `set_hud_click_through`,
   `set_hud_compact`
