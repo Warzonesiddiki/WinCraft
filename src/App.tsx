@@ -1,4 +1,4 @@
-import { orderSectionTweaks } from "./feature-order";
+import { tweaksForSection } from "./tweak-list-model";
 import { TweakyDriverPromoCard } from "./components/tweaky-driver-promo";
 import React, { Suspense, lazy, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { invoke } from "@tauri-apps/api/core";
@@ -33,20 +33,19 @@ import {
   HeartPulseIcon,
   ThermometerIcon,
 } from "./components/icons";
-import { Badge, Toggle, UpdateBanner } from "./components/ui";
+import { UpdateBanner } from "./components/ui";
 import { AccountMenu } from "./components/account";
-import { TweakIcon } from "./components/tweak-icon";
-import { TechnicalDetails, TechnicalToggle } from "./components/technical";
+import { TweakRow } from "./components/tweak-row";
+import { CATEGORY_STYLE } from "./categories";
 import { ScanPanel } from "./components/scan";
 import { PageBoundary } from "./components/page-boundary";
 import { RamCleaner, SystemMonitor, useScheduledRamClean } from "./components/monitor";
 import { usePulseSamples } from "./components/command";
 import { TitleBar } from "./components/titlebar";
-import { CATEGORY_STYLE } from "./categories";
 import { CommandPalette, useCommandPaletteShortcut } from "./components/command-palette";
 import { OnboardingFlow, shouldShowOnboarding } from "./components/onboarding";
 import { WorkspaceSidebar } from "./components/workspace-sidebar";
-import { CONFIGURABLE_TWEAK_IDS, buildName, isCurrentCatalogTweak } from "./catalog";
+import { CONFIGURABLE_TWEAK_IDS, isCurrentCatalogTweak } from "./catalog";
 // Every panel except the scan view is loaded when its section is opened, so the
 // window paints from an entry chunk that carries the shell and Scan instead of
 // all of them. Tauri serves the extra chunks from the app's own bundle, which
@@ -154,9 +153,6 @@ const NetworkCheckPanel = lazy(() =>
 );
 const DebloatPanel = lazy(() =>
   import("./components/debloat").then((m) => ({ default: m.DebloatPanel })),
-);
-const AdvancedControlCard = lazy(() =>
-  import("./components/advanced-controls").then((m) => ({ default: m.AdvancedControlCard })),
 );
 
 /** Stands in for a panel while its chunk loads: the shape of a panel rather
@@ -663,40 +659,10 @@ function App() {
 
   const searching = query.trim().length > 0;
 
-  const visibleTweaks = useMemo(() => {
-    // Turbo Boost is deliberately excluded: it has its own dedicated card on
-    // the Gaming screen, so listing it again would show two controls for it.
-    const base = tweaks.filter((t) => t.id !== "turbo_boost");
-
-    // While searching, ignore the selected section and look everywhere —
-    // otherwise the user has to already know which category a tweak lives in,
-    // which is exactly what the search is there to avoid.
-    if (searching) {
-      const needle = query.trim().toLowerCase();
-      return base.filter((t) => {
-        const text = textFor(s.tweaks, t.id, t.name, t.description);
-        return (
-          text.name.toLowerCase().includes(needle) ||
-          text.description.toLowerCase().includes(needle)
-        );
-      });
-    }
-
-    if (
-      filter === "overview" ||
-      filter === "scan" ||
-      filter === "health" ||
-      filter === "hardware" ||
-      filter === "startup" ||
-      filter === "pricing" ||
-      filter === "profiles"
-    )
-      return [];
-
-    const inCategory = base.filter((t) => t.category === filter);
-
-    return orderSectionTweaks(inCategory, filter);
-  }, [tweaks, filter, query, searching, s]);
+  const visibleTweaks = useMemo(
+    () => tweaksForSection(tweaks, filter, query, s),
+    [tweaks, filter, query, s],
+  );
 
   const showCleanup = filter === "maintenance" && !searching;
   const showPrivacyExtras = filter === "privacy" && !searching;
@@ -1030,121 +996,25 @@ function App() {
                   {filter === "ui" && !searching && <GamingHudCard s={s} pushToast={pushToast} />}
 
                   <ul className="flex flex-col gap-3">
-                    {visibleTweaks.map((t, i) => {
-                      if (
-                        t.id === "ecoqos_rules" ||
-                        t.id === "limit_do_background_download" ||
-                        t.id === "monitor_refresh_profile"
-                      ) {
-                        return (
-                          <li
-                            key={t.id}
-                            data-tweak-id={t.id}
-                            data-priority={
-                              !searching &&
-                              (filter === "performance" || filter === "gaming") &&
-                              i < 3
-                            }
-                            className="animate-card section-tweak"
-                          >
-                            <AdvancedControlCard id={t.id} lang={lang} onChanged={refresh} />
-                          </li>
-                        );
-                      }
-                      const style = CATEGORY_STYLE[t.category];
-                      const text = textFor(s.tweaks, t.id, t.name, t.description);
-                      return (
-                        <li
-                          key={t.id}
-                          data-tweak-id={t.id}
-                          data-priority={
-                            !searching && (filter === "performance" || filter === "gaming") && i < 3
-                          }
-                          style={{ animationDelay: `${i * 40}ms` }}
-                          className="animate-card section-tweak panel panel-hover group relative overflow-hidden p-4"
-                        >
-                          <div className="relative flex items-center gap-4">
-                            <div
-                              className="icon-module grid shrink-0 place-items-center"
-                              style={{ "--module-tint": style.tint } as React.CSSProperties}
-                            >
-                              <TweakIcon id={t.id} fallback={style.icon} />
-                            </div>
-                            <div className="min-w-0 flex-1">
-                              <div className="flex flex-wrap items-center gap-2">
-                                <h2 className="text-[15px] font-semibold tracking-[-0.01em] text-ink">
-                                  {text.name}
-                                </h2>
-                                {/* The (i) is the door to the exact system change.
-                            A description can be argued with; a registry path
-                            can be checked in regedit, so it is one click away
-                            rather than buried in a FAQ. */}
-                                {t.changes.length > 0 ? (
-                                  <TechnicalToggle
-                                    open={inspecting === t.id}
-                                    label={s.transparency.title}
-                                    hive={t.hive}
-                                    onClick={() => {
-                                      setInspecting(inspecting === t.id ? null : t.id);
-                                    }}
-                                  />
-                                ) : (
-                                  t.hive !== "—" && <Badge>{t.hive}</Badge>
-                                )}
-                                {t.requires_admin && <Badge kind="admin">{s.badges.admin}</Badge>}
-                                {(t.min_build || t.pro_edition || t.enterprise_edition) && (
-                                  <Badge kind="muted">
-                                    {[
-                                      t.min_build
-                                        ? format(s.requirements.minBuild, {
-                                            version: buildName(t.min_build),
-                                          })
-                                        : null,
-                                      t.pro_edition ? s.requirements.proEdition : null,
-                                      t.enterprise_edition
-                                        ? s.requirements.enterpriseEdition
-                                        : null,
-                                    ]
-                                      .filter(Boolean)
-                                      .join(" · ")}
-                                  </Badge>
-                                )}
-                              </div>
-                              <p className="mt-1 max-w-[52ch] text-[12.5px] leading-[1.55] text-ink-3">
-                                {text.description}
-                              </p>
-                              {t.unavailable && !t.applied && (
-                                <p className="mt-1.5 max-w-[52ch] text-[12px] leading-[1.5] text-warn">
-                                  {t.unavailable === "windows_version"
-                                    ? format(s.requirements.unavailableVersion, {
-                                        version: buildName(t.min_build ?? 22000),
-                                      })
-                                    : t.unavailable === "windows_edition"
-                                      ? s.requirements.unavailableEdition
-                                      : t.unavailable === "windows_edition_enterprise"
-                                        ? s.requirements.unavailableEnterpriseEdition
-                                        : t.unavailable === "windows_protected"
-                                          ? s.requirements.windowsProtected
-                                          : s.requirements.notPresent}
-                                </p>
-                              )}
-                              {inspecting === t.id && (
-                                <TechnicalDetails changes={t.changes} s={s} previewId={t.id} />
-                              )}
-                            </div>
-                            <Toggle
-                              label={text.name}
-                              busyLabel={t.applied ? s.restore.running : s.profiles.applying}
-                              checked={t.applied}
-                              busy={busyId === t.id}
-                              disabled={!!t.unavailable && !t.applied}
-                              onClick={() => toggle(t)}
-                              s={s}
-                            />
-                          </div>
-                        </li>
-                      );
-                    })}
+                    {visibleTweaks.map((t, i) => (
+                      <TweakRow
+                        key={t.id}
+                        tweak={t}
+                        index={i}
+                        priority={
+                          !searching && (filter === "performance" || filter === "gaming") && i < 3
+                        }
+                        open={inspecting === t.id}
+                        busy={busyId === t.id}
+                        lang={lang}
+                        s={s}
+                        onToggle={toggle}
+                        onInspect={() => {
+                          setInspecting(inspecting === t.id ? null : t.id);
+                        }}
+                        onChanged={refresh}
+                      />
+                    ))}
 
                     {showGamingExtras && (
                       <li>

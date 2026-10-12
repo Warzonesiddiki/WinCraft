@@ -73,7 +73,7 @@ cd site; npm run build; npm run check:seo   # if you touched anything under src/
 `npm test` is Vitest: it runs `src/**/*.test.ts(x)` in jsdom with Testing
 Library and jest-axe, so it is the only gate that renders a component. Add a
 test next to the module you change (`src/lib.test.ts`, `ui.test.tsx` and
-`pricing.test.tsx` were the first three; there are sixteen files now). It needs
+`pricing.test.tsx` were the first three; there are eighteen files now). It needs
 no Rust toolchain and no network.
 
 The website job matters more than it looks: `site/` imports shared modules

@@ -152,7 +152,8 @@ that are genuinely the same).
 `npm test` is the only layer that renders a component: the script suites run the
 pure models in Node, while the frontend suite runs them in jsdom with Testing
 Library and jest-axe. Tests live beside the module they cover (`src/lib.test.ts`,
-`src/scan-runner.test.ts`, `src/components/ui.test.tsx`).
+`src/scan-runner.test.ts`, `src/tweak-list-model.test.ts`,
+`src/components/ui.test.tsx`).
 
 A new test file must be `src/**/*.test.ts(x)` to be picked up, and it is
 type-checked by the same `tsc` pass as the app, so it cannot drift out of the
