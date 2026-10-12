@@ -62,9 +62,16 @@ assert.equal(localeOf("en"), "en");
 
 // 5. Only the language menu writes the choice, and the dev-only start
 //    language can never reach a production build.
+//    Only shipped sources are scanned: a *.test.ts(x) fixture seeds
+//    localStorage to exercise the reader, and a *.d.ts declaration is not
+//    code at all. Neither reaches a build, so neither is a second writer.
 const files = (dir) =>
   fs.readdirSync(dir, { withFileTypes: true }).flatMap((e) =>
-    e.isDirectory() ? files(`${dir}/${e.name}`) : /\.(ts|tsx)$/.test(e.name) ? [`${dir}/${e.name}`] : [],
+    e.isDirectory()
+      ? files(`${dir}/${e.name}`)
+      : /\.(ts|tsx)$/.test(e.name) && !/\.(test|spec)\.(ts|tsx)$/.test(e.name) && !/\.d\.ts$/.test(e.name)
+        ? [`${dir}/${e.name}`]
+        : [],
   );
 const sources = files(`${root}src`).map((f) => [f, fs.readFileSync(f, "utf8")]);
 const writers = sources.filter(([, s]) => /setItem\(\s*["']wincraft-lang["']/.test(s));
