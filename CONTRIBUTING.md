@@ -64,6 +64,7 @@ npm run check:public-counts
 npm run check:design-tokens
 npm run check:no-test-pro
 npm test                              # frontend modules + components (jsdom)
+npm run test:coverage                 # the same suite with the coverage ratchet
 node scripts/test-scan.mjs            # then every other scripts/test-*.mjs
 cd backend; npm test                  # 161 API tests, pg-mem backed
 cd site; npm run build; npm run check:seo   # if you touched anything under src/
@@ -80,6 +81,13 @@ straight out of `src/` — the offer banner and the offer format, for instance �
 so deleting or renaming one breaks the site build even though nothing under
 `site/` changed. `deploy-site.yml` only runs after a merge to master; the `site`
 job in `checks.yml` is what makes a pull request fail before that.
+
+`npm run test:coverage` is `npm test` instrumented, with the thresholds in
+`vitest.config.ts`. They are a **ratchet**: they sit about a point under what the
+tree measures so ordinary refactoring cannot trip them, and they exist to refuse a
+fall. Raise them when you add tests; never lower one to make a red run green. The
+count includes every file under `src/`, so a module you add and do not test will
+pull it down — that is the point.
 
 `npm run check` runs the same list plus `cargo test`, which needs a Windows
 machine and a disposable VM snapshot. Rust tests touch real files and protected

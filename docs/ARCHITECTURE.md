@@ -136,6 +136,7 @@ that are genuinely the same).
 | ----------------------- | ---------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Type and style gates    | `tsc`, ESLint, Prettier                  | strictness, unused code, formatting                                                                                                                   |
 | Frontend tests          | `npm test` (Vitest, jsdom)               | `src/**/*.test.ts(x)`: module helpers, components (Testing Library) and a11y (jest-axe)                                                               |
+| Coverage ratchet        | `npm run test:coverage`                  | thresholds in `vitest.config.ts`, about a point under the measured tree: they refuse a fall, not a target                                             |
 | Source/behaviour suites | `scripts/test-*.mjs`                     | scan pipeline, advisor, thermals, repair ETA, updater, debloat model, download limits, promo rules, language default, change history, UI polish, i18n |
 | Rust tests              | `src-tauri/src/*.rs`, `src-tauri/tests/` | adapters, IPC/capability parity, rollback store, license verification, game sessions                                                                  |
 | API tests               | `backend/test/*.test.mjs`                | auth, entitlements, Stripe policy, webhooks, mail, offers, admin boundaries                                                                           |
@@ -149,10 +150,17 @@ A new test file must be `src/**/*.test.ts(x)` to be picked up, and it is
 type-checked by the same `tsc` pass as the app, so it cannot drift out of the
 build's strictness.
 
-CI (`.github/workflows/checks.yml`) runs the type/style gates, `npm test`, every
-script suite listed above, `cargo test` and the API tests on every push and pull
-request, plus a separate `site` job that builds the website and runs its SEO
-check — the site imports shared modules straight out of `src/`, so a change here
+Coverage counts **every source file**, not only the ones a test imported
+(`coverage.include` in `vitest.config.ts`). Without that, untested modules vanish
+from the denominator and the number goes up when code is added and never tested —
+the same tree reads 30% with everything counted and 58% with only the imported
+files. Raise the thresholds as tests are added; never lower one to make a red run
+green.
+
+CI (`.github/workflows/checks.yml`) runs the type/style gates, the frontend suite
+with its coverage ratchet, every script suite listed above, `cargo test` and the
+API tests on every push and pull request, plus a separate `site` job that builds
+the website and runs its SEO check — the site imports shared modules straight out of `src/`, so a change here
 can break it without touching `site/`. `npm run check` is the same chain plus
 `cargo test` for release day; anything in it that CI does not also run is a gate
 that can only fail on release day, so keep the two lists in step.

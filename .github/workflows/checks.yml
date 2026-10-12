@@ -136,8 +136,13 @@ jobs:
 
       # React components and frontend modules in jsdom. The script suites above
       # cover the pure models; this is the only gate that renders a component.
-      - name: Component and module tests
-        run: npm test
+      #
+      # The coverage run replaces `npm test` here rather than following it: it is
+      # the same suite, instrumented, and its thresholds are a ratchet that
+      # refuses a fall (see vitest.config.ts). Running both would double the job
+      # for no extra signal. `npm test` stays the plain local entry point.
+      - name: Component and module tests, with the coverage ratchet
+        run: npm run test:coverage
 
       - name: Translations (keys + placeholders across all languages)
         run: npm run check:i18n
