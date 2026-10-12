@@ -43,11 +43,13 @@ export default defineConfig({
         // The entry point mounts the app and nothing else.
         "src/main.tsx",
       ],
+      // Raised with the tree, never ahead of it: Batch AH's two suites moved
+      // lines 43.94 -> 46.09, so the floor moves with them.
       thresholds: {
-        statements: 41,
-        branches: 40,
-        functions: 40,
-        lines: 42,
+        statements: 44,
+        branches: 43,
+        functions: 42,
+        lines: 44,
       },
     },
   },
