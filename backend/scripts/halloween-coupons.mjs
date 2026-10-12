@@ -96,8 +96,8 @@ for (const offer of PROMO.offers) {
     mode: offer.plan === "lifetime" ? "payment" : "subscription",
     line_items: [{ price: charge.lineItemPrice, quantity: 1 }],
     ...(charge.discounts ? { discounts: charge.discounts } : {}),
-    success_url: "https://pctweaker.app/checkout-success",
-    cancel_url: "https://pctweaker.app/checkout-cancel",
+    success_url: "https://wincraft.app/checkout-success",
+    cancel_url: "https://wincraft.app/checkout-cancel",
     expires_at: Math.floor(Date.now() / 1000) + LIFETIME_CHECKOUT_GRACE_SECONDS,
     metadata: { promo_verification: PROMO.id },
   });

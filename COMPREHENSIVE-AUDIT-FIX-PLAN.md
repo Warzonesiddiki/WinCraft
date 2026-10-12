@@ -5,7 +5,10 @@ Progress record for the audit-first fix programme (AUDIT → ranked findings →
 tied to a command that was actually run; the commands are listed in
 [Commands run](#commands-run) with their results.
 
-Repository: `Warzonesiddiki/pc-tweaker-app` (fork of `AurelioAvila/pc-tweaker-app`)
+Repository: `Warzonesiddiki/WinCraft` — the fork's current name on GitHub (it was
+`Warzonesiddiki/pc-tweaker-app`, and the old path still redirects). Parent:
+`AurelioAvila/pc-tweaker-app`, whose `v1.18.1` release is what the published
+download URLs resolve to
 Branch: `arena/c156110b-pc-tweaker-app` — no pull request opened (per instruction).
 
 ## Goal and standing decisions
@@ -35,7 +38,7 @@ Windows runtime, real a11y tooling) are marked _static only_.
 | Code quality  | 88     | **94** | ESLint 0 errors **and 0 warnings** (was 2E/6W), Prettier clean, `tsc` clean, ~1,200 lines of dead pricing/paywall/promo/Pro-gate code and 96 lines of dead dialog CSS deleted, stale comments corrected. The frontend has no `isPro` plumbing left; only the Rust `require_pro()` stub and the catalogue metadata remain                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
 | Performance   | 75     | **88** | Entry chunk 1,053.38 kB → **631.46 kB** (335.56 → **211.69 kB gzip**): dead code removed first, then 36 panels split into 16 lazy chunks loaded when their section opens; CSS one file at 210.51 kB. Still a 631 kB entry chunk because the six locale tables are 77% of it (measured), and no runtime profile has been taken on Windows                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
 | Testing       | 40     | **97** | Backend **161/161**, `test-scan` **15/15** (was failing), every script suite green, and **211 Vitest tests in 15 files**: the whole scan flow (13 probes, partial reports, apply/verify, pause/resume), the startup and scheduled-task lists, the update-drift and crash-report cards, the cleaners and maintenance cards, the thermal panel itself (a two-second poll on a fake clock, its verdicts and its profile staging), the thermal judge and driver plans, the driver audit and Windows Update catalogue (scan progress, tiers, restart, install subsets, failure versus emptiness), the debloat panel (what can be removed, presets, list save/load, the per-app removal receipt including a lost answer recorded as unknown), game sessions and core steering (including the five-second re-read that drives the live count), Turbo Boost (live dial, measured facts, before/after measurement), the cached-audit storage contract, a catalogue/translation drift guard, the Fix-all pipeline, and `lib.ts` — all through a fake Tauri IPC bridge, with jest-axe. ESLint is now verified over the whole tree, not per batch. Still no coverage report and no packaged-app run |
-| Documentation | 70     | **86** | Added `CONTRIBUTING.md`, `docs/ARCHITECTURE.md`, `docs/API.md`; documented the fork's updater/signing path; fixed README's licence contradiction and stale plan copy. Live docs still say `pctweaker.app`; catalogue counts still claim "35 Pro"                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| Documentation | 70     | **89** | Added `CONTRIBUTING.md`, `docs/ARCHITECTURE.md`, `docs/API.md`; documented the fork's updater/signing path; fixed README's licence contradiction and stale plan copy; every live doc, shipped link and the publisher PAD feed now names the owned domain, and the PAD feed describes the current release instead of one two versions old. Still outstanding: the canned Pro/paid prose in the public files, and the site tree's canonical/CNAME question                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
 | Accessibility | 80     | **84** | The unreachable Pro paywall `<dialog>` (dialog semantics, focus handling) is gone. An automated axe run now covers eleven rendered surfaces (the scan, cleaner, maintenance, startup, drift, crash, thermal, driver, debloat, game-session and Turbo Boost panels), and it earned its place by catching a real defect: the Turbo Boost comparison table opened with an empty `<th>`, which announces an unnamed column — now a `<td>`, with both column headers scoped. Keyboard and screen-reader behaviour on real Windows is still unverified                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
 | i18n          | 90     | **94** | 1,580 keys × 6 locales consistent; the free pricing page is now translated in all six (it used to be English-only); paywall, Pro-upsell and Pro-naming strings removed; dead Halloween/promo components deleted. 175 identical-to-English keys remain on the reviewed list                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
 | DX            | 85     | **94** | CI runs ESLint + Prettier + `npm test`; lint is clean; contributor and architecture docs exist; `npm test` at the root is the one entry point for frontend tests; backend/desktop commands documented. Rust gates (`fmt`, `clippy`, `audit`) are still absent because the toolchain is unavailable here                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
@@ -599,6 +602,71 @@ run.
 Validation: `npm test` **211 tests in 15 files** (~27 s), `tsc`, ESLint,
 Prettier, the five check gates and `npm run build` (605 ms) pass.
 
+### Batch R — the domain in shipped links, live docs and the publisher feed (done)
+
+Everything the product says about itself now names the domain it actually owns.
+The rule applied throughout: **`wincraft.app` / `api.wincraft.app` for the product,
+`pctweaker` only as the legacy product id** the backend still maps.
+
+- **Two links the app ships were pointing at the retired host.** The Debloat-adjacent
+  uninstaller card opened `pctweaker.app/uninstaller/` and the Tweaky Driver card
+  opened `pctweaker.app/tweaky-driver/`. Both pages are listed in the site's own
+  `sitemap.xml` under `wincraft.app`, and the backend's uninstaller email already
+  pointed at `wincraft.app/uninstaller` — so the app was the outlier. Both now use
+  the owned origin. (UTM parameters were left exactly as they were: changing them
+  would silently re-attribute the site's analytics.)
+- **`README.md`, `SECURITY.md`, `PRIVACY.md`, `backend/README.md` and
+  `backend/legal/PRIVACY.md`** carried the old origin, and `backend/README.md`
+  documented the support address as `support@pctweaker.app` while the code says
+  otherwise: `backend/src/support-inbox.ts` and `mailer.ts` both use
+  `support@wincraft.app`, and `backend/.env.example` documents it as
+  Cloudflare-routed. The docs now agree with the code.
+- **`backend/scripts/smoke-test.mjs` defaulted to the retired API host**, so running
+  it without `BASE_URL` exercised the wrong server. It now defaults to
+  `https://api.wincraft.app`, as does the documented `VITE_API_BASE_URL` and the
+  Stripe webhook path in the backend README.
+- **`docs/pad.xml` — the published PAD feed — described a two-release-old build.**
+  Refreshed from the live release rather than from guesswork: version 1.18.1,
+  release day 11 (published 2026-10-11), installer size 6,150,688 bytes / 6,006.53 K
+  / 5.87 MB, and the `v1.18.1` download URL, which returns `302` (GitHub serving
+  the asset). Its `Program_Change_Info` now summarises the release in the
+  changelog's own words. The file still parses as XML (verified with
+  `xml.etree`), and the screenshot URL was left alone after checking that
+  `docs/screenshots/pc-tweaker-1.16-overview.png` really does exist upstream —
+  it is a 404 in this fork's tree, which is exactly why the check mattered before
+  "fixing" it.
+
+**Left deliberately, with reasons:** `CHANGELOG.md` (a historical record — those
+entries describe what shipped at the time, and rewriting them would falsify the
+history), `DEEP-AUDIT.md` (the same, for the earlier audit), and the
+`backend/test/*.mjs` fixtures, which pass arbitrary URLs through URL-handling
+code and are not claims about the domain.
+
+**Two things this batch found but did not change, because they need one decision
+from the owner:**
+
+1. **The site tree is mid-migration and its own SEO gate is red.** `site/src/seo.ts`
+   sets `ORIGIN = "https://wincraft.app"`, and the committed
+   `site/public/sitemap.xml` lists **17 URLs, all on `wincraft.app`** — but
+   `site/scripts/check-seo.mjs:18` asserts `url.origin === "https://pctweaker.app"`
+   for every one of them, `site/index.html` and `site/public/tweaky-driver/index.html`
+   still carry `pctweaker.app` canonical/OpenGraph/JSON-LD tags, and
+   `site/public/CNAME` still names `pctweaker.app`. Reproduced without a site build:
+   **17 of 17 sitemap URLs fail the assertion.** `CNAME` is a _deployment_ setting —
+   changing it decides where GitHub Pages serves the site — so the fix waits on one
+   answer: which origin is live? Once that is known, the other three files follow
+   mechanically.
+2. **The marketing scripts carry a dated, explicit instruction.** All four
+   `marketing/**` files say _"Official pctweaker.app link (2026-08-22, explicitly
+   requested)"_. That was the owner's call at the time and the rename came later, so
+   overriding it silently would be exactly the wrong move — it is listed below
+   instead.
+
+Validation: `tsc`, ESLint, Prettier, `npm test` **211 tests in 15 files**, the five
+check gates, `npm run build` (632 ms) and `cd backend && npm test` **161/161** all
+pass. `git grep pctweaker.app` now returns **nothing** in the app, the backend (its
+test fixtures aside) or the root docs.
+
 Two dependencies the test work had declared — `rollup-plugin-visualizer` and
 `@vitest/coverage-v8` — turned out to be referenced by nothing: no config names
 them and no batch uses them. Both were removed rather than left in the tree
@@ -668,10 +736,24 @@ fresh clone could not run a single test. That declaration is what makes CI's
    Rust-aware pass (`cargo clippy`), not a grep.
 6. **Website and marketing trees** (`site/`, `marketing/`, Python and PowerShell
    scripts) were not audited in depth; they have their own dependency trees.
-7. **`pctweaker.app` in live docs** (README ×4, `SECURITY.md` ×2, `PRIVACY.md` ×1)
-   while the code and `site/src/seo.ts` use `wincraft.app`. Changing a support
-   address or a security-report mailbox is a live-service claim that cannot be
-   verified from here, so it is flagged instead of edited.
+7. **The old origin outside the app — resolved in Batch R, three pieces left.**
+   Every live doc, shipped link and the PAD feed now names `wincraft.app`, and the
+   support address follows the code (`support@wincraft.app`, documented in
+   `backend/.env.example` as Cloudflare-routed). Still on the old origin:
+   - **`site/public/CNAME` says `pctweaker.app`** while `site/src/seo.ts` and the
+     committed sitemap say `wincraft.app`. `CNAME` decides where GitHub Pages
+     serves the site, so this is a deployment setting, not copy: it needs one
+     answer from the owner (which origin is live?) before the three files that
+     follow it — `site/index.html`, `site/public/tweaky-driver/index.html` and
+     `site/scripts/check-seo.mjs`, whose origin assertion **fails for all 17
+     sitemap URLs today** — are edited.
+   - **`marketing/**` (four files)** links to `pctweaker.app` under a comment
+     recording an explicit owner request dated 2026-08-22. The rename came later,
+     so this is a decision, not a bug to fix silently.
+   - **`docs/pad.xml`'s Pro/pricing prose** (`Char_Desc_2000`: "advanced Pro tools
+     are paid", plus the `Expire_Other_Info` and `Char_Desc_250/450` access
+     wording) is the same class of stale claim as the public files in item 1, and
+     this feed is a tenth public file those counts do not guard.
 8. **Rename leftovers outside the UI** (flagged, not changed, because each is an
    external or persisted name): the uninstaller download URL in
    `maintenance.tsx` points at the upstream `pc-tweaker-uninstaller` release and
@@ -711,6 +793,7 @@ final pass (2026-10-12).
 | `node scripts/test-live-metrics.mjs`, `test-debloat-model.mjs`, `test-feature-order.mjs`, `test-starter-presets.mjs`, `test-language-default.mjs`, `test-history-model.mjs`, `release-verification.test.mjs` | PASS                                                                                                                                                                |
 | `npm run test:advisor                                                                                                                                                                                        | thermals                                                                                                                                                            | repair-eta | updater | debloat | download-limit-reconcile | promo | lifetime-offer` | PASS |
 | `npm run build`                                                                                                                                                                                              | PASS — entry 631.46 kB / 211.69 kB gzip plus 16 lazy panel chunks (7–75 kB), CSS 210.51 kB in one file                                                              |
+| Site SEO origin assertion, reproduced without a site build (`site/scripts/check-seo.mjs:18` against the committed sitemap)                                                                                   | **FAILS — 17 of 17 sitemap URLs are on `wincraft.app` while the assertion demands `pctweaker.app`**; see Batch R                                                    |
 | `cd backend && npm test`                                                                                                                                                                                     | PASS — 161/161 (was 121/161 on master)                                                                                                                              |
 | `cargo test --manifest-path src-tauri/Cargo.toml` and `npm run check:rust`                                                                                                                                   | **NOT RUN — no Rust toolchain in this environment** (`cargo`/`rustc` absent; `check:native-policy` fails with `spawnSync cargo ENOENT`)                             |
 | `npm run check` (full)                                                                                                                                                                                       | **NOT RUN** — it ends in `check:rust`, which needs the Windows VM. Run every other step with the commands above                                                     |
@@ -775,9 +858,14 @@ Ranked by value per unit of risk. None of these are started.
 5. **Smoke-test the lazy chunks on Windows**: open every section once in a
    packaged build and confirm the skeleton resolves and no chunk fails to load.
    Nothing in this sandbox can exercise the Tauri asset protocol.
-6. **Live-doc copy pass**: confirm the production domain and mailbox, then bring
-   README/`SECURITY.md`/`PRIVACY.md`, the Store listings and the CHANGELOG
-   references in line with `site/src/seo.ts`.
+6. **Answer one question about the site's origin, then finish the copy pass.**
+   Done in Batch R: the app's shipped links, the root and backend docs, the
+   support address and the PAD feed. Waiting: **is the site served from
+   `wincraft.app` or `pctweaker.app`?** If the answer is `wincraft.app`,
+   `site/public/CNAME` follows, and with it the canonical/OpenGraph tags in
+   `site/index.html` and `site/public/tweaky-driver/index.html` plus the origin
+   assertion in `site/scripts/check-seo.mjs` (red on all 17 sitemap URLs today).
+   The marketing CTAs need the same answer.
 7. **Retire the offer pipeline** once installed clients below 1.17 are out of
    support: remove `src/promo.ts`, `src/lifetime-offer.ts`, their tests and the
    `/api/offers/*` routes together.

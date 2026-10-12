@@ -472,7 +472,7 @@ export function BrowserCleanupCard({
  *  blue warning box is how a download gets abandoned. "Learn more" opens the
  *  product page, tagged so the site can tell visits from the app apart. */
 const UNINSTALLER_PAGE_URL =
-  "https://pctweaker.app/uninstaller/?utm_source=pc-tweaker&utm_medium=app&utm_campaign=uninstaller-card";
+  "https://wincraft.app/uninstaller/?utm_source=pc-tweaker&utm_medium=app&utm_campaign=uninstaller-card";
 /** Version-less on purpose: GitHub resolves `releases/latest/download/<name>`
  *  only for an exact filename, so this points at the stable-named copy the
  *  uninstaller's release script publishes alongside the versioned one. A

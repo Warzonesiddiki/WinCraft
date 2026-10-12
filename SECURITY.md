@@ -1,6 +1,6 @@
 # Reporting a vulnerability
 
-Email **support@pctweaker.app** with "Security" in the subject. That address is monitored.
+Email **support@wincraft.app** with "Security" in the subject. That address is monitored.
 
 Include the product and version, what you did, and what came back. A reproduction is worth more than a scanner's severity label. If you need to send anything sensitive, say so first and we will agree on a channel.
 
@@ -8,7 +8,7 @@ You will get an acknowledgement within three working days and an assessment with
 
 ## Scope
 
-In scope: this repository, the released installers and the `pctweaker.app` site and API.
+In scope: this repository, the released installers and the `wincraft.app` site and API.
 
 Out of scope: reports produced by running an automated scanner and pasting its output, missing headers on endpoints that return no HTML, rate limits reached by exceeding them deliberately, and anything requiring a victim to be running malware already.
 

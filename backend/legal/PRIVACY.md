@@ -114,7 +114,7 @@ data it collects and treats failures as closed rather than granting access.
 
 You can leave optional error reporting disabled, unsubscribe from newsletters,
 and request access, correction or deletion of your personal data. Use the
-private support form at https://pctweaker.app/support. Do not publish personal
+private support form at https://wincraft.app/support. Do not publish personal
 information in a public GitHub issue.
 
 Some payment or security records may need to be retained where required by law

@@ -21,7 +21,7 @@
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-2E7D32" alt="MIT License"></a>
 </p>
 
-**[Download Free for Windows](https://github.com/AurelioAvila/pc-tweaker-app/releases/latest/download/PCTweaker-Setup.exe)** · **[Microsoft Store](https://apps.microsoft.com/detail/9nh3c6dt1g87)** · [Chocolatey](https://community.chocolatey.org/packages/pc-tweaker) · [Website](https://pctweaker.app/) · [Support](https://pctweaker.app/support/) · [Release notes](CHANGELOG.md)
+**[Download Free for Windows](https://github.com/AurelioAvila/pc-tweaker-app/releases/latest/download/PCTweaker-Setup.exe)** · **[Microsoft Store](https://apps.microsoft.com/detail/9nh3c6dt1g87)** · [Chocolatey](https://community.chocolatey.org/packages/pc-tweaker) · [Website](https://wincraft.app/) · [Support](https://wincraft.app/support/) · [Release notes](CHANGELOG.md)
 
 <p align="center"><a href="#whats-new-in-115">What's new</a> · <a href="#what-you-can-do">Features</a> · <a href="#what-changes-on-your-system">What changes</a> · <a href="#free-for-everyone">Free for Everyone</a> · <a href="#download-integrity-and-code-signing">Code signing</a> · <a href="#build-from-source">Build from source</a></p>
 
@@ -31,10 +31,10 @@
 
 <p align="center">
   <a href="#safe-download-via-winget"><img src="https://img.shields.io/badge/Safe_download-via_Winget-1793D1?style=for-the-badge" alt="Safe download via Winget"></a>
-  <a href="https://pctweaker.app/#tip"><img src="https://img.shields.io/badge/%E2%98%95_Buy_me_a_coffee-Support_development-FF5500?style=for-the-badge&labelColor=1c1c1c" alt="Buy me a coffee — support WinCraft development"></a>
+  <a href="https://wincraft.app/#tip"><img src="https://img.shields.io/badge/%E2%98%95_Buy_me_a_coffee-Support_development-FF5500?style=for-the-badge&labelColor=1c1c1c" alt="Buy me a coffee — support WinCraft development"></a>
 </p>
 
-<p align="center">Help fund the next release with a <a href="https://pctweaker.app/#tip"><strong>one-off coffee tip</strong></a>. No account required, no subscription.</p>
+<p align="center">Help fund the next release with a <a href="https://wincraft.app/#tip"><strong>one-off coffee tip</strong></a>. No account required, no subscription.</p>
 
 ## Safe download via Winget
 
@@ -231,7 +231,7 @@ The website is in [`site/`](site/): run `npm ci` and `npm run build` from that d
 
 ## Report a problem
 
-Use [support](https://pctweaker.app/support/) or email [support@pctweaker.app](mailto:support@pctweaker.app) for billing or private diagnostics. For a reproducible software bug, open a [GitHub issue](https://github.com/AurelioAvila/pc-tweaker-app/issues) with the app version, Windows build, hardware, selected tweak, steps, expected behavior and actual outcome. Remove tokens, email addresses, license files and private paths from public attachments.
+Use [support](https://wincraft.app/support/) or email [support@wincraft.app](mailto:support@wincraft.app) for billing or private diagnostics. For a reproducible software bug, open a [GitHub issue](https://github.com/AurelioAvila/pc-tweaker-app/issues) with the app version, Windows build, hardware, selected tweak, steps, expected behavior and actual outcome. Remove tokens, email addresses, license files and private paths from public attachments.
 
 ## Source availability and license
 
