@@ -19,7 +19,8 @@ device is sent in that check.
 ## Account data
 
 Creating an account is optional and is only required for account-based features
-such as a Pro subscription. When you register, our backend stores:
+such as the licence of the separate WinCraft Uninstaller. When you register, our
+backend stores:
 
 - Your **first name**, **last name**, **date of birth** and **email address**
 - Your password as a **bcrypt hash**; the plain password is never stored

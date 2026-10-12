@@ -281,11 +281,9 @@ function App() {
         hasBilling: data.hasBilling ?? false,
       });
     } catch {
-      // Network hiccup: keep whatever Pro status we already had rather than
-      // dropping the user back to Free on a transient failure — but say so,
-      // since a silent failure here is indistinguishable from actually
-      // having lost Pro access (see: the account that looked like it had
-      // reverted to Free while the server still reported it as Pro).
+      // Network hiccup: keep the account state we already had rather than
+      // signing the user out on a transient failure — but say so, since a
+      // silent failure here is indistinguishable from the token expiring.
       pushToast("error", s.toasts.accountRefreshFailed);
     }
   }
