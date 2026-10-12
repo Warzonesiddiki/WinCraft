@@ -1647,6 +1647,33 @@ change across the Rust structs and the frontend type, and it now carries one
 value. **Rust is not compiled here:** `cargo test --lib` on Windows runs the
 catalogue test that this batch rewrote.
 
+### Batch AJ — the site copy sweep, verified rather than repeated (done)
+
+The owner asked for the site's remaining paid-plan copy to be finished. The audit
+found it already finished — Batches AA and AA part two had done it — so what this
+batch adds is the verification, and the one gap that was left:
+
+- The six Store listings read "EVERYTHING INCLUDED … all included, with no
+  subscription and no licence key"; none of the six contains the word "PRO".
+- `docs/pad.xml` says "No expiry: every control and tool is included, with no
+  subscription or licence key" and mentions neither Pro, paid access, a trial nor
+  an upgrade.
+- The home page's JSON-LD carries one offer, `"price": "0"`.
+- The built site was grepped for "WITH PRO", "Pro subscription", "paid plan" and
+  the three old WinCraft prices: the only hits are the Uninstaller's own paid page
+  and privacy copy — a separate product that still sells its own licence — and the
+  free copy that explains the paid plans are gone.
+- The FAQ keeps "I paid for Pro or Lifetime in the past" and answers it: that is a
+  question from a former buyer, not an offer, and removing it would leave their
+  accounts unexplained.
+
+The gap was in the gate. `check-public-counts.mjs` refused a published split by
+looking for either of the two numbers, and after Batch AI there is only one; its
+wording scan caught "Pro controls" but not the slash form, which is how a
+two-tier claim reappears without any number to compare against. It scans for
+`Free/Pro` (and its reverse) now, and the new pattern was negative-tested: the
+gate fails on a README containing it and passes once it is gone.
+
 ## Final report
 
 ### Changes applied
@@ -1754,9 +1781,13 @@ catalogue test that this batch rewrote.
      follows it, the SEO gate now asserts the shipped `CNAME` against
      `site/src/seo.ts`, and the four marketing files link the new domain with a
      comment recording both decisions.
-   - **`docs/pad.xml`'s Pro/pricing prose** (`Char_Desc_2000`: "advanced Pro tools
-     are paid", plus the `Expire_Other_Info` and `Char_Desc_250/450` access
-     wording) still describes a paid tier, in the publisher feed no gate watches.
+   - **`docs/pad.xml`'s Pro/pricing prose — closed in Batch AA, re-verified in
+     Batch AJ.** `Expire_Other_Info` reads "No expiry: every control and tool is
+     included, with no subscription or licence key", and the file contains no
+     mention of Pro, paid access, trials or upgrades — a grep for all four terms
+     over the whole feed returns that one line and nothing else. The publisher
+     feed is still the one artefact no gate watches, which is why it is re-read
+     rather than assumed.
      It publishes no count, so the "no split" rule does not cover it; it needs the
      same product decision as the website's pricing copy (item 6).
 9. **Rename leftovers outside the UI** (flagged, not changed, because each is an

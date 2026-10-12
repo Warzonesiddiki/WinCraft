@@ -54,8 +54,12 @@ for (const file of files) {
       );
     }
   }
-  // The wording has nothing to refer to any more, in any language.
-  for (const m of text.matchAll(/\b(?:Pro|Free)\s+(?:controls?|tweaks?|settings)\b/gi)) {
+  // The wording has nothing to refer to any more, in any language: neither the
+  // old split's phrasing nor its slash, which is how a two-tier claim reappears
+  // without a number for the check above to compare against.
+  for (const m of text.matchAll(
+    /\b(?:Pro|Free)\s+(?:controls?|tweaks?|settings)\b|\b(?:Pro|Free)\s*\/\s*(?:Pro|Free)\b/gi,
+  )) {
     problems.push(`${file}: "${m[0]}" — the catalogue is not split into paid and free`);
   }
 }
