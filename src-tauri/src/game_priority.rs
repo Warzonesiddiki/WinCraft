@@ -16,7 +16,7 @@ pub fn info() -> GamingInfo {
         name: "Set MMCSS Games task category",
         description: "Sets the Games task category to High for threads registered with MMCSS; High treats Priority as 2. The GPU and SFIO Priority values also written here are unused. This does not prioritize every game process (HKLM, requires administrator rights).",
         requires_admin: true,
-        requires_pro: true,
+        requires_pro: false,
     }
 }
 

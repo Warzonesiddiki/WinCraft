@@ -1,6 +1,7 @@
 // Public texts must state the catalog the app actually ships, and must not
-// publish it as a Free/Pro split: the app has no licence gate, so the split the
-// Rust catalogue still carries is metadata, not something to advertise.
+// publish it as a Free/Pro split: the app has no licence gate, so there is no
+// split to advertise. The catalogue's own flags were flipped to free, which is
+// why `pro` is 0 below and the split scan only runs if that ever changes back.
 //
 // The total comes from the Rust catalogue test (src-tauri/src/lib.rs), which
 // fails when the code and that number disagree; this check fails when a public
@@ -11,7 +12,9 @@ const read = (file) => fs.readFileSync(new URL(`../${file}`, import.meta.url), "
 const lib = read("src-tauri/src/lib.rs");
 const total = Number(lib.match(/assert_eq!\(total, (\d+),/)?.[1]);
 const pro = Number(lib.match(/assert_eq!\(pro, (\d+),/)?.[1]);
-if (!total || !pro) throw new Error("catalogue counts not found in src-tauri/src/lib.rs");
+if (!total || !Number.isInteger(pro)) {
+  throw new Error("catalogue counts not found in src-tauri/src/lib.rs");
+}
 const free = total - pro;
 
 const listings = fs
@@ -40,12 +43,20 @@ for (const file of files) {
       continue;
     problems.push(`${file}: "${m[0]}" (the catalog has ${total} controls)`);
   }
-  // The split is no longer published, so neither of its two numbers has a
-  // reason to appear in a public text at all - in any language, in any order.
-  const split = new RegExp(String.raw`\b(?:${String(free)}|${String(pro)})\b`, "g");
-  for (const m of text.matchAll(split)) {
-    const around = text.slice(Math.max(0, m.index - 40), m.index + 40).replaceAll("\n", " ");
-    problems.push(`${file}: "${m[0]}" in "...${around}..." — the Free/Pro split is not published`);
+  // With every flag free there is no second number to scan for, and scanning
+  // for the total on its own would flag the correct sentence.
+  if (free !== total) {
+    const split = new RegExp(String.raw`\b(?:${String(free)}|${String(pro)})\b`, "g");
+    for (const m of text.matchAll(split)) {
+      const around = text.slice(Math.max(0, m.index - 40), m.index + 40).replaceAll("\n", " ");
+      problems.push(
+        `${file}: "${m[0]}" in "...${around}..." — the Free/Pro split is not published`,
+      );
+    }
+  }
+  // The wording has nothing to refer to any more, in any language.
+  for (const m of text.matchAll(/\b(?:Pro|Free)\s+(?:controls?|tweaks?|settings)\b/gi)) {
+    problems.push(`${file}: "${m[0]}" — the catalogue is not split into paid and free`);
   }
 }
 for (const file of listings) {
@@ -64,6 +75,8 @@ if (problems.length) {
   process.exit(1);
 }
 console.log(
-  `Public counts match the catalog: ${total} controls, published without a Free/Pro split ` +
-    `(the ${free}/${pro} flags stay metadata; ${files.length} files checked).`,
+  free === total
+    ? `Public counts match the catalog: ${total} controls, all free (${files.length} files checked).`
+    : `Public counts match the catalog: ${total} controls, published without a Free/Pro split ` +
+        `(the ${free}/${pro} flags stay metadata; ${files.length} files checked).`,
 );

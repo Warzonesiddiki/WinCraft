@@ -494,7 +494,7 @@ fn tweak_infos(store: &RollbackStore) -> Result<Vec<TweakInfo>, String> {
         ("limit_do_background_download","Windows background download limit","Configure a Delivery Optimization limit in KB/s. Does not limit other applications or disable Windows Update.","performance",true),
         ("monitor_refresh_profile","Game display refresh profiles","Choose supported refresh rates per game. Preview and restore keep the original resolution and desktop layout.","gaming",false),
     ] {
-        list.push(TweakInfo{id:id.into(),name:name.into(),description:description.into(),category:category.into(),hive:"Windows API".into(),requires_admin:admin,requires_pro:true,applied:applied_ids.contains(id),changes:vec![],..Default::default()});
+        list.push(TweakInfo{id:id.into(),name:name.into(),description:description.into(),category:category.into(),hive:"Windows API".into(),requires_admin:admin,requires_pro: false,applied:applied_ids.contains(id),changes:vec![],..Default::default()});
     }
 
     #[cfg(windows)]
@@ -2564,7 +2564,7 @@ mod tests {
         // The catalogue's own flags stay as metadata even though nothing gates
         // on them any more: they are the record of what used to be gated.
         assert!(!cleanup::target("temp_cleanup").unwrap().requires_pro);
-        assert!(cleanup::target("winupdate_cache_cleanup").unwrap().requires_pro);
+        assert!(!cleanup::target("winupdate_cache_cleanup").unwrap().requires_pro);
         assert!(authorize_elevated_cleanup("temp_cleanup").is_err());
         // Previously Pro-only elevated cleanup is now accessible.
         assert!(authorize_elevated_cleanup("winupdate_cache_cleanup").is_ok());
@@ -2586,10 +2586,11 @@ mod tests {
         assert_eq!(tweak.value_name, "TaskbarDa");
     }
 
-    /// The source data still carries `requires_pro` flags for historical
-    /// bookkeeping, but `tweak_infos()` overrides them all to `false` and
-    /// nothing checks a licence — WinCraft is free for everyone.
-    /// This test pins the source-level counts so a refactor notices drift.
+    /// Nothing in the catalogue is Pro any more: the flags the source data
+    /// used to carry for historical bookkeeping were flipped to `false`, and
+    /// `tweak_infos()` sets every entry to `false` on the way out as well, so
+    /// there is no path by which a control can come out of this build gated.
+    /// This test pins the size of the catalogue so a refactor notices drift.
     #[test]
     fn the_catalogue_is_eighty_one_tweaks_all_free_in_output() {
         let registry: Vec<_> = tweaks::all_tweaks().into_iter().filter(|t| t.id != "disable_copilot").collect();
@@ -2615,9 +2616,9 @@ mod tests {
             services::windows_search_info().requires_pro,
             services::ai_fabric_info().requires_pro,
             false, // Filter Keys shortcut
-            true, // background app EcoQoS
-            true, // Delivery Optimization cap
-            true, // monitor refresh profiles
+            false, // background app EcoQoS
+            false, // Delivery Optimization cap
+            false, // monitor refresh profiles
         ];
 
         let settings = &settings_tweaks::TWEAKS;
@@ -2628,8 +2629,8 @@ mod tests {
             + settings.iter().filter(|t| t.requires_pro).count();
 
         assert_eq!(total, 81, "the catalogue no longer has 81 tweaks");
-        assert_eq!(pro, 35, "the Pro count moved");
-        assert_eq!(total - pro, 46, "the free count moved");
+        assert_eq!(pro, 0, "a control is Pro again: nothing in this build is gated");
+        assert_eq!(total - pro, 81, "every control is free");
 
         // The composite list must stay in step with what list_tweaks builds,
         // otherwise the totals above would quietly stop covering everything.

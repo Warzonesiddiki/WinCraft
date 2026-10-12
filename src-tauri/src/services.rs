@@ -51,7 +51,7 @@ pub fn ai_fabric_info() -> ServiceInfo {
         // string resources 112 and 113, en-US).
         description: "Stops the Windows AI Components Host service (WSAIFabricSvc) and sets it to Manual, so it no longer starts with Windows. Windows can still start it when an app or Windows feature asks for it. Windows describes it as providing AI component services to apps and other Windows services. Only present on PCs that have it.",
         requires_admin: true,
-        requires_pro: true,
+        requires_pro: false,
     }
 }
 
@@ -61,7 +61,7 @@ pub fn windows_search_info() -> ServiceInfo {
         name: "Disable the indexing service (Windows Search)",
         description: "Stops and disables the Windows file indexing service, cutting background disk activity - useful on small SSDs or while gaming. File search in the Start menu gets slower until you turn it back on (requires administrator rights).",
         requires_admin: true,
-        requires_pro: true,
+        requires_pro: false,
     }
 }
 

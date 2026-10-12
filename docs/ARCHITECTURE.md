@@ -54,9 +54,9 @@ gate, and that gate also asserts the shipped `public/CNAME` — the deployment
 setting that decides where GitHub Pages answers — so the two cannot drift.
 
 Public copy quotes the catalogue's total from `scripts/check-public-counts.mjs`
-and nothing else: the app has no licence gate, so the Free/Pro split the Rust
-catalogue still carries is metadata, and the check fails if a public text
-publishes it again (or quotes a different total).
+and nothing else: the app has no licence gate, no control in the catalogue is
+Pro, and the check fails if a public text splits the catalogue again — it scans
+for the wording when there is no second number left to compare against.
 
 ## How a change reaches Windows
 
@@ -124,9 +124,10 @@ WinCraft is free for everyone under the MIT license. Nothing in the desktop app
 checks a licence: the enforcement plumbing that used to sit in `apply_by_id`,
 the cleanup authorizer and the ten commands beside them was removed in Batch AB,
 and each of those paths now relies only on its own validation and on the
-elevation check. The Rust catalogue still carries its `requires_pro` flags as
-metadata — they are the record of what used to be gated, and the tests pin their
-counts — but no code reads them. The backend keeps the `entitlements` table, the
+elevation check. The `requires_pro` field is still part of the tweak payload, for
+compatibility with what the app already reads, but every entry sets it to false
+and `tweak_infos()` forces it false on the way out; the catalogue test asserts
+that count is zero, so a control cannot come back gated without failing the build. The backend keeps the `entitlements` table, the
 `products.ts` catalogue and the Stripe routes because they still serve the
 separate Uninstaller product and honour entitlements granted before the change;
 `pctweaker` remains a valid alias of the `wincraft` product id so old rows,

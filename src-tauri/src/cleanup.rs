@@ -54,7 +54,7 @@ pub fn cleanup_targets() -> Vec<CleanupInfo> {
             name: "Clear Windows Update cache",
             description: "Moves already-installed Windows Update packages to the Recycle Bin (requires administrator rights).",
             requires_admin: true,
-            requires_pro: true,
+            requires_pro: false,
         },
     ]
 }
