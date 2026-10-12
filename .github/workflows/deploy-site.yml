@@ -6,6 +6,15 @@ on:
     paths:
       - "site/**"
       - ".github/workflows/deploy-site.yml"
+      # The site imports shared modules straight out of the app tree:
+      # site/src/promo.tsx renders the offer banner from
+      # src/components/halloween-offer.tsx and reads the offer format from
+      # src/promo.ts, and site/src/pages/Uninstaller.tsx reads src/promo.ts too.
+      # A change under src/ can therefore break the site build without touching
+      # site/ — which is exactly how a deleted component left this workflow's
+      # own `npm run check:seo` step failing on all 17 routes while nothing in
+      # the app's checks noticed.
+      - "src/**"
       # The site's structured-data version is read from here at build time
       # (see vite.config.ts's __APP_VERSION__ substitution). Without this, a
       # release that bumps the version but never touches site/ leaves the

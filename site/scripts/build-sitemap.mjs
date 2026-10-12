@@ -11,6 +11,7 @@
  */
 import { execFileSync } from "node:child_process";
 import { writeFileSync } from "node:fs";
+import { ORIGIN } from "./site-origin.mjs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -61,7 +62,7 @@ function lastModified(paths) {
 const body = Object.entries(PAGES)
   .map(([route, sources]) => {
     const lastmod = lastModified([...sources, ...SHARED]);
-    const loc = `https://pctweaker.app${route}`;
+    const loc = `${ORIGIN}${route}`;
     return lastmod
       ? `  <url><loc>${loc}</loc><lastmod>${lastmod}</lastmod></url>`
       : `  <url><loc>${loc}</loc></url>`;

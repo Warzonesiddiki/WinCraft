@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
+import { ORIGIN, ORIGIN_PATTERN } from "./site-origin.mjs";
 
 const dist = new URL("../dist/", import.meta.url);
 const sitemap = await readFile(new URL("sitemap.xml", dist), "utf8");
@@ -15,7 +16,7 @@ const titles = new Set();
 const descriptions = new Set();
 
 for (const url of urls) {
-  assert.equal(url.origin, "https://pctweaker.app");
+  assert.equal(url.origin, ORIGIN);
   assert.ok(url.pathname.endsWith("/"), `Sitemap URL must be the trailing-slash form: ${url}`);
   const html = await readFile(new URL(`${url.pathname.slice(1)}index.html`, dist), "utf8");
 
@@ -123,7 +124,7 @@ assert.ok(
 );
 
 const robots = await readFile(new URL("robots.txt", dist), "utf8");
-assert.match(robots, /Sitemap:\s*https:\/\/pctweaker\.app\/sitemap\.xml/, "robots.txt must point at the sitemap");
+assert.match(robots, new RegExp(`Sitemap:\\s*${ORIGIN_PATTERN}/sitemap\\.xml`), "robots.txt must point at the sitemap");
 assert.match(robots, /^\s*Allow:\s*\/$/m, "robots.txt must allow crawling");
 
 console.log(`SEO checks passed for ${urls.length} sitemap routes, robots.txt and the 404 page.`);

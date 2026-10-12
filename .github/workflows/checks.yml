@@ -22,6 +22,37 @@ permissions:
   contents: read
 
 jobs:
+  # The website build, as its own job so the main checks keep their runtime.
+  # It has to run here as well as in the deploy workflow: that one only fires on
+  # a push to master, so without this a pull request that breaks the site — for
+  # instance by deleting or renaming a module under src/, which the site imports
+  # from directly — would merge green and only fail afterwards.
+  site:
+    if: ${{ !inputs.release_tag }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: site/package-lock.json
+
+      - name: Install site dependencies
+        run: npm ci
+        working-directory: site
+
+      - name: Build the site
+        run: npm run build
+        working-directory: site
+
+      - name: Site SEO checks
+        run: npm run check:seo
+        working-directory: site
+
   checks:
     if: ${{ !inputs.release_tag }}
     runs-on: windows-latest
