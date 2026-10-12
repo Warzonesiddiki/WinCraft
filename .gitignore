@@ -157,3 +157,8 @@ scripts/vm/results/
 
 # Vitest coverage output (npm run test:coverage)
 coverage/
+
+# Staging area for a release's public artifacts, copied out of
+# src-tauri/target/release/bundle and published to the GitHub Release. The
+# binaries themselves stay out of git history; only the tag names the build.
+release-artifacts/
