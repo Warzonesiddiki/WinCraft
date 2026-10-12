@@ -362,7 +362,7 @@ pub(crate) mod tests {
         for original in [DEFAULTS, without_hotkey(DEFAULTS)] {
             let fake = install(original);
             let fixture = crate::mock_registry::Fixture::new();
-            crate::apply_by_id_inner(&fixture.store, &fixture.dir, ID).unwrap();
+            crate::apply_by_id_inner(&fixture.store, ID).unwrap();
             assert_eq!(fake.value.get(), without_hotkey(original));
             assert!(effective(ID).unwrap());
             assert!(matches!(fixture.snapshot(ID),

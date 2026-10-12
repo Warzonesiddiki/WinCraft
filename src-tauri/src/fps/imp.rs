@@ -391,16 +391,9 @@ pub fn active() -> Vec<(u32, FpsStats)> {
 
 #[tauri::command(async)]
 pub fn start_fps_capture(
-    app: tauri::AppHandle,
+    _app: tauri::AppHandle,
     state: tauri::State<'_, FpsState>,
 ) -> Result<(), String> {
-    // Gated here and not only in the card that offers it. The card does check,
-    // but a UI check is a courtesy to the user, not a control: commands are
-    // reachable over IPC regardless of what the interface chose to render.
-    // Every other paid feature is enforced at this boundary — the overlay
-    // window itself included — and the frame counter was the one that was not.
-    crate::require_pro(&crate::store_for_dir(&app)?)?;
-
     let mut guard = state
         .0
         .lock()

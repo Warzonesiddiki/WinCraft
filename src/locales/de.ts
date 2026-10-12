@@ -190,7 +190,7 @@ export const de: Strings = {
     gameChange1: "Deaktiviert Game DVR (Hintergrundaufnahme)",
     gameChange2: "Wechselt zum Energiesparplan Höchstleistung",
     gameChange3: "Optimiert die CPU-Priorität für Spiele (Win32PrioritySeparation)",
-    previewReq: "Erfordert Administratorrechte · Pro-Funktion",
+    previewReq: "Erfordert Administratorrechte",
     previewCost: "Möglicher Preis: mehr Verbrauch und Wärme, solange aktiv.",
     previewRevert: "Mit einem Klick umkehrbar: jeder Originalwert wird vorher gesichert.",
     applySession: "Sitzung starten",
@@ -639,8 +639,6 @@ export const de: Strings = {
     fixAll: "Alles beheben",
     fixing: "Behebe {done}/{total}...",
     fixedToast: "{count} Probleme behoben.",
-    proIssuesTitle: "Auch mit Pro verfügbar",
-    unlockPro: "Pro freischalten",
     scanAgain: "Erneut scannen",
     verdictRecommended: "Auf diesem PC empfohlen",
     verdictNotRecommended: "Auf diesem PC nicht empfohlen",
@@ -1134,11 +1132,9 @@ export const de: Strings = {
     firstName: "Vorname",
     lastName: "Nachname",
     registerDetailsRequired: "Vorname, Nachname und Geburtsdatum sind erforderlich.",
-    loginRequiredForCheckout: "Vor dem Freischalten von Pro anmelden oder registrieren.",
-    verifyEmailForCheckout:
-      "Bestätige vor dem Freischalten von Pro deine E-Mail: Öffne den gesendeten Link oder fordere hier einen neuen an.",
+    loginRequiredToResend: "Melde dich zuerst an und fordere dann einen neuen Link an.",
     checkInboxAfterSignup:
-      "Wir haben einen Bestätigungslink an {email} gesendet. Sieh auch im Spam nach: Nach der Bestätigung öffnet sich die Pro-Zahlung von selbst.",
+      "Wir haben einen Bestätigungslink an {email} gesendet. Sieh auch im Spam nach: Nach der Bestätigung ist dein Konto bereit.",
     forgotPasswordLink: "Passwort vergessen?",
     forgotPasswordButton: "Link zum Zurücksetzen senden",
     forgotPasswordSent:

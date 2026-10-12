@@ -153,7 +153,6 @@ pub fn ecoqos_status(app: tauri::AppHandle) -> Result<EcoQosStatus, String> {
 #[tauri::command]
 pub fn ecoqos_add_rule(app: tauri::AppHandle, path: String) -> Result<EcoQosRule, String> {
     let dir = crate::store_for_dir(&app)?;
-    crate::require_pro(&dir)?;
     let (path, key) = selected_executable(&path)?;
     let _guard = LOCK.lock().map_err(|e| e.to_string())?;
     let mut config = load_config(&dir)?;
@@ -189,9 +188,6 @@ pub fn ecoqos_remove_rule(app: tauri::AppHandle, path: String) -> Result<(), Str
 #[tauri::command]
 pub fn ecoqos_set_enabled(app: tauri::AppHandle, enabled: bool) -> Result<(), String> {
     let dir = crate::store_for_dir(&app)?;
-    if enabled {
-        crate::require_pro(&dir)?;
-    }
     let _guard = LOCK.lock().map_err(|e| e.to_string())?;
     let mut config = load_config(&dir)?;
     config.enabled = enabled;
@@ -605,8 +601,7 @@ fn tick(
     let allowed = supported
         && !blocked_global
         && !SHUTTING_DOWN.load(Ordering::SeqCst)
-        && config.enabled
-        && crate::require_pro(dir).is_ok();
+        && config.enabled;
     let table = crate::process_guard::processes();
     let refreshed = table.is_ok();
     if !refreshed {

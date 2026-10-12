@@ -154,7 +154,6 @@ pub fn monitor_save_rule(
     hz: u32,
 ) -> Result<(), String> {
     let dir = crate::store_for_dir(&app)?;
-    crate::require_pro(&dir)?;
     let path = path_key(&path)?;
     native::target(&display_id, hz)?;
     let _lock = lock(&dir)?;
@@ -204,9 +203,6 @@ pub fn monitor_remove_rule(app: tauri::AppHandle, path: String) -> Result<(), St
 #[tauri::command(async)]
 pub fn monitor_set_enabled(app: tauri::AppHandle, enabled: bool) -> Result<(), String> {
     let dir = crate::store_for_dir(&app)?;
-    if enabled {
-        crate::require_pro(&dir)?;
-    }
     let _lock = lock(&dir)?;
     let mut s = load(&dir)?;
     if !enabled {
@@ -247,7 +243,6 @@ fn suppress_active_game(s: &mut Store) {
 #[tauri::command(async)]
 pub fn monitor_confirm(app: tauri::AppHandle) -> Result<(), String> {
     let dir = crate::store_for_dir(&app)?;
-    crate::require_pro(&dir)?;
     let _lock = lock(&dir)?;
     let mut s = load(&dir)?;
     let a = s.active.as_mut().ok_or("No preview is active")?;
@@ -263,7 +258,6 @@ pub fn monitor_confirm(app: tauri::AppHandle) -> Result<(), String> {
 #[tauri::command(async)]
 pub fn monitor_preview(app: tauri::AppHandle, display_id: String, hz: u32) -> Result<(), String> {
     let dir = crate::store_for_dir(&app)?;
-    crate::require_pro(&dir)?;
     begin(&dir, &display_id, hz, None)
 }
 fn begin(dir: &Path, id: &str, hz: u32, game: Option<String>) -> Result<(), String> {
@@ -353,14 +347,14 @@ pub fn tick(dir: &Path, paths: &[String]) {
                     suppress_active_game(&mut s);
                     restore(dir, &mut s)?;
                 } else if a.game.as_ref().is_some_and(|p| !paths.contains(p))
-                    || (a.game.is_some() && (!s.enabled || crate::require_pro(dir).is_err()))
+                    || (a.game.is_some() && !s.enabled)
                 {
                     restore(dir, &mut s)?;
                 } else {
                     return Ok(());
                 }
             }
-            next = if s.enabled && crate::require_pro(dir).is_ok() {
+            next = if s.enabled {
                 s.rules
                     .iter()
                     .find(|r| paths.contains(&r.path) && !s.suppressed.contains(&r.path))

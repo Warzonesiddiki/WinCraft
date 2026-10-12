@@ -283,11 +283,6 @@ function App() {
         plan: data.plan ?? null,
         hasBilling: data.hasBilling ?? false,
       });
-      // Fire-and-forget: refreshLicense() has its own error handling and
-      // must never block the UI's account status on a signing hiccup.
-      // Kept for compatibility: the Rust license store still reads it, but
-      // since require_pro() always succeeds, this is a no-op in practice.
-      void refreshLicense();
     } catch {
       // Network hiccup: keep whatever Pro status we already had rather than
       // dropping the user back to Free on a transient failure — but say so,
@@ -296,15 +291,6 @@ function App() {
       // reverted to Free while the server still reported it as Pro).
       pushToast("error", s.toasts.accountRefreshFailed);
     }
-  }
-
-  /**
-   * WinCraft is now free for everyone — no license check is needed.
-   * Kept as a no-op stub so call sites compile without changes and the
-   * function can be removed in a future cleanup pass.
-   */
-  async function refreshLicense() {
-    // No-op: require_pro() always succeeds on the Rust side.
   }
 
   // The server can hold every runtime adjustment to other apps for everyone
@@ -406,7 +392,7 @@ function App() {
   async function resendVerification() {
     if (!API_BASE_URL) throw new Error(s.auth.backendNotConfigured);
     const token = readToken();
-    if (!token) throw new Error(s.auth.loginRequiredForCheckout);
+    if (!token) throw new Error(s.auth.loginRequiredToResend);
     const res = await fetch(`${API_BASE_URL}/api/auth/resend-verification`, {
       method: "POST",
       headers: { Authorization: `Bearer ${token}` },

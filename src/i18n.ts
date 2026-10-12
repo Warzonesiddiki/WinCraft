@@ -562,8 +562,6 @@ export interface Strings {
     fixAll: string;
     fixing: string; // uses {done} {total}
     fixedToast: string; // uses {count}
-    proIssuesTitle: string;
-    unlockPro: string;
     scanAgain: string;
     /** Hardware-derived verdicts shown under a scanned item. */
     verdictRecommended: string;
@@ -1003,8 +1001,7 @@ export interface Strings {
     firstName: string;
     lastName: string;
     registerDetailsRequired: string;
-    loginRequiredForCheckout: string;
-    verifyEmailForCheckout: string;
+    loginRequiredToResend: string;
     checkInboxAfterSignup: string;
     forgotPasswordLink: string;
     forgotPasswordButton: string;

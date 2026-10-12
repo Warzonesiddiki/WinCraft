@@ -26,12 +26,12 @@ accepts the Start Recommended policy; Windows 10 refuses Paint AI, Notepad
 AI, End task, the drag tray, Widgets and Start Recommended; the AI
 Components Host control is offered only where `WSAIFabricSvc` exists.
 
-## Automated run (no licence, no clicks)
+## Automated run (no clicks)
 
-Build a debug test build on the development PC; the feature that unlocks
-Pro for tests exists only in debug builds, and a release build that enables
-it does not compile (`scripts/check-no-test-pro.mjs` also refuses any release
-binary that carries it):
+Build a debug test build on the development PC; the harness feature that
+drives controls without the UI exists only in debug builds, and a release build
+that enables it does not compile (`scripts/check-no-test-pro.mjs` also refuses
+any release binary that carries its marker):
 
     npm run tauri build -- --debug --no-bundle --features test-pro
 
@@ -50,8 +50,8 @@ on any difference (`results\*-profile-*.log`).
 
 ## Manual procedure (each VM, about 15 minutes)
 
-1. Take a VM checkpoint. Install the WinCraft build under test and sign in
-   with a Pro licence (11 of the 15 controls are Pro).
+1. Take a VM checkpoint. Install the WinCraft build under test. There is no
+   licence to sign in with and no locked control: all 15 controls apply.
 2. In a normal, non-elevated PowerShell as the same user:
    `.\verify-tweaks.ps1 -Phase Baseline`
 3. In WinCraft, search each control by name and apply it. Unsupported ones

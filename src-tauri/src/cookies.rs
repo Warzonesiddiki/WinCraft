@@ -480,7 +480,6 @@ pub fn set_cookie_whitelist(app: tauri::AppHandle, entries: Vec<String>) -> Resu
 #[tauri::command(async)]
 pub fn scan_cookies(app: tauri::AppHandle) -> Result<Vec<CookieScan>, String> {
     let dir = crate::store_for_dir(&app)?;
-    crate::require_pro(&dir)?;
     Ok(imp::scan(&load_whitelist(&dir)))
 }
 
@@ -491,7 +490,6 @@ pub fn clean_cookies(
     browsers: Vec<String>,
 ) -> Result<CookieCleanResult, String> {
     let dir = crate::store_for_dir(&app)?;
-    crate::require_pro(&dir)?;
     let result = imp::clean(&dir, &browsers, &load_whitelist(&dir));
     crate::audit::record(
         "cookie-clean",

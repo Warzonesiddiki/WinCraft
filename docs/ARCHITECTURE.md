@@ -35,7 +35,8 @@ strings in components.
 **`src-tauri/` — the Rust core.** 73 modules behind `lib.rs`. They own every
 privileged action: registry writes with snapshots, service control, scheduled
 task changes, debloat app removal, disk cleanup, driver audits, monitoring
-samples, the HUD overlay window, and the license check. The frontend never
+samples, the HUD overlay window, and the restore points taken before an
+elevated change. The frontend never
 touches the system directly — it calls a command, the Rust side validates the
 arguments, records a snapshot and performs the write.
 
@@ -119,10 +120,13 @@ the last cleanup, repair, disk optimisation, purge and RAM trim.
 
 ## Product state: everything is free
 
-WinCraft is free for everyone under the MIT license. The desktop app treats every
-feature as unlocked (`isProUnlocked` in `App.tsx`), and the Rust gate
-`require_pro()` in `lib.rs` is a documented no-op kept so the enforcement
-plumbing still compiles. The backend keeps the `entitlements` table, the
+WinCraft is free for everyone under the MIT license. Nothing in the desktop app
+checks a licence: the enforcement plumbing that used to sit in `apply_by_id`,
+the cleanup authorizer and the ten commands beside them was removed in Batch AB,
+and each of those paths now relies only on its own validation and on the
+elevation check. The Rust catalogue still carries its `requires_pro` flags as
+metadata — they are the record of what used to be gated, and the tests pin their
+counts — but no code reads them. The backend keeps the `entitlements` table, the
 `products.ts` catalogue and the Stripe routes because they still serve the
 separate Uninstaller product and honour entitlements granted before the change;
 `pctweaker` remains a valid alias of the `wincraft` product id so old rows,
@@ -154,7 +158,7 @@ that are genuinely the same).
 | Frontend tests          | `npm test` (Vitest, jsdom)               | `src/**/*.test.ts(x)`: module helpers, components (Testing Library) and a11y (jest-axe)                                                               |
 | Coverage ratchet        | `npm run test:coverage`                  | thresholds in `vitest.config.ts`, about a point under the measured tree: they refuse a fall, not a target                                             |
 | Source/behaviour suites | `scripts/test-*.mjs`                     | scan pipeline, advisor, thermals, repair ETA, updater, debloat model, download limits, promo rules, language default, change history, UI polish, i18n |
-| Rust tests              | `src-tauri/src/*.rs`, `src-tauri/tests/` | adapters, IPC/capability parity, rollback store, license verification, game sessions                                                                  |
+| Rust tests              | `src-tauri/src/*.rs`, `src-tauri/tests/` | adapters, IPC/capability parity, rollback store, elevation routing, game sessions                                                                      |
 | API tests               | `backend/test/*.test.mjs`                | auth, entitlements, Stripe policy, webhooks, mail, offers, admin boundaries                                                                           |
 
 `npm test` is the only layer that renders a component: the script suites run the

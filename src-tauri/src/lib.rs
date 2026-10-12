@@ -101,7 +101,6 @@ fn download_limit_state(app: tauri::AppHandle) -> Result<download_limit::Downloa
 #[tauri::command(async)]
 fn set_download_limit(app: tauri::AppHandle, kbps: u32) -> Result<download_limit::DownloadLimitState,String> {
     let dir=store_for_dir(&app)?;
-    require_pro(&dir)?;
     if !(1..=1_000_000).contains(&kbps) { return Err("Choose a bandwidth between 1 and 1000000 KB/s".into()); }
     if !elevation::is_elevated() {
         elevation::run_elevated_action("--elevated-download-limit",&kbps.to_string())?;
@@ -204,7 +203,7 @@ fn store_for(app: &tauri::AppHandle) -> Result<RollbackStore, String> {
 
 /* ---------------------------------------------------------------- *
  * Profile photo. See avatar.rs for why this is a file and not
- * localStorage â€” in short, people were losing their photos.
+ * localStorage — in short, people were losing their photos.
  * ---------------------------------------------------------------- */
 
 /// Every one of these takes the signed-in address, because the photo belongs
@@ -714,7 +713,7 @@ pub(crate) fn apply_or_undo(
     id: &str,
 ) -> Result<(), String> {
     let was_applied = store.is_applied_checked(id).unwrap_or(true);
-    let error = match apply_by_id_inner(store, app_data_dir, id) {
+    let error = match apply_by_id_inner(store, id) {
         Ok(()) => return Ok(()),
         Err(error) => error,
     };
@@ -739,42 +738,11 @@ pub(crate) fn apply_or_undo(
     })
 }
 
-/// Whether a friendly, stable prefix on a returned error means "this failed
-/// because the Pro license didn't verify" rather than some other failure â€”
-/// checked by the frontend to show the paywall instead of a generic toast.
-pub const PRO_REQUIRED_PREFIX: &str = "PRO_REQUIRED: ";
-
-/// WinCraft is now free for everyone — no tweak requires a paid license.
-/// The function signature is preserved so callers compile without changes.
-#[cfg(windows)]
-fn requires_pro_for(_id: &str) -> bool {
-    false
-}
-
-/// Side-effect-free entitlement decision shared by execution and policy tests.
-#[cfg(windows)]
-pub(crate) fn require_tweak_entitlement(
-    app_data_dir: &std::path::Path,
-    id: &str,
-) -> Result<(), String> {
-    if requires_pro_for(id) {
-        require_pro(app_data_dir)?;
-    }
-    Ok(())
-}
-
-/// This is the single chokepoint every apply path funnels through â€” the
-/// direct GUI call, the batched "fix all", *and* the elevated headless
-/// re-entry (`--elevated-apply`), which calls this function directly and
-/// would otherwise skip any check placed only in the Tauri command handlers
-/// above it. That headless path is reachable by launching the shipped exe
-/// with that flag from a terminal, with no GUI involved at all, so gating
-/// only the commands would have left it wide open.
-///
-/// Deliberately not applied to `rollback_by_id`: cancelling a subscription
-/// must not strand a tweak the user already paid to have applied â€” TERMS.md
-/// is explicit that cancellation locks *further* Pro use, not what's already
-/// on the machine.
+/// This is the single chokepoint every apply path funnels through: the direct
+/// GUI call, the batched "fix all", *and* the elevated headless re-entry
+/// (`--elevated-apply`), which calls this function directly. Keeping one funnel
+/// is what makes the audit entry below cover every path exactly once, and it is
+/// why nothing here has to trust that its caller came from the UI.
 #[cfg(windows)]
 fn apply_by_id(
     store: &RollbackStore,
@@ -786,9 +754,7 @@ fn apply_by_id(
     // offline the whole time, and the guard would revert a good tweak on a
     // PC that never had internet. The same reading is the "before" half of
     // the verification record the UI shows afterwards.
-    // A Pro tweak a Free user cannot apply is refused without the wait.
-    let before = (netcheck::relevant(id) && require_tweak_entitlement(app_data_dir, id).is_ok())
-        .then(diagnostics::network_verify::measure);
+    let before = netcheck::relevant(id).then(diagnostics::network_verify::measure);
     let was_online = before.as_ref().is_some_and(|b| b.online);
 
     // What a re-apply is about to overwrite (after a Windows update put a
@@ -893,16 +859,12 @@ fn live_value(part: &rollback::RegistrySnapshot) -> Option<String> {
 }
 
 #[cfg(windows)]
-fn apply_by_id_inner(
-    store: &RollbackStore,
-    app_data_dir: &std::path::Path,
-    id: &str,
-) -> Result<(), String> {
-    // Refused for everyone, Pro or not, before the licence is even looked at.
+fn apply_by_id_inner(store: &RollbackStore, id: &str) -> Result<(), String> {
+    // The three configurable controls apply from their own panels; a default
+    // written from the list would be a value nobody chose.
     if ["ecoqos_rules","limit_do_background_download","monitor_refresh_profile"].contains(&id) {
         return Err("Configure this control in its dedicated panel; no default configuration is applied automatically".into());
     }
-    require_tweak_entitlement(app_data_dir, id)?;
     if id == TASKBAR_WIDGETS_ID && services::user_choice_protected() {
         return Err(TASKBAR_WIDGETS_PROTECTED.into());
     }
@@ -1104,7 +1066,7 @@ fn split_by_elevation(ids: Vec<String>) -> (Vec<String>, Vec<String>) {
 /// Applies several tweaks at once (the Scan screen's "fix all").
 ///
 /// Applying them one by one would fire a separate UAC prompt for every
-/// admin-level tweak â€” a dozen consecutive prompts for a single click. So the
+/// admin-level tweak — a dozen consecutive prompts for a single click. So the
 /// admin ones are collected and handed to a *single* elevated helper run,
 /// while the rest are applied in-process. Failures are collected per id
 /// instead of aborting, so one bad tweak can't silently swallow the rest.
@@ -1277,21 +1239,18 @@ fn last_cleanup_result_path(app: &tauri::AppHandle) -> Result<std::path::PathBuf
     Ok(dir.join("last_cleanup_result.json"))
 }
 
-/// Whether a cleanup needs administrator rights, after its Pro gate. The gate
-/// lives here rather than only on the card: `invoke` and the elevated command
-/// line both reach the cleanup without passing through the UI.
-fn authorize_cleanup(app_data_dir: &std::path::Path, id: &str) -> Result<bool, String> {
+/// Whether a cleanup needs administrator rights. Decided here rather than only
+/// on the card: `invoke` and the elevated command line both reach the cleanup
+/// without passing through the UI.
+fn authorize_cleanup(id: &str) -> Result<bool, String> {
     let target = cleanup::target(id).ok_or_else(|| format!("unknown cleanup action: {}", id))?;
-    if target.requires_pro {
-        require_pro(app_data_dir)?;
-    }
     Ok(target.requires_admin)
 }
 
 /// The elevated helper only runs the cleanups that need it. Anything else
 /// would be an administrator emptying a folder the signed-in user chooses.
-fn authorize_elevated_cleanup(app_data_dir: &std::path::Path, id: &str) -> Result<(), String> {
-    if authorize_cleanup(app_data_dir, id)? {
+fn authorize_elevated_cleanup(id: &str) -> Result<(), String> {
+    if authorize_cleanup(id)? {
         Ok(())
     } else {
         Err("this cleanup does not run as administrator".to_string())
@@ -1301,7 +1260,7 @@ fn authorize_elevated_cleanup(app_data_dir: &std::path::Path, id: &str) -> Resul
 #[cfg(windows)]
 #[tauri::command(async)]
 fn run_cleanup(app: tauri::AppHandle, id: String) -> Result<CleanupResult, String> {
-    let requires_admin = authorize_cleanup(&store_for_dir(&app)?, &id)?;
+    let requires_admin = authorize_cleanup(&id)?;
 
     if requires_admin && !elevation::is_elevated() {
         elevation::run_elevated_action("--elevated-cleanup", &id)?;
@@ -1339,7 +1298,7 @@ fn run_cleanup_selected(
     id: String,
     names: Vec<String>,
 ) -> Result<CleanupResult, String> {
-    let requires_admin = authorize_cleanup(&store_for_dir(&app)?, &id)?;
+    let requires_admin = authorize_cleanup(&id)?;
 
     if requires_admin && !elevation::is_elevated() {
         // Validate before the payload is built, so a bad name fails here
@@ -1386,11 +1345,9 @@ fn run_cleanup(_app: tauri::AppHandle, _id: String) -> Result<CleanupResult, Str
 
 #[tauri::command(async)]
 fn scan_duplicates(
-    app: tauri::AppHandle,
+    _app: tauri::AppHandle,
     root: String,
 ) -> Result<Vec<cleanup::DuplicateGroup>, String> {
-    // Pro in the UI; the native check is the boundary that holds.
-    require_pro(&store_for_dir(&app)?)?;
     let stop = cleanup::folder_scan_stop(cleanup::FolderScan::Duplicates);
     cleanup::scan_duplicates(&root, &stop)
 }
@@ -1409,7 +1366,7 @@ fn cancel_folder_scan(kind: String) {
 fn delete_files(paths: Vec<String>) -> CleanupResult {
     let requested = paths.len();
     let result = cleanup::delete_files(paths);
-    // Counts only â€” never file paths â€” so the local log stays free of
+    // Counts only — never file paths — so the local log stays free of
     // anything resembling personal data.
     audit::record(
         "files-deleted",
@@ -1425,11 +1382,10 @@ fn delete_files(paths: Vec<String>) -> CleanupResult {
 
 #[tauri::command(async)]
 fn scan_large_files(
-    app: tauri::AppHandle,
+    _app: tauri::AppHandle,
     root: String,
     min_bytes: u64,
 ) -> Result<Vec<cleanup::LargeFile>, String> {
-    require_pro(&store_for_dir(&app)?)?;
     let stop = cleanup::folder_scan_stop(cleanup::FolderScan::LargeFiles);
     cleanup::scan_large_files(&root, min_bytes, &stop)
 }
@@ -1455,10 +1411,6 @@ fn optimize_disk(app: tauri::AppHandle, drive: String) -> Result<diskopt::DiskOp
     // this guarantees the elevated child only ever sees a bare "X:", never a
     // defrag flag or anything shell-like.
     let drive = diskinfo::validate_drive(&drive)?;
-    // The UI gates this behind Pro, but that gate lives in the frontend and
-    // `invoke` is reachable without it. This is the boundary that actually
-    // holds.
-    require_pro(&store_for_dir(&app)?)?;
     if !elevation::is_elevated() {
         elevation::run_elevated_action("--elevated-diskopt", &drive)?;
         let path = last_diskopt_result_path(&app)?;
@@ -1682,9 +1634,6 @@ fn scheduled_cleanup_enabled() -> bool {
 #[cfg(windows)]
 #[tauri::command(async)]
 fn set_scheduled_cleanup(app: tauri::AppHandle, enabled: bool) -> Result<bool, String> {
-    if enabled {
-        require_pro(&store_for_dir(&app)?)?;
-    }
     configure_logon_task(TEMP_CLEANUP_TASK, "--scheduled-temp-cleanup", "0010:00", enabled)?;
     let actual = task_registered(TEMP_CLEANUP_TASK);
     if actual != enabled {
@@ -1735,7 +1684,7 @@ pub fn run_scheduled_temp_cleanup_headless() -> ! {
         .ok()
         .and_then(|raw| serde_json::from_slice(&raw).ok())
         .unwrap_or_default();
-    if require_pro(&dir).is_err() || !temp_cleanup_due(state.last_run, now) {
+    if !temp_cleanup_due(state.last_run, now) {
         std::process::exit(0);
     }
     if process_guard::paused(&dir) || game_sessions::registered_game_running(&dir) {
@@ -1868,7 +1817,7 @@ pub fn run_elevated_headless(action: &str, id: &str) -> ! {
     let store = RollbackStore::new(dir.clone());
 
     // Safety net first: a System Restore point before any elevated change.
-    // Best-effort by design â€” Windows throttles restore points (one per 24h
+    // Best-effort by design — Windows throttles restore points (one per 24h
     // by default) and System Restore can be disabled entirely, and neither
     // condition may block an action the user asked for. The outcome lands in
     // the audit log either way, so "was I protected?" always has an answer.
@@ -1883,13 +1832,12 @@ pub fn run_elevated_headless(action: &str, id: &str) -> ! {
     }
 
     let result: Result<(), String> = match action {
-        "--elevated-download-limit" => require_pro(&dir).and_then(|_| {
-            let kbps=id.parse::<u32>().map_err(|_|"Invalid bandwidth".to_string())?;
-            download_limit::configure(&store,kbps).map(|_|())
-        }),
+        "--elevated-download-limit" => id
+            .parse::<u32>()
+            .map_err(|_| "Invalid bandwidth".to_string())
+            .and_then(|kbps| download_limit::configure(&store, kbps).map(|_| ())),
         "--elevated-download-restore" if id == "restore" => download_limit::rollback(&store).map(|_|()),
         "--elevated-session-apply" => game_sessions::validate_owner_token(id)
-            .and_then(|_| require_pro(&dir))
             .and_then(|_| turbo::apply_for_session(&store, id).map(|_| ())),
         "--elevated-session-rollback" => game_sessions::validate_owner_token(id)
             .and_then(|_| turbo::rollback_for_session(&store, id).map(|_| ())),
@@ -1959,7 +1907,7 @@ pub fn run_elevated_headless(action: &str, id: &str) -> ! {
         }
         "--elevated-cleanup" => {
             let result =
-                authorize_elevated_cleanup(&dir, id).and_then(|_| cleanup::run_cleanup(id));
+                authorize_elevated_cleanup(id).and_then(|_| cleanup::run_cleanup(id));
             audit::record(
                 "cleanup",
                 id,
@@ -1976,7 +1924,7 @@ pub fn run_elevated_headless(action: &str, id: &str) -> ! {
             // Re-decoded and re-validated on this side: the elevated entry
             // point must not trust that its caller was our own app.
             let result = cleanup::decode_selected_payload(id).and_then(|(cleanup_id, names)| {
-                authorize_elevated_cleanup(&dir, &cleanup_id)?;
+                authorize_elevated_cleanup(&cleanup_id)?;
                 let outcome = cleanup::run_cleanup_selected(&cleanup_id, &names);
                 audit::record(
                     "cleanup",
@@ -1995,9 +1943,7 @@ pub fn run_elevated_headless(action: &str, id: &str) -> ! {
         // Re-validated on this side too: the elevated entry point is a plain
         // CLI flag, so it must not trust that its caller was our own app.
         "--elevated-diskopt" => {
-            let result = require_pro(&dir)
-                .and_then(|_| diskinfo::validate_drive(id))
-                .and_then(|drive| diskopt::optimize(&drive));
+            let result = diskinfo::validate_drive(id).and_then(|drive| diskopt::optimize(&drive));
             audit::record(
                 "disk-optimize",
                 id,
@@ -2014,7 +1960,7 @@ pub fn run_elevated_headless(action: &str, id: &str) -> ! {
         // process has no AppHandle, so it cannot emit events itself.
         "--elevated-securedefrag" => {
             let progress_path = defrag_progress_path(&dir);
-            let drive = require_pro(&dir).and_then(|_| diskinfo::validate_drive(id));
+            let drive = diskinfo::validate_drive(id);
             let result = drive.and_then(|drive| {
                 securedefrag::run(&drive, |p| {
                     if let Ok(json) = serde_json::to_string(&p) {
@@ -2036,7 +1982,7 @@ pub fn run_elevated_headless(action: &str, id: &str) -> ! {
         }
 
         "--elevated-memorypurge" => {
-            let result = require_pro(&dir).and_then(|_| zerotrace::purge_standby_memory());
+            let result = zerotrace::purge_standby_memory();
             audit::record(
                 "memory-purge",
                 id,
@@ -2050,14 +1996,10 @@ pub fn run_elevated_headless(action: &str, id: &str) -> ! {
         }
 
         // Progress goes to a file the unelevated parent polls, exactly as the
-        // secure defrag does â€” this process has no AppHandle to emit from.
+        // secure defrag does — this process has no AppHandle to emit from.
         "--elevated-repair" => {
             let progress_path = repair_progress_path(&dir);
             let result = sysrepair::RepairJob::from_id(id).and_then(|job| {
-                // Same gate as `run_system_repair`: only the check is free.
-                if job != sysrepair::RepairJob::Check {
-                    require_pro(&dir)?;
-                }
                 sysrepair::run(job, |p| {
                     if let Ok(json) = serde_json::to_string(&p) {
                         let _ = std::fs::write(&progress_path, json);
@@ -2189,8 +2131,8 @@ fn list_audit_log(app: tauri::AppHandle) -> Result<Vec<audit::AuditEntry>, Strin
 /// elevated helper shows up here even though that process never had a window.
 /// Whether Windows has undone any applied tweak since the last look.
 ///
-/// Reads two independent things â€” the patch level, and the live value of
-/// every registry tweak the rollback store says is applied â€” and records the
+/// Reads two independent things — the patch level, and the live value of
+/// every registry tweak the rollback store says is applied — and records the
 /// patch level for next time. Never changes anything: re-applying is a
 /// button, because a watchdog that silently re-applied would make system
 /// changes at the moment the user least expects them.
@@ -2548,16 +2490,7 @@ mod tests {
     }
 
     #[test]
-    fn expansion_entitlement_and_elevation_routing() {
-        let dir = std::env::temp_dir().join(format!("pct-expansion-unlicensed-{}", std::process::id()));
-        // WinCraft is now free for everyone — every tweak is accessible
-        // regardless of license state.
-        for id in ["ecoqos_rules", "limit_do_background_download", "monitor_refresh_profile"] {
-            assert!(require_tweak_entitlement(&dir,id).is_ok());
-        }
-        for id in ["disable_restart_apps", "enable_long_paths", "disable_filter_keys_shortcut"] {
-            assert!(require_tweak_entitlement(&dir,id).is_ok());
-        }
+    fn expansion_elevation_routing() {
         assert!(requires_admin_for("limit_do_background_download"));
         assert!(requires_admin_for("enable_long_paths"));
         assert!(!requires_admin_for("disable_restart_apps"));
@@ -2565,7 +2498,7 @@ mod tests {
     }
 
     /// The Scan screen's "fix all" must produce at most one elevation request,
-    /// no matter how many admin tweaks were selected â€” the whole point of
+    /// no matter how many admin tweaks were selected — the whole point of
     /// batching. This asserts the grouping without actually elevating.
     #[test]
     fn the_scheduled_cleanup_runs_at_most_once_a_week() {
@@ -2623,33 +2556,6 @@ mod tests {
         );
     }
 
-    /// Exercise the production entitlement policy without invoking a Windows
-    /// adapter. A temporary journal does not isolate actual registry writes.
-    #[test]
-    /// WinCraft is now free for everyone — every tweak is accessible
-    /// without any cached license, even those that were previously Pro-only.
-    #[test]
-    fn every_tweak_is_accessible_without_a_license() {
-        let ids = all_visible_ids();
-        assert!(!ids.is_empty(), "catalogue must not be empty");
-
-        let dir = std::env::temp_dir().join(format!(
-            "wincraft-free-for-all-test-{}-{}",
-            std::process::id(),
-            std::time::SystemTime::now()
-                .duration_since(std::time::UNIX_EPOCH)
-                .unwrap()
-                .as_nanos()
-        ));
-        for id in &ids {
-            assert!(
-                require_tweak_entitlement(&dir, id).is_ok(),
-                "tweak `{}` should be accessible without a license",
-                id
-            );
-        }
-    }
-
     /// Cleanups: all cleanups are now free. The free ones still gate on
     /// their frequency limits and the elevated helper only runs admin ones.
     #[test]
@@ -2658,13 +2564,17 @@ mod tests {
             "wincraft-cleanup-gate-test-{}",
             std::process::id()
         ));
-        assert_eq!(authorize_cleanup(&dir, "temp_cleanup"), Ok(false));
+        assert_eq!(authorize_cleanup("temp_cleanup"), Ok(false));
         // Previously Pro-only cleanup is now accessible without a license.
-        assert!(authorize_cleanup(&dir, "winupdate_cache_cleanup").is_ok());
-        assert!(authorize_cleanup(&dir, "no_such_cleanup").is_err());
-        assert!(authorize_elevated_cleanup(&dir, "temp_cleanup").is_err());
+        assert!(authorize_cleanup("winupdate_cache_cleanup").is_ok());
+        assert!(authorize_cleanup("no_such_cleanup").is_err());
+        // The catalogue's own flags stay as metadata even though nothing gates
+        // on them any more: they are the record of what used to be gated.
+        assert!(!cleanup::target("temp_cleanup").unwrap().requires_pro);
+        assert!(cleanup::target("winupdate_cache_cleanup").unwrap().requires_pro);
+        assert!(authorize_elevated_cleanup("temp_cleanup").is_err());
         // Previously Pro-only elevated cleanup is now accessible.
-        assert!(authorize_elevated_cleanup(&dir, "winupdate_cache_cleanup").is_ok());
+        assert!(authorize_elevated_cleanup("winupdate_cache_cleanup").is_ok());
     }
 
     /// The catalogue's size and its free/Pro split, pinned.
@@ -2673,7 +2583,7 @@ mod tests {
     /// in the pricing card, and they have gone stale before: the site claimed
     /// "50 tweaks" for three releases after the count had moved. A test is the
     /// only place that notices, because nothing else reads all three sources
-    /// at once. If this fails, the catalogue changed â€” update the numbers
+    /// at once. If this fails, the catalogue changed — update the numbers
     /// here, then update every surface listed above to match.
     /// The Windows-protection guard keys on this id; a rename would silently
     /// bring back the "Access is denied" failure on current Windows 11.
@@ -2685,7 +2595,7 @@ mod tests {
 
     /// The source data still carries `requires_pro` flags for historical
     /// bookkeeping, but `tweak_infos()` overrides them all to `false` and
-    /// `require_pro()` always succeeds — WinCraft is free for everyone.
+    /// nothing checks a licence — WinCraft is free for everyone.
     /// This test pins the source-level counts so a refactor notices drift.
     #[test]
     fn the_catalogue_is_eighty_one_tweaks_all_free_in_output() {
@@ -2734,32 +2644,6 @@ mod tests {
             composite_pro.len() + power_tuning::TWEAKS.len() + settings.len(),
             all_visible_ids().len() - registry.len(),
             "a composite tweak was added or removed without updating this test",
-        );
-    }
-
-    #[test]
-    fn a_free_tweak_is_never_blocked_by_the_license_check() {
-        let ids = all_visible_ids();
-        let free_id = ids
-            .iter()
-            .find(|id| !requires_pro_for(id))
-            .expect("test is meaningless without at least one free tweak");
-
-        let dir = std::env::temp_dir().join(format!(
-            "wincraft-license-wiring-test-free-{}-{}",
-            std::process::id(),
-            std::time::SystemTime::now()
-                .duration_since(std::time::UNIX_EPOCH)
-                .unwrap()
-                .as_nanos()
-        ));
-        assert!(require_tweak_entitlement(&dir, free_id).is_ok());
-        for id in ids.iter().filter(|id| !requires_pro_for(id)) {
-            assert!(require_tweak_entitlement(&dir, id).is_ok());
-        }
-        assert!(
-            !dir.exists(),
-            "policy checks must not create a system journal"
         );
     }
 
@@ -2813,8 +2697,8 @@ mod tests {
 
     /// The frontend falls back to the English name/description baked into
     /// these Rust structs whenever a tweak id is missing from `s.tweaks`, so a
-    /// forgotten translation doesn't fail loudly â€” it just leaves one English
-    /// row sitting in an otherwise Italian (or French, â€¦) list. That is
+    /// forgotten translation doesn't fail loudly — it just leaves one English
+    /// row sitting in an otherwise Italian (or French, …) list. That is
     /// exactly the "some parts aren't translated" symptom users report, and
     /// nothing else catches it, so assert here that every id the UI can show
     /// has an entry in every locale.
@@ -2855,22 +2739,14 @@ mod tests {
 }
 
 /* ================================================================== *
- * Pro features added in the Zero-Trace / Secure Defrag / HUD set.
+ * Zero-Trace, Secure Defrag and the HUD.
  *
- * Every command here gates on the signed licence in Rust, not only in
- * the UI. The frontend gate is a courtesy that keeps the paywall
- * pleasant; this one is the actual boundary, because `invoke` is
- * reachable from anything that can talk to the IPC channel.
+ * These commands were once gated on a signed licence in Rust, on the
+ * argument that `invoke` is reachable from anything that can talk to the
+ * IPC channel, so the UI's paywall could not be the boundary. WinCraft is
+ * free for everyone, so there is no licence left to check: what remains
+ * is this set of commands and their own validation.
  * ================================================================== */
-
-/// Shared Pro gate. WinCraft is now free for everyone — this always
-/// succeeds. The function signature is preserved so the rest of the
-/// enforcement plumbing compiles without churn and can be removed in a
-/// later cleanup pass.
-pub(crate) fn require_pro(app_data_dir: &std::path::Path) -> Result<(), String> {
-    let _ = app_data_dir;
-    Ok(())
-}
 
 /// Marker the release checks look for: present in a binary only when it was
 /// built with the test-pro feature.
@@ -2992,7 +2868,6 @@ fn secure_defrag(
     use tauri::Emitter;
 
     let dir = store_for_dir(&app)?;
-    require_pro(&dir)?;
     let drive = diskinfo::validate_drive(&drive)?;
 
     if !elevation::is_elevated() {
@@ -3064,8 +2939,8 @@ pub(crate) fn repair_progress_path(dir: &std::path::Path) -> std::path::PathBuf 
 
 /// Runs a DISM/SFC job, streaming progress to the UI.
 ///
-/// The read-only check is free â€” it is the honest way to find out whether
-/// there is anything to repair â€” while the repairs themselves are Pro.
+/// The read-only check writes nothing, so it is always available; the
+/// repairs themselves are what the elevated entry point runs.
 #[cfg(windows)]
 #[tauri::command(async)]
 fn run_system_repair(
@@ -3076,9 +2951,6 @@ fn run_system_repair(
 
     let dir = store_for_dir(&app)?;
     let parsed = sysrepair::RepairJob::from_id(&job)?;
-    if parsed != sysrepair::RepairJob::Check {
-        require_pro(&dir)?;
-    }
     let _guard = sysrepair::RunGuard::acquire()?;
 
     if !elevation::is_elevated() {
@@ -3143,7 +3015,6 @@ fn run_system_repair(
 #[tauri::command(async)]
 fn purge_standby_memory(app: tauri::AppHandle) -> Result<zerotrace::PurgeResult, String> {
     let dir = store_for_dir(&app)?;
-    require_pro(&dir)?;
 
     if !elevation::is_elevated() {
         elevation::run_elevated_action("--elevated-memorypurge", "standby")?;
@@ -3171,12 +3042,9 @@ fn purge_standby_memory(app: tauri::AppHandle) -> Result<zerotrace::PurgeResult,
 /// already delete, this will not delete either.
 #[tauri::command(async)]
 fn shred_files(
-    app: tauri::AppHandle,
+    _app: tauri::AppHandle,
     paths: Vec<String>,
 ) -> Result<zerotrace::ShredResult, String> {
-    let dir = store_for_dir(&app)?;
-    require_pro(&dir)?;
-
     if paths.is_empty() {
         return Err("no files were selected".to_string());
     }
@@ -3207,7 +3075,7 @@ fn shred_files(
 /// Opens the overlay: a transparent, always-on-top, click-through window.
 ///
 /// Click-through (`set_ignore_cursor_events`) is what makes it usable over a
-/// game at all â€” without it the panel would swallow every click that landed on
+/// game at all — without it the panel would swallow every click that landed on
 /// it, which in a shooter is the difference between a HUD and a liability. It
 /// also means the window needs no close button of its own: it is dismissed
 /// from the same switch that opened it.
@@ -3216,7 +3084,7 @@ fn shred_files(
 /// Windows 11 rounds the corners of every top-level window, including a
 /// borderless transparent one. The panel already draws its own rounded
 /// corners, and the two radii do not agree, so each corner was left with a
-/// sliver between the system's curve and the panel's â€” small hard-edged
+/// sliver between the system's curve and the panel's — small hard-edged
 /// triangles against whatever was behind the overlay. Telling DWM to leave
 /// this window square hands the corners back to the panel, which is the only
 /// thing that should be shaping them.
@@ -3230,8 +3098,8 @@ fn square_off_corners(window: &tauri::WebviewWindow) {
     };
     let preference = DWMWCP_DONOTROUND;
     // SAFETY: a live window handle and a pointer to a local of the size the
-    // attribute expects. Purely cosmetic, so a failure â€” on a Windows build
-    // predating the attribute, for instance â€” is ignored rather than
+    // attribute expects. Purely cosmetic, so a failure — on a Windows build
+    // predating the attribute, for instance — is ignored rather than
     // surfaced: the overlay is entirely usable with rounded corners.
     unsafe {
         DwmSetWindowAttribute(
@@ -3249,8 +3117,6 @@ fn square_off_corners(_window: &tauri::WebviewWindow) {}
 #[tauri::command(async)]
 fn open_hud_overlay(app: tauri::AppHandle) -> Result<(), String> {
     use tauri::{Manager, WebviewUrl, WebviewWindowBuilder};
-
-    require_pro(&store_for_dir(&app)?)?;
 
     // Already open: make it visible again rather than building a second one.
     if let Some(existing) = app.get_webview_window("hud") {
@@ -3283,7 +3149,7 @@ fn open_hud_overlay(app: tauri::AppHandle) -> Result<(), String> {
     // Opened interactive on purpose. Click-through is what this window wants
     // while a game is running, but applying it here left the overlay
     // impossible to place: it could not be grabbed, and a click aimed at it
-    // landed on whatever was behind â€” on the desktop, that dragged the icons
+    // landed on whatever was behind — on the desktop, that dragged the icons
     // underneath. It is now a mode the user turns on once the overlay sits
     // where they want it, from the same card that opened it.
     square_off_corners(&window);
@@ -3329,7 +3195,7 @@ fn remember_position(_app: tauri::AppHandle, _window: &tauri::WebviewWindow) {}
 /// Turns the overlay's click-through mode on or off.
 ///
 /// On: the window stops receiving the mouse entirely, so a click over it
-/// reaches the game underneath â€” what an in-game overlay has to do. Off: it
+/// reaches the game underneath — what an in-game overlay has to do. Off: it
 /// can be grabbed and moved again.
 /// Switches the overlay between its normal and compact sizes.
 ///

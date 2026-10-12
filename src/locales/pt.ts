@@ -190,7 +190,7 @@ export const pt: Strings = {
     gameChange1: "Desativa o Game DVR (captura em segundo plano)",
     gameChange2: "Muda para o plano de energia Alto desempenho",
     gameChange3: "Otimiza a prioridade da CPU para jogos (Win32PrioritySeparation)",
-    previewReq: "Requer privilégios de administrador · Funcionalidade Pro",
+    previewReq: "Requer privilégios de administrador",
     previewCost: "Custo potencial: maior consumo de energia e mais calor enquanto estiver ativa.",
     previewRevert: "Reversível com um clique: cada valor original é guardado antes.",
     applySession: "Iniciar sessão",
@@ -637,8 +637,6 @@ export const pt: Strings = {
     fixAll: "Corrigir tudo",
     fixing: "A corrigir {done}/{total}...",
     fixedToast: "{count} problemas corrigidos.",
-    proIssuesTitle: "Também disponível com o Pro",
-    unlockPro: "Desbloquear o Pro",
     scanAgain: "Verificar novamente",
     verdictRecommended: "Recomendado neste PC",
     verdictNotRecommended: "Não recomendado para este PC",
@@ -1129,11 +1127,9 @@ export const pt: Strings = {
     firstName: "Nome",
     lastName: "Apelido",
     registerDetailsRequired: "Nome, apelido e data de nascimento são obrigatórios.",
-    loginRequiredForCheckout: "Inicie sessão ou registe-se antes de desbloquear o Pro.",
-    verifyEmailForCheckout:
-      "Confirme o seu e-mail antes de desbloquear o Pro: abra a ligação que enviámos ou peça uma nova aqui.",
+    loginRequiredToResend: "Inicie sessão primeiro e depois peça um link novo.",
     checkInboxAfterSignup:
-      "Enviámos uma ligação de confirmação para {email}. Verifique também o spam: depois da confirmação, o pagamento do Pro abre sozinho.",
+      "Enviámos uma ligação de confirmação para {email}. Verifique também o spam: assim que confirmar, a sua conta fica pronta.",
     forgotPasswordLink: "Esqueceu-se da palavra-passe?",
     forgotPasswordButton: "Enviar ligação de reposição",
     forgotPasswordSent:
