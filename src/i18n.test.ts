@@ -67,6 +67,23 @@ describe("language tables", () => {
     expect(detectInitialLang()).toBe("en");
   });
 
+  it("keeps each language's copy in that language's table", () => {
+    // A block-level mix-up shipped once: an index-based rewrite of the pricing
+    // copy put the English text in the Italian table, the Italian in the
+    // English one, the German in the French and the French in the German. Every
+    // gate passed — all six tables still had every key, and every string was
+    // distinct from its neighbours: it was simply in the wrong language.
+    // Nothing can judge arbitrary copy automatically, so these pin the headline
+    // of the section that was crossed. They move with the copy on purpose: a
+    // silent swap is exactly what they exist to make impossible.
+    expect(STRINGS.en.pricing.title).toBe("Free for everyone");
+    expect(STRINGS.it.pricing.title).toBe("Gratis per tutti");
+    expect(STRINGS.fr.pricing.title).toBe("Gratuit pour tous");
+    expect(STRINGS.de.pricing.title).toBe("Kostenlos für alle");
+    expect(STRINGS.es.pricing.title).toBe("Gratis para todos");
+    expect(STRINGS.pt.pricing.title).toBe("Grátis para todos");
+  });
+
   it("keeps every language's table the same shape as English", async () => {
     // The i18n gates compare the tables by key; this checks the same thing from
     // inside the app, where the tables are read one at a time. A language that
