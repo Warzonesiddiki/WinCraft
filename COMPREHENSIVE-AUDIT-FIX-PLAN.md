@@ -38,7 +38,7 @@ Windows runtime, real a11y tooling) are marked _static only_.
 | Code quality  | 88     | **94** | ESLint 0 errors **and 0 warnings** (was 2E/6W), Prettier clean, `tsc` clean, ~1,200 lines of dead pricing/paywall/promo/Pro-gate code and 96 lines of dead dialog CSS deleted, stale comments corrected. The frontend has no `isPro` plumbing left; only the Rust `require_pro()` stub and the catalogue metadata remain. **Two deletions in that sweep were wrong** — `halloween-offer.tsx` and `halloween-decor.ts` were imported by the website, and removing them broke its build until Batch S restored them: the lesson on record is that "unrendered" has to be checked per consuming tree, not per repository. Batch X then took the app's main surface out of the shell: the tweak list is a tested rule (`tweak-list-model.ts`) plus a tested row (`tweak-row.tsx`), and `App.tsx` is ~150 lines smaller for it                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
 | Performance   | 75     | **94** | Entry chunk 1,053.38 kB → **229.49 kB** (335.56 → **72.07 kB gzip**): dead code removed first, then 36 panels split into 16 lazy chunks, then the five non-English locale tables split out of the entry (631.46 → 229.49 kB, Batch Z) — each language is now a 78–83 kB chunk fetched when it is chosen, and English stays in the bundle as the primary language and fallback. CSS still one file at 212.55 kB, and no runtime profile has been taken on Windows                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
 | Testing       | 40     | **99** | Backend **161/161**, `test-scan` **15/15** (was failing), every script suite green, and **290 Vitest tests in 20 files**: the whole scan flow (13 probes, partial reports, apply/verify, pause/resume), the startup and scheduled-task lists, the update-drift and crash-report cards, the cleaners and maintenance cards, the thermal panel itself (a two-second poll on a fake clock, its verdicts and its profile staging), the thermal judge and driver plans, the driver audit and Windows Update catalogue (scan progress, tiers, restart, install subsets, failure versus emptiness), the debloat panel (what can be removed, presets, list save/load, the per-app removal receipt including a lost answer recorded as unknown), game sessions and core steering (including the five-second re-read that drives the live count), Turbo Boost (live dial, measured facts, before/after measurement), the Before & After comparison (both measurements, the verdicts and their wording, the startup-log read, the history list and the report export), the tweak list's own rule and row (Batch X), the change history (Batch Y), the language loading (Batch Z), the cached-audit storage contract, a catalogue/translation drift guard, the Fix-all pipeline, and `lib.ts` — all through a fake Tauri IPC bridge, with jest-axe. ESLint is now verified over the whole tree, not per batch, and every script suite in the release chain also runs on every push, so no gate can now first fail on release day. Coverage is measured over every source file (**40.03% of lines**, 2,766 still uncovered — concentrated in `App.tsx` and a dozen untested panels) and enforced as a ratchet in CI, whose thresholds were raised with the tests rather than left behind them. Not measured: a packaged-app run on Windows |
-| Documentation | 70     | **91** | Added `CONTRIBUTING.md`, `docs/ARCHITECTURE.md`, `docs/API.md`; documented the fork's updater/signing path; fixed README's licence contradiction and stale plan copy; every live doc, shipped link and the publisher PAD feed now names the owned domain, and the PAD feed describes the current release instead of one two versions old. Every public control count is now the catalogue's own total and nothing more, the site's origin is single-source including the `CNAME` that decides where it is served, and the marketing CTAs point at the site the owner confirmed. Still outstanding: the residual Pro/paid prose (the site's pricing cards and FAQ sentence, the listings' "WITH PRO" sections, `docs/pad.xml`)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| Documentation | 70     | **91** | Added `CONTRIBUTING.md`, `docs/ARCHITECTURE.md`, `docs/API.md`; documented the fork's updater/signing path; fixed README's licence contradiction and stale plan copy; every live doc, shipped link and the publisher PAD feed now names the owned domain, and the PAD feed describes the current release instead of one two versions old. Every public control count is now the catalogue's own total and nothing more, the site's origin is single-source including the `CNAME` that decides where it is served, and the marketing CTAs point at the site the owner confirmed. The residual Pro/paid prose is gone (Batch AA: the site's pricing cards and the subscription FAQ, the guide and support claims, the PAD feed and the privacy copy that described a paid plan; the listings carry no paid claim). Still outstanding: the live Halloween campaign's WinCraft offers, which are the owner's call                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
 | Accessibility | 80     | **85** | The unreachable Pro paywall `<dialog>` (dialog semantics, focus handling) is gone. An automated axe run now covers twelve rendered surfaces (the scan, cleaner, maintenance, startup, drift, crash, thermal, driver, debloat, game-session, Before & After and Turbo Boost panels), and it has earned its place twice: the Turbo Boost comparison table opened with an empty `<th>`, which announces an unnamed column — now a `<td>`, with both column headers scoped — and the Before & After panel jumped from `<h2>` straight to `<h4>` in two places, which reads as a broken outline to a screen reader, now `<h3>` with the stylesheet following. Keyboard and screen-reader behaviour on real Windows is still unverified                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
 | i18n          | 90     | **94** | 1,580 keys × 6 locales consistent; the free pricing page is now translated in all six (it used to be English-only); paywall, Pro-upsell and Pro-naming strings removed; dead Halloween/promo components deleted. 175 identical-to-English keys remain on the reviewed list                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
 | DX            | 85     | **96** | CI runs ESLint + Prettier + `npm test`; lint is clean; contributor and architecture docs exist; `npm test` at the root is the one entry point for frontend tests; backend/desktop commands documented; the website now builds and runs its SEO gate in pull requests too, and its deploy workflow watches the app modules it imports from; CI is now a superset of everything `npm run check` enforces except `cargo test`, which needs the Windows toolchain. Rust gates (`fmt`, `clippy`, `audit`) are still absent because the toolchain is unavailable here                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
@@ -938,11 +938,12 @@ total, and the home page stat must still be the release's controls. Verified red
 on both failure modes — restoring the split into a listing's short description
 and changing the total in the README — then green again.
 
-What this does **not** settle, and should not: the website still sells plans
-(pricing cards at €59.99 / €7.99, the "WITH PRO" sections of the listings, the
-FAQ's subscription sentence), `docs/pad.xml` still says "advanced Pro tools are
-paid", and the Uninstaller page prices a different product. Those are commercial
-claims, not counts, so they need a product decision rather than an edit here.
+**Batch AA later settled all of this**, on the owner's answer: the site's plans,
+the FAQ's subscription sentence, the guide and support claims and `docs/pad.xml`
+now state the free product, and the Uninstaller page keeps its own price without
+borrowing WinCraft's plans. What is left is the live Halloween campaign, whose
+WinCraft offers are for plans the app no longer sells — a commercial action with
+Stripe objects behind it, not an edit.
 
 Validation: `npm run check:public-counts`, `check:i18n` (1,579 keys × 6), the site
 build and `check:seo` (17/17 routes, robots, 404 and now the CNAME), plus the full
@@ -1191,6 +1192,66 @@ site build with its SEO gate. Not measured: memory at runtime on Windows, and th
 cost of the first fetch for a reader whose language is not English (a local file
 in the packaged app, so a disk read rather than a network one).
 
+### Batch AA — the site stops selling a product that is free (done)
+
+The owner's answer to the last open commercial question was "remove the paid
+plans". The site had them in five places, and each described a tier the app no
+longer enforces.
+
+**Removed from `site/`:**
+
+- the three pricing cards (`FREE €0`, `PRO — ANNUAL €59.99 / year · monthly option
+€7.99` with `SAVE 37% VS MONTHLY`, `LIFETIME €99` with `MOST CHOSEN`) and the
+  campaign machinery that priced them — struck prices, countdown, coupon terms.
+  The section is now one card: `€0`, everything included, eight lines of what is
+  in it, and one sentence saying plainly that WinCraft used to have paid plans and
+  that a tip funds the next release without unlocking anything;
+- the FAQ answer that sold the subscription (monthly, annual, lifetime, the
+  Uninstaller bonus, renewal terms) — now "What does WinCraft cost?" → "Nothing";
+- the support entry "Pro features are still locked after paying", which cannot
+  happen any more, replaced by what a former Pro or Lifetime owner actually needs
+  (nothing to activate; the purchase record stays with the account);
+- the support form's own `Pro activation` category label (the value the backend
+  receives is unchanged);
+- the Uninstaller page's profitable-looking coupling: "Already on a WinCraft plan?
+  €4.99 per year on the same account", the 12-month bonus, and the instruction to
+  open "Plans & pricing" in the app and "choose Go Pro" — a screen that no longer
+  sells anything. Uninstaller Pro keeps its own €9.99 and its feature list, with
+  one sentence saying it is a separate product with its own price.
+
+**Fixed while grepping the built output rather than the sources** — four claims no
+one had looked at because they were not in the pricing files:
+
+- `practical-guides.ts` said the source is published "under a proprietary licence".
+  It is MIT;
+- `PRIVACY.md` and `backend/legal/PRIVACY.md` (served at `/privacy`) said each app
+  "has its own paid plan; a subscription to one app does not unlock another". Now:
+  each app has its own entitlement, and WinCraft itself has no plan to buy;
+- `site/index.html`'s `Offer` node said "Free plan — no account required", a plan
+  among plans. Now: "Free — every control included, no account required";
+- `docs/pad.xml` (the publisher PAD feed) said "advanced Pro tools are paid", "free
+  and paid access", and `Paid access and trial eligibility follow the official plan
+and checkout`. All three now state the free product, inside the feed's own
+  character limits (250: 165, 2000: 576).
+
+**Verification, by grep on the artefact rather than the source.** The built site
+contains no `€59.99`, `€7.99`, `€99`, `€4.99`, `PRO — ANNUAL`, `LIFETIME`,
+`MOST CHOSEN`, `SAVE 37`, `Pro adds` or `proprietary licence`. The only euro
+amounts left are `€0` — the new section and its `Offer` node — and `€9.99`, the
+Uninstaller product. `check:seo` green over 17 routes, `check:public-counts` green
+(81 controls, no split), backend **161/161** with the privacy copy edited, app tsc,
+eslint, Prettier, 290 tests and the build unchanged.
+
+**Not applied, and why: the Halloween campaign is still live.** `backend/src/promo.ts`
+runs a real −50% promotion (owner decisions of 10 October 2026: lawful reference
+prices for the EU Omnibus rule, Stripe coupons already issued, a test that
+recomputes every reference) until 23:59:59 on 6 November, and three of its four
+offers are the WinCraft plans. The site's strip is fed by that endpoint, so until
+the campaign stops it can still show a WinCraft discount above a price section
+that no longer lists a WinCraft price. Ending or narrowing it is a commercial
+action with Stripe objects behind it, not an edit to make quietly — **it is the one
+open question this batch leaves.**
+
 ## Final report
 
 ### Changes applied
@@ -1430,7 +1491,10 @@ Ranked by value per unit of risk. None of these are started.
     what is left there is the part worth testing next: the section routing, the
     mount reads and the toasts. It needs the workspace's own reads mocked and the
     locale table accepted, which makes it the heaviest single test in the tree.
-12. **Decide the site's remaining commercial copy** (Batch W, item 6): the pricing
-    cards, the FAQ's subscription sentence, the listings' "WITH PRO" sections and
-    `docs/pad.xml`'s Pro prose all describe a paid tier the app does not enforce.
-    Either the plans are real and the copy stays, or the copy follows the app.
+12. **Decide the live Halloween campaign** (Batch AA): `backend/src/promo.ts` runs
+    a −50% promotion until 6 November whose three WinCraft offers are for plans the
+    app no longer sells, and the site's strip is fed by that endpoint. Either end
+    the WinCraft part of it, or let it run knowing the strip can show a discount
+    above a price section that lists no price. Everything else the site published
+    about a paid tier is gone, and the app's own Plans screen has said "free for
+    everyone" since Batch C.

@@ -110,15 +110,10 @@ export function UninstallerPage() {
             </li>
           ))}
         </ul>
-        <p className="mb-4 leading-relaxed text-[var(--fg-dim)]">
-          Already on a WinCraft plan? Uninstaller Pro is <strong>€4.99 per year</strong> on the
-          same account. WinCraft Lifetime includes 12 months of Uninstaller Pro from your first
-          sign-in, existing Lifetime owners included; that bonus does not renew automatically.
-        </p>
         <p className="leading-relaxed text-[var(--fg-dim)]">
-          Open Plans &amp; pricing in the app&apos;s top bar: sign in or create your free suite
-          account there, then choose Go Pro. One account covers both applications. Taxes and the
-          final renewal terms are shown at checkout.
+          Uninstaller Pro is a separate product with its own price and its own entitlement,
+          bought and renewed on its own. WinCraft itself is free and includes no plan to upgrade
+          to. Taxes and the final renewal terms are shown at checkout.
         </p>
       </section>
 
@@ -152,8 +147,7 @@ export function UninstallerPage() {
           Check the recorded outcome before relying on it. Recovery applies only
           to supported operations and is not a guarantee that a removed application, its
           settings or its data can be restored. This is a separate application with its own
-          Pro entitlement: a WinCraft subscription qualifies for the reduced price, while
-          Lifetime includes the 12-month bonus described above.
+          Pro entitlement and its own price.
         </p>
       </section>
     </main>

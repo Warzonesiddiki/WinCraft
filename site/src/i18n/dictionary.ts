@@ -94,22 +94,8 @@ export interface Dictionary {
       readonly features: readonly string[];
       readonly cta: string;
     };
-    readonly pro: {
-      readonly plan: string;
-      readonly price: string;
-      readonly per: string;
-      readonly save: string;
-      readonly features: readonly string[];
-      readonly cta: string;
-    };
-    readonly lifetime: {
-      readonly plan: string;
-      readonly price: string;
-      readonly per: string;
-      readonly badge: string;
-      readonly features: readonly string[];
-      readonly cta: string;
-    };
+    /** What the price used to be, stated plainly rather than left to be asked. */
+    readonly note: string;
   };
   readonly faq: {
     readonly tag: string;
@@ -450,7 +436,7 @@ export const engDictionary: Dictionary = {
       {
         "mono": "COMPARE",
         "title": "Run the same workload",
-        "body": "Repeat the same scene or task under comparable conditions. Look at consistency and frame-time spikes alongside average FPS. Pro adds Game Sessions for repeatable session setup."
+        "body": "Repeat the same scene or task under comparable conditions. Look at consistency and frame-time spikes alongside average FPS. Game Sessions, included with the app, set a scene up the same way twice."
       },
       {
         "mono": "RESTORE",
@@ -460,52 +446,25 @@ export const engDictionary: Dictionary = {
     ]
   },
   "pricing": {
-    "tag": "05 / PLANS",
-    "title": "Start with control. Upgrade for convenience.",
+    "tag": "05 / PRICE",
+    "title": "Free for everyone.",
     "free": {
-      "plan": "FREE",
+      "plan": "EVERYTHING INCLUDED",
       "price": "€0",
-      "per": "/ no subscription",
+      "per": "/ forever · no subscription, no account",
       "features": [
         "All 81 Windows controls",
         "Scan and review your settings",
         "Startup tools and Windows integrity checks",
-        "Restore supported changes",
-        "No account or card required"
-      ],
-      "cta": "Download Free"
-    },
-    "pro": {
-      "plan": "PRO — ANNUAL",
-      "price": "€59.99",
-      "per": "/ year · monthly option €7.99",
-      "save": "SAVE 37% VS MONTHLY",
-      "features": [
-        "All 81 controls in this release",
         "Turbo Gaming and Game Sessions",
         "Guided Windows repair with DISM and SFC",
-        "Selective cookie cleanup",
-        "Supported app cache cleanup",
         "Advanced file and drive tools",
-        "Account-based Pro activation"
+        "Restore supported changes",
+        "Every future update included"
       ],
-      "cta": "Download & Explore Pro"
+      "cta": "Download for Windows"
     },
-    "lifetime": {
-      "plan": "LIFETIME",
-      "price": "€99",
-      "per": "/ once · no renewal",
-      "badge": "MOST CHOSEN",
-      "features": [
-        "Everything in Pro, without a subscription",
-        "New features in early preview",
-        "Exclusive access to selected future tweaks",
-        "Priority support",
-        "12 months of Uninstaller Pro from your first sign-in",
-        "Compare saved profiles and export tuning reports"
-      ],
-      "cta": "Download & Get Lifetime"
-    }
+    "note": "WinCraft used to have paid plans. Every feature they included is now free for everyone: no licence key, nothing to activate and nothing that expires. Optional tips fund the next release and unlock nothing."
   },
   "faq": {
     "tag": "07 / BEFORE YOU START",
@@ -528,8 +487,8 @@ export const engDictionary: Dictionary = {
         "a": "WinCraft tunes Windows itself and reads performance data through standard Windows interfaces. It never changes a game's files or gameplay, and a game that manages its own performance is left exactly as it is while it runs."
       },
       {
-        "q": "What is free, and how does Pro work?",
-        "a": "All 81 controls, scan, supported restore tools, hardware monitoring and selected maintenance tools need no account. Pro adds advanced features and Game Sessions. Current subscriptions are €7.99 per month or €59.99 per year; Lifetime is €99 once. Everything in Pro, plus: exclusive access to selected future tweaks, priority support, saved-profile comparison and portable tuning reports. Lifetime also includes Uninstaller Pro for 12 months from your first sign-in to Uninstaller with the same account, including existing Lifetime owners. This bonus does not renew automatically. Upcoming exclusive tweaks are not included in the current catalog. Review the final price and renewal terms at checkout. Existing lifetime purchases retain the access promised when purchased."
+        "q": "What does WinCraft cost?",
+        "a": "Nothing. Every control and every tool is included: no subscription, no licence key and no account to create. The paid plans that used to exist are gone, and everything they included is free for everyone. You can support the project with a one-off tip, and nothing in the app depends on it."
       },
       {
         "q": "What leaves my PC?",
@@ -578,8 +537,8 @@ export const engDictionary: Dictionary = {
         "a": "Check that the download came from an official channel and compare the release notes and publisher details. Version 1.9.0 introduces signed Windows installers from Aurelio Avila. Older versions, including v1.8.0, may be unsigned. A valid signature or winget installation does not guarantee that SmartScreen will show no warning."
       },
       {
-        "q": "Pro features are still locked after paying",
-        "a": "Return to WinCraft while connected to the internet so it can refresh your account and license. If access is still locked, contact support with the email used for the purchase and the payment time. Do not post your license file or payment details publicly."
+        "q": "I paid for Pro or Lifetime in the past",
+        "a": "Nothing in the app is gated any more, so there is nothing to activate: every feature those plans included is free for everyone, and no licence is required. Purchase records stay with the account that holds them; support can confirm one if you need a receipt."
       },
       {
         "q": "The app won't start at all",
@@ -606,7 +565,7 @@ export const engDictionary: Dictionary = {
       },
       {
         "value": "activation",
-        "label": "Pro activation"
+        "label": "Account or licence"
       },
       {
         "value": "tweak-issue",

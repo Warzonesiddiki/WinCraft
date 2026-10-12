@@ -29,9 +29,10 @@ such as a Pro subscription. When you register, our backend stores:
 - A session-revocation version used to invalidate existing sign-ins
 
 The same account signs you in to WinCraft, WinCraft Uninstaller and Tweaky
-Driver. Each app keeps its own sign-in sessions and its own paid plan; a
-subscription to one app does not unlock another. Changing or resetting your
-password applies to all three and signs you out of each.
+Driver. Each app keeps its own sign-in sessions and its own entitlement; a
+subscription or licence in one app does not unlock another, and WinCraft itself
+has no plan to buy. Changing or resetting your password applies to all three and
+signs you out of each.
 
 ## Information you choose to submit
 
