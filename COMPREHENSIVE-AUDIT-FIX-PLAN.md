@@ -1690,6 +1690,34 @@ What is left is not code: the packaged-build smoke test that opens the app in
 another language is still next-step 5's, because nothing here can load a chunk
 through the Tauri asset protocol.
 
+### Batch AL — the CI edits, held back by a permission (done)
+
+The branch could not be pushed when the pull request was asked for: GitHub refused
+every attempt with
+
+    refusing to allow a GitHub App to create or update workflow
+    `.github/workflows/build.yml` without `workflows` permission
+
+naming the three workflow files this session edited (Batch T added the site build
+and its SEO gate, ESLint, Prettier, the model suites, the coverage ratchet and the
+isolated native-policy step to `checks.yml`; Batch AE removed the two
+`check-no-test-pro` steps from `checks.yml` and `build.yml`; `deploy-site.yml`
+gained the `src/**` trigger the site's shared imports need). The connection is a
+GitHub App installation without the `workflows` permission.
+
+The rule is evaluated on the pushed diff, not on the commits: a branch whose tip
+carries `master`'s workflow files pushes successfully even though earlier commits
+in it edit them — which is how the branch was finally created. So the CI edits
+were reset out of the tip and preserved unchanged in
+`docs/ci-workflow-changes.patch`, where the header states why it is a file, what
+each hunk does, and the two commands that apply it. `git apply --check` confirms
+it applies to the tree as pushed.
+
+One consequence is on the record rather than hidden: `master`'s CI still calls
+`scripts/check-no-test-pro.mjs`, which Batch AF retired, so those two steps fail
+if a workflow run reaches them. Applying the patch removes them. No workflow in
+this repository has ever executed.
+
 ## Final report
 
 ### Changes applied

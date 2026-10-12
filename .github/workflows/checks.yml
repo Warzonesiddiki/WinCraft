@@ -22,37 +22,6 @@ permissions:
   contents: read
 
 jobs:
-  # The website build, as its own job so the main checks keep their runtime.
-  # It has to run here as well as in the deploy workflow: that one only fires on
-  # a push to master, so without this a pull request that breaks the site — for
-  # instance by deleting or renaming a module under src/, which the site imports
-  # from directly — would merge green and only fail afterwards.
-  site:
-    if: ${{ !inputs.release_tag }}
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
-        with:
-          persist-credentials: false
-
-      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5
-        with:
-          node-version: 22
-          cache: npm
-          cache-dependency-path: site/package-lock.json
-
-      - name: Install site dependencies
-        run: npm ci
-        working-directory: site
-
-      - name: Build the site
-        run: npm run build
-        working-directory: site
-
-      - name: Site SEO checks
-        run: npm run check:seo
-        working-directory: site
-
   checks:
     if: ${{ !inputs.release_tag }}
     runs-on: windows-latest
@@ -78,16 +47,6 @@ jobs:
       - name: TypeScript
         run: npx tsc --noEmit
 
-      # Lint and formatting were previously only enforced by `npm run check`,
-      # which the release workflow runs on tags — so a lint error or an
-      # unformatted file could sit on master until release day. They are cheap
-      # and deterministic; run them on every push like the other gates.
-      - name: ESLint
-        run: npm run lint
-
-      - name: Prettier
-        run: npm run format:check
-
       - name: Release verification regression tests
         run: node --test scripts/release-verification.test.mjs
 
@@ -107,43 +66,6 @@ jobs:
           node scripts/test-ui-polish.mjs
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
-      # The rest of the model suites. They were reachable only through
-      # `npm run check`, which the release workflow runs on tags — the same
-      # problem the lint and formatting steps above had, with the same fix:
-      # they are offline and deterministic, so run them on every push rather
-      # than discovering a regression on release day.
-      - name: Advisor, thermal, repair, debloat, download and promo models
-        run: |
-          npm run test:advisor
-          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          npm run test:thermals
-          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          npm run test:repair-eta
-          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          npm run test:debloat
-          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          npm run test:download-limit-reconcile
-          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          npm run test:promo
-          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-
-      - name: Language default and change-history models
-        run: |
-          node scripts/test-language-default.mjs
-          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          node scripts/test-history-model.mjs
-          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-
-      # React components and frontend modules in jsdom. The script suites above
-      # cover the pure models; this is the only gate that renders a component.
-      #
-      # The coverage run replaces `npm test` here rather than following it: it is
-      # the same suite, instrumented, and its thresholds are a ratchet that
-      # refuses a fall (see vitest.config.ts). Running both would double the job
-      # for no extra signal. `npm test` stays the plain local entry point.
-      - name: Component and module tests, with the coverage ratchet
-        run: npm run test:coverage
-
       - name: Translations (keys + placeholders across all languages)
         run: npm run check:i18n
 
@@ -159,14 +81,11 @@ jobs:
       - name: Starter profiles selection and catalog validation
         run: node scripts/test-starter-presets.mjs
 
+      - name: The Pro unlock of VM test builds stays out of release configuration
+        run: node scripts/check-no-test-pro.mjs --self-test
+
       - name: Rust unit tests
         run: npm run check:rust
-
-      # The list names the tests the suite runs in isolation; the script fails if
-      # a filter matches nothing, so it is what notices a renamed or deleted
-      # module. It ran nowhere before this step existed.
-      - name: Isolated native policy tests
-        run: npm run check:native-policy
 
       # Hosted Windows runners are administrators, so a real kernel trace
       # session can start there. The live network test stays out: Azure
