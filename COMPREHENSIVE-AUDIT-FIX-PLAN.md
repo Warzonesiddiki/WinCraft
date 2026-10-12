@@ -1674,6 +1674,22 @@ two-tier claim reappears without any number to compare against. It scans for
 `Free/Pro` (and its reverse) now, and the new pattern was negative-tested: the
 gate fails on a README containing it and passes once it is gone.
 
+### Batch AK — the locale split, re-measured (done)
+
+Two entries in this document still described loading the locale tables on demand
+as proposed work — _Changes not applied_ 5 quoted a 631 kB entry chunk with 486 kB
+of `src/i18n.ts`, and next-step 10 had it "waiting on the decision" — while the
+scoreboard's Performance row had recorded the split since Batch Z. The build was
+measured again to settle it: the entry chunk is `main-*.js` at 228.13 kB, English
+is the only table in it, and the other five arrive as one chunk each (`it` 78.0,
+`es` 79.9, `pt` 80.2, `de` 80.3, `fr` 82.8 kB) through the dynamic imports in
+`i18n.ts`, resolved before first paint so a saved language never flashes English.
+Both entries now say what the build does.
+
+What is left is not code: the packaged-build smoke test that opens the app in
+another language is still next-step 5's, because nothing here can load a chunk
+through the Tauri asset protocol.
+
 ## Final report
 
 ### Changes applied
@@ -1749,11 +1765,13 @@ gate fails on a README containing it and passes once it is gone.
    `account.tsx`, `health.tsx`, `diagnostics.tsx` and the remaining panels. The drawing
    half of `before-after.tsx` (its canvas report) cannot be covered in jsdom: that
    needs a packaged Windows run.
-5. **Load locales on demand.** The panel split is done (Batch I) but the entry
-   chunk is still 631 kB, and `src/i18n.ts` measured alone accounts for 486 kB of
-   it (77%). English could load eagerly and the other five tables on demand. That
-   touches every direct `STRINGS[...]` reader and both i18n gates, so it is
-   proposed rather than started.
+5. **Load locales on demand — applied in Batch Z.** This entry said the entry chunk
+   was still 631 kB with `src/i18n.ts` at 486 kB of it; that was true when it was
+   written and stopped being true when Batch Z split the five non-English tables
+   out. Measured again in Batch AK: the entry is 228.13 kB, English is the only
+   table in it, and the other five are one chunk each — it 78.0, es 79.9, pt 80.2,
+   de 80.3, fr 82.8 kB — fetched through the dynamic imports at `i18n.ts:1125-1129`
+   and resolved before first paint, so a saved language never flashes English.
 6. **Rust-side gates** (`cargo fmt --check`, `cargo clippy -D warnings`,
    `cargo audit`, `cargo test`), and the Rust `unwrap`/`expect` review. No
    `cargo`/`rustc` in this environment — see _Remaining risks_. Note: the earlier
@@ -1968,10 +1986,12 @@ Ranked by value per unit of risk. None of these are started.
    launch are the likely places; `Regex::new` on a literal is not.
 9. **Accessibility pass** with a real tool (axe/NVDA) on the six main panels,
    then wire the result into CI if it can run headless.
-10. **The locale tables on demand — measured, waiting on the decision.** See
-    _Measurement_ above: −402,770 B from the entry chunk (−63.8%), one ~80 kB
-    chunk per language fetched on first use, and a touch list of seven app files
-    plus four scripts. Approved in principle; the numbers came first on request.
+10. **Settled: the locale tables load on demand** (Batch Z), re-measured in
+    Batch AK: the entry chunk is 228.13 kB, each of the five non-English tables is
+    a 78.0–82.8 kB chunk fetched on first use, and English stays in the bundle as
+    the primary language and the fallback. Nothing is left to decide here; what
+    remains is the packaged-build smoke test (next step 5) opening the app in a
+    language other than English.
 11. **Settled: the licence machinery is retired** (Batch AE/AF), on the owner's
     instruction. `license.rs` and its three commands, the debug-only `test-pro`
     feature with `check-no-test-pro` and its VM runbook, the `isPro` ring on the
