@@ -1715,8 +1715,19 @@ it applies to the tree as pushed.
 
 One consequence is on the record rather than hidden: `master`'s CI still calls
 `scripts/check-no-test-pro.mjs`, which Batch AF retired, so those two steps fail
-if a workflow run reaches them. Applying the patch removes them. No workflow in
-this repository has ever executed.
+if a workflow run reaches them. Applying the patch removes them.
+
+**The branch is pushed and open as [PR #2](https://github.com/Warzonesiddiki/WinCraft/pull/2)**
+(`arena/c156110b-pc-tweaker-app` → `master`), and the first workflow run this
+repository has ever had confirmed the prediction and nothing else: the `verify`
+job passed in twelve seconds, and the `checks` job failed at the step named "The
+Pro unlock of VM test builds stays out of release configuration" — the retired
+script — after every step before it passed (npm ci, the i18n and public-count
+gates, design tokens, lint, Prettier). Because that step fails, "Rust unit tests"
+and everything after it were skipped, which is the practical reason to apply
+`docs/ci-workflow-changes.patch` first: the patch deletes that step and adds the
+isolated native-policy one, and the shell that follows it is what compiles the
+Rust sweeps.
 
 ## Final report
 
