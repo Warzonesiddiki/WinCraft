@@ -188,12 +188,7 @@ export function ProfilesPanel({
       // without one.
       const after = await invoke<TweakInfo[]>("list_tweaks");
       await onChanged();
-      failures.forEach((f) =>
-        pushToast(
-          "error",
-          f.includes("PRO_REQUIRED: ") ? s.toasts.licenseNeedsRefresh : friendlyError(f, s),
-        ),
-      );
+      failures.forEach((f) => pushToast("error", friendlyError(f, s)));
       // Only what this apply turned on: tweaks that were already on are not
       // counted again.
       const done = ids.filter(

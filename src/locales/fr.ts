@@ -939,8 +939,6 @@ export const fr: Strings = {
     rolledBack: "« {name} » restauré à sa valeur d'origine.",
     elevationDeclined:
       "L'autorisation administrateur n'a pas été accordée, donc rien n'a été modifié.",
-    licenseNeedsRefresh:
-      "Impossible de vérifier votre abonnement Pro après une si longue période hors ligne. Reconnectez-vous à internet et réessayez.",
     accountRefreshFailed:
       "Impossible de vérifier l'état de votre compte. Les informations affichées ici peuvent être obsolètes — vérifiez votre connexion ou réessayez plus tard.",
   },

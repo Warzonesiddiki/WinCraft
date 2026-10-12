@@ -938,8 +938,6 @@ export const de: Strings = {
   toasts: {
     applied: '„{name}" angewendet.',
     rolledBack: '„{name}" auf den ursprünglichen Wert zurückgesetzt.',
-    licenseNeedsRefresh:
-      "Wir können Ihr Pro-Abonnement nach so langer Offline-Zeit nicht bestätigen. Stellen Sie eine Internetverbindung her und versuchen Sie es erneut.",
     elevationDeclined:
       "Die Administratorberechtigung wurde nicht erteilt, daher wurde nichts geändert.",
     accountRefreshFailed:

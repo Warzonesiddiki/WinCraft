@@ -933,8 +933,6 @@ export const it: Strings = {
   toasts: {
     applied: '"{name}" applicato.',
     rolledBack: '"{name}" ripristinato al valore originale.',
-    licenseNeedsRefresh:
-      "Non riusciamo a verificare il tuo abbonamento Pro offline da troppo tempo. Riconnettiti a internet e riprova.",
     elevationDeclined:
       "L'autorizzazione di amministratore non è stata concessa, quindi non è stato modificato nulla.",
     accountRefreshFailed:

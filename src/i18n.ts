@@ -836,7 +836,6 @@ export interface Strings {
     applied: string; // uses {name}
     rolledBack: string; // uses {name}
     elevationDeclined: string;
-    licenseNeedsRefresh: string;
     accountRefreshFailed: string;
   };
   titlebar: {

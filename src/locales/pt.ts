@@ -935,8 +935,6 @@ export const pt: Strings = {
   toasts: {
     applied: '"{name}" aplicado.',
     rolledBack: '"{name}" restaurado ao valor original.',
-    licenseNeedsRefresh:
-      "Não foi possível verificar a sua subscrição Pro depois de tanto tempo offline. Volte a ligar-se à Internet e tente novamente.",
     elevationDeclined:
       "A permissão de administrador não foi concedida, por isso nada foi alterado.",
     accountRefreshFailed:

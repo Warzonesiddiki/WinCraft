@@ -569,19 +569,11 @@ function App() {
       }
       await refresh();
     } catch (e) {
-      // The Rust side re-verifies Pro independently of this screen's own
-      // gate above — see license.rs. In normal use that gate already stops
-      // a non-Pro user from getting here, so the only realistic way to hit
-      // this is a genuine subscriber whose cached proof of that went stale
-      // from being offline past the grace period. Rust's raw error message
-      // ("requires an active subscription") would be misleading for them —
-      // they have one — so this is worded around reconnecting instead.
-      const message = String(e);
-      if (message.startsWith("PRO_REQUIRED: ")) {
-        pushToast("error", s.toasts.licenseNeedsRefresh);
-      } else {
-        pushToast("error", friendlyError(message, s));
-      }
+      // Nothing here gates a tweak any more, so a refusal is the machine's
+      // own: an administrator prompt declined, a key this PC locks down, a
+      // value Windows writes back. `friendlyError` maps the markers Rust
+      // sends onto the sentence that explains the fix.
+      pushToast("error", friendlyError(e, s));
     } finally {
       setBusyId(null);
     }

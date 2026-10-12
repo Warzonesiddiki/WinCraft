@@ -916,8 +916,6 @@ export const en: Strings = {
   toasts: {
     applied: '"{name}" applied.',
     rolledBack: '"{name}" restored to its original value.',
-    licenseNeedsRefresh:
-      "We can't verify your Pro subscription after this long offline. Reconnect to the internet and try again.",
     elevationDeclined: "Administrator permission was not given, so nothing was changed.",
     accountRefreshFailed:
       "We couldn't verify your account status. What's shown here may be out of date — check your connection or try again later.",

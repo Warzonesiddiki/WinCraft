@@ -932,8 +932,6 @@ export const es: Strings = {
   toasts: {
     applied: '"{name}" aplicado.',
     rolledBack: '"{name}" restaurado a su valor original.',
-    licenseNeedsRefresh:
-      "No podemos verificar tu suscripción Pro tras tanto tiempo sin conexión. Reconectate a internet e inténtalo de nuevo.",
     elevationDeclined: "No se concedió el permiso de administrador, así que no se cambió nada.",
     accountRefreshFailed:
       "No pudimos verificar el estado de tu cuenta. Lo que se muestra aquí puede estar desactualizado: revisa tu conexión o inténtalo más tarde.",
