@@ -34,11 +34,11 @@ Windows runtime, real a11y tooling) are marked _static only_.
 
 | Category      | Before | Now    | Evidence for the movement                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
 | ------------- | ------ | ------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Security      | 95     | **96** | Static review still clean (no secrets, no `eval`, no SQL interpolation, webhook signature verified, helmet + allowlist + rate limits, Tauri CSP and scoped capabilities). `db.ts` can now verify the database certificate via `DATABASE_CA` instead of always accepting any certificate; dead offer/fetch code removed from the frontend                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
-| Code quality  | 88     | **95** | ESLint 0 errors **and 0 warnings** (was 2E/6W), Prettier clean, `tsc` clean, ~1,200 lines of dead pricing/paywall/promo/Pro-gate code and 96 lines of dead dialog CSS deleted, stale comments corrected. The frontend has no `isPro` plumbing left and, since Batch AB's frontend half, no licence-refresh toast either: the last two places that handled `PRO_REQUIRED: ` are gone with the string that explained it. Batch AB then removed the Rust half too — the stub, `PRO_REQUIRED_PREFIX`, the two helpers behind them and all 38 call sites, with every binding their removal orphaned — so what is left of the Free/Pro split is the catalogue metadata and the assertion that pins its counts. **Two deletions in that sweep were wrong** — `halloween-offer.tsx` and `halloween-decor.ts` were imported by the website, and removing them broke its build until Batch S restored them: the lesson on record is that "unrendered" has to be checked per consuming tree, not per repository. Batch X then took the app's main surface out of the shell: the tweak list is a tested rule (`tweak-list-model.ts`) plus a tested row (`tweak-row.tsx`), and `App.tsx` is ~150 lines smaller for it                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| Security      | 95     | **96** | Static review still clean (no secrets, no `eval`, no SQL interpolation, webhook signature verified, helmet + allowlist + rate limits, Tauri CSP and scoped capabilities). `db.ts` can now verify the database certificate via `DATABASE_CA` instead of always accepting any certificate; dead offer/fetch code removed from the frontend                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               Batch AE then deleted the licence store itself — the Ed25519 signature check, the embedded public key, the payload parser and the file it read — so that class of code can no longer be got wrong |
+| Code quality  | 88     | **95** | ESLint 0 errors **and 0 warnings** (was 2E/6W), Prettier clean, `tsc` clean, ~1,200 lines of dead pricing/paywall/promo/Pro-gate code and 96 lines of dead dialog CSS deleted, stale comments corrected. The frontend has no `isPro` plumbing left and, since Batch AB's frontend half, no licence-refresh toast either: the last two places that handled `PRO_REQUIRED: ` are gone with the string that explained it. Batch AB then removed the Rust half too — the stub, `PRO_REQUIRED_PREFIX`, the two helpers behind them and all 38 call sites, with every binding their removal orphaned — so what is left of the Free/Pro split is the catalogue metadata and the assertion that pins its counts. **Two deletions in that sweep were wrong** — `halloween-offer.tsx` and `halloween-decor.ts` were imported by the website, and removing them broke its build until Batch S restored them: the lesson on record is that "unrendered" has to be checked per consuming tree, not per repository. Batch X then took the app's main surface out of the shell: the tweak list is a tested rule (`tweak-list-model.ts`) plus a tested row (`tweak-row.tsx`), and `App.tsx` is ~150 lines smaller for it                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       Batch AE/AF removed the licence machinery and the test-only plumbing around it — 660 lines of Rust, two CLI entry points, a Cargo feature and its release guard — with two scripted sweeps, one for the call sites and one for the resources they orphaned, clearing the tree for `cargo check` |
 | Performance   | 75     | **94** | Entry chunk 1,053.38 kB → **229.49 kB** (335.56 → **72.07 kB gzip**): dead code removed first, then 36 panels split into 16 lazy chunks, then the five non-English locale tables split out of the entry (631.46 → 229.49 kB, Batch Z) — each language is now a 78–83 kB chunk fetched when it is chosen, and English stays in the bundle as the primary language and fallback. CSS still one file at 212.55 kB, and no runtime profile has been taken on Windows                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
-| Testing       | 40     | **99** | Backend **161/161**, `test-scan` **15/15** (was failing), every script suite green, and **309 Vitest tests in 21 files**: the whole scan flow (13 probes, partial reports, apply/verify, pause/resume), the startup and scheduled-task lists, the update-drift and crash-report cards, the cleaners and maintenance cards, the thermal panel itself (a two-second poll on a fake clock, its verdicts and its profile staging), the thermal judge and driver plans, the driver audit and Windows Update catalogue (scan progress, tiers, restart, install subsets, failure versus emptiness), the debloat panel (what can be removed, presets, list save/load, the per-app removal receipt including a lost answer recorded as unknown), game sessions and core steering (including the five-second re-read that drives the live count), Turbo Boost (live dial, measured facts, before/after measurement), the Before & After comparison (both measurements, the verdicts and their wording, the startup-log read, the history list and the report export), the tweak list's own rule and row (Batch X), the change history (Batch Y), the language loading (Batch Z), "Right now"'s live promises (Batch AC: the timer stops when the window leaves the front, the slow sources are read on their own schedules, a sensor that is absent is reported as absent, and a gap in the readings restarts the chart), the cached-audit storage contract, a catalogue/translation drift guard, the Fix-all pipeline, and `lib.ts` — all through a fake Tauri IPC bridge, with jest-axe. ESLint is now verified over the whole tree, not per batch, and every script suite in the release chain also runs on every push, so no gate can now first fail on release day. Coverage is measured over every source file (**43.94% of lines**, 2,586 still uncovered — concentrated in `App.tsx` and a dozen untested panels) and enforced as a ratchet in CI, whose thresholds were raised with the tests rather than left behind them. The Rust suite moved with Batch AB's gate removal (two tests that existed only to prove the licence check passed, one renamed to keep its elevation half, and the catalogue-wide funnel test rewritten), and that is the one part of the batch this environment cannot compile — see _Remaining risks_. Not measured: a packaged-app run on Windows |
-| Documentation | 70     | **93** | Added `CONTRIBUTING.md`, `docs/ARCHITECTURE.md`, `docs/API.md`; documented the fork's updater/signing path; fixed README's licence contradiction and stale plan copy; every live doc, shipped link and the publisher PAD feed now names the owned domain, and the PAD feed describes the current release instead of one two versions old. Every public control count is now the catalogue's own total and nothing more, the site's origin is single-source including the `CNAME` that decides where it is served, and the marketing CTAs point at the site the owner confirmed, and no live document, listing or piece of structured data advertises a paid tier: Batch AA removed the pricing cards, the campaign strip and hero card, the JSON-LD offers, the six listings' "WITH PRO" paragraphs, the README's Free/Pro column and the PAD feed's Pro prose. The residual Pro/paid prose is gone (Batch AA: the site's pricing cards and the subscription FAQ, the guide and support claims, the PAD feed and the privacy copy that described a paid plan; the listings carry no paid claim). Batch AB's Rust half also corrected the two documents that still described the licence gate: `docs/ARCHITECTURE.md` called `require_pro()` a no-op stub kept "so the enforcement plumbing still compiles" and listed "license verification" as a Rust suite, and `scripts/vm/README.md` still asked the tester to "sign in with a Pro licence (11 of the 15 controls are Pro)". Still outstanding: the live Halloween campaign's WinCraft offers, which are the owner's call                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| Testing       | 40     | **99** | Backend **161/161**, `test-scan` **15/15** (was failing), every script suite green, and **309 Vitest tests in 21 files**: the whole scan flow (13 probes, partial reports, apply/verify, pause/resume), the startup and scheduled-task lists, the update-drift and crash-report cards, the cleaners and maintenance cards, the thermal panel itself (a two-second poll on a fake clock, its verdicts and its profile staging), the thermal judge and driver plans, the driver audit and Windows Update catalogue (scan progress, tiers, restart, install subsets, failure versus emptiness), the debloat panel (what can be removed, presets, list save/load, the per-app removal receipt including a lost answer recorded as unknown), game sessions and core steering (including the five-second re-read that drives the live count), Turbo Boost (live dial, measured facts, before/after measurement), the Before & After comparison (both measurements, the verdicts and their wording, the startup-log read, the history list and the report export), the tweak list's own rule and row (Batch X), the change history (Batch Y), the language loading (Batch Z), "Right now"'s live promises (Batch AC: the timer stops when the window leaves the front, the slow sources are read on their own schedules, a sensor that is absent is reported as absent, and a gap in the readings restarts the chart), the cached-audit storage contract, a catalogue/translation drift guard, the Fix-all pipeline, and `lib.ts` — all through a fake Tauri IPC bridge, with jest-axe. ESLint is now verified over the whole tree, not per batch, and every script suite in the release chain also runs on every push, so no gate can now first fail on release day. Coverage is measured over every source file (**43.94% of lines**, 2,586 still uncovered — concentrated in `App.tsx` and a dozen untested panels) and enforced as a ratchet in CI, whose thresholds were raised with the tests rather than left behind them. The Rust suite moved with Batch AB's gate removal (two tests that existed only to prove the licence check passed, one renamed to keep its elevation half, and the catalogue-wide funnel test rewritten), and that is the one part of the batch this environment cannot compile — see _Remaining risks_. Not measured: a packaged-app run on Windows Batch AE/AF moved the Rust half again (the feature's two CLI tests went; one test replaced them), and Batch AG's public copy is now policed by the gate that reads `README.md` |
+| Documentation | 70     | **93** | Added `CONTRIBUTING.md`, `docs/ARCHITECTURE.md`, `docs/API.md`; documented the fork's updater/signing path; fixed README's licence contradiction and stale plan copy; every live doc, shipped link and the publisher PAD feed now names the owned domain, and the PAD feed describes the current release instead of one two versions old. Every public control count is now the catalogue's own total and nothing more, the site's origin is single-source including the `CNAME` that decides where it is served, and the marketing CTAs point at the site the owner confirmed, and no live document, listing or piece of structured data advertises a paid tier: Batch AA removed the pricing cards, the campaign strip and hero card, the JSON-LD offers, the six listings' "WITH PRO" paragraphs, the README's Free/Pro column and the PAD feed's Pro prose. The residual Pro/paid prose is gone (Batch AA: the site's pricing cards and the subscription FAQ, the guide and support claims, the PAD feed and the privacy copy that described a paid plan; the listings carry no paid claim). Batch AB's Rust half also corrected the two documents that still described the licence gate: `docs/ARCHITECTURE.md` called `require_pro()` a no-op stub kept "so the enforcement plumbing still compiles" and listed "license verification" as a Rust suite, and `scripts/vm/README.md` still asked the tester to "sign in with a Pro licence (11 of the 15 controls are Pro)". Still outstanding: the live Halloween campaign's WinCraft offers, which are the owner's call                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          Batch AG rewrote the README around what the app is now — a task table for the searches the page should answer, the zero-compromise claims, a FAQ, and 1.18 release notes — and dropped the 1.15 leftovers; both PRIVACY copies stopped naming a subscription WinCraft never sold |
 | Accessibility | 80     | **86** | The unreachable Pro paywall `<dialog>` (dialog semantics, focus handling) is gone. An automated axe run now covers thirteen rendered surfaces (the scan, cleaner, maintenance, startup, drift, crash, thermal, driver, debloat, game-session, Before & After, Turbo Boost and "Right now" panels), and it has earned its place twice: the Turbo Boost comparison table opened with an empty `<th>`, which announces an unnamed column — now a `<td>`, with both column headers scoped — and the Before & After panel jumped from `<h2>` straight to `<h4>` in two places, which reads as a broken outline to a screen reader, now `<h3>` with the stylesheet following. "Right now" added its live region, meter and tooltip unchanged (Batch AC). Keyboard and screen-reader behaviour on real Windows is still unverified                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
 | i18n          | 90     | **94** | 1,580 keys × 6 locales consistent; the free pricing page is now translated in all six (it used to be English-only); paywall, Pro-upsell and Pro-naming strings removed; dead Halloween/promo components deleted. 175 identical-to-English keys remain on the reviewed list                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
 | DX            | 85     | **96** | CI runs ESLint + Prettier + `npm test`; lint is clean; contributor and architecture docs exist; `npm test` at the root is the one entry point for frontend tests; backend/desktop commands documented; the website now builds and runs its SEO gate in pull requests too, and its deploy workflow watches the app modules it imports from; CI is now a superset of everything `npm run check` enforces except `cargo test`, which needs the Windows toolchain. Rust gates (`fmt`, `clippy`, `audit`) are still absent because the toolchain is unavailable here                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
@@ -1495,6 +1495,98 @@ price arrives. Invisible to readers and to assistive technology by construction.
 Validation: `cd backend && npm test` (162/162), `cd site && npm run build &&
 npm run check:seo` (17/17 routes), and the built page greppped for the address.
 
+### Batch AE — the licence store, and the harness that replaced it (done)
+
+The owner retired the whole licence machinery, and the first sweep (Batch AB,
+frontend half) had already removed what depended on it. This is the removal of
+the machinery itself, in one commit with Batch AF below:
+
+- `src-tauri/src/license.rs` (660 lines) deleted: the Ed25519 verification
+  against an embedded public key, the payload parser, the licence file.
+- The three IPC commands it registered — `license_status`, `save_license`,
+  `clear_license` — removed from `lib.rs`, from `ipc_commands.rs`'s
+  `APP_COMMANDS` and from the app's sign-out path, and **BREAKING** in
+  `docs/API.md`: a bridge consumer calling them now gets "unknown command".
+- `lifetime_tools.rs` lost its store read and the `LifetimeError` it produced.
+- The avatar's `isPro` ring and crown badge, the `isPro` prop behind them, the
+  `isPro` field in the app's own account state and `CrownIcon` all deleted. The
+  *backend* still returns `isPro`: it serves the Uninstaller from the same
+  tables, and `src/types.ts` says so where the field is declared.
+- `ed25519-dalek` has no user left in `src-tauri/`. It is still in `Cargo.toml`
+  and in the tracked `Cargo.lock`: removing it needs a `cargo build` to
+  regenerate the lock, which cannot run here.
+
+Batch AF removed the debug-only harness that existed to apply locked tweaks
+without a licence: the `test-pro` Cargo feature with its `compile_error!`
+release guard, `TEST_PRO_MARKER`, `test_pro_cli`, `test_pro_debloat_cli`,
+`test_restore_check`, `debloat.rs`'s 34-line `test_pro_debloat` helper,
+`main.rs`'s three arms, `package.json`'s `check:no-test-pro` (and its slot in
+the `check` chain) and `test:lifetime-offer`, both CI verifier steps,
+`CONTRIBUTING.md`'s script line, `RELEASING.md`'s gate sentence, and five files:
+`scripts/check-no-test-pro.mjs`, `scripts/test-lifetime-offer.mjs`,
+`src/lifetime-offer.ts`, `scripts/vm/run-auto.ps1`, `scripts/vm/run-debloat.ps1`.
+`scripts/vm/README.md` is the manual procedure now and no longer asks for a
+licence. This is a **deliberate capability reduction**: automated apply/restore
+against a test build is gone; `verify-tweaks.ps1` and `tweak-matrix.json` stay.
+
+Two sweeps made the Rust side reviewable rather than hopeful: one asserted every
+call site before replacing it, the second walked the removed function names back
+over the whole crate and cleared the resources they left behind — four
+`let (path, dir)` bindings, the pre-measurement condition in `apply_by_id`, and
+the `is_ok()`/`is_err()` clauses in four monitors. A third gate was found broken
+and repaired: `scripts/check-native-policy.mjs` lists the tests the suite runs in
+isolation and fails when a filter matches nothing, and it named `license::tests`,
+`tests::a_free_tweak_is_never_blocked_by_the_license_check` (deleted with the
+gate it proved) and `tests::a_pro_tweak_is_refused_with_no_cached_license` —
+which has never existed in this repository and had kept the script failing since
+the zero-match rule was added at `fb97d48`. The list now names only tests that
+exist, and the script finally runs somewhere: the `check` chain and the Windows
+CI job, neither of which invoked it before.
+
+Validation: `tsc`, `eslint src`, Prettier, **309 tests / 21 files**,
+`check:i18n` (1,575 × 6), `check:public-counts`, `check:design-tokens`
+(131 → 128 legacy classes) and `npm run build` (entry 229.17 → 228.13 kB) all
+pass. The Rust half is **not compiled here** — see _Remaining risks_ 1.
+
+### Batch AG — the front page describes the app that shipped (done)
+
+The README still sold the 1.15 app and closed on "while that is being wound
+down". It now leads with what the app is and answers the searches it exists to
+answer:
+
+- **`Find your task`** — fourteen rows mapping a search phrase (debloat Windows
+  11, remove bloatware, free Windows optimizer, turn off telemetry, reduce input
+  lag, run `sfc`/`DISM` without the command line, undo what a tweaking tool did)
+  to the panel that does it, each row a control or a reading rather than a number.
+- **`Zero compromises`** — the ten things most suites trade away and what this one
+  does instead, every claim checkable in the repository.
+- **What's new 1.15 → 1.18** (Before & After, the change-history timeline, six
+  starter profiles, the Windows AI controls, the live dashboard, 13 scan checks),
+  the "Gaming, Study and Work" profile paragraph replaced by the six starter
+  profiles the app ships, and a FAQ for the questions a download page cannot answer.
+
+Three claims were checked rather than assumed, and two were wrong:
+
+- **"No third-party offers"** — the app carries three cross-promo cards. Two point
+  at the publisher's own site with `utm_*` campaign tags; the Redaxa card points
+  at `redaxa.getcertsprint.com` with `?ref=pctweaker`, an affiliate-style link.
+  The bullet names the three cards and the tag instead of denying them, and the
+  link itself is now a decision for the owner (see _Changes not applied_).
+- **"Remove up to 13 optional Windows apps"** — the Debloat catalogue holds 23
+  entries. The number is gone rather than corrected to one nothing verifies.
+- The badges, the review counts, the signing inventory and the 81-control total
+  are unchanged: `check-public-counts` reads `README.md`, so the copy could not
+  quietly drift from the catalogue.
+
+Also in this batch: both `PRIVACY.md` copies named "a Pro subscription" as the
+example of an account-based feature — the one product in this repository that
+never had one — and now name the Uninstaller's licence; `src/App.tsx`'s
+account-refresh comment explained itself with a Pro status the app no longer
+tracks.
+
+Validation: Prettier, `check-public-counts` (81, no Free/Pro split),
+`check:i18n` (1,575 × 6), `tsc`, `eslint src`, **309 tests / 21 files**.
+
 ## Final report
 
 ### Changes applied
@@ -1518,6 +1610,9 @@ npm run check:seo` (17/17 routes), and the built page greppped for the address.
 | Desktop app  | The Rust licence gate is retired: `require_pro()`, `PRO_REQUIRED_PREFIX`, `requires_pro_for()`, `require_tweak_entitlement()` and `authorize_configuration_change()` deleted with all 38 call sites, and every binding that only existed for the gate (`AppHandle`s, `NativeBackend.dir`, the pre-measurement condition in `apply_by_id`, the `is_ok()`/`is_err()` clauses in four monitors)                                                                                    | No — the check could no longer fail                                                                      |
 | Desktop app  | The last copy that offered a paid tier: the game-session preview's "· Pro feature" claim, the unread "Also available with Pro"/"Unlock Pro" keys and the checkout strings removed, and the sign-in string on the resend-verification path rewritten, in all six locales                                                        | No                                                                                                       |
 | Backend      | The Halloween campaign's three WinCraft offers are retired: one offer left (the Uninstaller's), the offer shape now typed, the Omnibus table and tests reduced to what still runs, and the Stripe objects deliberately left in place because the webhook resolves them | **BREAKING (commerce only)** — the three WinCraft plans can no longer be discounted |
+| Desktop app  | The licence store is deleted: `license.rs`, the three IPC commands, the sign-out call, the avatar's `isPro` ring and crown, and the `isPro` field the app kept in its own account state; the backend's `isPro` payload stays for the Uninstaller | **BREAKING (IPC)** — `license_status`, `save_license`, `clear_license` are gone |
+| Desktop app  | The debug-only `test-pro` harness is retired with its runbook: the Cargo feature and release guard, both CLI entry points, `check-no-test-pro` with its two CI steps, `src/lifetime-offer.ts` and two VM scripts | **BREAKING (tooling)** — automated apply/restore against a test build is no longer possible |
+| Docs         | The README describes 1.18 and answers the debloat/optimizer searches it should, with `Find your task`, `Zero compromises` and a FAQ; both `PRIVACY.md` copies stopped naming a Pro subscription | No |
 | Website      | The Tweaky Driver return page sends readers to `tweakydriver@wincraft.app`, the address the page above it already used; no shipped site file mentions the old domain | No |
 
 ### Changes not applied (and why)
@@ -1529,16 +1624,24 @@ npm run check:seo` (17/17 routes), and the built page greppped for the address.
    the split any more, and `check-public-counts` fails if one does. Flipping the
    flags themselves would mean rebuilding and re-testing Rust, which this
    environment cannot do, and would change nothing the app does.
-2. **The Rust-side licence stub — now applied.** Batch AB deleted `require_pro()`
-   and every caller, as the owner directed, keeping the catalogue flags and the
-   assertion that pins 81/46/35. What the same sweep deliberately did **not** touch
-   is the licence machinery behind it: `license.rs` still registers
-   `license_status`, `save_license` and `clear_license` (the app calls the last one
-   on sign-out), `Cargo.toml` still carries the debug-only `test-pro` feature that
-   `scripts/check-no-test-pro.mjs` guards, and the account's `isPro` flag still
-   drives the avatar's gold ring. None of them gates anything any more, and each is
-   a separate decision rather than a deletion to guess at.
-3. **Frontend coverage: 43.94% of lines, now measured and ratcheted.** 309 tests (Batches G–AC) cover
+2. **The Rust-side licence stub — applied, and now the machinery behind it too.**
+   Batch AB deleted `require_pro()` and every caller as the owner directed,
+   keeping the catalogue flags and the assertion that pins 81/46/35; Batch AE/AF
+   then removed the licence store, the test-only harness and the `isPro` surfaces,
+   because the owner retired them rather than leaving them inert. Two items from
+   that work stay open on purpose: `ed25519-dalek` is still declared in
+   `Cargo.toml` with no user left (removing it needs a regenerated `Cargo.lock`,
+   which needs cargo), and the Hallowe'en card that the *website* renders stays in
+   `src/components/halloween-offer.tsx` because `site/src/promo.tsx` imports it —
+   the app itself no longer shows an offer screen.
+3. **The Redaxa card's referral link is left as it is.** The Privacy screen
+   carries a cross-promo card whose button opens
+   `https://redaxa.getcertsprint.com/?ref=pctweaker` — an attribution parameter
+   on a domain that is not the publisher's own. The README now discloses it
+   ("a campaign or referral tag on the link so the publisher can see WinCraft
+   sent you") rather than claiming there are no referral links, because removing
+   the parameter and retiring the card are product decisions, not cleanups.
+4. **Frontend coverage: 43.94% of lines, now measured and ratcheted.** 309 tests (Batches G–AC) cover
    `lib.ts`, the Fix-all pipeline, the scan flow, `Badge`/`Toggle`, the plans
    page, the cleaners/maintenance cards, the startup/drift/crash surfaces, the
    thermal panel and its profiles, the thermal judge and driver plans, the driver
@@ -1558,12 +1661,12 @@ npm run check:seo` (17/17 routes), and the built page greppped for the address.
    `account.tsx`, `health.tsx`, `diagnostics.tsx` and the remaining panels. The drawing
    half of `before-after.tsx` (its canvas report) cannot be covered in jsdom: that
    needs a packaged Windows run.
-4. **Load locales on demand.** The panel split is done (Batch I) but the entry
+5. **Load locales on demand.** The panel split is done (Batch I) but the entry
    chunk is still 631 kB, and `src/i18n.ts` measured alone accounts for 486 kB of
    it (77%). English could load eagerly and the other five tables on demand. That
    touches every direct `STRINGS[...]` reader and both i18n gates, so it is
    proposed rather than started.
-5. **Rust-side gates** (`cargo fmt --check`, `cargo clippy -D warnings`,
+6. **Rust-side gates** (`cargo fmt --check`, `cargo clippy -D warnings`,
    `cargo audit`, `cargo test`), and the Rust `unwrap`/`expect` review. No
    `cargo`/`rustc` in this environment — see _Remaining risks_. Note: the earlier
    audit's "111 non-test `unwrap`/`expect`" figure did not survive re-measurement.
@@ -1572,7 +1675,7 @@ npm run check:seo` (17/17 routes), and the built page greppped for the address.
    (`rollback.rs`, `debloat.rs`, `download_limit.rs`, `dns.rs`, `gaming.rs`,
    `turbo.rs`), with a large share of them in test support. This needs a
    Rust-aware pass (`cargo clippy`), not a grep.
-6. **Website and marketing trees** (`site/`, `marketing/`, Python and PowerShell
+7. **Website and marketing trees** (`site/`, `marketing/`, Python and PowerShell
    scripts) have not been audited in depth; they have their own dependency trees.
    What Batch W did cover: the site's origin end to end (including `CNAME` and the
    marketing CTAs) and every public control count. What it did not touch, because
@@ -1581,7 +1684,7 @@ npm run check:seo` (17/17 routes), and the built page greppped for the address.
    PRO" sections, `docs/pad.xml`'s Pro prose, and the Uninstaller page's own
    pricing. The app itself has no licence gate, so those texts describe something
    the app does not enforce.
-7. **The old origin outside the app — resolved in Batch R, three pieces left.**
+8. **The old origin outside the app — resolved in Batch R, three pieces left.**
    Every live doc, shipped link and the PAD feed now names `wincraft.app`, and the
    support address follows the code (`support@wincraft.app`, documented in
    `backend/.env.example` as Cloudflare-routed). Still on the old origin:
@@ -1595,7 +1698,7 @@ npm run check:seo` (17/17 routes), and the built page greppped for the address.
      wording) still describes a paid tier, in the publisher feed no gate watches.
      It publishes no count, so the "no split" rule does not cover it; it needs the
      same product decision as the website's pricing copy (item 6).
-8. **Rename leftovers outside the UI** (flagged, not changed, because each is an
+9. **Rename leftovers outside the UI** (flagged, not changed, because each is an
    external or persisted name): the uninstaller download URL in
    `maintenance.tsx` points at the upstream `pc-tweaker-uninstaller` release and
    file name; the Redaxa cross-promo link carries `?ref=pctweaker` and the
@@ -1606,13 +1709,13 @@ npm run check:seo` (17/17 routes), and the built page greppped for the address.
    offers those clients receive. Rust temp-file prefixes (`pctweaker-*`) are
    internal and harmless. The exported profile file name was renamed to
    `.wincraft.json`, which is safe because importing matches on the extension.
-9. **The offer pipeline in the backend** (`/api/offers/lifetime`, `/api/offers/promo`)
+10. **The offer pipeline in the backend** (`/api/offers/lifetime`, `/api/offers/promo`)
    still runs for installed clients up to 1.16.x, and Batch AD removed the
    WinCraft offers from it without deleting anything in Stripe. What is left
    deliberately: the `LIFETIME_CAMPAIGN_*` window (`RELEASING.md` says not to set
    it again, because 1.16.4 clients strike through a €119 price that was never
    charged), the promo Price the webhook resolves, and the retired coupons.
-10. **`COMPREHENSIVE-AUDIT-FIX-PLAN.md` itself is new** — the file was never in the
+11. **`COMPREHENSIVE-AUDIT-FIX-PLAN.md` itself is new** — the file was never in the
     repository, so this is the record the instruction asked to keep, created here.
 
 ### Commands run
@@ -1630,7 +1733,7 @@ final pass (2026-10-12).
 | `npm run check:i18n`                                                                                                                                                                                         | PASS — 1,575 keys × 6 languages (three dead keys left the tables in Batch AB's Rust half, and one was renamed)                                                      |
 | `npm run check:i18n-quality`                                                                                                                                                                                 | PASS — 175 identical-to-English keys on the reviewed list                                                                                                           |
 | `npm run check:public-counts`                                                                                                                                                                                | PASS — "81 controls, published without a Free/Pro split" (9 files; verified red twice, see Batches U-W)                                                             |
-| `npm run check:no-test-pro`                                                                                                                                                                                  | PASS                                                                                                                                                                |
+| `npm run check:native-policy`                                                                                                                                                                                  | PASS                                                                                                                                                                |
 | `node scripts/check-design-tokens.mjs`                                                                                                                                                                       | PASS — 131 legacy raw palette classes, exit 0                                                                                                                       |
 | `node scripts/test-scan.mjs`                                                                                                                                                                                 | PASS — 15/15 (was 14/15)                                                                                                                                            |
 | `node scripts/test-ui-polish.mjs`                                                                                                                                                                            | PASS                                                                                                                                                                |
@@ -1704,7 +1807,12 @@ final pass (2026-10-12).
    load a chunk through the Tauri asset protocol. A failed chunk is caught by
    `PageBoundary` (retry button) — a recovery path, not a substitute for the
    smoke test. Vite still warns about a >500 kB entry chunk.
-9. **Untested trees**: `site/`, `marketing/`, the Python and PowerShell tooling,
+9. **Two dependency versions are declared twice in the workspace.** `src-tauri/Cargo.lock`
+    resolves `epoch` and `jiff` twice (0.2 + 0.3) because different crates pin
+    different majors. Nothing here can run `cargo update` or `cargo tree`, so it is
+    recorded rather than changed: it is a size and audit-surface question, not a
+    correctness one, and the lock file is the thing a dependency bump should fix.
+10. **Untested trees**: `site/`, `marketing/`, the Python and PowerShell tooling,
    and the Store submission scripts.
 
 ### Next steps
@@ -1716,12 +1824,14 @@ Ranked by value per unit of risk. None of these are started.
 2. **Decide the catalogue Pro split** (item 1 under _Changes not applied_): either
    flip the 35 flags and update the nine public files plus the assertion, or drop
    the Free/Pro counts from the public text. Then `check:public-counts` follows.
-3. **Compile Batch AB's Rust sweep.** Both halves are written; neither has been
-   built, because this environment has no toolchain. On Windows, in this order:
-   `cargo check`, then `cargo test --lib`, then
+3. **Compile the Rust sweeps (Batches AB and AE/AF).** All of them are written;
+   none has been built, because this environment has no toolchain. On Windows, in
+   this order: `cargo check`, then `cargo test --lib`, then
    `cargo clippy --all-targets -- -D warnings` (all with
    `--manifest-path src-tauri/Cargo.toml`). The review that found the orphaned
-   bindings is in Batch AB's section; the lint is what proves it complete.
+   bindings is in Batch AB's section, and AE/AF's two sweeps cleared the bindings
+   the licence store and the `test-pro` harness left behind; the lint is what
+   proves both complete.
 4. **Keep growing the frontend suite.** Twenty-one files and 309 tests now
    (Batches G–AC), the coverage ratchet is in place and was raised with them
    (Batches U, X, Y, Z, AC),
@@ -1760,14 +1870,19 @@ Ranked by value per unit of risk. None of these are started.
     _Measurement_ above: −402,770 B from the entry chunk (−63.8%), one ~80 kB
     chunk per language fetched on first use, and a touch list of seven app files
     plus four scripts. Approved in principle; the numbers came first on request.
-11. **Decide what is left of the licence machinery** (Batch AB's one deliberate
-    omission): `license.rs` with its three commands, the debug-only `test-pro`
-    feature and the `isPro` ring on the avatar. Nothing reads a licence any more —
-    `require_pro()` is gone — so the question is only whether to retire the
-    plumbing or keep it for the entitlements the backend still tracks. `src/lifetime-offer.ts`
-    and its `npm run test:lifetime-offer` script are in the same position: the
-    module has no importer left, only its own test.
-12. **Mount the shell itself.** The tweak list is out of `App.tsx` (Batch X), so
+11. **Settled: the licence machinery is retired** (Batch AE/AF), on the owner's
+    instruction. `license.rs` and its three commands, the debug-only `test-pro`
+    feature with `check-no-test-pro` and its VM runbook, the `isPro` ring on the
+    avatar and the orphaned `src/lifetime-offer.ts` are gone; the backend keeps its
+    own `isPro` payload, entitlements and the Uninstaller's offer because it serves
+    other products from the same tables. Two follow-ups stay on the owner's side:
+    `ed25519-dalek` wants a `cargo build` to leave `Cargo.lock`, and the account
+    payload's `isPro` field can only be dropped when no other product reads it.
+12. **Decide the Redaxa card** (see _Changes not applied_ 3): the button opens
+    `redaxa.getcertsprint.com/?ref=pctweaker`. Keep the card and the README
+    disclosure, drop the referral parameter, or retire the card — the first is what
+    the copy says today.
+13. **Mount the shell itself.** The tweak list is out of `App.tsx` (Batch X), so
     what is left there is the part worth testing next: the section routing, the
     mount reads and the toasts. It needs the workspace's own reads mocked and the
     locale table accepted, which makes it the heaviest single test in the tree.
