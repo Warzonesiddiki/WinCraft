@@ -21,7 +21,7 @@ Stated plainly rather than left to be discovered after download:
 
 - **The binaries in this release are not code-signed.** Authenticode signing identifies the publisher; without it Windows SmartScreen may warn on first run, and the publisher will not read as Aurelio Avila. A signed release needs the publisher certificate loaded through its configured provider, applied during Tauri bundling so the executable metadata is final before the signature.
 - **Automatic updates are not enabled in this build.** The updater configuration still points at the upstream project's release endpoint and public key. A fork has two options and no third one: keep both, in which case installed clients keep updating from upstream and never from this repository, or publish its own key pair, which stops updates for every client on the old key. That is an owner's decision, recorded in `RELEASING.md`, and it is not something this release decides.
-- **No packaged-build smoke test has been run.** The split chunks build and the asset protocol is not exercised in CI. Opening every section once in a real install is still the outstanding manual check, and it needs a packaged build on a Windows machine.
+- **The split chunks are not smoke-tested.** The build splits, the CSS cascade holds and the imports are dynamic, but nothing has opened every section once in a packaged install. What *was* verified: the packaged `WinCraft.exe` launches, reports a responding process and opens a window titled "WinCraft". What was not: clicking through each section to confirm every lazy chunk resolves and no skeleton hangs. That needs a person at a screen.
 
 ## Trust wording
 

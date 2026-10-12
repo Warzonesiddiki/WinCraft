@@ -11,7 +11,7 @@ WinCraft 1.19.0 is the first release built after the desktop app was made free a
 - Accessibility work: `lifetime-tools`, `starter-profiles` and the Before & After panel now have axe-clean suites, and the heading outline a screen-reader user would have felt was repaired.
 - Every release gate now runs on every push: TypeScript, ESLint, Prettier, the translation, design-token and public-count gates, the frontend component suite with its coverage ratchet, the backend suite and the Rust suite, plus the site build and its SEO gate as their own job. Previously the model suites and the component tests were reachable only through `npm run check`, which the release workflow runs on tags.
 
-Known gaps are stated in `release-notes/RELEASE-NOTES-1.19.0.md`: this build is not code-signed, automatic updates still point at the upstream project's endpoint and key, and no packaged-build smoke test has been run.
+Known gaps are stated in `release-notes/RELEASE-NOTES-1.19.0.md`: this build is not code-signed, automatic updates still point at the upstream project's endpoint and key, and the lazy chunks have not been opened one by one in a packaged install. The packaged `WinCraft.exe` does launch and open its window.
 
 ## v1.18.1
 
