@@ -107,6 +107,33 @@ jobs:
           node scripts/test-ui-polish.mjs
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
+      # The rest of the model suites. They were reachable only through
+      # `npm run check`, which the release workflow runs on tags — the same
+      # problem the lint and formatting steps above had, with the same fix:
+      # they are offline and deterministic, so run them on every push rather
+      # than discovering a regression on release day.
+      - name: Advisor, thermal, repair, debloat, download and promo models
+        run: |
+          npm run test:advisor
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          npm run test:thermals
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          npm run test:repair-eta
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          npm run test:debloat
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          npm run test:download-limit-reconcile
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          npm run test:promo
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Language default and change-history models
+        run: |
+          node scripts/test-language-default.mjs
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          node scripts/test-history-model.mjs
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
       # React components and frontend modules in jsdom. The script suites above
       # cover the pure models; this is the only gate that renders a component.
       - name: Component and module tests

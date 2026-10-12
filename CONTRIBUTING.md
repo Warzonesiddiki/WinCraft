@@ -64,17 +64,22 @@ npm run check:public-counts
 npm run check:design-tokens
 npm run check:no-test-pro
 npm test                              # frontend modules + components (jsdom)
-node scripts/test-scan.mjs
-node scripts/test-live-metrics.mjs
-node scripts/test-ui-polish.mjs       # plus the other scripts/test-*.mjs suites
+node scripts/test-scan.mjs            # then every other scripts/test-*.mjs
 cd backend; npm test                  # 161 API tests, pg-mem backed
+cd site; npm run build; npm run check:seo   # if you touched anything under src/
 ```
 
 `npm test` is Vitest: it runs `src/**/*.test.ts(x)` in jsdom with Testing
 Library and jest-axe, so it is the only gate that renders a component. Add a
-test next to the module you change (`src/lib.test.ts`, `ui.test.tsx`, and
-`pricing.test.tsx` are the first three). It needs no Rust toolchain and no
-network.
+test next to the module you change (`src/lib.test.ts`, `ui.test.tsx` and
+`pricing.test.tsx` were the first three; there are fifteen files now). It needs
+no Rust toolchain and no network.
+
+The website job matters more than it looks: `site/` imports shared modules
+straight out of `src/` — the offer banner and the offer format, for instance —
+so deleting or renaming one breaks the site build even though nothing under
+`site/` changed. `deploy-site.yml` only runs after a merge to master; the `site`
+job in `checks.yml` is what makes a pull request fail before that.
 
 `npm run check` runs the same list plus `cargo test`, which needs a Windows
 machine and a disposable VM snapshot. Rust tests touch real files and protected
