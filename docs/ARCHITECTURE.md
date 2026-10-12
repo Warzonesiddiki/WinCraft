@@ -161,7 +161,11 @@ that are genuinely the same).
 pure models in Node, while the frontend suite runs them in jsdom with Testing
 Library and jest-axe. Tests live beside the module they cover (`src/lib.test.ts`,
 `src/scan-runner.test.ts`, `src/tweak-list-model.test.ts`,
-`src/components/ui.test.tsx`).
+`src/components/ui.test.tsx`). A component suite is where a panel's promises are
+asserted as behaviour rather than read: `live-dashboard.test.tsx` holds "Right now"
+to the two it makes in public — that nothing is measured while the window is in the
+background, and that a sensor which is not there is reported as absent rather than
+as a zero.
 
 A new test file must be `src/**/*.test.ts(x)` to be picked up, and it is
 type-checked by the same `tsc` pass as the app, so it cannot drift out of the
