@@ -127,8 +127,26 @@ const binaries = [
 const sha256 = (file) => createHash("sha256").update(fs.readFileSync(file)).digest("hex");
 const hashes = new Map(binaries.map((file) => [file, sha256(file)]));
 for (const binary of binaries) {
-  execFileSync("pwsh", ["-NoProfile", "-NonInteractive", "-File",
-    path.join(root, "scripts", "verify-authenticode.ps1"), "-Path", binary], { stdio: "inherit" });
+  // PowerShell 7 is a documented prerequisite of this script, not an optional
+  // helper. Without the check below a missing install surfaces as a raw
+  // `spawnSync pwsh ENOENT` stack trace part-way through verifying the first
+  // binary, which reads like a fault in the artifacts rather than a missing
+  // tool. RELEASE-VERIFICATION.md is explicit that missing tools stop
+  // preparation, so say which one and stop here.
+  try {
+    execFileSync("pwsh", ["-NoProfile", "-NonInteractive", "-File",
+      path.join(root, "scripts", "verify-authenticode.ps1"), "-Path", binary], { stdio: "inherit" });
+  } catch (e) {
+    if (e?.code === "ENOENT") {
+      console.error(
+        "make-latest-json: PowerShell 7 (pwsh) was not found on PATH, so the Authenticode " +
+          "and trusted-timestamp checks could not run. Nothing was written. Install " +
+          "PowerShell 7 and run this again.",
+      );
+      process.exit(1);
+    }
+    throw e;
+  }
 }
 const updaterSignature = verifyUpdater(path.join(nsisDir, setup), conf.plugins.updater.pubkey);
 const msiSignature = verifyUpdater(path.join(msiDir, msis[0]), conf.plugins.updater.pubkey);

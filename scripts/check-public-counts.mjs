@@ -21,11 +21,22 @@ const listings = fs
   .readdirSync(new URL("../scripts/store/listing/", import.meta.url))
   .filter((f) => f.endsWith(".json"))
   .map((f) => `scripts/store/listing/${f}`);
+
+// The release notes for the version being shipped are public copy too, and they
+// are where a stale split survives longest: 1.18.1's notes still promised "46
+// Free and 35 Pro" after the catalogue had been made free in Batch AI, and
+// nothing failed because no gate read this file. Only the current version's
+// notes are scanned - older ones describe the split truthfully and rewriting
+// history would be the real error.
+const version = JSON.parse(read("package.json")).version;
+const releaseNotes = `release-notes/RELEASE-NOTES-${version}.md`;
+
 const files = [
   "README.md",
   "site/src/i18n/dictionary.ts",
   "site/src/pages/practical-guides.ts",
   ...listings,
+  ...(fs.existsSync(new URL(`../${releaseNotes}`, import.meta.url)) ? [releaseNotes] : []),
 ];
 
 // A number right before a catalog noun, in the six languages the texts use.
@@ -61,6 +72,20 @@ for (const file of files) {
     /\b(?:Pro|Free)\s+(?:controls?|tweaks?|settings)\b|\b(?:Pro|Free)\s*\/\s*(?:Pro|Free)\b/gi,
   )) {
     problems.push(`${file}: "${m[0]}" — the catalogue is not split into paid and free`);
+  }
+  // A number carrying a tier label is the split's other shape, and the one that
+  // actually shipped: 1.18.1's release notes ended "81 controls, 46 Free and 35
+  // Pro" for several releases after the catalogue had been made free. The scan
+  // above cannot see it ("46 Free and" is not "Free controls"), and the numeric
+  // scan is skipped precisely when free === total, so the sentence that should
+  // never have been published passed every gate. Matched unconditionally, and
+  // without naming the old numbers so it keeps working if the catalogue moves.
+  for (const m of text.matchAll(
+    /\b\d{1,3}\s+(?:Free|Pro)\b|\b(?:Free|Pro)\s*[:/]\s*\d{1,3}\b/gi,
+  )) {
+    problems.push(
+      `${file}: "${m[0]}" — a count labelled Free/Pro; every one of the ${total} controls is free`,
+    );
   }
 }
 for (const file of listings) {
