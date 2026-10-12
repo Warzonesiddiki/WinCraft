@@ -6,7 +6,7 @@ export async function loadTranslations() {
   const result = await build({
     stdin: {
       contents: `
-        import { STRINGS } from './src/i18n';
+        import { STRINGS } from './src/i18n-tables';
         import { SCAN_COPY } from './src/components/scan-copy';
         import { ADVANCED_COPY } from './src/components/advanced-copy';
         import { DEBLOAT_COPY, LIBRARY_COPY, EXTRA_IMPACTS } from './src/components/debloat-copy';

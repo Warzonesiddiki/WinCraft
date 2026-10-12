@@ -1,7 +1,8 @@
 import { afterEach, beforeEach, describe, expect, it, vi, type Mock } from "vitest";
 import { act, cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { axe } from "jest-axe";
-import { STRINGS, format } from "../i18n";
+import { format } from "../i18n";
+import { STRINGS } from "../i18n-tables";
 import type { DriverAudit, DriverEntry, InstallOutcome, UpdateSearchResult } from "../types";
 import { HardwarePanel } from "./hardware";
 

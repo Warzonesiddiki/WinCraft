@@ -1,7 +1,8 @@
 import { afterEach, describe, expect, it } from "vitest";
 import { cleanup, render, within } from "@testing-library/react";
 import { axe } from "jest-axe";
-import { LANGUAGES, STRINGS } from "../i18n";
+import { LANGUAGES } from "../i18n";
+import { STRINGS } from "../i18n-tables";
 import { PricingPanel } from "./pricing";
 
 afterEach(cleanup);

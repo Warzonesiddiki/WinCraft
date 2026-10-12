@@ -16,7 +16,7 @@ import {
   verdict,
 } from "../src/live-metrics";
 import { friendlyError } from "../src/lib";
-import { STRINGS } from "../src/i18n";
+import { STRINGS } from "../src/i18n-tables";
 
 test("the history keeps the newest readings and never grows past its length", () => {
   let values: number[] = [];

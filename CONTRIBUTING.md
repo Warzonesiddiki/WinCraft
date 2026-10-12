@@ -37,14 +37,14 @@ npm ci
 
 ## Repository layout
 
-| Path                  | What lives there                                                           |
-| --------------------- | -------------------------------------------------------------------------- |
-| `src/`                | React + TypeScript user interface (39 components, `i18n.ts`, `catalog.ts`) |
-| `src-tauri/`          | Rust core: privileged operations, IPC commands, Windows APIs               |
-| `backend/`            | Express API: accounts, entitlements, licenses, Stripe, mail                |
-| `scripts/`            | Check and test scripts run by `npm run check` and CI                       |
-| `site/`, `marketing/` | Website and release/announcement tooling                                   |
-| `docs/`               | [Architecture](docs/ARCHITECTURE.md), [API](docs/API.md), release runbooks |
+| Path                  | What lives there                                                                        |
+| --------------------- | --------------------------------------------------------------------------------------- |
+| `src/`                | React + TypeScript user interface (39 components, `i18n.ts` + `locales/`, `catalog.ts`) |
+| `src-tauri/`          | Rust core: privileged operations, IPC commands, Windows APIs                            |
+| `backend/`            | Express API: accounts, entitlements, licenses, Stripe, mail                             |
+| `scripts/`            | Check and test scripts run by `npm run check` and CI                                    |
+| `site/`, `marketing/` | Website and release/announcement tooling                                                |
+| `docs/`               | [Architecture](docs/ARCHITECTURE.md), [API](docs/API.md), release runbooks              |
 
 `docs/ARCHITECTURE.md` explains how the three parts fit together, and
 `docs/API.md` lists the HTTP endpoints and the desktop IPC surface.
@@ -73,7 +73,7 @@ cd site; npm run build; npm run check:seo   # if you touched anything under src/
 `npm test` is Vitest: it runs `src/**/*.test.ts(x)` in jsdom with Testing
 Library and jest-axe, so it is the only gate that renders a component. Add a
 test next to the module you change (`src/lib.test.ts`, `ui.test.tsx` and
-`pricing.test.tsx` were the first three; there are nineteen files now). It needs
+`pricing.test.tsx` were the first three; there are twenty files now). It needs
 no Rust toolchain and no network.
 
 The website job matters more than it looks: `site/` imports shared modules
@@ -102,8 +102,8 @@ pull request and include the exact command a reviewer should run.
 needs a refactor first, land the refactor separately.
 
 **Every user-visible string goes through the translation tables.** Add the key to
-the `Strings` interface in `src/i18n.ts` and to all six locales (`en`, `it`,
-`de`, `es`, `fr`, `pt`); component-scoped copy lives in the matching
+the `Strings` interface in `src/i18n.ts` and to all six tables
+(`src/locales/en.ts`, `it.ts`, `de.ts`, `es.ts`, `fr.ts`, `pt.ts`); component-scoped copy lives in the matching
 `src/components/*-copy.ts` table the same way. `check:i18n` fails when a locale
 is missing a key or a placeholder does not match, and `check:i18n-quality` fails
 when a "translation" is byte-identical to English without being on the reviewed

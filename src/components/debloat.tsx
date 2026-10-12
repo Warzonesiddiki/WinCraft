@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { invoke } from "@tauri-apps/api/core";
 import { openUrl } from "@tauri-apps/plugin-opener";
 import { open as openFileDialog, save as saveFileDialog } from "@tauri-apps/plugin-dialog";
-import { format, STRINGS, type Lang, localeOf } from "../i18n";
+import { format, stringsFor, type Lang, localeOf } from "../i18n";
 import { FEATURE_INTELLIGENCE } from "../lib";
 import {
   canRemove,
@@ -121,7 +121,7 @@ export function DebloatPanel({
 }) {
   const c = DEBLOAT_COPY[lang];
   const l = LIBRARY_COPY[lang];
-  const s = STRINGS[lang];
+  const s = stringsFor(lang);
   const [view, setView] = useState<View>("apps");
   const [category, setCategory] = useState<Category>("all");
   const [query, setQuery] = useState("");

@@ -1,7 +1,8 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { act, cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { axe } from "jest-axe";
-import { STRINGS, format } from "../i18n";
+import { format } from "../i18n";
+import { STRINGS } from "../i18n-tables";
 import { formatNumber } from "../lib";
 import type { AuditEntry, TweakInfo } from "../types";
 import {

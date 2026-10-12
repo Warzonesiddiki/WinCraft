@@ -3,7 +3,7 @@ import { TweakyDriverPromoCard } from "./components/tweaky-driver-promo";
 import React, { Suspense, lazy, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { invoke } from "@tauri-apps/api/core";
 import { openUrl } from "@tauri-apps/plugin-opener";
-import { STRINGS, Lang, detectInitialLang, format, localeOf } from "./i18n";
+import { Lang, detectInitialLang, format, loadStrings, localeOf, stringsFor } from "./i18n";
 import { ThemeName, detectInitialTheme } from "./theme";
 import {
   API_BASE_URL,
@@ -181,7 +181,19 @@ function App() {
   const [lang, setLangState] = useState<Lang>(
     () => (import.meta.env.DEV && (import.meta.env.VITE_START_LANG as Lang)) || detectInitialLang(),
   );
-  const s = STRINGS[lang];
+  // The words for the chosen language. `main.tsx` has already fetched the saved
+  // one, so the first paint is in the right language; picking another fetches
+  // its table and re-renders when it arrives.
+  const [s, setS] = useState(() => stringsFor(lang));
+  useEffect(() => {
+    let live = true;
+    void loadStrings(lang).then((table) => {
+      if (live) setS(table);
+    });
+    return () => {
+      live = false;
+    };
+  }, [lang]);
 
   function setLang(l: Lang) {
     setLangState(l);

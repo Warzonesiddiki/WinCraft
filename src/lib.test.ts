@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { STRINGS } from "./i18n";
+import { STRINGS } from "./i18n-tables";
 import {
   GAUGE_C,
   LARGE_FILE_THRESHOLD_BYTES,

@@ -1,7 +1,8 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { act, cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { axe } from "jest-axe";
-import { STRINGS, format } from "../i18n";
+import { format } from "../i18n";
+import { STRINGS } from "../i18n-tables";
 import type { GameEntry } from "../types";
 import { GameSessionsPanel, TurboBoostPanel } from "./gaming";
 import { uiLocale } from "../lib";

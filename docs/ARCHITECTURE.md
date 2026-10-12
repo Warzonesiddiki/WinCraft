@@ -10,7 +10,7 @@ and which boundaries the code is not allowed to cross.
 │  React + TypeScript UI            │  Rust core (src-tauri)         │  elevated helper      │
 │  src/  · 39 components            │  · IPC command handlers        │  · admin operations   │
 │  · App.tsx shell and tab router   │  · rollback journal            │  · same binary,       │
-│  · i18n.ts, six locales           │  · Windows registry/service    │    separate process   │
+│  · i18n.ts + locales (chunks)     │  · Windows registry/service    │    separate process   │
 │  · catalog.ts tweak catalogue     │    adapters, monitoring,       │    with a narrow      │
 │  · scan-runner.ts apply pipeline  │    cleanup, game sessions      │    argument surface   │
 └─────────────┬─────────────────────┴───────────────┬──────────────────────────────────────────┘
@@ -130,8 +130,16 @@ licences and Stripe metadata keep resolving.
 
 ## Translations
 
-`src/i18n.ts` defines the `Strings` interface and the six locale tables
-(`en`, `it`, `de`, `es`, `fr`, `pt`). Component-level copy is split into
+`src/i18n.ts` defines the `Strings` interface, the language list and the loading;
+the tables themselves are data files under `src/locales/` (`en`, `it`, `de`,
+`es`, `fr`, `pt`). English is imported into the bundle — it is the primary
+language and the fallback for every other — and the other five are fetched on
+demand, one chunk each, the first time that language is chosen. `stringsFor(lang)`
+is the synchronous read while drawing (English until the chosen table arrives) and
+`loadStrings(lang)` is the only writer. `src/i18n-tables.ts` imports all six for
+the gates and the tests that need them at once: **the app must never import it**,
+because that would put all 562 kB of strings back into the entry chunk.
+Component-level copy is split into
 `*-copy.ts` tables typed against the English table, so a missing key fails
 `tsc`. Two gates guard the result: `check:i18n` proves every locale has every key
 with matching placeholders, and `check:i18n-quality` flags strings that are

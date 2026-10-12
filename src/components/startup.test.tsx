@@ -1,7 +1,8 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { axe } from "jest-axe";
-import { STRINGS, format } from "../i18n";
+import { format } from "../i18n";
+import { STRINGS } from "../i18n-tables";
 import type { ScheduledTaskEntry, StartupEntry } from "../types";
 import { ScheduledTaskManager, StartupManager } from "./startup";
 

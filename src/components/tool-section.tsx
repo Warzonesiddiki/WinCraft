@@ -1,5 +1,5 @@
 import { useRef, type ReactNode } from "react";
-import { STRINGS, type Lang, type Strings } from "../i18n";
+import { langOfTable, type Lang, type Strings } from "../i18n";
 import "./tool-surfaces.css";
 
 /** Presentational structure shared by desktop tools; no native effects. */
@@ -103,7 +103,9 @@ export function ToolSearch({
   count: number;
   total: number;
 }) {
-  const language = (Object.keys(STRINGS) as Lang[]).find((key) => STRINGS[key] === s) ?? "en";
+  // Which language this table is, asked of the table itself: the app holds one
+  // table at a time now, so there is no six-language list to look it up in.
+  const language: Lang = langOfTable(s);
   const label = LIST_SEARCH[language];
   const inputRef = useRef<HTMLInputElement>(null);
   return (

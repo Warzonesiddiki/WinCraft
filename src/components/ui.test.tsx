@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { cleanup, fireEvent, render } from "@testing-library/react";
 import { axe } from "jest-axe";
-import { STRINGS } from "../i18n";
+import { STRINGS } from "../i18n-tables";
 import { Badge, Toggle } from "./ui";
 
 afterEach(cleanup);

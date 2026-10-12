@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import { STRINGS } from "./i18n";
+import { STRINGS } from "./i18n-tables";
 import { tweaksForSection } from "./tweak-list-model";
 import type { Category, Section, TweakInfo } from "./types";
 

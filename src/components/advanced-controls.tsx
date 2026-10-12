@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { invoke } from "@tauri-apps/api/core";
 import { open } from "@tauri-apps/plugin-dialog";
-import { STRINGS, format, type Lang } from "../i18n";
+import { format, stringsFor, type Lang } from "../i18n";
 import { friendlyError } from "../lib";
 import type {
   DownloadLimitState,
@@ -68,7 +68,7 @@ function EcoCard({ lang, onChanged }: { lang: Lang; onChanged: () => Promise<voi
       await task();
       await refresh();
     } catch (e) {
-      setError(friendlyError(e, STRINGS[lang]));
+      setError(friendlyError(e, stringsFor(lang)));
     } finally {
       setBusy(false);
     }
@@ -85,7 +85,7 @@ function EcoCard({ lang, onChanged }: { lang: Lang; onChanged: () => Promise<voi
             disabled={!state}
             label={c.ecoTitle}
             busyLabel={c.working}
-            s={STRINGS[lang]}
+            s={stringsFor(lang)}
             onClick={() =>
               void act(() => invoke("ecoqos_set_enabled", { enabled: !state?.enabled }))
             }
@@ -111,7 +111,7 @@ function EcoCard({ lang, onChanged }: { lang: Lang; onChanged: () => Promise<voi
           </button>
         </div>
       )}
-      {state?.paused && <ToolStatus>{STRINGS[lang].guard.paused}</ToolStatus>}
+      {state?.paused && <ToolStatus>{stringsFor(lang).guard.paused}</ToolStatus>}
       {state && (
         <div className="advanced-facts">
           <span>{state.enabled ? c.ecoOn : c.ecoOff}</span>
@@ -186,7 +186,7 @@ const PRIORITIES: Priority[] = ["idle", "below_normal", "normal", "above_normal"
  *  High, never Windows' own processes or a game that manages its own
  *  performance; the engine and its journal live in process_rules.rs. */
 function PriorityRulesCard({ lang }: { lang: Lang }) {
-  const s = STRINGS[lang];
+  const s = stringsFor(lang);
   const c = ADVANCED_COPY[lang];
   const p = s.priorityRules;
   const label: Record<Priority, string> = {
@@ -488,7 +488,7 @@ function MonitorCard({ lang }: { lang: Lang }) {
             checked={state?.enabled ?? false}
             busy={busy || (!state && !error)}
             disabled={!state}
-            s={STRINGS[lang]}
+            s={stringsFor(lang)}
             busyLabel={c.working}
             onClick={() =>
               void act(() => invoke("monitor_set_enabled", { enabled: !state?.enabled }))

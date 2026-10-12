@@ -5,7 +5,8 @@ import {
   buildName,
   isCurrentCatalogTweak,
 } from "./catalog";
-import { LANGUAGES, STRINGS } from "./i18n";
+import { LANGUAGES } from "./i18n";
+import { STRINGS } from "./i18n-tables";
 import { CATEGORY_STYLE } from "./categories";
 
 describe("buildName", () => {
