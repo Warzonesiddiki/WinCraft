@@ -153,9 +153,9 @@ build's strictness.
 Coverage counts **every source file**, not only the ones a test imported
 (`coverage.include` in `vitest.config.ts`). Without that, untested modules vanish
 from the denominator and the number goes up when code is added and never tested —
-the same tree reads 30% with everything counted and 58% with only the imported
-files. Raise the thresholds as tests are added; never lower one to make a red run
-green.
+measured on this tree, the same suite read 30% with everything counted and 58%
+with only the imported files. Raise the thresholds as tests are added; never lower
+one to make a red run green.
 
 CI (`.github/workflows/checks.yml`) runs the type/style gates, the frontend suite
 with its coverage ratchet, every script suite listed above, `cargo test` and the
