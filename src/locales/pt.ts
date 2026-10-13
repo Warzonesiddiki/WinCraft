@@ -1225,7 +1225,7 @@ export const pt: Strings = {
     disable_edge_ai: {
       name: "Desativar as funcionalidades de IA do Microsoft Edge",
       description:
-        "Aplica políticas do Microsoft Edge para as suas funcionalidades de IA. As que têm efeito dependem do perfil do Edge: impedir que o Edge transfira o seu modelo de IA local funciona em todos os perfis; ocultar a barra lateral e desativar a pesquisa com IA no histórico e os temas gerados por IA funciona nos perfis que não têm sessão iniciada com uma conta Microsoft pessoal; desativar o acesso do Copilot ao conteúdo das páginas e a respetiva ajuda de escrita funciona apenas em perfis profissionais ou escolares. O Edge aplica-as sem reiniciar; edge://policy mostra a lista. O Edge vai indicar que é gerido pela sua organização: é assim que indica as políticas.",
+        "Aplica políticas do Microsoft Edge para as suas funcionalidades de IA. As que têm efeito dependem do perfil do Edge: impedir que o Edge transfira o seu modelo de IA local funciona em todos os perfis; desativar a pesquisa com IA no histórico e os temas gerados por IA funciona nos perfis que não têm sessão iniciada com uma conta Microsoft pessoal; desativar o acesso do Copilot ao conteúdo das páginas e a respetiva ajuda de escrita funciona apenas em perfis profissionais ou escolares. A barra lateral do Edge tem o seu próprio controlo nesta lista. O Edge aplica as políticas sem reiniciar; edge://policy mostra a lista. O Edge vai indicar que é gerido pela sua organização: é assim que indica as políticas.",
     },
     disable_paint_ai: {
       name: "Desativar as funcionalidades de IA do Paint",
@@ -1516,7 +1516,8 @@ export const pt: Strings = {
     },
     disable_bing_search: {
       name: "Desativar a pesquisa do Bing no menu Iniciar",
-      description: "Impede que as suas pesquisas no menu Iniciar sejam enviadas para o Bing.",
+      description:
+        "Aplica a política Explorer que mantém os resultados web e as sugestões do Bing fora da pesquisa do Iniciar, para que a pesquisa fique neste PC. As Definições vão mostrá-la como gerida pela sua organização: é assim que o Windows indica as políticas.",
     },
     power_plan_performance: {
       name: "Alto desempenho (plano de energia)",
@@ -1812,20 +1813,20 @@ export const pt: Strings = {
       description:
         "Impede a telemetria de diagnóstico do Windows de reservar e gravar bases de dados de cache locais no disco.",
     },
-    disable_activity_feed: {
-      name: "Desativar feed de atividades e linha cronológica",
+    disable_consumer_experiences: {
+      name: "Desativar as experiências de consumidor da Microsoft",
       description:
-        "Impede o Windows de gerar gráficos de linha cronológica e rastrear atividades do utilizador entre dispositivos.",
+        "Ativa a política que impede o Windows de instalar automaticamente aplicações da Store promovidas, aplicações sugeridas e dicas de consumidor. As Definições vão mostrá-la como gerida pela sua organização: é assim que o Windows indica as políticas. As aplicações que instalou por conta própria não são removidas.",
     },
-    disable_publish_user_activities: {
-      name: "Desativar publicação de atividades do utilizador na nuvem",
+    disable_cloud_clipboard: {
+      name: "Desativar a sincronização da área de transferência entre dispositivos",
       description:
-        "Impede o Windows de sincronizar o histórico de atividades com os serviços na nuvem da Microsoft.",
+        "Aplica a política que impede o Windows de sincronizar o conteúdo da área de transferência com a sua conta Microsoft e os seus outros dispositivos. A área de transferência deste PC continua a funcionar como antes. O restauro remove a política.",
     },
-    disable_bing_widget_search: {
-      name: "Desativar widgets e feeds do Windows 11",
+    disable_error_reporting: {
+      name: "Desativar os relatórios de erros do Windows",
       description:
-        "Desativa o painel de widgets do Windows 11 e a sincronização de feeds em segundo plano.",
+        "Ativa a política que impede o Windows de enviar à Microsoft relatórios de falhas e bloqueios. O Windows continua a mostrar-lhe o erro, mas não é enviado qualquer relatório. O restauro remove a política.",
     },
     disable_typing_insights: {
       name: "Desativar telemetria de informações de escrita",
@@ -1873,14 +1874,14 @@ export const pt: Strings = {
         "Impede a Microsoft Store de instalar aplicações neste PC remotamente a partir da Web.",
     },
     disable_sqm_telemetry: {
-      name: "Desativar cliente de telemetria SQM",
+      name: "Desativar a sessão de registo automático do SQM",
       description:
-        "Desativa o envio de dados do cliente SQM (Software Quality Metrics) nos componentes do Windows.",
+        "Desativa a sessão de registo automático SQMLogger, pelo que o rastreio Software Quality Metrics que alimenta o cliente CEIP da Microsoft deixa de arrancar com o sistema. O Windows pode reativar a sessão através de uma atualização; reaplique o controlo se ela voltar. O restauro repõe o valor Start original.",
     },
-    disable_inventory_telemetry: {
-      name: "Desativar inventário de compatibilidade de aplicações",
+    disable_diagtrack_autologger: {
+      name: "Desativar a sessão de registo automático do DiagTrack",
       description:
-        "Impede o Windows Application Experience de compilar listas de inventário das aplicações instaladas.",
+        "Desativa a sessão AutoLogger-Diagtrack-Listener, pelo que o rastreio de diagnóstico consumido pelo serviço DiagTrack deixa de arrancar com o sistema. O serviço em si não é alterado: apenas a sessão de rastreio é parada, não o serviço. O restauro repõe o valor Start original.",
     },
     disable_compatibility_assistant: {
       name: "Desativar Assistente de Compatibilidade de Programas",

@@ -20,7 +20,7 @@ type Command = {
 /**
  * A VS Code-style command palette triggered by Ctrl+K.
  *
- * Fuzzy-searches across all 81 tweaks, 14 navigation sections, and
+ * Fuzzy-searches across every control in the catalogue, 14 navigation sections, and
  * common actions (scan, restore, profiles). Results are ranked by
  * match quality: prefix matches first, then substring, then fuzzy.
  *

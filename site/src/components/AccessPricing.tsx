@@ -1,6 +1,6 @@
 import { text } from "../i18n/dictionary";
 import { Reveal, RevealGroup } from "../reveal";
-import { DOWNLOAD_EXE } from "../constants";
+import { DOWNLOAD_URL } from "../constants";
 
 /**
  * The price. WinCraft has one plan — free — so this states what is included
@@ -51,7 +51,7 @@ export function AccessPricing() {
             ))}
           </ul>
           <a
-            href={DOWNLOAD_EXE}
+            href={DOWNLOAD_URL}
             className="bg-accent block rounded-xl border border-transparent py-3.5 text-center text-[14.5px] font-bold text-[var(--bg)] transition-transform hover:-translate-y-0.5"
           >
             {free.cta}

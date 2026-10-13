@@ -21,6 +21,9 @@ const ROUTES = [
   "windows-privacy-tool",
   "turn-off-windows-recall",
   "uninstall-programs-completely",
+  // The backend's tip return address. It is not a page anybody navigates to,
+  // but a completed payment has to land somewhere that answers with a 200.
+  "tip-thanks",
 ];
 
 /**

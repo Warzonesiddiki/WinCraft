@@ -1226,7 +1226,7 @@ export const fr: Strings = {
     disable_edge_ai: {
       name: "Désactiver les fonctions d'IA de Microsoft Edge",
       description:
-        "Applique les stratégies Microsoft Edge pour ses fonctions d'IA. Leur effet dépend du profil Edge : empêcher Edge de télécharger son modèle d'IA local fonctionne pour tous les profils ; masquer la barre latérale et désactiver la recherche par IA dans l'historique et les thèmes générés par IA fonctionne pour les profils qui ne sont pas connectés avec un compte Microsoft personnel ; désactiver l'accès de Copilot au contenu des pages et son aide à la rédaction ne fonctionne que pour les profils professionnels ou scolaires. Edge les prend en compte sans redémarrage ; edge://policy les affiche. Edge indiquera qu'il est géré par votre organisation : c'est ainsi qu'il signale les stratégies.",
+        "Applique les stratégies Microsoft Edge pour ses fonctions d'IA. Leur effet dépend du profil Edge : empêcher Edge de télécharger son modèle d'IA local fonctionne pour tous les profils ; désactiver la recherche par IA dans l'historique et les thèmes générés par IA fonctionne pour les profils qui ne sont pas connectés avec un compte Microsoft personnel ; désactiver l'accès de Copilot au contenu des pages et son aide à la rédaction ne fonctionne que pour les profils professionnels ou scolaires. La barre latérale d'Edge a son propre réglage dans cette liste. Edge prend les stratégies en compte sans redémarrage ; edge://policy les affiche. Edge indiquera qu'il est géré par votre organisation : c'est ainsi qu'il signale les stratégies.",
     },
     disable_paint_ai: {
       name: "Désactiver les fonctions d'IA de Paint",
@@ -1518,7 +1518,8 @@ export const fr: Strings = {
     },
     disable_bing_search: {
       name: "Désactiver la recherche Bing dans le menu Démarrer",
-      description: "Empêche l'envoi de vos recherches du menu Démarrer à Bing.",
+      description:
+        "Applique la stratégie Explorer qui tient les résultats web et les suggestions Bing hors de la recherche du menu Démarrer : la recherche reste sur ce PC. Paramètres l'indiquera comme géré par votre organisation : c'est ainsi que Windows signale les stratégies.",
     },
     power_plan_performance: {
       name: "Performances élevées (mode d'alimentation)",
@@ -1813,20 +1814,20 @@ export const fr: Strings = {
       description:
         "Empêche la télémétrie de diagnostic de Windows d'écrire et de réserver des bases de données de cache locales sur le disque.",
     },
-    disable_activity_feed: {
-      name: "Désactiver le flux d'activité et la chronologie Windows",
+    disable_consumer_experiences: {
+      name: "Désactiver les expériences grand public de Microsoft",
       description:
-        "Empêche Windows de générer des graphiques de chronologie et de suivre les activités de l'utilisateur entre appareils.",
+        "Active la stratégie qui empêche Windows d'installer automatiquement les applications Store mises en avant, les applications suggérées et les astuces grand public. Paramètres l'indiquera comme géré par votre organisation : c'est ainsi que Windows signale les stratégies. Les applications que vous avez installées vous-même ne sont pas supprimées.",
     },
-    disable_publish_user_activities: {
-      name: "Désactiver la publication des activités dans le cloud",
+    disable_cloud_clipboard: {
+      name: "Désactiver la synchronisation du presse-papiers entre appareils",
       description:
-        "Empêche Windows de synchroniser l'historique des activités avec les services cloud de Microsoft.",
+        "Applique la stratégie qui empêche Windows de synchroniser le contenu du presse-papiers avec votre compte Microsoft et vos autres appareils. Le presse-papiers de ce PC continue de fonctionner normalement. La restauration supprime la stratégie.",
     },
-    disable_bing_widget_search: {
-      name: "Désactiver les widgets et flux de Windows 11",
+    disable_error_reporting: {
+      name: "Désactiver le rapport d'erreurs Windows",
       description:
-        "Désactive le panneau de widgets Windows 11 et la synchronisation des flux web en arrière-plan.",
+        "Active la stratégie qui empêche Windows d'envoyer à Microsoft les rapports de plantage et de blocage. Windows vous affiche toujours l'erreur, mais aucun rapport n'est envoyé. La restauration supprime la stratégie.",
     },
     disable_typing_insights: {
       name: "Désactiver la télémétrie des insights de saisie",
@@ -1874,14 +1875,14 @@ export const fr: Strings = {
         "Empêche le Microsoft Store d'installer des applications à distance depuis le web.",
     },
     disable_sqm_telemetry: {
-      name: "Désactiver le client de télémétrie SQM",
+      name: "Désactiver la session d'autologging SQM",
       description:
-        "Désactive la transmission des données du client SQM (Software Quality Metrics) dans Windows.",
+        "Désactive la session d'autologging SQMLogger : la trace Software Quality Metrics qui alimente le client CEIP de Microsoft ne démarre plus au démarrage. Windows peut réactiver cette session via une mise à jour ; réappliquez le réglage si elle revient. La restauration réécrit la valeur Start d'origine.",
     },
-    disable_inventory_telemetry: {
-      name: "Désactiver l'inventaire de compatibilité des applications",
+    disable_diagtrack_autologger: {
+      name: "Désactiver la session d'autologging DiagTrack",
       description:
-        "Empêche Windows Application Experience d'établir des listes d'inventaire de vos applications installées.",
+        "Désactive la session AutoLogger-Diagtrack-Listener : la trace de diagnostic consommée par le service DiagTrack ne démarre plus au démarrage de Windows. Le service lui-même reste intact : seule la session de trace est arrêtée, pas le service. La restauration réécrit la valeur Start d'origine.",
     },
     disable_compatibility_assistant: {
       name: "Désactiver l'Assistant de compatibilité des programmes",

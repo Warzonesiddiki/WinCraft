@@ -84,14 +84,14 @@
       <Application_XML_File_URL>https://raw.githubusercontent.com/Warzonesiddiki/WinCraft/master/docs/pad.xml</Application_XML_File_URL>
     </Application_URLs>
     <Download_URLs>
-      <Primary_Download_URL>https://github.com/Warzonesiddiki/WinCraft/releases/download/v1.18.1/pc-tweaker-app_1.18.1_x64-setup.exe</Primary_Download_URL>
+      <Primary_Download_URL>https://github.com/AurelioAvila/pc-tweaker-app/releases/download/v1.18.1/pc-tweaker-app_1.18.1_x64-setup.exe</Primary_Download_URL>
       <Secondary_Download_URL></Secondary_Download_URL>
       <Additional_Download_URL_1></Additional_Download_URL_1>
       <Additional_Download_URL_2></Additional_Download_URL_2>
     </Download_URLs>
   </Web_Info>
   <Permissions>
-    <Distribution_Permissions>Catalogs may link to the unmodified official signed download. Repackaging, modification and source redistribution are not authorized. Proprietary terms: https://github.com/Warzonesiddiki/WinCraft/blob/master/LICENSE</Distribution_Permissions>
+    <Distribution_Permissions>Catalogs may link to the unmodified official signed download; that build is the only one carrying the verified publisher signature. The source is public under the MIT licence and may be read, modified and redistributed: https://github.com/Warzonesiddiki/WinCraft/blob/master/LICENSE</Distribution_Permissions>
     <EULA></EULA>
   </Permissions>
 </XML_DIZ_INFO>

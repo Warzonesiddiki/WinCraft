@@ -1,4 +1,4 @@
-# WinCraft Quick Installer. Prefer downloading and reviewing this script first.
+﻿# WinCraft Quick Installer. Prefer downloading and reviewing this script first.
 [CmdletBinding()]
 param([switch]$LibraryOnly)
 $ErrorActionPreference = 'Stop'
@@ -68,4 +68,20 @@ try {
     Write-Warning 'Release discovery unavailable; using the signed stable x64 installer alias.'
     $download = 'https://github.com/Warzonesiddiki/WinCraft/releases/latest/download/PCTweaker-Setup.exe'
 }
-Invoke-WinCraftInstall -DownloadUrl $download
+try {
+    Invoke-WinCraftInstall -DownloadUrl $download
+} catch {
+    # A raw 404 from the stable alias is the shape of "no signature-verified
+    # release exists yet", which is the state this repository is in whenever the
+    # only published release is an unsigned pre-release. Say so, and keep the
+    # original error: the message is guidance, not a second failure path.
+    Write-Host ''
+    if ($_.Exception.GetType().Name -in @('WebException', 'HttpResponseException')) {
+        Write-Host 'The installer download failed, so nothing was installed.' -ForegroundColor Red
+        Write-Host 'If that was a 404, no signature-verified release is published yet — the stable link is created by the first one.' -ForegroundColor Yellow
+        Write-Host 'The releases page shows what exists: https://github.com/Warzonesiddiki/WinCraft/releases' -ForegroundColor Yellow
+    } else {
+        Write-Host 'Nothing was installed.' -ForegroundColor Red
+    }
+    throw
+}

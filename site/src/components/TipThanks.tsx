@@ -2,9 +2,13 @@ import { useEffect, useState } from "react";
 import { text } from "../i18n/dictionary";
 
 /**
- * Acknowledges a completed tip. Stripe redirects back to `/?tip=thanks`, and
- * without this the tipper lands on the homepage with no sign anything
- * happened — the one place in this feature where silence isn't acceptable.
+ * Acknowledges a completed tip. The backend's tip Checkout returns the buyer to
+ * `${APP_URL}/tip-thanks`: its own page when it runs on the API host, and this
+ * site's `/tip-thanks` route when `APP_URL` names the site. Both leave the
+ * visitor on a page with no sign anything happened unless the site says so —
+ * the one place in this feature where silence isn't acceptable — so the banner
+ * answers to that path as well as to the `?tip=thanks` query the site uses for
+ * its own links.
  *
  * Deliberately not a toast system: this is the only after-redirect state the
  * site has, so it reads the query string itself and drops the parameter on
@@ -21,7 +25,8 @@ export function TipThanks() {
   const [shown, setShown] = useState(false);
 
   useEffect(() => {
-    if (new URLSearchParams(window.location.search).get("tip") === "thanks") {
+    const path = window.location.pathname.replace(/\/+$/, "");
+    if (path === "/tip-thanks" || new URLSearchParams(window.location.search).get("tip") === "thanks") {
       setShown(true);
     }
   }, []);

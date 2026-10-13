@@ -1223,7 +1223,7 @@ export const es: Strings = {
     disable_edge_ai: {
       name: "Desactivar las funciones de IA de Microsoft Edge",
       description:
-        "Aplica directivas de Microsoft Edge para sus funciones de IA. Cuáles surten efecto depende del perfil de Edge: impedir que Edge descargue su modelo de IA local funciona en todos los perfiles; ocultar la barra lateral y desactivar la búsqueda con IA en el historial y los temas generados por IA funciona en los perfiles que no han iniciado sesión con una cuenta Microsoft personal; desactivar el acceso de Copilot al contenido de las páginas y su ayuda para escribir solo funciona en perfiles profesionales o educativos. Edge los aplica sin reiniciar; puedes verlos en edge://policy. Edge indicará que lo administra tu organización: así es como señala las directivas.",
+        "Aplica directivas de Microsoft Edge para sus funciones de IA. Cuáles surten efecto depende del perfil de Edge: impedir que Edge descargue su modelo de IA local funciona en todos los perfiles; desactivar la búsqueda con IA en el historial y los temas generados por IA funciona en los perfiles que no han iniciado sesión con una cuenta Microsoft personal; desactivar el acceso de Copilot al contenido de las páginas y su ayuda para escribir solo funciona en perfiles profesionales o educativos. La barra lateral de Edge tiene su propio control en esta lista. Edge aplica las directivas sin reiniciar; puedes verlas en edge://policy. Edge indicará que lo administra tu organización: así es como señala las directivas.",
     },
     disable_paint_ai: {
       name: "Desactivar las funciones de IA de Paint",
@@ -1514,7 +1514,8 @@ export const es: Strings = {
     },
     disable_bing_search: {
       name: "Desactivar la búsqueda de Bing en el menú Inicio",
-      description: "Impide que tus búsquedas del menú Inicio se envíen a Bing.",
+      description:
+        "Aplica la directiva Explorer que mantiene los resultados web y las sugerencias de Bing fuera de la búsqueda de Inicio, de modo que la búsqueda se queda en este PC. Configuración lo mostrará como administrado por tu organización: así es como Windows indica las directivas.",
     },
     power_plan_performance: {
       name: "Alto rendimiento (plan de energía)",
@@ -1810,20 +1811,20 @@ export const es: Strings = {
       description:
         "Evita que la telemetría de diagnóstico de Windows reserve y escriba bases de datos de caché locales en disco.",
     },
-    disable_activity_feed: {
-      name: "Desactivar fuente de actividades y línea de tiempo",
+    disable_consumer_experiences: {
+      name: "Desactivar las experiencias para el consumidor de Microsoft",
       description:
-        "Evita que Windows genere gráficos de historial y rastree las actividades del usuario entre dispositivos.",
+        "Activa la directiva que impide que Windows instale automáticamente aplicaciones de Store promocionadas, aplicaciones sugeridas y consejos para el consumidor. Configuración lo mostrará como administrado por tu organización: así es como Windows indica las directivas. Las aplicaciones que instalaste tú mismo no se eliminan.",
     },
-    disable_publish_user_activities: {
-      name: "Desactivar publicación de actividades de usuario en la nube",
+    disable_cloud_clipboard: {
+      name: "Desactivar la sincronización del portapapeles entre dispositivos",
       description:
-        "Evita que Windows sincronice el historial de actividades con los servicios en la nube de Microsoft.",
+        "Aplica la directiva que impide que Windows sincronice el contenido del portapapeles con tu cuenta de Microsoft y tus otros dispositivos. El portapapeles de este PC sigue funcionando igual. Al restaurar se elimina la directiva.",
     },
-    disable_bing_widget_search: {
-      name: "Desactivar widgets y fuentes de Windows 11",
+    disable_error_reporting: {
+      name: "Desactivar los informes de errores de Windows",
       description:
-        "Desactiva el panel de widgets de Windows 11 y la sincronización de noticias en segundo plano.",
+        "Activa la directiva que impide que Windows envíe a Microsoft informes de bloqueos y cuelgues. Windows sigue mostrándote el error, pero no se envía ningún informe. Al restaurar se elimina la directiva.",
     },
     disable_typing_insights: {
       name: "Desactivar información de escritura y telemetría",
@@ -1871,14 +1872,14 @@ export const es: Strings = {
         "Evita que Microsoft Store envíe instalaciones de aplicaciones a este PC de forma remota.",
     },
     disable_sqm_telemetry: {
-      name: "Desactivar cliente de telemetría SQM",
+      name: "Desactivar la sesión de registro automático de SQM",
       description:
-        "Desactiva el envío de datos del cliente SQM (Software Quality Metrics) en Windows.",
+        "Desactiva la sesión de registro automático SQMLogger, por lo que el seguimiento de Software Quality Metrics que alimenta el cliente CEIP de Microsoft ya no se inicia al arrancar. Windows puede reactivar la sesión con una actualización; vuelve a aplicar el control si reaparece. Al restaurar se devuelve el valor Start original.",
     },
-    disable_inventory_telemetry: {
-      name: "Desactivar inventario de compatibilidad de aplicaciones",
+    disable_diagtrack_autologger: {
+      name: "Desactivar la sesión de registro automático de DiagTrack",
       description:
-        "Evita que Windows Application Experience recopile inventarios de las aplicaciones instaladas.",
+        "Desactiva la sesión AutoLogger-Diagtrack-Listener, por lo que el seguimiento de diagnóstico que consume el servicio DiagTrack ya no se inicia al arrancar. El servicio no se toca: solo se detiene la sesión de seguimiento, no el servicio. Al restaurar se devuelve el valor Start original.",
     },
     disable_compatibility_assistant: {
       name: "Desactivar Asistente para la compatibilidad de programas",

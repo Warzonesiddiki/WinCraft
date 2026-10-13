@@ -1,0 +1,25 @@
+diff --git a/.github/workflows/checks.yml b/.github/workflows/checks.yml
+index 74db682..3473ecb 100644
+--- a/.github/workflows/checks.yml
++++ b/.github/workflows/checks.yml
+@@ -168,7 +168,19 @@ jobs:
+         run: npm run check:workflows
+ 
+       - name: Rust unit tests
+-        run: npm run check:rust
++        # `cargo test` prints the reason hundreds of lines above its last line,
++        # and a failed run's log is a download most people never open. The
++        # failure is therefore re-emitted as workflow annotations, which the
++        # run page shows inline and the checks API exposes as data.
++        run: |
++          $log = npm run check:rust 2>&1
++          $log | Out-String -Width 400 | Write-Host
++          if ($LASTEXITCODE -ne 0) {
++            $interesting = $log | Select-String -Pattern '^error(\[E[0-9]+\])?: ','^warning: unused','panicked at','^test result: FAILED','^---- ' | Select-Object -First 8
++            if (-not $interesting) { $interesting = $log | Select-Object -Last 8 }
++            foreach ($line in $interesting) { Write-Host "::error::$($line.Line.Trim())" }
++            exit 1
++          }
+ 
+       # The list names the tests the suite runs in isolation; the script fails if
+       # a filter matches nothing, so it is what notices a renamed or deleted

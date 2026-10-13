@@ -79,6 +79,9 @@ export default function App({ initialPath = "/" }: { initialPath?: string }) {
       page = <UninstallerPage />;
       break;
     case "/":
+    // The tip flow's return address (see ROUTE_SEO): the homepage, with the
+    // thanks banner the query string or this path turns on.
+    case "/tip-thanks":
       page = <HomePage />;
       break;
     case "/support":

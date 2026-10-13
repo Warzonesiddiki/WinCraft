@@ -1201,7 +1201,7 @@ export const en: Strings = {
     disable_edge_ai: {
       name: "Turn off AI features in Microsoft Edge",
       description:
-        "Sets Microsoft Edge policies for its AI features. Which ones take effect depends on the Edge profile: stopping Edge from downloading its on-device AI model works for every profile; hiding the sidebar and turning off AI history search and AI-generated themes work for profiles not signed in with a personal Microsoft account; turning off Copilot's access to page content and its writing help works only for work or school profiles. Edge picks them up without a restart; edge://policy lists them. Edge will show that it is managed by your organization, which is how it labels policies.",
+        "Sets Microsoft Edge policies for its AI features. Which ones take effect depends on the Edge profile: stopping Edge from downloading its on-device AI model works for every profile; turning off AI history search and AI-generated themes works for profiles not signed in with a personal Microsoft account; turning off Copilot's access to page content and its writing help works only for work or school profiles. The Edge sidebar has its own control in this list. Edge picks the policies up without a restart; edge://policy lists them. Edge will show that it is managed by your organization, which is how it labels policies.",
     },
     disable_paint_ai: {
       name: "Turn off AI features in Paint",
@@ -1491,7 +1491,8 @@ export const en: Strings = {
     },
     disable_bing_search: {
       name: "Disable Bing search in the Start menu",
-      description: "Stops your Start menu searches from being sent to Bing.",
+      description:
+        "Sets the Explorer policy that keeps Bing web results and suggestions out of Start search, so a search stays on this PC. Settings will show it as managed by your organization, which is how Windows labels policies.",
     },
     power_plan_performance: {
       name: "High performance (power plan)",
@@ -1783,19 +1784,20 @@ export const en: Strings = {
       description:
         "Stops Windows diagnostic telemetry from reserving and writing local telemetry database caches on disk.",
     },
-    disable_activity_feed: {
-      name: "Disable Windows activity feed and timeline",
+    disable_consumer_experiences: {
+      name: "Turn off Microsoft consumer experiences",
       description:
-        "Prevents Windows from generating timeline graphs and tracking cross-device user activities.",
+        "Turns on the policy that stops Windows from automatically installing promoted Store apps, suggested apps and consumer tips. Settings will show it as managed by your organization, which is how Windows labels policies. Apps you installed yourself are not removed.",
     },
-    disable_publish_user_activities: {
-      name: "Disable publishing user activities to cloud",
+    disable_cloud_clipboard: {
+      name: "Turn off clipboard sync across devices",
       description:
-        "Prevents Windows from publishing activity timeline history to Microsoft cloud services.",
+        "Applies the policy that stops Windows from syncing clipboard content to your Microsoft account and your other devices. The clipboard on this PC keeps working as before. Restore removes the policy.",
     },
-    disable_bing_widget_search: {
-      name: "Disable Windows 11 Widgets and feeds",
-      description: "Disables the Windows 11 widgets board and background web feed synchronization.",
+    disable_error_reporting: {
+      name: "Turn off Windows Error Reporting",
+      description:
+        "Turns on the policy that stops Windows from sending crash and hang reports to Microsoft. Windows still shows you the error, but no report is sent. Restore removes the policy.",
     },
     disable_typing_insights: {
       name: "Disable typing insights telemetry",
@@ -1843,14 +1845,14 @@ export const en: Strings = {
         "Prevents Microsoft Store from pushing app installations to this PC remotely from the web.",
     },
     disable_sqm_telemetry: {
-      name: "Disable SQM telemetry client",
+      name: "Disable the SQM autologger trace session",
       description:
-        "Disables Software Quality Metrics (SQM) client data reporting across Windows components.",
+        "Sets the SQMLogger autologger session to off, so the Software Quality Metrics trace that feeds Microsoft's CEIP client never starts at boot. Windows can re-enable the session through an update; re-apply the control if it returns. Restore puts the original Start value back.",
     },
-    disable_inventory_telemetry: {
-      name: "Disable application compatibility inventory",
+    disable_diagtrack_autologger: {
+      name: "Disable the DiagTrack autologger trace session",
       description:
-        "Stops Windows Application Experience from compiling inventory lists of your installed applications.",
+        "Sets the AutoLogger-Diagtrack-Listener session to off, so the diagnostic trace that the DiagTrack service consumes does not start at boot. The service itself is left alone: this stops the trace session, not the service. Restore puts the original Start value back.",
     },
     disable_compatibility_assistant: {
       name: "Disable Program Compatibility Assistant",

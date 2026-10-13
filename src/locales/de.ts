@@ -1233,7 +1233,7 @@ export const de: Strings = {
     disable_edge_ai: {
       name: "KI-Funktionen in Microsoft Edge deaktivieren",
       description:
-        "Setzt Microsoft-Edge-Richtlinien für seine KI-Funktionen. Welche wirken, hängt vom Edge-Profil ab: Edge am Herunterladen seines lokalen KI-Modells zu hindern, wirkt in jedem Profil; die Seitenleiste auszublenden sowie die KI-Suche im Verlauf und KI-generierte Designs abzuschalten, wirkt in Profilen, die nicht mit einem privaten Microsoft-Konto angemeldet sind; den Zugriff von Copilot auf Seiteninhalte und seine Schreibhilfe abzuschalten, wirkt nur in Geschäfts- oder Schulprofilen. Edge übernimmt sie ohne Neustart; edge://policy listet sie auf. Edge zeigt dann an, dass es von deiner Organisation verwaltet wird – so kennzeichnet es Richtlinien.",
+        "Setzt Microsoft-Edge-Richtlinien für seine KI-Funktionen. Welche wirken, hängt vom Edge-Profil ab: Edge am Herunterladen seines lokalen KI-Modells zu hindern, wirkt in jedem Profil; die KI-Suche im Verlauf und KI-generierte Designs abzuschalten, wirkt in Profilen, die nicht mit einem privaten Microsoft-Konto angemeldet sind; den Zugriff von Copilot auf Seiteninhalte und seine Schreibhilfe abzuschalten, wirkt nur in Geschäfts- oder Schulprofilen. Die Edge-Seitenleiste hat einen eigenen Schalter in dieser Liste. Edge übernimmt die Richtlinien ohne Neustart; edge://policy listet sie auf. Edge zeigt dann an, dass es von deiner Organisation verwaltet wird – so kennzeichnet es Richtlinien.",
     },
     disable_paint_ai: {
       name: "KI-Funktionen in Paint deaktivieren",
@@ -1523,7 +1523,8 @@ export const de: Strings = {
     },
     disable_bing_search: {
       name: "Bing-Suche im Startmenü deaktivieren",
-      description: "Verhindert, dass deine Suchanfragen im Startmenü an Bing gesendet werden.",
+      description:
+        "Setzt die Explorer-Richtlinie, die Bing-Webtreffer und -Vorschläge aus der Startsuche heraushält, sodass eine Suche auf diesem PC bleibt. Die Einstellungen zeigen die Option dann als von deiner Organisation verwaltet an – so kennzeichnet Windows Richtlinien.",
     },
     power_plan_performance: {
       name: "Hohe Leistung (Energiesparplan)",
@@ -1818,20 +1819,20 @@ export const de: Strings = {
       description:
         "Verhindert, dass die Windows-Diagnosetelemetrie lokale Cache-Datenbanken auf dem Datenträger reserviert.",
     },
-    disable_activity_feed: {
-      name: "Aktivitätsfeed und Zeitachse deaktivieren",
+    disable_consumer_experiences: {
+      name: "Microsoft-Verbrauchererfahrungen deaktivieren",
       description:
-        "Verhindert, dass Windows Zeitachsen-Graphen erstellt und Benutzeraktivitäten geräteübergreifend verfolgt.",
+        "Aktiviert die Richtlinie, die verhindert, dass Windows beworbene Store-Apps, vorgeschlagene Apps und Verbrauchertipps automatisch installiert. Die Einstellungen zeigen die Option dann als von deiner Organisation verwaltet an – so kennzeichnet Windows Richtlinien. Selbst installierte Apps werden nicht entfernt.",
     },
-    disable_publish_user_activities: {
-      name: "Veröffentlichung von Benutzeraktivitäten in der Cloud deaktivieren",
+    disable_cloud_clipboard: {
+      name: "Synchronisierung der Zwischenablage zwischen Geräten deaktivieren",
       description:
-        "Verhindert, dass Windows den Aktivitätsverlauf an Microsoft-Clouddienste synchronisiert.",
+        "Setzt die Richtlinie, die verhindert, dass Windows den Inhalt der Zwischenablage mit deinem Microsoft-Konto und deinen anderen Geräten synchronisiert. Die Zwischenablage auf diesem PC funktioniert unverändert weiter. Beim Wiederherstellen wird die Richtlinie entfernt.",
     },
-    disable_bing_widget_search: {
-      name: "Windows 11-Widgets und Feeds deaktivieren",
+    disable_error_reporting: {
+      name: "Windows-Fehlerberichterstattung deaktivieren",
       description:
-        "Deaktiviert das Windows 11-Widget-Board und die Hintergrund-Synchronisierung von Web-Feeds.",
+        "Aktiviert die Richtlinie, die verhindert, dass Windows Absturz- und Hängerberichte an Microsoft sendet. Der Fehler wird dir weiterhin angezeigt, es wird jedoch kein Bericht gesendet. Beim Wiederherstellen wird die Richtlinie entfernt.",
     },
     disable_typing_insights: {
       name: "Eingabeerkenntnisse-Telemetrie deaktivieren",
@@ -1879,14 +1880,14 @@ export const de: Strings = {
         "Verhindert, dass der Microsoft Store App-Installationen remote aus dem Web auf diesen PC überträgt.",
     },
     disable_sqm_telemetry: {
-      name: "SQM-Telemetrie-Client deaktivieren",
+      name: "SQM-Autologger-Sitzung deaktivieren",
       description:
-        "Deaktiviert die Datenübertragung des Software Quality Metrics (SQM)-Clients in Windows-Komponenten.",
+        "Schaltet die Autologger-Sitzung SQMLogger aus, sodass die Software Quality Metrics-Ablaufverfolgung, die den CEIP-Client von Microsoft versorgt, nicht mehr beim Start anläuft. Windows kann die Sitzung per Update wieder aktivieren; wende das Element dann erneut an. Beim Wiederherstellen wird der ursprüngliche Start-Wert zurückgeschrieben.",
     },
-    disable_inventory_telemetry: {
-      name: "Anwendungskompatibilitätsinventar deaktivieren",
+    disable_diagtrack_autologger: {
+      name: "DiagTrack-Autologger-Sitzung deaktivieren",
       description:
-        "Verhindert, dass die Windows-Anwendungserfahrung Bestandslisten Ihrer installierten Anwendungen erstellt.",
+        "Schaltet die Sitzung AutoLogger-Diagtrack-Listener aus, sodass die Diagnoseablaufverfolgung, die der Dienst DiagTrack nutzt, nicht mehr beim Start anläuft. Der Dienst selbst bleibt unangetastet: Hier wird nur die Ablaufverfolgungssitzung beendet, nicht der Dienst. Beim Wiederherstellen wird der ursprüngliche Start-Wert zurückgeschrieben.",
     },
     disable_compatibility_assistant: {
       name: "Programmkompatibilitäts-Assistenten deaktivieren",

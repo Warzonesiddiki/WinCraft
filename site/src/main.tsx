@@ -3,7 +3,7 @@ import { createRoot, hydrateRoot } from "react-dom/client";
 import App from "./App";
 import { ThemeProvider } from "./theme";
 import { campaignLabels, captureEntry } from "./campaign-store";
-import { API_BASE, DOWNLOAD_EXE } from "./constants";
+import { API_BASE, DOWNLOAD_URL } from "./constants";
 // Self-hosted fonts (previously Google Fonts <link>s): keeps every visitor
 // request on our own origin — no IPs sent to Google, nothing to consent to.
 // Weights match what the old fonts.googleapis.com URL loaded.
@@ -44,7 +44,7 @@ captureEntry(window.location.search);
 // unchanged link; the beacon carries only the in-memory labels, nothing else.
 document.addEventListener("click", (event) => {
   const utm = campaignLabels();
-  if (utm.utm_source && (event.target as Element | null)?.closest?.(`a[href="${DOWNLOAD_EXE}"]`)) {
+  if (utm.utm_source && (event.target as Element | null)?.closest?.(`a[href="${DOWNLOAD_URL}"]`)) {
     navigator.sendBeacon(`${API_BASE}/api/download?${new URLSearchParams(utm)}`);
   }
 });

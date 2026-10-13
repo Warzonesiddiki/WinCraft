@@ -260,3 +260,222 @@ On x64 Windows, run:
 npm run check:rust
 npm run check:native-policy
 ```
+
+## Third pass, later the same day — the run that finally executed, and the links audit
+
+Branch `arena/0a0ad37e-wincraft`. This pass starts from a pushed branch and a
+red CI run, and it ends with the first green Checks run this lineage has had.
+
+### CI, before and after
+
+| Run                | Head      | Result                                                                                     |
+| ------------------ | --------- | ------------------------------------------------------------------------------------------ |
+| `38430230518`      | `9338a66` | Failure at step 22: `no_value_is_written_twice_or_by_another_tweak` panicked — `disable_edge_hub_sidebar` overlapped the settings card `disable_edge_ai` |
+| `38432375696`      | `e26aff1` | **Green, 26/26 steps** — including the four that had never run here: Isolated native policy tests (20 `cargo test --lib` filters), Live DPC capture, Native power policies on a disposable plan, and Backend unit tests |
+
+Getting to step 22 at all was itself work: the previous session's branch did not
+compile, and the six errors were the audit's own: six `Category::System`
+variants in `tweaks.rs` (the variant does not exist), a non-exhaustive
+`RegValue` match in `dns.rs`, and a missing import. The overlap that failed the
+run after that was a **real assertion, not a flake** — one registry value with
+two owners — so it was fixed by giving `HubsSidebarEnabled` back to its
+dedicated control rather than by relaxing the test.
+
+### Catalogue corrections
+
+| Change                                                                                                                                                    | Why                                                                                                                                                                    |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Six ids renamed or retargeted: `disable_activity_feed` → `disable_consumer_experiences`, `disable_publish_user_activities` → `disable_cloud_clipboard`, `disable_bing_widget_search` → `disable_error_reporting`, `disable_inventory_telemetry` → `disable_diagtrack_autologger`, `disable_sqm_telemetry` → `SQMLogger`, `disable_ndu` → the Ndu service key | Each one wrote a value Windows no longer reads, or wrote the same value as another control. The ids and their names/descriptions were renamed together in all six locale tables, which `check:i18n` verifies |
+| `disable_bing_search` keeps its id and now writes `DisableSearchBoxSuggestions` (`HKCU\Software\Policies\Microsoft\Windows\Explorer`)               | `BingSearchEnabled` has been ignored since Windows 10 2004 and is reset by feature updates; the policy value is the durable one. It must stay a non-finding in `recommend.rs`, which a Rust test asserts |
+| Six `Category::System` values became `Privacy`                                                                                                          | The variant does not exist; the catalogue compiles again. Categories now read Privacy 58 / Performance 18 / Ui 14 / Gaming 9 / Maintenance 5 |
+| `HKLM\SOFTWARE\Policies\Microsoft\Edge\HubsSidebarEnabled` has one owner                                                                            | `disable_edge_ai` writes five Edge AI policies and says the sidebar has its own control; the VM matrix matches the catalogue byte for byte                                   |
+| Five orphaned permission files and the unused `ed25519-dalek` dependency removed                                                                          | `ipc_commands.rs` declares 147 commands and 147 `allow-*` permissions remain; `Cargo.lock` went from 569 to 557 packages with no dangling reference                        |
+
+### The links audit
+
+Holding the published claims against the published artifacts found a rename that
+had been applied to the reachable half only — the same failure mode as the held
+workflow patch, one level down: a session that could not push its workflow
+change left every *link* rewritten and the *file names* unchanged.
+
+| Where                                                                   | Said                                              | Reality                                                                                                          |
+| ----------------------------------------------------------------------- | ------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| `site/src/constants.ts`, `site/index.html` (JSON-LD `downloadUrl`)      | `.../releases/latest/download/WinCraft-Setup.exe`  | The alias workflow uploads `PCTweaker-Setup.exe`; nothing has ever published `WinCraft-Setup.exe`                 |
+| `site/src/constants.ts`, `src/components/maintenance.tsx`               | `WinCraftUninstaller-Setup.exe` in *this* repository | The Uninstaller is a separate product: `AurelioAvila/pc-tweaker-uninstaller`, asset `PCTweakerUninstaller-Setup.exe` |
+| `README.md`, `site/src/i18n/dictionary.ts`, the launch kit              | WinGet identifier `Warzonesiddiki.WinCraft`        | winget-pkgs has `AurelioAvila.PCTweaker` (1.18.1); `Warzonesiddiki.WinCraft` was never submitted                  |
+| `docs/pad.xml`                                                          | 1.18.1 downloaded from this repository (its size and hash were correct) | The signed 1.18.1 release lives in `AurelioAvila/pc-tweaker-app`; the feed also called the licence "Proprietary terms" |
+| `CHANGELOG.md` (the 1.19.0 section), the launch kit, an Instagram caption | 81 controls, a Pro tier at €9.99/mo, 5 languages, 10 themes | 141 controls, no tier, 6 languages, 14 themes                                                                     |
+
+Two gates now hold those statements in place, each verified by reverting the fix
+it guards and watching it fail:
+
+- `npm run check:download-links` (`scripts/check-download-links.mjs`) reads the
+  stable filenames out of `.github/workflows/*.yml` and the identifiers the
+  WinGet workflow submits, then checks every download URL and WinGet reference in
+  the tree against them. Cross-repository aliases are listed with the reason they
+  cannot be derived. It is enforced in CI through `src/repo-gates.test.ts`, since
+  adding a step to `checks.yml` needs the `workflows` permission.
+- `npm run check:public-counts` now also reads the changelog section for the
+  version being shipped and the launch kit, tolerates a modifier between the number
+  and its noun ("81 one-click Windows controls" was invisible to the old pattern)
+  and rejects a non-zero price.
+
+### Verified locally
+
+`npx tsc --noEmit`; `npx eslint src`; `prettier --check "src/**/*.{ts,tsx,css}"`;
+`npm test` (371 tests); `check:design-tokens`, `check:i18n` (1731 keys × 6),
+`check:i18n-quality`, `check:public-counts`, `check:workflows`,
+`check:no-new-privileges` (147 permissions), `check:data-inventory`,
+`check:download-links`, and the eight model suites — all exit 0;
+`npm ci && npm run build && npm run check:seo` in `site/` (17 sitemap routes);
+`backend`: 197 pass / 0 skip against a real PostgreSQL 17 on loopback.
+`check:rust` and `check:native-policy` cannot run here (no Rust toolchain, and
+the rustup hosts are unreachable from this sandbox); CI is their home, and it is
+green.
+
+### The same holding-to-account, applied to copy and to a money path
+
+- **Fixed: the site said the wrong thing about signatures.** The hero note and
+  the FAQ answer both asserted that WinCraft installers are code-signed and that
+  *older* downloads may be unsigned. The published 1.19.0 is a pre-release and
+  unsigned — the alias workflow's own run reports `Authenticode verification
+  failed (NotSigned): WinCraft_1.19.0_x64_en-US.msi` — while the signed builds
+  are the older 1.18.x ones, so both halves were inverted. Both strings now
+  state the rule (a signed release identifies Aurelio Avila and carries a
+  trusted timestamp), the current state (the published build is a pre-release
+  and not code-signed), and what the visitor should do. RELEASING.md's listing
+  step now says to re-read those sentences at every release, because they go
+  stale the moment the signature state changes.
+- **Fixed, in the site's half: where a tip returns.** The backend creates the
+  tip session with `${APP_URL}/tip-thanks`; `backend/README.md` documents
+  `APP_URL` as the API origin (`https://api.wincraft.app`), and the backend
+  serves that page, so the documented configuration already put the tipper
+  somewhere real. The site's half did not exist: `site/src/components/TipThanks.tsx`
+  acknowledged a tip at `/?tip=thanks` and its own comment claimed Stripe
+  redirected there, but no code path produced that URL and
+  `https://wincraft.app/tip-thanks` answered with the 404 page — so under
+  `stripe.ts`'s own default (`APP_URL=https://wincraft.app`), the one visitor who
+  had just paid was the one visitor shown a 404. The site now serves
+  `/tip-thanks` as the homepage with the acknowledgement, through the same route
+  table the prerender walks, so both configurations land on a page that says
+  thank you. The banner answers to the path as well as to the query, the page
+  canonicalises to the homepage and stays out of the sitemap, and
+  `site/scripts/check-hydration.mjs` loads it and fails when the acknowledgement
+  is missing — or when it appears on the homepage uninvited. No Stripe
+  parameter, price or redirect target changed, which is also why the redirect's
+  target stays a question for the owner rather than an edit here: the backend's
+  `/tip-thanks` page and the site's thanks state are both real now, and which
+  origin `stripe.ts`'s own default names is a deployment setting this sandbox
+  cannot observe.
+
+### The 2.0 roadmap's done-markers, held to account
+
+`docs/WINCRAFT-2.0-ROADMAP.md` marked every work package `[x]`. Holding each box
+against the tree found five claims that nothing implements — `SvcHostSplitThresholdInKB`
+grouped service hosting, NTFS 8.3 names and Last Access Time, the `AITEventLog`
+and `DiagLog` autologgers (only `AutoLogger-Diagtrack-Listener` and `SQMLogger`
+are written), the nine workflow archetypes (six starter profiles ship), and the
+named non-critical services (`MapsBroker`, `WerSvc`, `dmwappushservice`, `lfsvc`
+appear nowhere in the code) — plus two that are true only in effect: the pre-flight
+restore point is the native `SRSetRestorePointW` API rather than WMI, and boot
+times come from `sysinfo` and Windows' own record rather than the WMI
+`SystemBootTime` class. The five are now unchecked, and a reconciliation section
+in the roadmap records what ships instead and what holds up. None of it is a
+regression: nothing published claims those five, and the design spec already held
+the SvcHost fan-out back for a manual hardware test.
+
+### Owner actions this session cannot complete
+
+1. **GitHub Pages.** Every deploy job has failed at `actions/configure-pages`
+   with `Get Pages site failed … Not Found`, because the repository has no Pages
+   site. The API refuses all three enable routes with this credential (`PUT
+   /pages`, `PATCH has_pages=true`, `POST /pages/builds` → 403). Either set
+   Settings → Pages → Source = GitHub Actions once, or apply
+   `docs/workflows-pending.patch`, which passes `enablement: true` to the action
+   so the workflow creates the site itself.
+2. **Two held workflow patches** (`docs/checks-annotation.patch`,
+   `docs/workflows-pending.patch`) — see [ci-workflow-changes.md](ci-workflow-changes.md).
+3. **A signature-verified release in this repository.** The published 1.19.0 is a
+   pre-release and unsigned (`WinCraft_1.19.0_x64_en-US.msi`: `NotSigned`), so the
+   stable alias does not exist, the in-app updater endpoint
+   (`.../releases/latest/download/latest.json`) has nothing to serve, and
+   `install.ps1` fails closed exactly as designed. Nothing in this sandbox can
+   sign a Windows binary.
+4. **The publisher question is settled by reading, not by editing.** `install.ps1`
+   requires the Authenticode signer to be `Aurelio Avila`; `tauri.conf.json`'s
+   `bundle.publisher` (`WinCraft Contributors`) only sets file metadata, not the
+   certificate, and every signed release so far was signed as Aurelio Avila
+   (`verify-installers.ps1` pins that certificate's thumbprint). Nothing needs to
+   change on either side; the two strings describe different things.
+
+## Fourth pass — the licence cluster, the installer, and gates that had no runner
+
+The links audit's method applied to copy found one more cluster, and it is the
+same shape: a decision that changed and three sentences that did not.
+
+`site/src/i18n/dictionary.ts` labelled the MIT `LICENSE` file
+"Source-Available License", and the reel and long-form generators carried
+"WinCraft isn't open source, but the code is source-available" — with a comment
+saying it must never be called open source. That was correct while the project
+was source-available and wrong from the day it became MIT, which is why the
+sentence had a comment defending it and why no gate noticed: nothing read a
+licence claim. All four lines are fixed (including "source available" as a
+YouTube tag), the footer's product column now says `WINCRAFT` rather than
+`PC TWEAKER`, and `npm run check:license-claims` holds it: it reads the licence
+name out of `LICENSE`, fails on "source available", "not open source", "closed
+source", "all rights reserved" and "proprietary licence/terms" across the
+public copy, and requires README, TERMS.md, `docs/pad.xml` and the site's own
+dictionary to name it. Both halves were verified by reverting them.
+
+A third gate closes the same loop for the project's own origin.
+`npm run check:site-links` reads every wincraft.app URL in the tree — backends,
+docs, listings, workflows — and fails when the path is not a route the site ships
+or a file under `site/public/`. It is the check that would have caught the tip
+return address, and it found one more: the offer-verification script created test
+Checkout sessions on the site's origin with the backend's `/checkout-success` and
+`/checkout-cancel` paths. Both now name the origin that answers, and the gate runs
+in CI through `src/repo-gates.test.ts` beside the other two.
+
+**Checked live on 2026-10-13, because a URL that resolves is the only evidence
+that matters, and it changed one decision.** `curl` from this sandbox reaches
+GitHub (the site's own hosts are not in its allowlist, so wincraft.app and
+api.wincraft.app could not be re-measured from here). Every release URL this
+project publishes was requested: the Uninstaller's alias and Tweaky Driver's
+answer with the signed asset, the PAD feed's 1.18.1 file is the one it names, the
+legacy `pc-tweaker-app` installers still resolve — and this repository's own
+stable alias, `.../releases/latest/download/PCTweaker-Setup.exe`, answers **404**,
+because `releases/latest` resolves only to a non-prerelease release and 1.19.0 is
+a pre-release. The site's download button used exactly that URL.
+
+The owner's call, taken while this was being written: point the buttons at the
+releases page until a signed release exists rather than leave a 404 behind the
+most-clicked control on the site. `DOWNLOAD_URL` in `site/src/constants.ts` is
+now `https://github.com/Warzonesiddiki/WinCraft/releases`; the README button, the
+JSON-LD `downloadUrl` and the launch kit followed it; the hero note says the
+buttons open the releases page and that the direct stable link appears once a
+signed release ships; and RELEASING.md's listing step makes switching back part
+of the first signature-verified release. The Uninstaller's own button keeps its
+direct alias, which does resolve.
+
+The live check left the rest of the family standing: the Uninstaller's stable
+alias is on every release of `AurelioAvila/pc-tweaker-uninstaller`, Tweaky
+Driver's is on `AurelioAvila/Tweaky-Driver-Releases`, the PAD feed's 1.18.1 file,
+size and licence line are exact, and this repository's legacy 1.18.x builds are
+still published and signed in `AurelioAvila/pc-tweaker-app`.
+
+Two gates that had no runner now have one, neither needing a workflow edit:
+
+- `scripts/test-quick-installer.ps1`, the offline suite over `install.ps1`, runs
+  from `src/repo-gates.test.ts` in the `checks` job, which is already on a
+  Windows image — plus a parse of every `.ps1` in the tree, the only check that
+  would catch a syntax error in a release script before the day it is needed.
+  `docs/workflows-pending.patch` dropped the now-duplicate step and still applies
+  cleanly.
+- `scripts/check-license-claims.mjs`, beside `check-download-links.mjs`.
+
+`install.ps1` itself is small and security-relevant, so the change to it is
+small: a catch that prints what a failed download means and rethrows, and a
+UTF-8 BOM so Windows PowerShell 5.1 — what `irm … | iex` runs — stops reading
+the script as ANSI and mojibaking the em dash in its banner. Discovery is still
+the only stage inside a `catch`; verification, download and execution are still
+outside it.

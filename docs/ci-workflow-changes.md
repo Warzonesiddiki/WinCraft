@@ -47,3 +47,52 @@ CI had never executed. `scripts/check-workflow-scripts.mjs` now resolves every
 script, `npm run` and `.ps1` a workflow names against the tree and
 `package.json`, and runs in `checks.yml` as its own step. It is part of
 `npm run check` too, so it is enforced locally as well.
+
+## Pending patches: two files, one blocker
+
+Further changes are **not applied**, because the connection this work runs
+through is again a GitHub App installation without the `workflows` permission:
+
+```
+refusing to allow a GitHub App to create or update workflow
+`.github/workflows/checks.yml` without `workflows` permission
+```
+
+Both patches are held rather than dropped — they are the two halves of work
+whose point is not to rot:
+
+| Patch                            | Touches                                | What it does                                                                                                                                                                                                                                                                                                       |
+| -------------------------------- | -------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `docs/checks-annotation.patch`   | `checks.yml`                           | Replaces the `Rust unit tests` step's plain `npm run check:rust` with a run that captures cargo's output and re-emits the lines that matter — `error[E…]`, `warning: unused`, `panicked at`, `test result: FAILED`, the failing test's `----` header — as `::error::` annotations. A failed run's log is a download that few people open, and the reason sits hundreds of lines above the last line; annotations are what the run page and the checks API show. |
+| `docs/workflows-pending.patch`   | `checks.yml`, `deploy-site.yml`        | Adds a `backend` job with a `postgres:16` service and `TEST_DATABASE_URL` + `DATABASE_ALLOW_PLAINTEXT` so the three database tests stop being skipped; and passes `enablement: true` to `actions/configure-pages` so the site deploy can create the Pages site, which is the one thing every deploy job has failed on so far.               |
+
+Apply either with:
+
+```sh
+git apply docs/checks-annotation.patch
+git apply docs/workflows-pending.patch
+```
+
+The `workflows-pending` patch moves the remaining checks into CI. Two of the
+three it was written for now have a home that does not need a workflow edit:
+
+- `scripts/check-no-new-privileges.mjs`, `scripts/check-data-inventory.mjs`,
+  `scripts/check-download-links.mjs`, `scripts/check-site-links.mjs` and
+  `scripts/check-license-claims.mjs` have no step of their own in `checks.yml`.
+  They are enforced anyway: `src/repo-gates.test.ts` runs them through the
+  Vitest suite, which is a step in that workflow, so a red gate still fails the
+  run. A step would be the tidier home, not the only enforcement.
+- `scripts/test-quick-installer.ps1` is Windows-only — and it runs in CI now,
+  through `src/repo-gates.test.ts`, in the same `checks` job, on the same
+  Windows image (the suite plus a parse of every `.ps1` in the tree). It used to
+  need this patch; it no longer does, and the patch no longer adds a step for
+  it, because running the same suite twice in one job buys nothing.
+- the three PostgreSQL-backed backend tests (transaction rollback, account
+  deletion eligibility, retention) skip themselves without `TEST_DATABASE_URL`,
+  which is the state CI has been in: 194 passing, 3 skipped. With the job in
+  the patch they run against a real server, which is how they were verified
+  locally (197 passing, 0 skipped).
+
+It is held back rather than dropped because the two workflow test steps this
+project has already had that "ran" for several releases without ever
+executing showed what an unread failure costs.

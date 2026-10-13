@@ -476,9 +476,14 @@ const UNINSTALLER_PAGE_URL =
 /** Version-less on purpose: GitHub resolves `releases/latest/download/<name>`
  *  only for an exact filename, so this points at the stable-named copy the
  *  uninstaller's release script publishes alongside the versioned one. A
- *  versioned URL here would break on that product's next release. */
+ *  versioned URL here would break on that product's next release.
+ *
+ *  The Uninstaller ships from its own repository, not this one: the rename
+ *  rewrote the owner segment to this repository, where no such asset has ever
+ *  existed, so the button 404'd. `scripts/check-download-links.mjs` now fails
+ *  the build when an asset name and the repository that publishes it disagree. */
 const UNINSTALLER_DOWNLOAD_URL =
-  "https://github.com/Warzonesiddiki/WinCraft/releases/latest/download/PCTweakerUninstaller-Setup.exe";
+  "https://github.com/AurelioAvila/pc-tweaker-uninstaller/releases/latest/download/PCTweakerUninstaller-Setup.exe";
 
 export function UninstallerPromoCard({ s }: { s: Strings }) {
   const [asking, setAsking] = useState(false);
