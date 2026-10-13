@@ -76,11 +76,12 @@ git apply docs/workflows-pending.patch
 The `workflows-pending` patch moves the remaining checks into CI. Two of the
 three it was written for now have a home that does not need a workflow edit:
 
-- `scripts/check-no-new-privileges.mjs` and `scripts/check-data-inventory.mjs`
-  have no step in `checks.yml`. They are enforced anyway: `src/repo-gates.test.ts`
-  runs them through the Vitest suite, which is a step in that workflow, so a
-  red gate still fails the run. The patch is the tidier home, not the only
-  enforcement.
+- `scripts/check-no-new-privileges.mjs`, `scripts/check-data-inventory.mjs`,
+  `scripts/check-download-links.mjs`, `scripts/check-site-links.mjs` and
+  `scripts/check-license-claims.mjs` have no step of their own in `checks.yml`.
+  They are enforced anyway: `src/repo-gates.test.ts` runs them through the
+  Vitest suite, which is a step in that workflow, so a red gate still fails the
+  run. A step would be the tidier home, not the only enforcement.
 - `scripts/test-quick-installer.ps1` is Windows-only — and it runs in CI now,
   through `src/repo-gates.test.ts`, in the same `checks` job, on the same
   Windows image (the suite plus a parse of every `.ps1` in the tree). It used to

@@ -100,8 +100,14 @@ for (const offer of PROMO.offers) {
     mode: offer.plan === "lifetime" ? "payment" : "subscription",
     line_items: [{ price: charge.lineItemPrice, quantity: 1 }],
     ...(charge.discounts ? { discounts: charge.discounts } : {}),
-    success_url: "https://wincraft.app/checkout-success",
-    cancel_url: "https://wincraft.app/checkout-cancel",
+    // Never visited — the session is expired in the next request — but they
+    // still have to be the URLs production uses, and those pages are the
+    // backend's own, on its origin. The site has no /checkout-success or
+    // /checkout-cancel route, which is what the wincraft.app pair used to name
+    // (scripts/check-site-links.mjs fails on exactly that).
+    success_url:
+      process.env.CHECKOUT_SUCCESS_URL || "https://api.wincraft.app/checkout-success",
+    cancel_url: process.env.CHECKOUT_CANCEL_URL || "https://api.wincraft.app/checkout-cancel",
     expires_at: Math.floor(Date.now() / 1000) + LIFETIME_CHECKOUT_GRACE_SECONDS,
     metadata: { promo_verification: PROMO.id },
   });

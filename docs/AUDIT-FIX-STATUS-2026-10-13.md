@@ -362,7 +362,11 @@ green.
   canonicalises to the homepage and stays out of the sitemap, and
   `site/scripts/check-hydration.mjs` loads it and fails when the acknowledgement
   is missing — or when it appears on the homepage uninvited. No Stripe
-  parameter, price or redirect target changed.
+  parameter, price or redirect target changed, which is also why the redirect's
+  target stays a question for the owner rather than an edit here: the backend's
+  `/tip-thanks` page and the site's thanks state are both real now, and which
+  origin `stripe.ts`'s own default names is a deployment setting this sandbox
+  cannot observe.
 
 ### The 2.0 roadmap's done-markers, held to account
 
@@ -422,6 +426,26 @@ name out of `LICENSE`, fails on "source available", "not open source", "closed
 source", "all rights reserved" and "proprietary licence/terms" across the
 public copy, and requires README, TERMS.md, `docs/pad.xml` and the site's own
 dictionary to name it. Both halves were verified by reverting them.
+
+A third gate closes the same loop for the project's own origin.
+`npm run check:site-links` reads every wincraft.app URL in the tree — backends,
+docs, listings, workflows — and fails when the path is not a route the site ships
+or a file under `site/public/`. It is the check that would have caught the tip
+return address, and it found one more: the offer-verification script created test
+Checkout sessions on the site's origin with the backend's `/checkout-success` and
+`/checkout-cancel` paths. Both now name the origin that answers, and the gate runs
+in CI through `src/repo-gates.test.ts` beside the other two.
+
+**Checked live on 2026-10-13, because a URL that resolves is the only evidence
+that matters.** The Uninstaller's stable alias is on every release of
+`AurelioAvila/pc-tweaker-uninstaller`, Tweaky Driver's is on
+`AurelioAvila/Tweaky-Driver-Releases`, the PAD feed's 1.18.1 file, size and
+licence line are exact, and this repository's legacy 1.18.x builds are still
+published and signed in `AurelioAvila/pc-tweaker-app`. The one URL that does not
+resolve is this repository's own alias: the workflow only creates it for a
+signature-verified release, and 1.19.0 is a pre-release and unsigned, so the link
+404s by design until a signed release exists — and the site's hero note says
+exactly that.
 
 Two gates that had no runner now have one, neither needing a workflow edit:
 

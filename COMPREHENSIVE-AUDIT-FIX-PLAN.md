@@ -2183,6 +2183,11 @@ which is the only kind of gate that can be added from this credential:
   and still applies cleanly.
 - `scripts/check-license-claims.mjs` runs the same way, beside
   `check-download-links.mjs`.
+- `scripts/check-site-links.mjs` reads every wincraft.app URL in the tree and
+  fails when the path is not a route the site ships or a file under
+  `site/public/`. It found the offer-verification script creating test Checkout
+  sessions on the site's origin with the backend's own paths; both now name the
+  origin that answers.
 
 `docs/WINCRAFT-2.0-ROADMAP.md` was reconciled in the same pass: five checked work
 packages have nothing behind them and are unchecked, and the roadmap records what

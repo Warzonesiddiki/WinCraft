@@ -36,6 +36,22 @@ public statement true, and each one has a gate behind it.
   links to.
 - **Dependencies:** `ed25519-dalek` and the five orphaned permission files left
   behind by the retired licence machinery are gone.
+- **A stable download URL exists on every release that has one.** Checked
+  live on 2026-10-13: the Uninstaller's alias (`PCTweakerUninstaller-Setup.exe`)
+  is on every release of `AurelioAvila/pc-tweaker-uninstaller`, Tweaky Driver's
+  (`TweakyDriver-Setup.exe`) on `AurelioAvila/Tweaky-Driver-Releases`, the PAD
+  feed's 1.18.1 file and its size are exact, and this repository's legacy
+  1.18.x builds are still published, signed, in `AurelioAvila/pc-tweaker-app`.
+  The one link that does not resolve yet is this repository's own
+  `PCTweaker-Setup.exe`, because the alias workflow only creates it for a
+  signature-verified release and 1.19.0 is an unsigned pre-release — which is
+  the designed fail-closed state, not a broken link.
+- **`npm run check:site-links` reads every wincraft.app URL** in the tree and
+  fails when the path is not a route the site ships or a file under
+  `site/public/`. It found the offer-verification script creating test Checkout
+  sessions on the site's origin with the backend's `/checkout-success` and
+  `/checkout-cancel` paths — pages the backend serves on the API origin — and
+  the script now names the origin that answers.
 - **Public copy states the licence the repository ships.** The site footer
   labelled the MIT `LICENSE` file "Source-Available License", and the reel and
   long-form generators still carried the line "WinCraft isn't open source, but
