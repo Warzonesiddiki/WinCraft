@@ -13,7 +13,7 @@ const { DEBLOAT_COPY, DEBLOAT_IMPACT, LIBRARY_COPY, APP_CATEGORIES, EXTRA_IMPACT
   `data:text/javascript;base64,${Buffer.from(outputFiles[0].text).toString("base64")}`
 );
 assert.deepEqual(Object.keys(DEBLOAT_COPY).sort(), ["de", "en", "es", "fr", "it", "pt"]);
-assert.equal(Object.keys(APP_CATEGORIES).length, 13);
+assert.equal(Object.keys(APP_CATEGORIES).length, 25);
 for (const lang of Object.keys(DEBLOAT_COPY)) {
   assert.deepEqual(Object.keys(LIBRARY_COPY[lang]).sort(), Object.keys(LIBRARY_COPY.en).sort());
   for (const id of Object.keys(APP_CATEGORIES)) {

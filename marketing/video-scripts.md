@@ -88,7 +88,7 @@ because they arrive already intending to install something.
    does not exist yet, it has to be built before shooting this video)
 2. (9-15s) Show the rollback: apply a tweak, then undo it in one click, show
    that it returns to exactly the previous value
-3. (15-21s) Show installation via `winget install AurelioAvila.PCTweaker` in the
+3. (15-21s) Show installation via `winget install Warzonesiddiki.WinCraft` in the
    terminal — winget means published through Microsoft's official package
    manager, not an .exe downloaded from some random site
 4. (21-25s) Text: "Rule: if a tool won't tell you EXACTLY what it changes, you don't install it"

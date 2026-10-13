@@ -478,7 +478,7 @@ const UNINSTALLER_PAGE_URL =
  *  uninstaller's release script publishes alongside the versioned one. A
  *  versioned URL here would break on that product's next release. */
 const UNINSTALLER_DOWNLOAD_URL =
-  "https://github.com/AurelioAvila/pc-tweaker-uninstaller/releases/latest/download/PCTweakerUninstaller-Setup.exe";
+  "https://github.com/Warzonesiddiki/WinCraft/releases/latest/download/PCTweakerUninstaller-Setup.exe";
 
 export function UninstallerPromoCard({ s }: { s: Strings }) {
   const [asking, setAsking] = useState(false);

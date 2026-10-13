@@ -3,7 +3,7 @@ import { text } from "../i18n/dictionary";
 import { Link } from "../router";
 import { NewsletterSignup } from "./NewsletterSignup";
 
-const GH = "https://github.com/AurelioAvila/pc-tweaker-app";
+const GH = "https://github.com/Warzonesiddiki/WinCraft";
 
 interface FootLink {
   readonly label: string;

@@ -606,7 +606,11 @@ fn reg_values_equal(a: &crate::rollback::RegValue, b: &crate::rollback::RegValue
     use crate::rollback::RegValue;
     match (a, b) {
         (RegValue::Dword(x), RegValue::Dword(y)) => x == y,
+        (RegValue::Qword(x), RegValue::Qword(y)) => x == y,
         (RegValue::Str(x), RegValue::Str(y)) => x == y,
+        (RegValue::ExpandStr(x), RegValue::ExpandStr(y)) => x == y,
+        (RegValue::MultiSz(x), RegValue::MultiSz(y)) => x == y,
+        (RegValue::Binary(x), RegValue::Binary(y)) => x == y,
         _ => false,
     }
 }

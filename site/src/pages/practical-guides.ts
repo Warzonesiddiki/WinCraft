@@ -24,7 +24,7 @@ export const PRACTICAL_GUIDES = {
       items: [
         { label: "Microsoft Support: uninstall or remove apps and programs in Windows", url: "https://support.microsoft.com/en-us/windows/uninstall-or-remove-apps-and-programs-in-windows-4b55f974-2cc6-2d2b-d092-5905080eaf98" },
         { label: "Microsoft Support: fix problems that block programs from being installed or removed", url: "https://support.microsoft.com/en-us/windows/deployment/install-upgrade/fix-problems-that-block-programs-from-being-installed-or-removed" },
-        { label: "WinCraft Uninstaller: the leftover-detection rules in the source (residue.rs)", url: "https://github.com/AurelioAvila/pc-tweaker-uninstaller/blob/master/src-tauri/src/residue.rs" }
+        { label: "WinCraft Uninstaller: the leftover-detection rules in the source (residue.rs)", url: "https://github.com/Warzonesiddiki/WinCraft/blob/master/src-tauri/src/residue.rs" }
       ]
     }
   },
@@ -53,7 +53,7 @@ export const PRACTICAL_GUIDES = {
       items: [
         { label: "Microsoft Learn: manage Recall (policies, component removal, snapshot deletion)", url: "https://learn.microsoft.com/en-us/windows/client-management/manage-recall" },
         { label: "Microsoft Support: retrace your steps with Recall (opt-in, Settings path, requirements)", url: "https://support.microsoft.com/en-us/windows/retrace-your-steps-with-recall-aa03f8a0-a78b-4b3e-b0a1-2eb8ac48701c" },
-        { label: "WinCraft: the disable_recall entry in the tweak catalogue", url: "https://github.com/AurelioAvila/pc-tweaker-app/blob/master/src-tauri/src/tweaks.rs" }
+        { label: "WinCraft: the disable_recall entry in the tweak catalogue", url: "https://github.com/Warzonesiddiki/WinCraft/blob/master/src-tauri/src/tweaks.rs" }
       ]
     }
   },
@@ -119,8 +119,8 @@ export const PRACTICAL_GUIDES = {
       { heading: "Machine-wide changes and administrator access", body: "Some controls target HKEY_LOCAL_MACHINE or Windows system tools and require administrator rights. An Admin label identifies that requirement; it is not a recommendation to enable the setting. Read the description and decide whether the trade-off fits your machine." },
       { heading: "Power settings depend on your hardware", body: "The native power controls edit supported AC values in the active power scheme. Plugged-in and battery settings are distinct. Availability and practical effects depend on hardware, drivers and Windows policy. More aggressive settings can affect power use and thermals." },
       { heading: "Maintenance is different from a reversible setting", body: "Cleanup, repair, uninstall and update actions are not interchangeable with a registry toggle. Deleted files may not be recoverable; repairs and updates have their own recovery mechanisms. Read operation details and preserve important data before maintenance." },
-      { heading: "Free features and signed installers", body: "The current release includes all 81 controls in the catalogue, plus editable starter profiles, with no account required and no paid tier. Official Windows installers are digitally signed by Aurelio Avila. Signing identifies the publisher and protects file integrity; it does not guarantee that SmartScreen or antivirus warnings will never appear." },
-      { heading: "Inspect the implementation", body: "The source is publicly available at github.com/AurelioAvila/pc-tweaker-app under the MIT licence. The tweak catalogue and Windows implementations live in src-tauri/src, where each entry records its hive, key path, value name and whether it requires administrator rights. Review the source for the exact release you installed when checking an action." }
+      { heading: "Free features and signed installers", body: "The current release includes all 141 controls in the catalogue, plus editable starter profiles, with no account required and no paid tier. Official Windows installers are digitally signed. Signing identifies the publisher and protects file integrity; it does not guarantee that SmartScreen or antivirus warnings will never appear." },
+      { heading: "Inspect the implementation", body: "The source is publicly available at github.com/Warzonesiddiki/WinCraft under the MIT licence. The tweak catalogue and Windows implementations live in src-tauri/src, where each entry records its hive, key path, value name and whether it requires administrator rights. Review the source for the exact release you installed when checking an action." }
     ],
     related: [
       { to: "/reversible-windows-tweaks/", label: "which of these changes can be undone", note: "Setting rollback, change history and the operations that fall outside both." },

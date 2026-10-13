@@ -6,7 +6,7 @@ Welcome to WinCraft ("we", "us", "our"). By downloading, installing, or using Wi
 
 ## 1. What WinCraft does
 
-WinCraft is a Windows desktop app for system settings, maintenance and current-user app removal. Supported setting changes save their original values for restoration. File cleanup and app removal may delete data permanently; reinstalling an app does not restore its data or guarantee the same version. Source code is publicly viewable at [github.com/AurelioAvila/pc-tweaker-app](https://github.com/AurelioAvila/pc-tweaker-app) for transparency; see the repository's [LICENSE](https://github.com/AurelioAvila/pc-tweaker-app/blob/master/LICENSE) for the terms governing that source.
+WinCraft is a Windows desktop app for system settings, maintenance and current-user app removal. Supported setting changes save their original values for restoration. File cleanup and app removal may delete data permanently; reinstalling an app does not restore its data or guarantee the same version. Source code is publicly viewable at [github.com/Warzonesiddiki/WinCraft](https://github.com/Warzonesiddiki/WinCraft) for transparency; see the repository's [LICENSE](https://github.com/Warzonesiddiki/WinCraft/blob/master/LICENSE) for the terms governing that source.
 
 ## 2. Free and open source
 
@@ -28,7 +28,7 @@ WinCraft is open source under the MIT License. You are free to use, modify, and 
 
 ## 6. Third-party services
 
-If you create an account, an SMTP provider handles verification and password-reset emails. See our [Privacy Policy](https://github.com/AurelioAvila/pc-tweaker-app/blob/master/PRIVACY.md) for details.
+If you create an account, an SMTP provider handles verification and password-reset emails. See our [Privacy Policy](PRIVACY.md) for details.
 
 ## 7. Changes to these terms
 
@@ -36,4 +36,4 @@ We may update these Terms as the app evolves; the "Last updated" date above refl
 
 ## 8. Contact
 
-Questions about these Terms? Open an issue at [github.com/AurelioAvila/pc-tweaker-app/issues](https://github.com/AurelioAvila/pc-tweaker-app/issues).
+Questions about these Terms? Open an issue at [github.com/Warzonesiddiki/WinCraft/issues](https://github.com/Warzonesiddiki/WinCraft/issues).

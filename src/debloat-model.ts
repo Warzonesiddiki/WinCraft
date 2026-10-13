@@ -26,6 +26,18 @@ export const TIERS: Record<string, Tier> = {
   movies: "caution",
   phone: "caution",
   outlook: "caution",
+  maps: "recommended",
+  gethelp: "recommended",
+  tips: "recommended",
+  people: "safe",
+  stickynotes: "safe",
+  alarms: "caution",
+  quickassist: "caution",
+  powerautomate: "safe",
+  "3dviewer": "recommended",
+  paint3d: "recommended",
+  cortana: "recommended",
+  devhome: "safe",
 };
 
 export const tierOf = (app: Pick<DebloatApp, "catalogId">): Tier =>
@@ -90,10 +102,11 @@ export function sortApps(apps: readonly DebloatApp[], by: SortKey, lang?: string
   });
 }
 
-export type Preset = "minimal" | "balanced" | "aggressive";
+export type Preset = "minimal" | "balanced" | "aggressive" | "barebone";
 
 /** What each selection preset fills in: minimal = recommended apps,
- *  balanced = recommended and safe ones, aggressive = every removable app.
+ *  balanced = recommended and safe ones, aggressive = every removable app,
+ *  barebone = ultra-lean footprint selecting all removable apps (Atlas OS level).
  *  Only ever a button: nothing is selected until the user picks one, and the
  *  preview still lists every app before anything is removed. */
 export function presetSelection(apps: readonly DebloatApp[], preset: Preset): string[] {

@@ -1578,6 +1578,306 @@ export const en: Strings = {
       description:
         "Stops and disables Windows' file indexing service, reducing background disk activity — useful on small SSDs or while gaming. Start menu file search becomes slower until you turn it back on (requires administrator rights).",
     },
+    enable_regback: {
+      name: "Enable automatic registry backup (RegBack)",
+      description:
+        "Re-enables periodic automatic backups of the Windows registry hives to %SystemRoot%\\System32\\config\\RegBack for emergency recovery.",
+    },
+    explorer_anti_hang: {
+      name: "Prevent File Explorer shortcut hangs",
+      description:
+        "Disables resolving target tracking and network search when opening shortcuts, preventing File Explorer from freezing when shortcuts point to disconnected drives or network shares.",
+    },
+    no_internet_open_with: {
+      name: "Skip Microsoft Store query for unknown files",
+      description:
+        "Opens the local “Open with” application picker immediately instead of prompting to search the Microsoft Store when double-clicking unrecognized file types.",
+    },
+    detailed_bsod: {
+      name: "Show detailed BSOD crash parameters",
+      description:
+        "Displays exact hexadecimal stop codes, faulting drivers, and memory addresses on blue screens instead of hiding them behind a generic QR code.",
+    },
+    disable_wpbt: {
+      name: "Block WPBT UEFI software execution",
+      description:
+        "Prevents motherboard UEFI firmware from automatically installing OEM bloatware binaries into Windows via the Windows Platform Binary Table.",
+    },
+    disable_ndu: {
+      name: "Disable NDU non-paged pool RAM leak",
+      description:
+        "Disables the Network Diagnostic Usage driver service, preventing high non-paged memory pool accumulation during large network downloads.",
+    },
+    disable_search_highlights: {
+      name: "Disable search highlights and doodles",
+      description:
+        "Removes web search illustrations, daily Bing doodles, and dynamic trending topics from the Windows Search bar and taskbar search box.",
+    },
+    auto_complete_run: {
+      name: "Enable Run dialog auto-completion",
+      description:
+        "Enables instant command auto-completion and suggestions in the Windows Run dialog (Win + R).",
+    },
+    disable_aero_shake: {
+      name: "Disable Aero Shake window minimization",
+      description:
+        "Prevents shaking a window's title bar from accidentally minimizing all other background open windows.",
+    },
+    disable_remote_assistance: {
+      name: "Disable Remote Assistance invitations",
+      description:
+        "Disables Windows Remote Assistance connections and invitations to protect against unsolicited remote support requests.",
+    },
+    disable_llmnr: {
+      name: "Disable LLMNR protocol",
+      description:
+        "Disables Link-Local Multicast Name Resolution (LLMNR) to protect against local network spoofing and hash-harvesting attacks.",
+    },
+    disable_wifi_sense: {
+      name: "Disable Wi-Fi Sense hotspot sharing",
+      description:
+        "Prevents Windows from automatically connecting to open Wi-Fi networks and sharing credentials with contacts.",
+    },
+    disable_cloud_search: {
+      name: "Disable cloud search in Windows search",
+      description:
+        "Stops Windows Search from querying cloud account history and Microsoft account search logs when looking for local files.",
+    },
+    disable_app_suggestions_start: {
+      name: "Disable Start menu suggestions and tips",
+      description:
+        "Turns off promotional application suggestions and feature tips inside the Windows Start menu.",
+    },
+    disable_handwriting_sharing: {
+      name: "Disable handwriting error report sharing",
+      description:
+        "Prevents Windows from transmitting handwriting recognition error logs and stroke samples to Microsoft.",
+    },
+    disable_ceip: {
+      name: "Disable Customer Experience Improvement Program",
+      description:
+        "Turns off the Windows SQM telemetry client for the Customer Experience Improvement Program (CEIP).",
+    },
+    disable_lockscreen_camera: {
+      name: "Disable lock screen camera",
+      description:
+        "Disables the lock screen camera gesture and button to prevent photo capture without unlocking the device.",
+    },
+    disable_cortana_consent: {
+      name: "Disable Cortana search consent",
+      description:
+        "Disables Cortana search consent to stop search queries and voice data from being shared with Microsoft cloud services.",
+    },
+    disable_wer_queuing: {
+      name: "Disable Windows error report queuing",
+      description:
+        "Prevents Windows Error Reporting from saving and queuing crash reports on disk for later transmission.",
+    },
+    disable_experimentation: {
+      name: "Disable Windows experimentation telemetry",
+      description:
+        "Disables Microsoft A/B testing and experimentation features on Windows, keeping features consistent and predictable.",
+    },
+    disable_app_inventory_collection: {
+      name: "Disable Application Compatibility Inventory",
+      description:
+        "Disables the Application Compatibility Inventory collector that scans installed software and reports application catalogs to Microsoft.",
+    },
+    disable_problem_steps_recorder: {
+      name: "Disable Problem Steps Recorder telemetry",
+      description:
+        "Disables Problem Steps Recorder (PSR) error capture and diagnostic data submission.",
+    },
+    disable_ait_telemetry: {
+      name: "Disable Application Impact Telemetry",
+      description:
+        "Disables Application Impact Telemetry (AIT) data collection across software launches.",
+    },
+    disable_smartscreen_app_install: {
+      name: "Disable SmartScreen app install telemetry",
+      description:
+        "Disables SmartScreen application installation telemetry and URL lookup queries.",
+    },
+    disable_online_speech_privacy: {
+      name: "Disable online speech recognition data collection",
+      description:
+        "Disables cloud speech recognition data harvesting for voice typing and speech models.",
+    },
+    disable_edge_shopping: {
+      name: "Disable Edge shopping assistant",
+      description:
+        "Disables Microsoft Edge shopping assistant and coupon tracking telemetry.",
+    },
+    disable_edge_metrics: {
+      name: "Disable Edge diagnostic metrics reporting",
+      description:
+        "Disables Microsoft Edge usage metrics and diagnostic crash report transmission.",
+    },
+    disable_edge_startup_boost: {
+      name: "Disable Edge Startup Boost",
+      description:
+        "Disables Edge Startup Boost, preventing Edge background processes from launching at Windows boot.",
+    },
+    disable_edge_background_mode: {
+      name: "Disable Edge background extensions mode",
+      description:
+        "Prevents Microsoft Edge from running in the background when closed, freeing system memory.",
+    },
+    disable_bluetooth_le_discovery: {
+      name: "Disable background Bluetooth LE scanning",
+      description:
+        "Disables continuous background Bluetooth Low Energy scanning to reduce background CPU cycles and power drain.",
+    },
+    disable_edge_hub_sidebar: {
+      name: "Disable Microsoft Edge sidebar",
+      description:
+        "Disables the Edge sidebar and its integrated background web widgets.",
+    },
+    disable_edge_wallet: {
+      name: "Disable Edge wallet autofill suggestions",
+      description:
+        "Prevents Microsoft Edge from querying payment and wallet services automatically.",
+    },
+    disable_cortana_above_lock: {
+      name: "Disable Cortana above lock screen",
+      description:
+        "Prevents voice assistants and search from listening or activating while your screen is locked.",
+    },
+    disable_device_history: {
+      name: "Disable Windows device activity history",
+      description:
+        "Stops Windows from recording and tracking app and file history on this device.",
+    },
+    disable_search_history: {
+      name: "Disable taskbar search history",
+      description:
+        "Disables tracking and storing past search queries in the taskbar and Start menu search box.",
+    },
+    disable_news_and_interests: {
+      name: "Disable News and Interests taskbar feed",
+      description:
+        "Hides the weather and news widget on the Windows taskbar, saving background network and memory.",
+    },
+    disable_auto_maintenance_wake: {
+      name: "Disable wake-to-run automatic maintenance",
+      description:
+        "Prevents Windows Automatic Maintenance from waking your computer or draining laptop battery overnight.",
+    },
+    disable_diagnostic_data_viewer: {
+      name: "Disable diagnostic data local datastore",
+      description:
+        "Stops Windows diagnostic telemetry from reserving and writing local telemetry database caches on disk.",
+    },
+    disable_activity_feed: {
+      name: "Disable Windows activity feed and timeline",
+      description:
+        "Prevents Windows from generating timeline graphs and tracking cross-device user activities.",
+    },
+    disable_publish_user_activities: {
+      name: "Disable publishing user activities to cloud",
+      description:
+        "Prevents Windows from publishing activity timeline history to Microsoft cloud services.",
+    },
+    disable_bing_widget_search: {
+      name: "Disable Windows 11 Widgets and feeds",
+      description:
+        "Disables the Windows 11 widgets board and background web feed synchronization.",
+    },
+    disable_typing_insights: {
+      name: "Disable typing insights telemetry",
+      description:
+        "Prevents Windows from analyzing your keystroke patterns and autocomplete statistics.",
+    },
+    disable_inking_typing_personalization: {
+      name: "Disable inking and typing personalization",
+      description:
+        "Prevents Windows from sending local handwriting and typing dictionary data to Microsoft.",
+    },
+    disable_shared_experiences: {
+      name: "Disable Connected Devices cross-device sharing",
+      description:
+        "Disables Connected Devices Platform (CDP) background synchronization across your accounts.",
+    },
+    disable_remote_desktop: {
+      name: "Disable Remote Desktop inbound connections",
+      description:
+        "Blocks incoming RDP remote desktop connections to reduce network attack surface.",
+    },
+    disable_edge_collections: {
+      name: "Disable Microsoft Edge Collections",
+      description:
+        "Disables Edge Collections and background sync to minimize browser resource footprint.",
+    },
+    disable_edge_quick_search: {
+      name: "Disable Edge desktop search bar widget",
+      description:
+        "Prevents Microsoft Edge from displaying floating search widgets on the Windows desktop.",
+    },
+    disable_edge_personalization: {
+      name: "Disable Edge personalization and browsing telemetry",
+      description:
+        "Disables reporting browsing history and personal advertising profiles inside Microsoft Edge.",
+    },
+    disable_lockscreen_spotlight: {
+      name: "Disable Windows Spotlight on lock screen",
+      description:
+        "Stops Windows Spotlight from downloading promotional wallpaper images and tips on the lock screen.",
+    },
+    disable_push_install_service: {
+      name: "Disable Windows PushToInstall remote app service",
+      description:
+        "Prevents Microsoft Store from pushing app installations to this PC remotely from the web.",
+    },
+    disable_sqm_telemetry: {
+      name: "Disable SQM telemetry client",
+      description:
+        "Disables Software Quality Metrics (SQM) client data reporting across Windows components.",
+    },
+    disable_inventory_telemetry: {
+      name: "Disable application compatibility inventory",
+      description:
+        "Stops Windows Application Experience from compiling inventory lists of your installed applications.",
+    },
+    disable_compatibility_assistant: {
+      name: "Disable Program Compatibility Assistant",
+      description:
+        "Disables Program Compatibility Assistant popups and background application scans when launching legacy tools.",
+    },
+    disable_cortana_cloud_search: {
+      name: "Disable Windows Search cloud indexer",
+      description:
+        "Prevents Windows Search from querying cloud indices and Bing servers when searching local files.",
+    },
+    disable_find_my_device: {
+      name: "Disable Find My Device tracking",
+      description:
+        "Disables continuous GPS and Wi-Fi location broadcasting for Find My Device services.",
+    },
+    disable_sensors_data_collection: {
+      name: "Disable hardware sensors data collection",
+      description:
+        "Disables background sensor monitoring (ambient light, accelerometer) and location polling.",
+    },
+    disable_location_scripting: {
+      name: "Disable location scripting access",
+      description:
+        "Prevents background scripts and browser engines from querying device physical location.",
+    },
+    disable_advertising_info: {
+      name: "Disable Windows advertising info policy",
+      description:
+        "Enforces a group policy lock disabling advertising ID tracking system-wide for all users.",
+    },
+    disable_sync_settings: {
+      name: "Disable Windows Settings cloud sync",
+      description:
+        "Stops Windows from syncing your personalization, passwords, and system preferences to Microsoft servers.",
+    },
+    disable_app_diagnostics_access: {
+      name: "Disable app access to diagnostic information",
+      description:
+        "Blocks third-party Store applications from reading diagnostic information and system telemetry.",
+    },
   },
   cleanup: {
     temp_cleanup: {

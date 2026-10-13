@@ -83,6 +83,32 @@ need a dedicated UI (EcoQoS rules, priority rules, Game Sessions, the X3D cache
 aligner) are listed in `CONFIGURABLE_TWEAK_IDS` and are handled by their own
 cards instead of the generic toggle path.
 
+## Debloat, barebone optimization and starter profiles
+
+WinCraft offers deep debloat and lean system optimization reaching the barebone
+footprint level of gaming playbooks (such as Atlas OS, ReviOS, and Tiny11), while enforcing
+strict reversibility invariants:
+
+1. **Debloat model (`src/debloat-model.ts`, `src-tauri/src/debloat.rs`):**
+   - Curated 25-package MSIX catalog verified against publisher ID and signature,
+     covering preinstalled bloatware (Cortana, Windows Maps, Get Help, Tips, People,
+     Sticky Notes, Alarms, Quick Assist, Power Automate, 3D Viewer, Paint 3D, Dev Home,
+     Solitaire, Weather, News, Copilot, Clipchamp, Outlook, To Do, Sound Recorder, Feedback Hub,
+     Phone Link, Media Player, Movies & TV, and Office Hub).
+   - User-scoped (`currentUser`) removal that leaves shared system files intact.
+   - Four selection presets: `Minimal`, `Balanced`, `Aggressive`, and `Barebone`
+     (Atlas OS / ReviOS / Tiny11 level), which stage candidate packages without modifying
+     the system until confirmed by the user in the preview modal.
+   - Durable per-package journal storing exact removal state, timestamps, and
+     direct Microsoft Store reinstall links.
+
+2. **Starter optimization profiles (`src/components/starter-presets.mjs`):**
+   - Offers 9 tailored, non-elevated HKCU profiles catering to distinct workflows:
+     `Gaming`, `Streaming`, `Work`, `Study`, `Laptop`, `No interruptions`,
+     `Barebone` (Atlas OS / Tiny11 level), `Browser Only`, and `Browser + MS Office`.
+   - Each bundles safe, user-scoped optimizations without irreversible modifications.
+   - Retains 100% snapshot rollback capability via the Change History ledger.
+
 ## Desktop windows and processes
 
 - **Main window** — the application, capability manifest `default.json`.

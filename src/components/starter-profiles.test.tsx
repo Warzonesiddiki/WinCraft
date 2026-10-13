@@ -44,7 +44,7 @@ describe("StarterProfiles", () => {
   it("offers every preset and describes the selected one", () => {
     mount();
     const group = screen.getByRole("group", { name: c.heading });
-    expect(group.querySelectorAll("button")).toHaveLength(6);
+    expect(group.querySelectorAll("button")).toHaveLength(9);
     expect(screen.getByRole("button", { name: new RegExp(c.gaming) })).toHaveAttribute(
       "aria-pressed",
       "true",

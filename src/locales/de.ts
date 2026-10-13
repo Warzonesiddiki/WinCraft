@@ -1610,6 +1610,306 @@ export const de: Strings = {
       description:
         "Stoppt und deaktiviert den Datei-Indizierungsdienst von Windows und reduziert so die Festplattenaktivität im Hintergrund — nützlich bei kleinen SSDs oder beim Spielen. Die Dateisuche im Startmenü wird langsamer, bis du ihn wieder aktivierst (Administratorrechte erforderlich).",
     },
+    enable_regback: {
+      name: "Automatische Registrierungssicherung aktivieren (RegBack)",
+      description:
+        "Aktiviert regelmäßige automatische Sicherungen der Windows-Registrierungsstruktur in %SystemRoot%\\System32\\config\\RegBack für die Notfallwiederherstellung.",
+    },
+    explorer_anti_hang: {
+      name: "Hänger des Explorers bei Verknüpfungen verhindern",
+      description:
+        "Deaktiviert die Zielverfolgung und Netzwerksuche beim Öffnen von Verknüpfungen, damit der Datei-Explorer nicht einfriert, wenn Verknüpfungen auf getrennte Laufwerke oder Netzwerkfreigaben zeigen.",
+    },
+    no_internet_open_with: {
+      name: "Microsoft-Store-Suche für unbekannte Dateien überspringen",
+      description:
+        "Öffnet sofort den lokalen Dialog „Öffnen mit“, anstatt beim Doppelklick auf unbekannte Dateitypen eine Suche im Microsoft Store vorzuschlagen.",
+    },
+    detailed_bsod: {
+      name: "Detaillierte BSOD-Absturzparameter anzeigen",
+      description:
+        "Zeigt exakte hexadezimale Stoppcodes, fehlerhafte Treiber und Speicheradressen auf Bluescreens an, anstatt sie hinter einem QR-Code zu verbergen.",
+    },
+    disable_wpbt: {
+      name: "Ausführung von UEFI-WPBT-Software blockieren",
+      description:
+        "Verhindert, dass die UEFI-Firmware des Mainboards über die Windows Platform Binary Table automatisch unerwünschte OEM-Programme in Windows installiert.",
+    },
+    disable_ndu: {
+      name: "NDU-Speicherleck im nicht ausgelagerten Pool beheben",
+      description:
+        "Deaktiviert den Treiberdienst Network Diagnostic Usage und verhindert so eine hohe Belegung des nicht ausgelagerten Speicherpools bei großen Netzwerkübertragungen.",
+    },
+    disable_search_highlights: {
+      name: "Suchhervorhebungen und Doodles deaktivieren",
+      description:
+        "Entfernt Webgrafiken, tägliche Bing-Doodles und Trendthemen aus der Windows-Suchleiste und der Taskleiste.",
+    },
+    auto_complete_run: {
+      name: "Automatische Vervollständigung im Ausführen-Dialog aktivieren",
+      description:
+        "Aktiviert die sofortige automatische Befehlsvervollständigung und Vorschläge im Windows-Ausführen-Dialog (Win + R).",
+    },
+    disable_aero_shake: {
+      name: "Fensterminimierung durch Schütteln (Aero Shake) deaktivieren",
+      description:
+        "Verhindert, dass das Schütteln an der Titelleiste eines Fensters versehentlich alle anderen geöffneten Fenster minimiert.",
+    },
+    disable_remote_assistance: {
+      name: "Remoteunterstützungseinladungen deaktivieren",
+      description:
+        "Deaktiviert Verbindungen und Einladungen zur Windows-Remoteunterstützung, um das System vor unaufgeforderten Supportanfragen zu schützen.",
+    },
+    disable_llmnr: {
+      name: "LLMNR-Protokoll deaktivieren",
+      description:
+        "Deaktiviert Link-Local Multicast Name Resolution (LLMNR), um sich vor Spoofing-Angriffen und Anmeldeinformationsabfängen im lokalen Netzwerk zu schützen.",
+    },
+    disable_wifi_sense: {
+      name: "Wi-Fi Sense Hotspot-Freigabe deaktivieren",
+      description:
+        "Verhindert, dass sich Windows automatisch mit offenen WLAN-Netzwerken verbindet oder Netzwerkdaten mit Kontakten teilt.",
+    },
+    disable_cloud_search: {
+      name: "Cloud-Suche in der Windows-Suche deaktivieren",
+      description:
+        "Verhindert, dass die Windows-Suche den Cloud-Verlauf und Suchprotokolle des Microsoft-Kontos abfragt, wenn nach lokalen Dateien gesucht wird.",
+    },
+    disable_app_suggestions_start: {
+      name: "Vorschläge und Tipps im Startmenü deaktivieren",
+      description:
+        "Schaltet werbliche App-Vorschläge und Funktionstipps im Windows-Startmenü aus.",
+    },
+    disable_handwriting_sharing: {
+      name: "Teilen von Handschriftfehlerberichten deaktivieren",
+      description:
+        "Verhindert, dass Windows Fehlerprotokolle der Handschrifterkennung und Stiftstriche an Microsoft überträgt.",
+    },
+    disable_ceip: {
+      name: "Programm zur Verbesserung der Benutzerfreundlichkeit (CEIP) deaktivieren",
+      description:
+        "Schaltet den Windows-SQM-Telemetrie-Client für das Programm zur Verbesserung der Benutzerfreundlichkeit (CEIP) aus.",
+    },
+    disable_lockscreen_camera: {
+      name: "Kamera auf dem Sperrbildschirm deaktivieren",
+      description:
+        "Deaktiviert die Kamerafunktion auf dem Sperrbildschirm, um Fotoaufnahmen ohne Entsperren des Geräts zu verhindern.",
+    },
+    disable_cortana_consent: {
+      name: "Cortana-Suchzustimmung widerrufen",
+      description:
+        "Widerruft die Zustimmung zur Cortana-Suche, damit Suchanfragen und Sprachdaten nicht an Microsoft-Clouddienste übermittelt werden.",
+    },
+    disable_wer_queuing: {
+      name: "Warteschlange für Windows-Fehlerberichte deaktivieren",
+      description:
+        "Verhindert, dass die Windows-Fehlerberichterstattung Absturzberichte auf der Festplatte zwischenspeichert und wartet.",
+    },
+    disable_experimentation: {
+      name: "Windows-Experimentiertelemetrie deaktivieren",
+      description:
+        "Deaktiviert Microsoft-A/B-Tests und Experimentierfunktionen in Windows, um ein einheitliches und vorhersehbares Systemverhalten zu gewährleisten.",
+    },
+    disable_app_inventory_collection: {
+      name: "Anwendungskompatibilitätsinventar deaktivieren",
+      description:
+        "Deaktiviert den Kompatibilitätsinventar-Sammler, der installierte Software scannt und an Microsoft meldet.",
+    },
+    disable_problem_steps_recorder: {
+      name: "Telemetrie der Problemaufzeichnung deaktivieren",
+      description:
+        "Deaktiviert die Fehlererfassung und Übermittlung von Diagnosedaten durch die Problemaufzeichnung (PSR).",
+    },
+    disable_ait_telemetry: {
+      name: "Anwendungsauswirkungstelemetrie (AIT) deaktivieren",
+      description:
+        "Deaktiviert die Erfassung von Application Impact Telemetry (AIT) beim Starten von Anwendungen.",
+    },
+    disable_smartscreen_app_install: {
+      name: "SmartScreen-App-Installations-Telemetrie deaktivieren",
+      description:
+        "Deaktiviert die Übermittlung von Installations-Telemetriedaten und URL-Abfragen von SmartScreen.",
+    },
+    disable_online_speech_privacy: {
+      name: "Datenerfassung für Online-Spracherkennung deaktivieren",
+      description:
+        "Deaktiviert die Erfassung von Sprachdaten in der Cloud für Spracheingabe und Sprachmodelle.",
+    },
+    disable_edge_shopping: {
+      name: "Edge-Shopping-Assistenten deaktivieren",
+      description:
+        "Deaktiviert den Einkaufsassistenten und die Gutscheinverfolgung in Microsoft Edge.",
+    },
+    disable_edge_metrics: {
+      name: "Edge-Diagnosemetrikberichte deaktivieren",
+      description:
+        "Deaktiviert die Übermittlung von Nutzungsmetriken und Absturzberichten von Microsoft Edge.",
+    },
+    disable_edge_startup_boost: {
+      name: "Edge-Startverstärkung deaktivieren",
+      description:
+        "Deaktiviert den Schnellstart von Microsoft Edge und verhindert Hintergrundprozesse beim Windows-Start.",
+    },
+    disable_edge_background_mode: {
+      name: "Edge-Hintergrunderweiterungsmodus deaktivieren",
+      description:
+        "Verhindert, dass Microsoft Edge nach dem Schließen im Hintergrund weiterläuft, und spart Arbeitsspeicher.",
+    },
+    disable_bluetooth_le_discovery: {
+      name: "Hintergrundsuche nach Bluetooth LE deaktivieren",
+      description:
+        "Deaktiviert die kontinuierliche Hintergrundsuche nach Bluetooth-Low-Energy-Geräten, um CPU-Last und Stromverbrauch zu senken.",
+    },
+    disable_edge_hub_sidebar: {
+      name: "Microsoft Edge-Seitenleiste deaktivieren",
+      description:
+        "Deaktiviert die Edge-Seitenleiste und ihre integrierten Hintergrund-Web-Widgets.",
+    },
+    disable_edge_wallet: {
+      name: "Edge-Wallet-Vorschläge deaktivieren",
+      description:
+        "Verhindert, dass Microsoft Edge automatisch Zahlungs- und Wallet-Dienste abfragt.",
+    },
+    disable_cortana_above_lock: {
+      name: "Cortana über dem Sperrbildschirm deaktivieren",
+      description:
+        "Verhindert, dass Sprachassistenten und die Suche bei gesperrtem Bildschirm zuhören oder aktiviert werden.",
+    },
+    disable_device_history: {
+      name: "Geräteaktivitätsverlauf von Windows deaktivieren",
+      description:
+        "Verhindert, dass Windows den App- und Dateiverlauf auf diesem Gerät aufzeichnet.",
+    },
+    disable_search_history: {
+      name: "Suchverlauf der Taskleiste deaktivieren",
+      description:
+        "Deaktiviert die Speicherung vergangener Suchanfragen in der Taskleiste und im Startmenü.",
+    },
+    disable_news_and_interests: {
+      name: "Neuigkeiten und interessante Themen deaktivieren",
+      description:
+        "Blendet das Wetter- und News-Widget in der Taskleiste aus und spart Netzwerk sowie Arbeitsspeicher.",
+    },
+    disable_auto_maintenance_wake: {
+      name: "Aufwachen für automatische Wartung deaktivieren",
+      description:
+        "Verhindert, dass die automatische Windows-Wartung das Gerät nachts aufweckt oder den Akku entlädt.",
+    },
+    disable_diagnostic_data_viewer: {
+      name: "Lokalen Diagnosedatenspeicher deaktivieren",
+      description:
+        "Verhindert, dass die Windows-Diagnosetelemetrie lokale Cache-Datenbanken auf dem Datenträger reserviert.",
+    },
+    disable_activity_feed: {
+      name: "Aktivitätsfeed und Zeitachse deaktivieren",
+      description:
+        "Verhindert, dass Windows Zeitachsen-Graphen erstellt und Benutzeraktivitäten geräteübergreifend verfolgt.",
+    },
+    disable_publish_user_activities: {
+      name: "Veröffentlichung von Benutzeraktivitäten in der Cloud deaktivieren",
+      description:
+        "Verhindert, dass Windows den Aktivitätsverlauf an Microsoft-Clouddienste synchronisiert.",
+    },
+    disable_bing_widget_search: {
+      name: "Windows 11-Widgets und Feeds deaktivieren",
+      description:
+        "Deaktiviert das Windows 11-Widget-Board und die Hintergrund-Synchronisierung von Web-Feeds.",
+    },
+    disable_typing_insights: {
+      name: "Eingabeerkenntnisse-Telemetrie deaktivieren",
+      description:
+        "Verhindert, dass Windows Tastenanschlagsmuster und Autovervollständigungsstatistiken analysiert.",
+    },
+    disable_inking_typing_personalization: {
+      name: "Handschrift- und Tastatureingabe-Personalisierung deaktivieren",
+      description:
+        "Verhindert, dass Windows lokale Wörterbuchdaten für Handschrift und Tastatur an Microsoft sendet.",
+    },
+    disable_shared_experiences: {
+      name: "Freigabe für verbundene Geräte deaktivieren",
+      description:
+        "Deaktiviert die Hintergrundsynchronisierung der Connected Devices Platform (CDP) über Konten hinweg.",
+    },
+    disable_remote_desktop: {
+      name: "Eingehende Remotedesktop-Verbindungen deaktivieren",
+      description:
+        "Blockiert eingehende RDP-Remotedesktopverbindungen, um die Angriffsfläche zu verringern.",
+    },
+    disable_edge_collections: {
+      name: "Microsoft Edge-Sammlungen deaktivieren",
+      description:
+        "Deaktiviert Edge-Sammlungen und die Hintergrundsynchronisierung, um Ressourcen zu sparen.",
+    },
+    disable_edge_quick_search: {
+      name: "Edge-Desktop-Suchleisten-Widget deaktivieren",
+      description:
+        "Verhindert, dass Microsoft Edge unverankerte Such-Widgets auf dem Windows-Desktop anzeigt.",
+    },
+    disable_edge_personalization: {
+      name: "Edge-Personalisierung und Browsing-Telemetrie deaktivieren",
+      description:
+        "Deaktiviert das Melden des Browserverlaufs und personalisierter Werbeprofile in Microsoft Edge.",
+    },
+    disable_lockscreen_spotlight: {
+      name: "Windows-Blickpunkt auf dem Sperrbildschirm deaktivieren",
+      description:
+        "Verhindert das Herunterladen von Werbehintergrundbildern und Tipps auf dem Sperrbildschirm.",
+    },
+    disable_push_install_service: {
+      name: "PushToInstall-Remoteverteilungsdienst deaktivieren",
+      description:
+        "Verhindert, dass der Microsoft Store App-Installationen remote aus dem Web auf diesen PC überträgt.",
+    },
+    disable_sqm_telemetry: {
+      name: "SQM-Telemetrie-Client deaktivieren",
+      description:
+        "Deaktiviert die Datenübertragung des Software Quality Metrics (SQM)-Clients in Windows-Komponenten.",
+    },
+    disable_inventory_telemetry: {
+      name: "Anwendungskompatibilitätsinventar deaktivieren",
+      description:
+        "Verhindert, dass die Windows-Anwendungserfahrung Bestandslisten Ihrer installierten Anwendungen erstellt.",
+    },
+    disable_compatibility_assistant: {
+      name: "Programmkompatibilitäts-Assistenten deaktivieren",
+      description:
+        "Deaktiviert Popups und Hintergrundprüfungen des Programmkompatibilitäts-Assistenten beim Starten älterer Tools.",
+    },
+    disable_cortana_cloud_search: {
+      name: "Windows Search-Cloud-Indexer deaktivieren",
+      description:
+        "Verhindert, dass Windows Search bei der lokalen Dateisuche Cloud-Indizes und Bing-Server abfragt.",
+    },
+    disable_find_my_device: {
+      name: "Mein Gerät suchen-Ortung deaktivieren",
+      description:
+        "Deaktiviert die kontinuierliche GPS- und WLAN-Standortübertragung für Mein Gerät suchen.",
+    },
+    disable_sensors_data_collection: {
+      name: "Datenerfassung von Hardwaresensoren deaktivieren",
+      description:
+        "Deaktiviert die Hintergrundüberwachung von Sensoren (Umgebungslicht, Beschleunigungsmesser) und Ortung.",
+    },
+    disable_location_scripting: {
+      name: "Standortzugriff für Skripte deaktivieren",
+      description:
+        "Verhindert, dass Hintergrundskripte und Browser-Engines den physischen Gerätestandort abfragen.",
+    },
+    disable_advertising_info: {
+      name: "Richtlinie für Werbeinformationen deaktivieren",
+      description:
+        "Erzwingt eine Gruppenrichtliniensperre, die das Werbe-ID-Tracking systemweit für alle Benutzer deaktiviert.",
+    },
+    disable_sync_settings: {
+      name: "Cloud-Synchronisierung von Windows-Einstellungen deaktivieren",
+      description:
+        "Verhindert, dass Windows Personalisierung, Kennwörter und Systemeinstellungen mit Microsoft-Servern synchronisiert.",
+    },
+    disable_app_diagnostics_access: {
+      name: "App-Zugriff auf Diagnoseinformationen deaktivieren",
+      description:
+        "Blockiert den Zugriff von Store-Apps von Drittanbietern auf Diagnoseinformationen und Systemtelemetrie.",
+    },
   },
   cleanup: {
     temp_cleanup: {

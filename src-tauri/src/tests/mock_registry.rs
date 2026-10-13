@@ -406,7 +406,11 @@ fn targets(entry: &SnapshotEntry) -> Vec<(Hive, String, String)> {
 fn user_value(written: &Stored) -> Stored {
     match written {
         Stored::Value(RegValue::Dword(v)) => Stored::Value(RegValue::Dword(v.wrapping_add(7))),
+        Stored::Value(RegValue::Qword(v)) => Stored::Value(RegValue::Qword(v.wrapping_add(7))),
         Stored::Value(RegValue::Str(s)) => Stored::Value(RegValue::Str(format!("{s}7"))),
+        Stored::Value(RegValue::ExpandStr(s)) => Stored::Value(RegValue::ExpandStr(format!("{s}7"))),
+        Stored::Value(RegValue::MultiSz(v)) => Stored::Value(RegValue::MultiSz(vec![format!("{:?}7", v)])),
+        Stored::Value(RegValue::Binary(b)) => Stored::Value(RegValue::Binary(vec![b.first().copied().unwrap_or(0).wrapping_add(1)])),
         Stored::Unsupported => unreachable!(),
     }
 }

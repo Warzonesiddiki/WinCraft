@@ -16,7 +16,11 @@ static TMP_SEQ: AtomicU64 = AtomicU64::new(0);
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
 pub enum RegValue {
     Dword(u32),
+    Qword(u64),
     Str(String),
+    ExpandStr(String),
+    MultiSz(Vec<String>),
+    Binary(Vec<u8>),
 }
 
 /// A snapshot of a single registry value, taken right before a tweak is applied.

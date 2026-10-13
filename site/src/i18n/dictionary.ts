@@ -215,7 +215,7 @@ export const engDictionary: Dictionary = {
     "screenshotAlt": "WinCraft Overview screen with processor and memory usage, the number of applied settings and a suggested next step.",
     "screenshotCaption": "The Overview screen, as it appears in the app.",
     "terminalTitle": "Install with Windows Package Manager",
-    "terminalCmd": "winget install --id AurelioAvila.WinCraft --exact",
+    "terminalCmd": "winget install --id Warzonesiddiki.WinCraft --exact",
     "terminalHint": "# install the official WinCraft package",
     "copy": "COPY",
     "copied": "COPIED",
@@ -234,7 +234,7 @@ export const engDictionary: Dictionary = {
       },
       {
         "label": "Inspect the source",
-        "href": "https://github.com/AurelioAvila/pc-tweaker-app"
+        "href": "https://github.com/Warzonesiddiki/WinCraft"
       }
     ],
     "themeLabel": "THEMES"
@@ -245,7 +245,7 @@ export const engDictionary: Dictionary = {
     "sub": "Judge a change by repeated runs: frame-time spikes, 1% lows and consistency. Results depend on your hardware, drivers and game. The chart below is a concept sketch, not a captured benchmark or a promised improvement.",
     "stats": [
       {
-        "value": 81,
+        "value": 141,
         "unit": "",
         "label": "CONTROLS IN THIS RELEASE"
       },
@@ -453,7 +453,7 @@ export const engDictionary: Dictionary = {
       "price": "€0",
       "per": "/ forever · no subscription, no account",
       "features": [
-        "All 81 Windows controls",
+        "All 141 Windows controls",
         "Scan and review your settings",
         "Startup tools and Windows integrity checks",
         "Turbo Gaming and Game Sessions",

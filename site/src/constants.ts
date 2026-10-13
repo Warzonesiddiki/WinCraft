@@ -2,17 +2,17 @@
  *  A "Stable download alias" GitHub Action re-uploads this fixed filename on
  *  every published release, so the URL never needs to change again. */
 export const DOWNLOAD_EXE =
-  "https://github.com/AurelioAvila/pc-tweaker-app/releases/latest/download/WinCraft-Setup.exe";
+  "https://github.com/Warzonesiddiki/WinCraft/releases/latest/download/WinCraft-Setup.exe";
 
 /** The Uninstaller is a separate product with its own release stream and its
  *  own stable alias. The nav's Download button used to serve WinCraft's
  *  installer on every page, including /uninstaller/ — the loudest control on
  *  that page downloaded the wrong application. */
 export const UNINSTALLER_DOWNLOAD_EXE =
-  "https://github.com/AurelioAvila/pc-tweaker-uninstaller/releases/latest/download/WinCraftUninstaller-Setup.exe";
+  "https://github.com/Warzonesiddiki/WinCraft/releases/latest/download/WinCraftUninstaller-Setup.exe";
 
 export const UNINSTALLER_RELEASES =
-  "https://github.com/AurelioAvila/pc-tweaker-uninstaller/releases/latest";
+  "https://github.com/Warzonesiddiki/WinCraft/releases/latest";
 
 /** The Microsoft Store listing. It has existed and been live all along, and
  *  appeared only inside the JSON-LD `sameAs` array — invisible to a human
@@ -22,7 +22,7 @@ export const UNINSTALLER_RELEASES =
 export const MICROSOFT_STORE = "https://apps.microsoft.com/detail/9nh3c6dt1g87?cid=pct-website";
 
 /** For people who want the .msi, release notes, checksums, or older versions. */
-export const RELEASES_PAGE = "https://github.com/AurelioAvila/pc-tweaker-app/releases/latest";
+export const RELEASES_PAGE = "https://github.com/Warzonesiddiki/WinCraft/releases/latest";
 
 /** Backend that relays the support form and stores reviews. The support
  *  inbox address itself lives only on that server and is never shipped in

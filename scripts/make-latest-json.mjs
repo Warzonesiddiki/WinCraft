@@ -156,7 +156,7 @@ const msiSignature = verifyUpdater(path.join(msiDir, msis[0]), conf.plugins.upda
 const required = {
   setup: `pc-tweaker-app_${version}_x64-setup.exe`,
   msi: `pc-tweaker-app_${version}_x64_en-US.msi`,
-  url: `https://github.com/AurelioAvila/pc-tweaker-app/releases/download/v${version}/pc-tweaker-app_${version}_x64-setup.exe`,
+  url: `https://github.com/Warzonesiddiki/WinCraft/releases/download/v${version}/pc-tweaker-app_${version}_x64-setup.exe`,
 };
 const downloadUrl = `${repoUrl}/releases/download/v${version}/${assetName}`;
 if (setup !== required.setup || msis[0] !== required.msi || downloadUrl !== required.url) {

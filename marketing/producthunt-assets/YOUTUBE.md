@@ -35,9 +35,9 @@ In this video:
 - 5 languages and 10 color themes
 
 DOWNLOAD (free tier included)
-winget install AurelioAvila.PCTweaker
+winget install Warzonesiddiki.WinCraft
 https://sourceforge.net/projects/pc-tweaker/
-https://github.com/AurelioAvila/pc-tweaker-app
+https://github.com/Warzonesiddiki/WinCraft
 
 Windows 10 and 11, x64. Built solo with Tauri (Rust) and React.
 

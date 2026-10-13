@@ -130,10 +130,13 @@ const en = {
   presetMinimal: "Minimal",
   presetBalanced: "Balanced",
   presetAggressive: "Aggressive",
+  presetBarebone: "Barebone",
   presetMinimalHint: "Only the recommended apps: rarely used, and nothing personal is lost.",
   presetBalancedHint: "The recommended apps and those that are safe to remove.",
   presetAggressiveHint:
     "Every app that can be removed here, including those that keep local data. Check each one in the preview.",
+  presetBareboneHint:
+    "Ultra-lean barebone footprint matching Atlas OS: selects all removable bloatware and telemetry packages for maximum stripping.",
   saveList: "Save list",
   loadList: "Load list",
   listSaved: "List saved.",
@@ -276,10 +279,13 @@ export const DEBLOAT_COPY: Record<Lang, Copy> = {
     presetMinimal: "Minima",
     presetBalanced: "Bilanciata",
     presetAggressive: "Aggressiva",
+    presetBarebone: "Barebone",
     presetMinimalHint: "Solo le app consigliate: poco usate, e non si perde nulla di personale.",
     presetBalancedHint: "Le app consigliate e quelle sicure da rimuovere.",
     presetAggressiveHint:
       "Tutte le app che si possono rimuovere qui, anche quelle con dati locali. Controllale una per una nell'anteprima.",
+    presetBareboneHint:
+      "Impronta minima essenziale al livello di Atlas OS: seleziona tutti i pacchetti superflui e di telemetria rimovibili.",
     saveList: "Salva elenco",
     loadList: "Carica elenco",
     listSaved: "Elenco salvato.",
@@ -422,11 +428,14 @@ export const DEBLOAT_COPY: Record<Lang, Copy> = {
     presetMinimal: "Minimale",
     presetBalanced: "Équilibrée",
     presetAggressive: "Agressive",
+    presetBarebone: "Barebone",
     presetMinimalHint:
       "Seulement les applications recommandées : peu utilisées, sans rien perdre de personnel.",
     presetBalancedHint: "Les applications recommandées et celles qu'on peut supprimer sans risque.",
     presetAggressiveHint:
       "Toutes les applications qu'on peut supprimer ici, y compris celles qui gardent des données locales. Vérifiez-les une par une dans l'aperçu.",
+    presetBareboneHint:
+      "Empreinte minimale épurée au niveau d’Atlas OS : sélectionne tous les logiciels superflus et paquets de télémétrie supprimables.",
     saveList: "Enregistrer la liste",
     loadList: "Charger une liste",
     listSaved: "Liste enregistrée.",
@@ -569,11 +578,14 @@ export const DEBLOAT_COPY: Record<Lang, Copy> = {
     presetMinimal: "Mínima",
     presetBalanced: "Equilibrada",
     presetAggressive: "Agresiva",
+    presetBarebone: "Barebone",
     presetMinimalHint:
       "Solo las aplicaciones recomendadas: poco usadas y sin perder nada personal.",
     presetBalancedHint: "Las aplicaciones recomendadas y las que se pueden quitar sin riesgo.",
     presetAggressiveHint:
       "Todas las aplicaciones que se pueden quitar aquí, también las que guardan datos locales. Revísalas una a una en la vista previa.",
+    presetBareboneHint:
+      "Huella mínima ultraligera al nivel de Atlas OS: selecciona todos los paquetes innecesarios y de telemetría extraíbles.",
     saveList: "Guardar lista",
     loadList: "Cargar lista",
     listSaved: "Lista guardada.",
@@ -717,11 +729,14 @@ export const DEBLOAT_COPY: Record<Lang, Copy> = {
     presetMinimal: "Minimal",
     presetBalanced: "Ausgewogen",
     presetAggressive: "Gründlich",
+    presetBarebone: "Barebone",
     presetMinimalHint:
       "Nur die empfohlenen Apps: selten genutzt, und nichts Persönliches geht verloren.",
     presetBalancedHint: "Die empfohlenen Apps und die, die sich gefahrlos entfernen lassen.",
     presetAggressiveHint:
       "Jede App, die sich hier entfernen lässt, auch solche mit lokalen Daten. Prüfe jede einzeln in der Vorschau.",
+    presetBareboneHint:
+      "Minimaler Barebone-Verbrauch auf Atlas OS-Niveau: wählt alle entfernbaren Bloatware- und Telemetriepakete aus.",
     saveList: "Liste speichern",
     loadList: "Liste laden",
     listSaved: "Liste gespeichert.",
@@ -863,11 +878,14 @@ export const DEBLOAT_COPY: Record<Lang, Copy> = {
     presetMinimal: "Mínima",
     presetBalanced: "Equilibrada",
     presetAggressive: "Profunda",
+    presetBarebone: "Barebone",
     presetMinimalHint:
       "Apenas as aplicações recomendadas: pouco usadas, e nada de pessoal se perde.",
     presetBalancedHint: "As aplicações recomendadas e as que são seguras de remover.",
     presetAggressiveHint:
       "Todas as aplicações que se podem remover aqui, incluindo as que guardam dados locais. Verifique cada uma na pré-visualização.",
+    presetBareboneHint:
+      "Estrutura mínima essencial ao nível do Atlas OS: seleciona todos os pacotes desnecessários e de telemetria removíveis.",
     saveList: "Guardar lista",
     loadList: "Carregar lista",
     listSaved: "Lista guardada.",
@@ -898,14 +916,26 @@ export const APP_CATEGORIES: Record<string, "media" | "productivity" | "connecti
     media: "media",
     movies: "media",
     recorder: "media",
+    "3dviewer": "media",
+    paint3d: "media",
     copilot: "productivity",
     todo: "productivity",
     office: "productivity",
+    powerautomate: "productivity",
+    devhome: "productivity",
     outlook: "connections",
     phone: "connections",
+    people: "connections",
     weather: "windows",
     news: "windows",
     feedback: "windows",
+    maps: "windows",
+    gethelp: "windows",
+    tips: "windows",
+    stickynotes: "windows",
+    alarms: "windows",
+    quickassist: "windows",
+    cortana: "windows",
   };
 const libraryEn = {
   eyebrow: "WINDOWS APP LIBRARY",
@@ -1042,6 +1072,18 @@ export const EXTRA_IMPACTS: Record<Lang, Record<string, string>> = {
     movies: "Playback through this app stops. Check purchased content and offline downloads first.",
     office:
       "Removes the hub, not Word, Excel or your Microsoft 365 subscription. Local settings may be lost.",
+    maps: "Map downloads and local route history are removed.",
+    gethelp: "Interactive support wizards and local troubleshooting history are removed.",
+    tips: "Windows feature tips and onboarding guides are removed.",
+    people: "Local contact lists and address book caches leave this app.",
+    stickynotes: "Sync notes first. Local unsynced notes will be deleted.",
+    alarms: "Saved alarms, world clocks and timer settings leave this account.",
+    quickassist: "Screen sharing sessions cannot be initiated via Quick Assist until reinstalled.",
+    powerautomate: "Local automated desktop flows will stop running.",
+    "3dviewer": "3D model previewing and local model viewing through this app stops.",
+    paint3d: "Save local 3D projects and models first before removal.",
+    cortana: "Removes the deprecated Cortana standalone voice assistant.",
+    devhome: "Developer dashboard widgets and environment configurations leave this account.",
   },
   it: {
     todo: "Sincronizza prima gli elenchi. Attività non sincronizzate e impostazioni locali potrebbero andare perse.",
@@ -1056,6 +1098,21 @@ export const EXTRA_IMPACTS: Record<Lang, Record<string, string>> = {
       "La riproduzione tramite questa app si interrompe. Verifica prima acquisti e download offline.",
     office:
       "Rimuove l’hub, non Word, Excel o l’abbonamento Microsoft 365. Le impostazioni locali potrebbero andare perse.",
+    maps: "I download delle mappe e la cronologia locale dei percorsi vengono rimossi.",
+    gethelp:
+      "Le procedure di supporto interattive e la cronologia di risoluzione problemi vengono rimosse.",
+    tips: "I suggerimenti sulle funzionalità di Windows e le guide introduttive vengono rimossi.",
+    people: "Gli elenchi dei contatti locali e la rubrica vengono rimossi da questa app.",
+    stickynotes: "Sincronizza prima le note. Le note locali non sincronizzate andranno perse.",
+    alarms: "Le sveglie salvate, gli orologi mondiali e i timer vengono rimossi dall’account.",
+    quickassist:
+      "Le sessioni di assistenza remota non possono essere avviate fino alla reinstallazione.",
+    powerautomate: "I flussi di automazione desktop locali smetteranno di funzionare.",
+    "3dviewer":
+      "L’anteprima e la visualizzazione di modelli 3D tramite questa app si interrompono.",
+    paint3d: "Salva i progetti e i modelli 3D locali prima della rimozione.",
+    cortana: "Rimuove l’app autonoma obsoleta dell’assistente vocale Cortana.",
+    devhome: "I widget della dashboard sviluppatori e le configurazioni lasciano questo account.",
   },
   fr: {
     todo: "Synchronisez vos listes. Les tâches non synchronisées et les réglages locaux peuvent être perdus.",
@@ -1070,6 +1127,20 @@ export const EXTRA_IMPACTS: Record<Lang, Record<string, string>> = {
       "La lecture dans cette app s’arrête. Vérifiez vos achats et téléchargements hors ligne.",
     office:
       "Supprime le hub, pas Word, Excel ni votre abonnement Microsoft 365. Les réglages locaux peuvent être perdus.",
+    maps: "Les téléchargements de cartes et l’historique des itinéraires sont supprimés.",
+    gethelp: "Les assistants de dépannage interactifs et l’historique de support sont supprimés.",
+    tips: "Les astuces de fonctionnalités Windows et guides de prise en main sont supprimés.",
+    people: "Les listes de contacts locaux et carnets d’adresses quittent cette application.",
+    stickynotes:
+      "Synchronisez vos notes d’abord. Les notes locales non synchronisées seront supprimées.",
+    alarms: "Les alarmes enregistrées, horloges mondiales et minuteurs quittent ce compte.",
+    quickassist:
+      "Les sessions d’assistance rapide à distance ne peuvent plus être lancées avant réinstallation.",
+    powerautomate: "Les flux automatisés de bureau locaux cesseront de s’exécuter.",
+    "3dviewer": "L’aperçu et la visualisation de modèles 3D dans cette application s’arrêtent.",
+    paint3d: "Enregistrez vos projets et modèles 3D locaux avant la suppression.",
+    cortana: "Supprime l’application autonome obsolète de l’assistant vocal Cortana.",
+    devhome: "Les widgets du tableau de bord développeur et configurations quittent ce compte.",
   },
   es: {
     todo: "Sincroniza las listas primero. Las tareas sin sincronizar y los ajustes locales pueden perderse.",
@@ -1084,6 +1155,19 @@ export const EXTRA_IMPACTS: Record<Lang, Record<string, string>> = {
       "Se detiene la reproducción en esta app. Revisa antes tus compras y descargas sin conexión.",
     office:
       "Quita el centro, no Word, Excel ni tu suscripción a Microsoft 365. Los ajustes locales pueden perderse.",
+    maps: "Las descargas de mapas y el historial local de rutas se eliminan.",
+    gethelp: "Los asistentes de soporte interactivos y el historial de diagnóstico se eliminan.",
+    tips: "Los consejos de funciones de Windows y las guías de inicio se eliminan.",
+    people: "Las listas de contactos locales y libretas de direcciones salen de esta app.",
+    stickynotes: "Sincroniza tus notas primero. Las notas locales no sincronizadas se borrarán.",
+    alarms: "Las alarmas guardadas, relojes mundiales y temporizadores salen de esta cuenta.",
+    quickassist: "Las sesiones de Asistencia rápida no se podrán iniciar hasta reinstalar la app.",
+    powerautomate: "Los flujos de automatización de escritorio locales dejarán de ejecutarse.",
+    "3dviewer": "La previsualización de modelos 3D mediante esta app se detiene.",
+    paint3d: "Guarda los proyectos y modelos 3D locales antes de quitarlos.",
+    cortana: "Elimina la aplicación independiente obsoleta del asistente de voz Cortana.",
+    devhome:
+      "Los widgets del panel para desarrolladores y las configuraciones salen de esta cuenta.",
   },
   de: {
     todo: "Listen zuerst synchronisieren. Nicht synchronisierte Aufgaben und lokale Einstellungen können verloren gehen.",
@@ -1098,6 +1182,21 @@ export const EXTRA_IMPACTS: Record<Lang, Record<string, string>> = {
     movies: "Die Wiedergabe in dieser App endet. Käufe und Offline-Downloads vorher prüfen.",
     office:
       "Entfernt den Hub, nicht Word, Excel oder das Microsoft-365-Abo. Lokale Einstellungen können verloren gehen.",
+    maps: "Kartendownloads und der lokale Routenverlauf werden entfernt.",
+    gethelp:
+      "Interaktive Hilfeassistenten und der lokale Problembehandlungsverlauf werden entfernt.",
+    tips: "Windows-Feature-Tipps und Einführungshandbücher werden entfernt.",
+    people: "Lokale Kontaktlisten und Adressbücher werden aus dieser App entfernt.",
+    stickynotes:
+      "Notizen zuerst synchronisieren. Nicht synchronisierte Kurznotizen werden gelöscht.",
+    alarms: "Gespeicherte Wecker, Weltuhren und Timer-Einstellungen verlassen dieses Konto.",
+    quickassist:
+      "Sitzungen für Remotehilfe können erst nach einer Neuinstallation gestartet werden.",
+    powerautomate: "Lokale automatisierte Desktop-Abläufe werden nicht mehr ausgeführt.",
+    "3dviewer": "Die 3D-Modellvorschau über diese App endet.",
+    paint3d: "Lokale 3D-Projekte und Modelle vor dem Entfernen sichern.",
+    cortana: "Entfernt die veraltete eigenständige Sprachassistenten-App Cortana.",
+    devhome: "Entwickler-Dashboard-Widgets und Umgebungskonfigurationen verlassen dieses Konto.",
   },
   pt: {
     todo: "Sincronize primeiro as listas. Tarefas não sincronizadas e definições locais podem perder-se.",
@@ -1111,5 +1210,21 @@ export const EXTRA_IMPACTS: Record<Lang, Record<string, string>> = {
       "A reprodução nesta app termina. Verifique primeiro as compras e as transferências offline.",
     office:
       "Remove o hub, não o Word, o Excel nem a subscrição Microsoft 365. As definições locais podem perder-se.",
+    maps: "As transferências de mapas e o histórico local de percursos são removidos.",
+    gethelp:
+      "Os assistentes de suporte interativo e o histórico de resolução de problemas são removidos.",
+    tips: "As sugestões de funcionalidades do Windows e os guias iniciais são removidos.",
+    people: "As listas locais de contactos e os livros de endereços saem desta aplicação.",
+    stickynotes:
+      "Sincronize primeiro as notas. As notas locais não sincronizadas serão eliminadas.",
+    alarms: "Os alarmes guardados, relógios mundiais e temporizadores saem desta conta.",
+    quickassist:
+      "As sessões de Assistência Rápida não podem ser iniciadas até reinstalar a aplicação.",
+    powerautomate:
+      "Os fluxos de automatização de ambiente de trabalho locais deixam de ser executados.",
+    "3dviewer": "A pré-visualização de modelos 3D através desta aplicação é interrompida.",
+    paint3d: "Guarde primeiro os projetos e modelos 3D locais antes da remoção.",
+    cortana: "Remove a aplicação autónoma obsoleta do assistente de voz Cortana.",
+    devhome: "Os widgets do painel de programador e as configurações saem desta conta.",
   },
 };
