@@ -1,7 +1,7 @@
 import { useRef, useState, type MouseEvent } from "react";
 import { text } from "../i18n/dictionary";
 import { ACCENTS, THEME_ORDER, useTheme } from "../theme";
-import { DOWNLOAD_EXE } from "../constants";
+import { DOWNLOAD_URL } from "../constants";
 import { CoffeeTip } from "./CoffeeTip";
 import { NewsletterSignup } from "./NewsletterSignup";
 import { useCampaignStoreLink } from "../campaign-store";
@@ -135,7 +135,7 @@ export function HeroSection() {
               <CoffeeTip>
                 <a
                   ref={btnRef}
-                  href={DOWNLOAD_EXE}
+                  href={DOWNLOAD_URL}
                   onMouseMove={onMove}
                   onMouseLeave={onLeave}
                   className="bg-accent glow-accent press-tilt inline-flex items-center gap-2.5 rounded-xl px-8 py-4 text-[15px] font-bold text-[var(--bg)] transition-transform duration-300 will-change-transform"

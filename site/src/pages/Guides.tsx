@@ -1,4 +1,4 @@
-import { DOWNLOAD_EXE } from "../constants";
+import { DOWNLOAD_URL } from "../constants";
 import { useCampaignStoreLink } from "../campaign-store";
 import { PRACTICAL_GUIDES } from "./practical-guides";
 import { GUIDE_FAQS } from "./guide-faqs";
@@ -491,7 +491,7 @@ export function GuidePage({ path, navigate }: { path: string; navigate: (to: str
               Get it from Microsoft Store
             </a>
             <a
-              href={DOWNLOAD_EXE}
+              href={DOWNLOAD_URL}
               className="bg-accent rounded-lg px-5 py-3 text-sm font-semibold text-[var(--bg)]"
             >
               Download WinCraft

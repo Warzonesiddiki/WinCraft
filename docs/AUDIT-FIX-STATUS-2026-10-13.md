@@ -437,15 +437,31 @@ Checkout sessions on the site's origin with the backend's `/checkout-success` an
 in CI through `src/repo-gates.test.ts` beside the other two.
 
 **Checked live on 2026-10-13, because a URL that resolves is the only evidence
-that matters.** The Uninstaller's stable alias is on every release of
-`AurelioAvila/pc-tweaker-uninstaller`, Tweaky Driver's is on
-`AurelioAvila/Tweaky-Driver-Releases`, the PAD feed's 1.18.1 file, size and
-licence line are exact, and this repository's legacy 1.18.x builds are still
-published and signed in `AurelioAvila/pc-tweaker-app`. The one URL that does not
-resolve is this repository's own alias: the workflow only creates it for a
-signature-verified release, and 1.19.0 is a pre-release and unsigned, so the link
-404s by design until a signed release exists — and the site's hero note says
-exactly that.
+that matters, and it changed one decision.** `curl` from this sandbox reaches
+GitHub (the site's own hosts are not in its allowlist, so wincraft.app and
+api.wincraft.app could not be re-measured from here). Every release URL this
+project publishes was requested: the Uninstaller's alias and Tweaky Driver's
+answer with the signed asset, the PAD feed's 1.18.1 file is the one it names, the
+legacy `pc-tweaker-app` installers still resolve — and this repository's own
+stable alias, `.../releases/latest/download/PCTweaker-Setup.exe`, answers **404**,
+because `releases/latest` resolves only to a non-prerelease release and 1.19.0 is
+a pre-release. The site's download button used exactly that URL.
+
+The owner's call, taken while this was being written: point the buttons at the
+releases page until a signed release exists rather than leave a 404 behind the
+most-clicked control on the site. `DOWNLOAD_URL` in `site/src/constants.ts` is
+now `https://github.com/Warzonesiddiki/WinCraft/releases`; the README button, the
+JSON-LD `downloadUrl` and the launch kit followed it; the hero note says the
+buttons open the releases page and that the direct stable link appears once a
+signed release ships; and RELEASING.md's listing step makes switching back part
+of the first signature-verified release. The Uninstaller's own button keeps its
+direct alias, which does resolve.
+
+The live check left the rest of the family standing: the Uninstaller's stable
+alias is on every release of `AurelioAvila/pc-tweaker-uninstaller`, Tweaky
+Driver's is on `AurelioAvila/Tweaky-Driver-Releases`, the PAD feed's 1.18.1 file,
+size and licence line are exact, and this repository's legacy 1.18.x builds are
+still published and signed in `AurelioAvila/pc-tweaker-app`.
 
 Two gates that had no runner now have one, neither needing a workflow edit:
 

@@ -98,7 +98,7 @@ included
 
 **Official website:** https://github.com/Warzonesiddiki/WinCraft
 
-**Download link:** https://github.com/Warzonesiddiki/WinCraft/releases/latest
+**Download link:** https://github.com/Warzonesiddiki/WinCraft/releases
 
 **Icon to upload:** `app_icon_1024.png`
 

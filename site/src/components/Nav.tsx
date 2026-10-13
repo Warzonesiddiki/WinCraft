@@ -1,12 +1,12 @@
 import { text } from "../i18n/dictionary";
-import { DOWNLOAD_EXE } from "../constants";
+import { DOWNLOAD_URL } from "../constants";
 import { Link } from "../router";
 import logoUrl from "../assets/favicon.png";
 
 export function Nav({
   navigate,
   onSubpage,
-  downloadHref = DOWNLOAD_EXE,
+  downloadHref = DOWNLOAD_URL,
   downloadLabel,
 }: {
   navigate: (to: string) => void;

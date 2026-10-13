@@ -212,7 +212,7 @@ export const engDictionary: Dictionary = {
     sub: " Review Windows settings for gaming, privacy and everyday use. See what each tweak changes, save its previous state and restore supported settings when you need to. Start free. No account required.",
     cta: "Download Free for Windows",
     safetyNote:
-      "Signed installers identify Aurelio Avila as the publisher and carry a trusted timestamp. The build published so far is a pre-release and not code-signed, so SmartScreen may warn, and the stable download link only appears once a signed release is out; check the file's Digital Signatures tab before you run it.",
+      "Signed installers identify Aurelio Avila as the publisher and carry a trusted timestamp. The build published so far is a pre-release and not code-signed, so SmartScreen may warn; the download buttons open the releases page, where the build and its checksums are listed, and the direct stable link appears once a signed release is out. Check the file's Digital Signatures tab before you run it.",
     screenshotAlt:
       "WinCraft Overview screen with processor and memory usage, the number of applied settings and a suggested next step.",
     screenshotCaption: "The Overview screen, as it appears in the app.",

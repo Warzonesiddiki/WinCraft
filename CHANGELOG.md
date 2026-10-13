@@ -36,6 +36,16 @@ public statement true, and each one has a gate behind it.
   links to.
 - **Dependencies:** `ed25519-dalek` and the five orphaned permission files left
   behind by the retired licence machinery are gone.
+- **The download buttons open the release page, because the direct link
+  answers 404.** The stable alias `stable-download-alias.yml` creates
+  (`PCTweaker-Setup.exe`) exists only for a signature-verified release, and the
+  only release published in this repository is an unsigned pre-release — so the
+  URL the site button used answers 404 today, measured rather than assumed. Every
+  download button (hero, nav, footer, pricing, guides), the README's button, the
+  JSON-LD `downloadUrl` and the launch kit now point at
+  `https://github.com/Warzonesiddiki/WinCraft/releases`, which resolves and lists
+  the build with its checksums. `site/src/constants.ts` and RELEASING.md's listing
+  step say how to switch back the moment a signed release exists.
 - **A stable download URL exists on every release that has one.** Checked
   live on 2026-10-13: the Uninstaller's alias (`PCTweakerUninstaller-Setup.exe`)
   is on every release of `AurelioAvila/pc-tweaker-uninstaller`, Tweaky Driver's

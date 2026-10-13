@@ -22,7 +22,7 @@
   <a href="#zero-compromises"><img src="https://img.shields.io/badge/every_feature-free-2E7D32" alt="Every feature is free"></a>
 </p>
 
-**[Download for Windows](https://github.com/Warzonesiddiki/WinCraft/releases/latest/download/PCTweaker-Setup.exe)** · **[Microsoft Store](https://apps.microsoft.com/detail/9nh3c6dt1g87)** · [Chocolatey](https://community.chocolatey.org/packages/pc-tweaker) · [Website](https://wincraft.app/) · [Support](https://wincraft.app/support/) · [Release notes](CHANGELOG.md)
+**[Download for Windows](https://github.com/Warzonesiddiki/WinCraft/releases)** · **[Microsoft Store](https://apps.microsoft.com/detail/9nh3c6dt1g87)** · [Chocolatey](https://community.chocolatey.org/packages/pc-tweaker) · [Website](https://wincraft.app/) · [Support](https://wincraft.app/support/) · [Release notes](CHANGELOG.md)
 
 <p align="center"><a href="#zero-compromises">Zero compromises</a> · <a href="#find-your-task">Find your task</a> · <a href="#what-you-can-do">Features</a> · <a href="#what-changes-on-your-system">What changes</a> · <a href="#frequently-asked-questions">FAQ</a> · <a href="#whats-new-in-118">What's new</a> · <a href="#download-integrity-and-code-signing">Code signing</a> · <a href="#build-from-source">Build from source</a></p>
 
