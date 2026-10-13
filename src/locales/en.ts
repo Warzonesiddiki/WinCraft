@@ -1201,7 +1201,7 @@ export const en: Strings = {
     disable_edge_ai: {
       name: "Turn off AI features in Microsoft Edge",
       description:
-        "Sets Microsoft Edge policies for its AI features. Which ones take effect depends on the Edge profile: stopping Edge from downloading its on-device AI model works for every profile; hiding the sidebar and turning off AI history search and AI-generated themes work for profiles not signed in with a personal Microsoft account; turning off Copilot's access to page content and its writing help works only for work or school profiles. Edge picks them up without a restart; edge://policy lists them. Edge will show that it is managed by your organization, which is how it labels policies.",
+        "Sets Microsoft Edge policies for its AI features. Which ones take effect depends on the Edge profile: stopping Edge from downloading its on-device AI model works for every profile; turning off AI history search and AI-generated themes works for profiles not signed in with a personal Microsoft account; turning off Copilot's access to page content and its writing help works only for work or school profiles. The Edge sidebar has its own control in this list. Edge picks the policies up without a restart; edge://policy lists them. Edge will show that it is managed by your organization, which is how it labels policies.",
     },
     disable_paint_ai: {
       name: "Turn off AI features in Paint",

@@ -1233,7 +1233,7 @@ export const de: Strings = {
     disable_edge_ai: {
       name: "KI-Funktionen in Microsoft Edge deaktivieren",
       description:
-        "Setzt Microsoft-Edge-Richtlinien für seine KI-Funktionen. Welche wirken, hängt vom Edge-Profil ab: Edge am Herunterladen seines lokalen KI-Modells zu hindern, wirkt in jedem Profil; die Seitenleiste auszublenden sowie die KI-Suche im Verlauf und KI-generierte Designs abzuschalten, wirkt in Profilen, die nicht mit einem privaten Microsoft-Konto angemeldet sind; den Zugriff von Copilot auf Seiteninhalte und seine Schreibhilfe abzuschalten, wirkt nur in Geschäfts- oder Schulprofilen. Edge übernimmt sie ohne Neustart; edge://policy listet sie auf. Edge zeigt dann an, dass es von deiner Organisation verwaltet wird – so kennzeichnet es Richtlinien.",
+        "Setzt Microsoft-Edge-Richtlinien für seine KI-Funktionen. Welche wirken, hängt vom Edge-Profil ab: Edge am Herunterladen seines lokalen KI-Modells zu hindern, wirkt in jedem Profil; die KI-Suche im Verlauf und KI-generierte Designs abzuschalten, wirkt in Profilen, die nicht mit einem privaten Microsoft-Konto angemeldet sind; den Zugriff von Copilot auf Seiteninhalte und seine Schreibhilfe abzuschalten, wirkt nur in Geschäfts- oder Schulprofilen. Die Edge-Seitenleiste hat einen eigenen Schalter in dieser Liste. Edge übernimmt die Richtlinien ohne Neustart; edge://policy listet sie auf. Edge zeigt dann an, dass es von deiner Organisation verwaltet wird – so kennzeichnet es Richtlinien.",
     },
     disable_paint_ai: {
       name: "KI-Funktionen in Paint deaktivieren",

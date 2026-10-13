@@ -41,11 +41,6 @@
       "minBuild": 0,
       "writes": [
         {
-          "name": "HubsSidebarEnabled",
-          "path": "SOFTWARE\\Policies\\Microsoft\\Edge",
-          "value": 0
-        },
-        {
           "name": "GenAILocalFoundationalModelSettings",
           "path": "SOFTWARE\\Policies\\Microsoft\\Edge",
           "value": 1

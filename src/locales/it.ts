@@ -1224,7 +1224,7 @@ export const it: Strings = {
     disable_edge_ai: {
       name: "Disattiva le funzioni IA di Microsoft Edge",
       description:
-        "Imposta i criteri di Microsoft Edge per le sue funzioni IA. Quali hanno effetto dipende dal profilo di Edge: impedire a Edge di scaricare il suo modello IA locale funziona per tutti i profili; nascondere la barra laterale e disattivare la ricerca nella cronologia con l'IA e i temi generati dall'IA funziona per i profili non connessi con un account Microsoft personale; disattivare l'accesso di Copilot al contenuto delle pagine e il suo aiuto alla scrittura funziona solo per i profili di lavoro o scuola. Edge li applica senza riavvio; li trovi elencati in edge://policy. Edge indicherà di essere gestito dall'organizzazione: è così che segnala i criteri.",
+        "Imposta i criteri di Microsoft Edge per le sue funzioni IA. Quali hanno effetto dipende dal profilo di Edge: impedire a Edge di scaricare il suo modello IA locale funziona per tutti i profili; disattivare la ricerca nella cronologia con l'IA e i temi generati dall'IA funziona per i profili non connessi con un account Microsoft personale; disattivare l'accesso di Copilot al contenuto delle pagine e il suo aiuto alla scrittura funziona solo per i profili di lavoro o scuola. La barra laterale di Edge ha un controllo a parte in questo elenco. Edge applica i criteri senza riavvio; li trovi elencati in edge://policy. Edge indicherà di essere gestito dall'organizzazione: è così che segnala i criteri.",
     },
     disable_paint_ai: {
       name: "Disattiva le funzioni IA di Paint",
