@@ -333,6 +333,34 @@ it guards and watching it fail:
 the rustup hosts are unreachable from this sandbox); CI is their home, and it is
 green.
 
+### The same holding-to-account, applied to copy and to a money path
+
+- **Fixed: the site said the wrong thing about signatures.** The hero note and
+  the FAQ answer both asserted that WinCraft installers are code-signed and that
+  *older* downloads may be unsigned. The published 1.19.0 is a pre-release and
+  unsigned — the alias workflow's own run reports `Authenticode verification
+  failed (NotSigned): WinCraft_1.19.0_x64_en-US.msi` — while the signed builds
+  are the older 1.18.x ones, so both halves were inverted. Both strings now
+  state the rule (a signed release identifies Aurelio Avila and carries a
+  trusted timestamp), the current state (the published build is a pre-release
+  and not code-signed), and what the visitor should do. RELEASING.md's listing
+  step now says to re-read those sentences at every release, because they go
+  stale the moment the signature state changes.
+- **Recorded, not changed: where a tip returns.** The backend creates the tip
+  session with `${APP_URL}/tip-thanks`; `backend/README.md` documents `APP_URL`
+  as the API origin (`https://api.wincraft.app`), and the backend does serve
+  `/tip-thanks`, so nothing 404s. But `site/src/components/TipThanks.tsx` exists
+  to acknowledge a tip at `https://wincraft.app/?tip=thanks` and says in its own
+  comment that Stripe redirects there — no code path produces that URL, so the
+  banner cannot appear and the tipper is dropped on the API's bare page instead
+  of back on the site. One of the two halves is wrong and both are plausible
+  intentions. Choosing changes a live money path and depends on the deployed
+  environment, which this sandbox cannot observe, so it is written down rather
+  than decided: give the two website-facing redirects their own origin
+  (`SITE_URL`, default `https://wincraft.app`, as the backend's own defaults
+  already imply) if the banner is the intended experience, or delete the
+  component and the comment that promises it.
+
 ### Owner actions this session cannot complete
 
 1. **GitHub Pages.** Every deploy job has failed at `actions/configure-pages`

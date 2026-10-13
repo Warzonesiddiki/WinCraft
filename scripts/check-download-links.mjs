@@ -19,8 +19,11 @@
 // is a deliberate act, not a typo that passes.
 import fs from "node:fs";
 import path from "node:path";
+import { fileURLToPath } from "node:url";
 
-const root = path.resolve(new URL("..", import.meta.url).pathname);
+// `fileURLToPath`, not `.pathname`: on Windows a URL pathname starts with a
+// slash before the drive letter and `path.resolve` would then walk `C:\C:\…`.
+const root = path.resolve(fileURLToPath(new URL("..", import.meta.url)));
 
 /** Directories that hold build output, dependencies or VCS data, not sources. */
 const SKIP_DIRS = new Set([
@@ -106,15 +109,16 @@ const VERSIONED_ARTIFACT = [
 
 function walk(dir, out = []) {
   for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
-    if (entry.name.startsWith(".") && entry.name !== ".github") {
-      if (entry.isDirectory()) continue;
-    }
     const full = path.join(dir, entry.name);
     if (entry.isDirectory()) {
+      // Dot-directories other than the workflows one hold caches and tool
+      // state rather than published text.
+      if (entry.name.startsWith(".") && entry.name !== ".github") continue;
       if (skipDir(entry.name)) continue;
       walk(full, out);
       continue;
     }
+    if (entry.name.startsWith(".")) continue;
     if (!TEXT_EXT.has(path.extname(entry.name))) continue;
     const stat = fs.statSync(full);
     if (stat.size > MAX_BYTES) continue;
@@ -161,7 +165,8 @@ if (wingetIds.size === 0) problems.push("no WinGet identifier found in .github/w
 
 const DOWNLOAD_URL =
   /https:\/\/github\.com\/([A-Za-z0-9._-]+)\/([A-Za-z0-9._-]+)\/releases\/(latest\/download|download\/([^/\s)"'`]+))\/([A-Za-z0-9._+-]+)/g;
-const WINGET_ID = /(?:\bwinget\s+(?:install|upgrade)[^\n]*?--id\s+|img\.shields\.io\/winget\/v\/)([A-Za-z0-9._-]+)/g;
+const WINGET_ID =
+  /(?:\bwinget\s+(?:install|upgrade)[^\n]*?--id\s+|img\.shields\.io\/winget\/v\/)([A-Za-z0-9._-]+)/g;
 const WINGET_MANIFEST =
   /microsoft\/winget-pkgs\/tree\/[^/\s)"']+\/manifests\/([a-z0-9])\/([^/\s)"'`]+)\/([^/\s)"'`)]+)/g;
 
@@ -195,17 +200,22 @@ for (const file of walk(root)) {
     }
     // A template URL (`v${version}`, `v{offered_version}`) builds a filename at
     // run time, so there is no literal name to check and no version to match.
-    if (tag.includes("{") || tag.includes("$") || asset.includes("{") || asset.includes("$")) continue;
+    if (tag.includes("{") || tag.includes("$") || asset.includes("{") || asset.includes("$"))
+      continue;
     // A version-pinned URL: the filename has to look like a release artifact
     // and carry the same version as the tag.
     if (!VERSIONED_ARTIFACT.some((re) => re.test(asset))) {
-      problems.push(`${where}: ${match} — ${asset} is not a release artifact name this project publishes.`);
+      problems.push(
+        `${where}: ${match} — ${asset} is not a release artifact name this project publishes.`,
+      );
       continue;
     }
     const pinned = tag.replace(/^v/, "");
     const inName = asset.match(/(\d+\.\d+\.\d+)/)?.[1];
     if (/^\d+\.\d+\.\d+$/.test(pinned) && inName && inName !== pinned) {
-      problems.push(`${where}: ${match} — the tag says v${pinned} and the filename says ${inName}.`);
+      problems.push(
+        `${where}: ${match} — the tag says v${pinned} and the filename says ${inName}.`,
+      );
     }
   }
 
@@ -233,8 +243,10 @@ for (const file of walk(root)) {
   }
 }
 
-if (urlCount === 0) problems.push("no release download URLs were found anywhere: this check has lost its subject");
-if (wingetCount === 0) problems.push("no WinGet references were found anywhere: this check has lost its subject");
+if (urlCount === 0)
+  problems.push("no release download URLs were found anywhere: this check has lost its subject");
+if (wingetCount === 0)
+  problems.push("no WinGet references were found anywhere: this check has lost its subject");
 
 if (problems.length) {
   console.error("check-download-links: published links and the artifacts they name disagree.\n");

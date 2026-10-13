@@ -212,7 +212,7 @@ export const engDictionary: Dictionary = {
     sub: " Review Windows settings for gaming, privacy and everyday use. See what each tweak changes, save its previous state and restore supported settings when you need to. Start free. No account required.",
     cta: "Download Free for Windows",
     safetyNote:
-      "WinCraft installers are code-signed. Our signed Windows installers identify Aurelio Avila as the publisher. Older downloads may be unsigned; check the file's Digital Signatures tab. SmartScreen may still show a warning for a new release.",
+      "Signed installers identify Aurelio Avila as the publisher and carry a trusted timestamp. The build published so far is a pre-release and not code-signed, so SmartScreen may warn, and the stable download link only appears once a signed release is out; check the file's Digital Signatures tab before you run it.",
     screenshotAlt:
       "WinCraft Overview screen with processor and memory usage, the number of applied settings and a suggested next step.",
     screenshotCaption: "The Overview screen, as it appears in the app.",
@@ -499,7 +499,7 @@ export const engDictionary: Dictionary = {
       },
       {
         q: "Is WinCraft code-signed?",
-        a: "WinCraft ships with Windows application and installer signatures from Aurelio Avila and a trusted timestamp. Older releases may be unsigned. A valid signature identifies the publisher and helps detect changed files. The separate update signature verifies update packages. Neither guarantees performance gains or prevents every SmartScreen prompt.",
+        a: "Signed WinCraft releases carry application and installer signatures from Aurelio Avila with a trusted timestamp; the build published so far is a pre-release and is not code-signed. A valid signature identifies the publisher and helps detect changed files. The separate update signature verifies update packages. Neither guarantees performance gains nor prevents every SmartScreen prompt.",
       },
     ],
   },
