@@ -47,6 +47,22 @@ export const ROUTE_SEO: Record<string, RouteSeo> = {
     canonical: `${ORIGIN}/`,
     ogType: "website",
   },
+  // The post-tip landing. The backend returns a tipper to `/tip-thanks` — its
+  // own page when it runs on the API host, this path when `APP_URL` names the
+  // site — and the site had no such route, so that visitor got the 404 page
+  // and the thanks banner never had a way to appear. It renders the homepage;
+  // its canonical points at the homepage too, because that is what it is, and
+  // it is deliberately absent from the sitemap: nobody should find a receipt
+  // in a search result.
+  "/tip-thanks": {
+    title: "WinCraft | Windows Tuning for Steadier Frame Times",
+    description:
+      "Review Windows gaming, privacy and performance settings. Inspect each change and restore supported tweaks. Download WinCraft Free for Windows 10/11.",
+    // The homepage's address, not its own: the markup is the homepage's, and
+    // a search engine that finds this URL should count it as the homepage.
+    canonical: `${ORIGIN}/`,
+    ogType: "website",
+  },
   "/support": {
     title: "WinCraft Support — Help, Troubleshooting and Contact",
     description:

@@ -346,20 +346,23 @@ green.
   and not code-signed), and what the visitor should do. RELEASING.md's listing
   step now says to re-read those sentences at every release, because they go
   stale the moment the signature state changes.
-- **Recorded, not changed: where a tip returns.** The backend creates the tip
-  session with `${APP_URL}/tip-thanks`; `backend/README.md` documents `APP_URL`
-  as the API origin (`https://api.wincraft.app`), and the backend does serve
-  `/tip-thanks`, so nothing 404s. But `site/src/components/TipThanks.tsx` exists
-  to acknowledge a tip at `https://wincraft.app/?tip=thanks` and says in its own
-  comment that Stripe redirects there — no code path produces that URL, so the
-  banner cannot appear and the tipper is dropped on the API's bare page instead
-  of back on the site. One of the two halves is wrong and both are plausible
-  intentions. Choosing changes a live money path and depends on the deployed
-  environment, which this sandbox cannot observe, so it is written down rather
-  than decided: give the two website-facing redirects their own origin
-  (`SITE_URL`, default `https://wincraft.app`, as the backend's own defaults
-  already imply) if the banner is the intended experience, or delete the
-  component and the comment that promises it.
+- **Fixed, in the site's half: where a tip returns.** The backend creates the
+  tip session with `${APP_URL}/tip-thanks`; `backend/README.md` documents
+  `APP_URL` as the API origin (`https://api.wincraft.app`), and the backend
+  serves that page, so the documented configuration already put the tipper
+  somewhere real. The site's half did not exist: `site/src/components/TipThanks.tsx`
+  acknowledged a tip at `/?tip=thanks` and its own comment claimed Stripe
+  redirected there, but no code path produced that URL and
+  `https://wincraft.app/tip-thanks` answered with the 404 page — so under
+  `stripe.ts`'s own default (`APP_URL=https://wincraft.app`), the one visitor who
+  had just paid was the one visitor shown a 404. The site now serves
+  `/tip-thanks` as the homepage with the acknowledgement, through the same route
+  table the prerender walks, so both configurations land on a page that says
+  thank you. The banner answers to the path as well as to the query, the page
+  canonicalises to the homepage and stays out of the sitemap, and
+  `site/scripts/check-hydration.mjs` loads it and fails when the acknowledgement
+  is missing — or when it appears on the homepage uninvited. No Stripe
+  parameter, price or redirect target changed.
 
 ### The 2.0 roadmap's done-markers, held to account
 

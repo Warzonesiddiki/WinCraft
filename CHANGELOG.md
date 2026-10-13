@@ -49,6 +49,14 @@ public statement true, and each one has a gate behind it.
   also gained a UTF-8 BOM, because Windows PowerShell 5.1 — what `irm … | iex`
   runs — reads a BOM-less script as ANSI and turned the em dash in its banner
   into three characters.
+- **A completed tip lands on a page that exists.** The site had no
+  `/tip-thanks` route: the backend's tip Checkout returns to that path, and with
+  `APP_URL` naming the site — the default in `backend/src/routes/stripe.ts` — the
+  visitor who had just paid was the one visitor shown the 404 page. The site now
+  serves `/tip-thanks` as the homepage with the thanks banner, which also answers
+  to `/?tip=thanks`; the page canonicalises to the homepage, is absent from the
+  sitemap, and `site/scripts/check-hydration.mjs` loads it and fails when the
+  acknowledgement is missing or appears uninvited.
 - **The quick installer's offline suite runs on every push.** It is Windows-only
   and had no CI step; it now runs from `src/repo-gates.test.ts` in the `checks`
   job, which is already on a Windows image, together with a parse of every

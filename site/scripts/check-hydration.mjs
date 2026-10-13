@@ -88,9 +88,9 @@ const HYDRATION_COMPLAINT =
 const FOLD = 5000;
 
 /** One page load, played out to the end, with the knobs a browser would have. */
-async function load({ id, source, reducedMotion = false, onScreen = false }) {
+async function load({ id, source, reducedMotion = false, onScreen = false, url = "https://wincraft.app/" }) {
   const { JSDOM } = await import("jsdom");
-  const dom = new JSDOM(html, { url: "https://wincraft.app/", pretendToBeVisual: true });
+  const dom = new JSDOM(html, { url, pretendToBeVisual: true });
   const { window } = dom;
 
   // React writes to console.error for a hydration mismatch. It runs in this
@@ -211,21 +211,36 @@ async function load({ id, source, reducedMotion = false, onScreen = false }) {
     revealedOpacity: revealed ? window.getComputedStyle(revealed).opacity : null,
   };
 
+  // What the page says after it has hydrated: the tip acknowledgement is the
+  // only state the site renders from the URL, so it is the one thing to look
+  // for besides the reveal counts.
+  const banner = window.document.querySelector('[role="status"]')?.textContent?.trim() ?? null;
+
   window.close();
   globalThis.console = realConsole;
-  return { prerendered, mounted, afterScrolling, complaints };
+  return { prerendered, mounted, afterScrolling, complaints, banner };
 }
 
 const belowFold = await load({ id: "below-the-fold", source: bundle });
 const onScreen = await load({ id: "on-screen", source: bundle, onScreen: true });
 const reducedMotion = await load({ id: "reduced-motion", source: bundle, reducedMotion: true });
 const development = await load({ id: "development", source: devBundle });
+// The tip flow's return address. The host serves this path from the page the
+// prerender writes for it, and that page is the homepage tree — which is what
+// this loads — so hydration here is the same comparison the browser makes, plus
+// the one difference that is the point of the route.
+const tipThanks = await load({
+  id: "tip-thanks",
+  source: bundle,
+  url: "https://wincraft.app/tip-thanks/",
+});
 
 for (const [name, result] of [
   ["below the fold", belowFold],
   ["on screen", onScreen],
   ["reduced motion", reducedMotion],
   ["development build", development],
+  ["tip thanks", tipThanks],
 ]) {
   if (result.prerendered.hiddenInline !== 0) {
     fail(
@@ -239,6 +254,25 @@ for (const [name, result] of [
         `"${result.complaints[0].slice(0, 160)}". The server's markup and the browser's markup have to match.`,
     );
   }
+}
+
+// The tip acknowledgement is the only thing this site renders from the URL, and
+// the page it belongs on is the one a completed tip is returned to.
+if (tipThanks.banner === null) {
+  fail(
+    "tip thanks: /tip-thanks hydrated without the tip acknowledgement. The backend returns a " +
+      "completed tip to this path, so a visitor who just paid would see the homepage and no sign " +
+      "that anything happened.",
+  );
+}
+if (!/support/i.test(tipThanks.banner)) {
+  fail(`tip thanks: the acknowledgement reads "${tipThanks.banner.slice(0, 120)}", not a thanks.`);
+}
+if (belowFold.banner !== null) {
+  fail(
+    `that the homepage says "${belowFold.banner.slice(0, 120)}": the acknowledgement appears without ` +
+      "being asked for, so it would greet every visitor.",
+  );
 }
 
 // Development React reports what production React silently repairs, so this is
@@ -320,5 +354,6 @@ console.log(
   `hydration and reveals ok: ${belowFold.mounted.total} reveals over ${belowFold.mounted.armed} groups ` +
     `hydrate without a console error; nothing on screen is hidden, ${belowFold.mounted.total} below-fold ` +
     `elements are hidden only while observed and shown when scrolled to, and reduced motion never hides. ` +
+    `The tip return address (/tip-thanks) hydrates into the homepage and shows the acknowledgement. ` +
     `${development.complaints.length} report(s) from the development build.`,
 );
