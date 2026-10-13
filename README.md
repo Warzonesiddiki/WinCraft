@@ -232,7 +232,7 @@ Nobody can promise that, and this project does not. Some settings help on some h
 
 ### Can I undo everything?
 
-Yes. Supported tweaks keep their previous values, appear in Change history with the values before and after, and restore individually, by session, or all at once after a confirmation that lists what goes back. Restore first, then uninstall — uninstalling does not silently put settings back.
+Yes. Supported tweaks keep their previous values, appear in Change history with the values before and after, and restore individually, by session, or all at once after a confirmation that lists what goes back. Restore first, then uninstall — uninstalling does not silently put settings back. For offline recovery outside Windows or inside the Windows Recovery Environment (WinRE) Command Prompt, run `wincraft-emergency-undo.bat` to restore standard system defaults.
 
 ### How is this different from a paid optimizer suite?
 
