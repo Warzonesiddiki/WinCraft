@@ -90,7 +90,7 @@ This roadmap lays out the sequential engineering milestones, work packages, task
 
 - **WP-2.1: Telemetry & Privacy Hardening (~35 Controls)**
   - [x] Implement 7-location universal `AllowTelemetry` lockdown across HKLM and WOW6432Node.
-  - [x] Implement ETW Autologger session teardown (`AutoLogger-Diagtrack-Listener`, `SQMLogger`, `AITEventLog`, `DiagLog`).
+  - [x] Implement ETW Autologger session teardown for `AutoLogger-Diagtrack-Listener` and `SQMLogger`. The `AITEventLog` and `DiagLog` sessions named in the draft are not written by any control; Application Impact Telemetry is switched off through the `AITEnable` policy instead ([reconciliation](#status-reconciliation-2026-10-13-audit)).
   - [x] Implement Windows 11 Copilot, Recall AI snapshot, and Click-to-Do policy lockdowns.
   - [x] Implement Edge background extensions, Startup Boost, and shopping telemetry controls.
 - **WP-2.2: Windows 7-Grade Desktop & UI Responsiveness (~30 Controls)**
@@ -103,7 +103,7 @@ This roadmap lays out the sequential engineering milestones, work packages, task
   - [x] Implement MMCSS network throttling index (`NetworkThrottlingIndex = 0xFFFFFFFF`) and SystemResponsiveness (`0`).
   - [x] Implement Game DVR capture buffer and background polling teardown.
   - [x] Implement TCPNoDelay and TcpAckFrequency low-latency network tuning.
-  - [x] Implement NTFS 8.3 name creation and Last Access Time disablement.
+  - [ ] Implement NTFS 8.3 name creation and Last Access Time disablement. **Not implemented:** no control writes `NtfsDisable8dot3NameCreation` or `NtfsDisableLastAccessUpdate` ([reconciliation](#status-reconciliation-2026-10-13-audit)).
 
 ---
 
@@ -112,7 +112,7 @@ This roadmap lays out the sequential engineering milestones, work packages, task
 **Objective:** Reduce process counts and background CPU context switching by consolidating services and trimming bloat tasks.
 
 - **WP-3.1: Service Host Splitting Manager (`SvcHostSplitThresholdInKB`)**
-  - [x] Implement grouped service hosting control to slash idle process counts from ~180 down to ~70.
+  - [ ] Implement grouped service hosting control to slash idle process counts from ~180 down to ~70. **Not implemented:** no control writes `SvcHostSplitThresholdInKB`, and the design spec itself holds this item back for a separate manual hardware test ([reconciliation](#status-reconciliation-2026-10-13-audit)).
   - [x] Provide safe fallback for low-memory vs high-memory systems.
 - **WP-3.2: 40+ Bloat Scheduled Tasks Stripper**
   - [x] Implement inventory and disabling of CEIP, Application Experience, Disk Diagnostics, Maps Update, and Edge Update autologgers.
@@ -126,16 +126,17 @@ This roadmap lays out the sequential engineering milestones, work packages, task
 
 **Objective:** Deliver tailored optimization presets for 9 workflow archetypes and a 25-package MSIX debloat suite.
 
-- **WP-4.1: 9 Workflow Archetypes (`src/components/starter-presets.mjs`)**
-  - [x] `Pure Browser / Cloud`
-  - [x] `Browser + MS Office`
-  - [x] `eSports / Pure Gaming`
-  - [x] `Barebone (Atlas Level)`
-  - [x] `Creator / Streaming`
-  - [x] `Developer / Engineer`
-  - [x] `Audio / DAW Producer`
-  - [x] `Laptop Battery`
-  - [x] `No Interruptions`
+- **WP-4.1: Workflow Archetypes (`src/components/starter-presets.mjs`)**
+  - [ ] `Pure Browser / Cloud`
+  - [ ] `Browser + MS Office` — the name exists as a **debloat** preset, not a starter profile
+  - [x] `eSports / Pure Gaming` (ships as `gaming`)
+  - [ ] `Barebone (Atlas Level)` — the name exists as the debloat tier `presetBarebone`
+  - [x] `Creator / Streaming` (ships as `streaming`)
+  - [ ] `Developer / Engineer`
+  - [ ] `Audio / DAW Producer`
+  - [x] `Laptop Battery` (ships as `laptop`)
+  - [x] `No Interruptions` (ships as `quiet`)
+  - Six profiles ship today — `gaming`, `streaming`, `work`, `study`, `laptop`, `quiet` — not nine ([reconciliation](#status-reconciliation-2026-10-13-audit)).
 - **WP-4.2: 25-Package MSIX Debloat Catalog (`src-tauri/src/debloat.rs`, `src/debloat-model.ts`)**
   - [x] Curate all 25 preinstalled consumer bloatware packages with verified publisher IDs and Store links.
   - [x] Implement AppX Provisioned Package deprovisioning to prevent bloat reinstallation on Windows Update.
@@ -186,3 +187,45 @@ A feature or work package is considered complete only when:
 3. **Localization:** All user-facing strings are present and audited across all 6 supported languages.
 4. **Testing:** Unit and integration tests cover happy paths, failure cases, elevation boundaries, and edge cases.
 5. **Documentation:** Updated in architecture specifications, catalog reference tables, and user guides.
+
+---
+
+## Status reconciliation (2026-10-13 audit)
+
+This roadmap's boxes were written by the session that planned the 2.0 work, and
+an audit on 13 October held every one of them against the tree. Three kinds of
+disagreement came out of it, and they are recorded here rather than left for the
+next reader to rediscover.
+
+**Claims that are not implemented.** Each of these is now unchecked above.
+
+| Claim                                                              | What the tree actually has                                                                                                                                                            |
+| ------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `SvcHostSplitThresholdInKB` grouped service hosting (WP-3.1)        | Nothing writes that value. Service control in `src-tauri/src/services.rs` covers two services (`WSearch`, `WSAIFabricSvc`) with start type and running state restored through the rollback store. The design spec already holds the SvcHost fan-out back for a separate manual hardware test, and that is the right call: it is the one item in the plan that can change how the whole machine behaves |
+| NTFS 8.3 short names and Last Access Time (WP-2.3)                  | No control writes `NtfsDisable8dot3NameCreation` or `NtfsDisableLastAccessUpdate`, and no code shells out to `fsutil`                                                                  |
+| `AITEventLog` and `DiagLog` ETW autologger teardown (WP-2.1)         | The catalogue stops `AutoLogger-Diagtrack-Listener` and `SQMLogger`. Application Impact Telemetry is switched off with the `AITEnable` policy value instead, which is the supported control for it                                            |
+| The nine workflow archetypes (WP-4.1)                               | Six starter profiles ship: `gaming`, `streaming`, `work`, `study`, `laptop`, `quiet`. Debloat has its own four tiers including `presetBarebone`; "Browser + MS Office" is a debloat preset name                                             |
+| Non-critical services by name (WP-3.3): `MapsBroker`, `WerSvc`, `dmwappushservice`, `lfsvc` | None of those names appears in the code. Service control is generic over the entries the catalogue declares, and today it declares two |
+
+**Claims that are true, but describe a different mechanism than the code uses.**
+
+| Claim                                                       | What ships instead                                                                                                                                                    |
+| ----------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| WP-1.3: pre-flight restore point through WMI `SystemRestore.CreateRestorePoint` | `src-tauri/src/restore_point.rs` calls the native `SRSetRestorePointW` API, loading `srclient.dll` dynamically so an edition without System Restore is an honest failure rather than a startup crash. No WMI, no PowerShell; the outcome is reported per action   |
+| WP-5.3: cold boot time from the WMI class `SystemBootTime`   | Boot times come from `sysinfo::System::boot_time()` and from the times Windows itself records (`diagnostics::boot`), which is the same source the Before & After comparison documents |
+
+**Claims that hold up, for the record.** The `RegValue` widening (WP-1.1), the
+transactional scheduled-task adapter (WP-1.2), the ~150-control catalogue
+expansion — 141 controls ship — the UI-responsiveness and low-latency kernel
+items (WP-2.2, WP-2.3 minus NTFS), the 40+ scheduled tasks machinery (WP-3.2),
+the debloat catalogue at 26 curated package identities with provisioned-package
+removal and four tiers (WP-4.2), the live kernel DPC/ISR analyzer (WP-5.1, which
+CI now exercises on every push), the X3D and thread-director routing (WP-5.2),
+the measured Before & After suite (WP-5.3), six-locale parity (WP-6.1), the
+offline `wincraft-emergency-undo.bat` (WP-6.2) and the quality gates (WP-6.3) all
+exist in the tree.
+
+None of this is a regression: the unchecked items were never in a release, and
+nothing published claims them. They are the roadmap's remaining work, and they
+stay visible here because a checked box that nothing implements is how the audit
+started.

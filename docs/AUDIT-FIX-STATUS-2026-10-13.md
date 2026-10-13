@@ -361,6 +361,22 @@ green.
   already imply) if the banner is the intended experience, or delete the
   component and the comment that promises it.
 
+### The 2.0 roadmap's done-markers, held to account
+
+`docs/WINCRAFT-2.0-ROADMAP.md` marked every work package `[x]`. Holding each box
+against the tree found five claims that nothing implements — `SvcHostSplitThresholdInKB`
+grouped service hosting, NTFS 8.3 names and Last Access Time, the `AITEventLog`
+and `DiagLog` autologgers (only `AutoLogger-Diagtrack-Listener` and `SQMLogger`
+are written), the nine workflow archetypes (six starter profiles ship), and the
+named non-critical services (`MapsBroker`, `WerSvc`, `dmwappushservice`, `lfsvc`
+appear nowhere in the code) — plus two that are true only in effect: the pre-flight
+restore point is the native `SRSetRestorePointW` API rather than WMI, and boot
+times come from `sysinfo` and Windows' own record rather than the WMI
+`SystemBootTime` class. The five are now unchecked, and a reconciliation section
+in the roadmap records what ships instead and what holds up. None of it is a
+regression: nothing published claims those five, and the design spec already held
+the SvcHost fan-out back for a manual hardware test.
+
 ### Owner actions this session cannot complete
 
 1. **GitHub Pages.** Every deploy job has failed at `actions/configure-pages`
