@@ -2133,12 +2133,57 @@ was verified by reverting it:
     a `postgres:16` service and sets `TEST_DATABASE_URL`; without it three tests
     (transaction rollback, account deletion eligibility, retention) skip
     themselves. Verified locally against PostgreSQL 17: 197 pass, 0 skipped.
-18. **`install.ps1`'s failure message** — it fails closed today, and what a user
-    sees is a raw 404 from the stable alias URL. A clearer message is a small
-    edit to a security-relevant script that cannot be verified in this sandbox
-    (no PowerShell); run `scripts/test-quick-installer.ps1` on Windows with it.
+18. **Resolved, hours later — `install.ps1`'s failure message.** A failed
+    download now names what it means ("If that was a 404, no signature-verified
+    release is published yet …"), the original error is still rethrown, and every
+    fail-closed path stays where it was. The script also carries a UTF-8 BOM:
+    Windows PowerShell 5.1, which is what `irm … | iex` runs, reads a BOM-less
+    script as ANSI and turned the em dash in its banner into three characters.
+    The offline suite over it (`scripts/test-quick-installer.ps1`) now runs on
+    the Windows runner in the `checks` job through `src/repo-gates.test.ts`,
+    which is also why the held patch stopped adding a step for it.
 
 Items 1–13 above stand as written: the clippy and unwrap sweep, the axe pass on
 a real browser, the packaged-build smoke test, mounting `App.tsx`, the Redaxa
 card decision, and the coverage ratchet — all of them needing a tool or a runner
 this environment does not have.
+
+### Fourth pass — the licence, and the two gates that had no runner
+
+Holding public copy against the repository's own `LICENSE` found the same
+defect class as the links audit: three claims about the licence that stopped
+being true when the project became MIT, each of them anchored by a comment
+explaining why the old wording was chosen.
+
+| Where                                                                  | Said                                                                                                     | Reality                                                                                     |
+| ---------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
+| `site/src/i18n/dictionary.ts` footer                                    | "Source-Available License", on a link to `LICENSE`                                                        | `LICENSE` is MIT; README, TERMS.md and `docs/pad.xml` all say MIT                            |
+| `marketing/reel-generator/src/content.py`                               | "WinCraft isn't open source, but the code is source-available…", with a comment saying it must never be called open source | MIT is open source; the comment was right before the licence changed and survived the change  |
+| `marketing/reel-generator/src/script_writer.py`                        | the same claim as a CTA                                                                                   | the same                                                                                     |
+| `marketing/youtube-upload/compile-longform.js`                          | "source available" as a YouTube tag                                                                       | the same                                                                                     |
+
+All four are fixed, the footer's product column also says the product's name
+(`WINCRAFT`, it read `PC TWEAKER`), and `npm run check:license-claims` keeps them
+fixed: it reads the licence name out of `LICENSE`, fails on "source available",
+"not open source", "closed source", "all rights reserved" and "proprietary
+licence/terms" across 82 public files, and requires README, TERMS.md,
+`docs/pad.xml` and the site's dictionary to name the licence. Verified by
+reverting each half — the forbidden phrase fails it, and so does removing the
+name.
+
+Two gates that had no runner now have one, and neither needs a workflow edit,
+which is the only kind of gate that can be added from this credential:
+
+- `scripts/test-quick-installer.ps1` — asset selection, publisher and timestamp
+  checks, the mutation lock and the fail-closed fallback — runs from
+  `src/repo-gates.test.ts` on the Windows image the `checks` job already uses,
+  together with a parse of every `.ps1` in the tree. That parse is the only thing
+  that would notice a syntax error in a release or Store script before the day it
+  is needed. `docs/workflows-pending.patch` no longer adds a step for the suite,
+  and still applies cleanly.
+- `scripts/check-license-claims.mjs` runs the same way, beside
+  `check-download-links.mjs`.
+
+`docs/WINCRAFT-2.0-ROADMAP.md` was reconciled in the same pass: five checked work
+packages have nothing behind them and are unchecked, and the roadmap records what
+ships instead.

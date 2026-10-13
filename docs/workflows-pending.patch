@@ -2,17 +2,11 @@ diff --git a/.github/workflows/checks.yml b/.github/workflows/checks.yml
 index 74db682..98a6ef6 100644
 --- a/.github/workflows/checks.yml
 +++ b/.github/workflows/checks.yml
-@@ -190,8 +190,45 @@ jobs:
+@@ -190,8 +190,39 @@ jobs:
        - name: Native power policies on a disposable inactive plan
          run: cargo test --manifest-path src-tauri/Cargo.toml --lib power_tuning::tests::inactive_windows_plan_roundtrip -- --ignored --nocapture
  
 -      - name: Backend unit tests
-+      # Offline: the script loads install.ps1 as a library and substitutes the
-+      # signature, download and launch commands, so it needs no release assets.
-+      - name: Quick installer regressions
-+        shell: pwsh
-+        run: ./scripts/test-quick-installer.ps1
-+
 +  # Its own job so the checks above keep their runtime, and so the backend
 +  # tests run against a real PostgreSQL: three of them (transaction rollback,
 +  # account deletion, retention) skip without one, which is how a regression in

@@ -134,11 +134,12 @@ CTA = [
     "Save this before you forget, then let WinCraft do it for you in one click. Link in bio.",
     "Send this to whoever's PC is a mess right now, the one-click fix is in the bio.",
     # Added 2026-08-19: the one CTA that points explicitly at verifiability
-    # (source-available and independently listed) rather than repeating "free,
-    # link in bio" - a direct answer to the "is it safe?" doubt without
+    # (the source is published and independently listed) rather than repeating
+    # "free, link in bio" - a direct answer to the "is it safe?" doubt without
     # repeating it in every single video, where it would weigh as heavily as
-    # the other CTAs are light.
-    "Don't just trust a random tweak tool, check it yourself, the code is source-available. Link in bio.",
+    # the other CTAs are light. Re-checked 2026-10-13: MIT, so "open source"
+    # is the accurate word now.
+    "Don't just trust a random tweak tool, check it yourself, the code is open source and MIT licensed. Link in bio.",
 ]
 
 # Comment-game closers for the list format (2026-08-06): a lesson taken from

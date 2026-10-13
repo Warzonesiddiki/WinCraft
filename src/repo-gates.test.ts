@@ -38,6 +38,7 @@ const gates: ReadonlyArray<readonly [name: string, script: string]> = [
   ["renderer privilege envelope", "scripts/check-no-new-privileges.mjs"],
   ["data inventory", "scripts/check-data-inventory.mjs"],
   ["published download links", "scripts/check-download-links.mjs"],
+  ["licence claims in public copy", "scripts/check-license-claims.mjs"],
 ];
 
 describe("repository gates with no CI step of their own", () => {

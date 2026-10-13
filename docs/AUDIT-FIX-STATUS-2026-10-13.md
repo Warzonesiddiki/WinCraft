@@ -400,3 +400,39 @@ the SvcHost fan-out back for a manual hardware test.
    certificate, and every signed release so far was signed as Aurelio Avila
    (`verify-installers.ps1` pins that certificate's thumbprint). Nothing needs to
    change on either side; the two strings describe different things.
+
+## Fourth pass — the licence cluster, the installer, and gates that had no runner
+
+The links audit's method applied to copy found one more cluster, and it is the
+same shape: a decision that changed and three sentences that did not.
+
+`site/src/i18n/dictionary.ts` labelled the MIT `LICENSE` file
+"Source-Available License", and the reel and long-form generators carried
+"WinCraft isn't open source, but the code is source-available" — with a comment
+saying it must never be called open source. That was correct while the project
+was source-available and wrong from the day it became MIT, which is why the
+sentence had a comment defending it and why no gate noticed: nothing read a
+licence claim. All four lines are fixed (including "source available" as a
+YouTube tag), the footer's product column now says `WINCRAFT` rather than
+`PC TWEAKER`, and `npm run check:license-claims` holds it: it reads the licence
+name out of `LICENSE`, fails on "source available", "not open source", "closed
+source", "all rights reserved" and "proprietary licence/terms" across the
+public copy, and requires README, TERMS.md, `docs/pad.xml` and the site's own
+dictionary to name it. Both halves were verified by reverting them.
+
+Two gates that had no runner now have one, neither needing a workflow edit:
+
+- `scripts/test-quick-installer.ps1`, the offline suite over `install.ps1`, runs
+  from `src/repo-gates.test.ts` in the `checks` job, which is already on a
+  Windows image — plus a parse of every `.ps1` in the tree, the only check that
+  would catch a syntax error in a release script before the day it is needed.
+  `docs/workflows-pending.patch` dropped the now-duplicate step and still applies
+  cleanly.
+- `scripts/check-license-claims.mjs`, beside `check-download-links.mjs`.
+
+`install.ps1` itself is small and security-relevant, so the change to it is
+small: a catch that prints what a failed download means and rethrows, and a
+UTF-8 BOM so Windows PowerShell 5.1 — what `irm … | iex` runs — stops reading
+the script as ANSI and mojibaking the em dash in its banner. Discovery is still
+the only stage inside a `catch`; verification, download and execution are still
+outside it.

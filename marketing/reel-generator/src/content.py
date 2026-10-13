@@ -234,9 +234,10 @@ FALLBACK = {
         # having been checked by independent third parties - the real answer to
         # "vibe coded" is "not just my code, other people have looked at it",
         # not one more line of self-reassurance. Facts verifiable from
-        # README.md, nothing invented: it is NOT open source (source-available
-        # licence, not MIT/GPL), so it must never be called "open source".
-        "WinCraft isn't open source, but the code is source-available for anyone to review, and it's listed independently on MajorGeeks and Softpedia, not just self-hosted.",
+        # README.md, nothing invented. Re-checked 2026-10-13: the licence is
+        # MIT (LICENSE, README, TERMS), so this line may now invite people to
+        # read and reuse the code; the licence was stricter when it was written.
+        "WinCraft is MIT licensed, so the code is there for anyone to review, and it's listed independently on MajorGeeks and Softpedia, not just self-hosted.",
         "The Windows package manager only lists WinCraft because a Microsoft-reviewed pull request approved it into winget-pkgs, the same community repo every legit app goes through.",
         "78 automated tests run on every single code change before it ships, covering the exact rollback logic that undoes a tweak.",
     ],

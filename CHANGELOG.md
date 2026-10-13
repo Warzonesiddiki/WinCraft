@@ -36,6 +36,29 @@ public statement true, and each one has a gate behind it.
   links to.
 - **Dependencies:** `ed25519-dalek` and the five orphaned permission files left
   behind by the retired licence machinery are gone.
+- **Public copy states the licence the repository ships.** The site footer
+  labelled the MIT `LICENSE` file "Source-Available License", and the reel and
+  long-form generators still carried the line "WinCraft isn't open source, but
+  the code is source-available" with a comment saying it must never be called
+  open source — written while the project was source-available, and wrong since
+  it became MIT. `npm run check:license-claims` reads the licence out of
+  `LICENSE` and fails when public copy claims a different one.
+- **`install.ps1` says what a failed download means.** With no
+  signature-verified release published, the stable alias 404s and the run ended
+  in a raw HTTP error; it now names the reason and still fails closed. The file
+  also gained a UTF-8 BOM, because Windows PowerShell 5.1 — what `irm … | iex`
+  runs — reads a BOM-less script as ANSI and turned the em dash in its banner
+  into three characters.
+- **The quick installer's offline suite runs on every push.** It is Windows-only
+  and had no CI step; it now runs from `src/repo-gates.test.ts` in the `checks`
+  job, which is already on a Windows image, together with a parse of every
+  `.ps1` in the tree.
+- **The 2.0 roadmap's done-markers say what is true.** Five work packages were
+  checked with nothing behind them (`SvcHostSplitThresholdInKB`, the NTFS 8.3
+  and Last Access values, the `AITEventLog`/`DiagLog` autologgers, the nine
+  workflow archetypes and the named non-critical services), and two described a
+  mechanism the code does not use. The boxes are unchecked and the roadmap
+  carries a reconciliation section.
 
 ## v1.19.0
 

@@ -625,7 +625,7 @@ export const engDictionary: Dictionary = {
   },
   footer: {
     tagline: "Windows tuning. Visible changes. Informed decisions.",
-    product: "PC TWEAKER",
+    product: "WINCRAFT",
     download: "Download for Windows",
     changelog: "Release Notes",
     source: "Inspect the Source",
@@ -636,7 +636,7 @@ export const engDictionary: Dictionary = {
     cookies: "Cookies",
     accessibility: "Accessibility",
     contact: "Contact Aurelio",
-    license: "Source-Available License",
+    license: "MIT License",
     copyright: "Created and maintained by Aurelio Avila. © 2026 Aurelio Avila",
     motto: "// every millisecond is earned",
     tipThanks: "Thank you for supporting WinCraft.",

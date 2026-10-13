@@ -388,7 +388,7 @@ async function main() {
   // channel from the visible hashtags, so it is worth using rather than
   // stopping at 5.
   const tags = [
-    "windows tweak", "pc optimizer", "windows 11 tips", "free software", "source available",
+    "windows tweak", "pc optimizer", "windows 11 tips", "free software", "open source",
     "speed up pc", "windows 11 performance", "debloat windows", "pc maintenance",
     "windows settings", "gaming pc optimization", "pc tweaker",
   ];

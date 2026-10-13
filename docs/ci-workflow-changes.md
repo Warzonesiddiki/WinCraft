@@ -64,7 +64,7 @@ whose point is not to rot:
 | Patch                            | Touches                                | What it does                                                                                                                                                                                                                                                                                                       |
 | -------------------------------- | -------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `docs/checks-annotation.patch`   | `checks.yml`                           | Replaces the `Rust unit tests` step's plain `npm run check:rust` with a run that captures cargo's output and re-emits the lines that matter — `error[E…]`, `warning: unused`, `panicked at`, `test result: FAILED`, the failing test's `----` header — as `::error::` annotations. A failed run's log is a download that few people open, and the reason sits hundreds of lines above the last line; annotations are what the run page and the checks API show. |
-| `docs/workflows-pending.patch`   | `checks.yml`, `deploy-site.yml`        | Adds the offline Quick installer regression suite (`scripts/test-quick-installer.ps1`) as a CI step; adds a `backend` job with a `postgres:16` service and `TEST_DATABASE_URL` + `DATABASE_ALLOW_PLAINTEXT` so the three database tests stop being skipped; and passes `enablement: true` to `actions/configure-pages` so the site deploy can create the Pages site, which is the one thing every deploy job has failed on so far.               |
+| `docs/workflows-pending.patch`   | `checks.yml`, `deploy-site.yml`        | Adds a `backend` job with a `postgres:16` service and `TEST_DATABASE_URL` + `DATABASE_ALLOW_PLAINTEXT` so the three database tests stop being skipped; and passes `enablement: true` to `actions/configure-pages` so the site deploy can create the Pages site, which is the one thing every deploy job has failed on so far.               |
 
 Apply either with:
 
@@ -73,17 +73,19 @@ git apply docs/checks-annotation.patch
 git apply docs/workflows-pending.patch
 ```
 
-The `workflows-pending` patch moves three checks into CI that currently run
-elsewhere or not at all:
+The `workflows-pending` patch moves the remaining checks into CI. Two of the
+three it was written for now have a home that does not need a workflow edit:
 
 - `scripts/check-no-new-privileges.mjs` and `scripts/check-data-inventory.mjs`
   have no step in `checks.yml`. They are enforced anyway: `src/repo-gates.test.ts`
   runs them through the Vitest suite, which is a step in that workflow, so a
   red gate still fails the run. The patch is the tidier home, not the only
   enforcement.
-- `scripts/test-quick-installer.ps1` is Windows-only and has never run in CI.
-  Until the patch lands, the quick installer's signature checks are covered by
-  reading, not by a runner.
+- `scripts/test-quick-installer.ps1` is Windows-only — and it runs in CI now,
+  through `src/repo-gates.test.ts`, in the same `checks` job, on the same
+  Windows image (the suite plus a parse of every `.ps1` in the tree). It used to
+  need this patch; it no longer does, and the patch no longer adds a step for
+  it, because running the same suite twice in one job buys nothing.
 - the three PostgreSQL-backed backend tests (transaction rollback, account
   deletion eligibility, retention) skip themselves without `TEST_DATABASE_URL`,
   which is the state CI has been in: 194 passing, 3 skipped. With the job in
