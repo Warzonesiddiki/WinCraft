@@ -89,12 +89,12 @@ The WinCraft 2.0 architecture was subjected to a rigorous failure-mode, threat-m
 
 ---
 
-### 2.7 Antivirus & Anti-Cheat False-Positive Prevention
-- **Risk:** Aggressive debloat scripts often execute PowerShell one-liners or download unsigned binaries from third-party hosts, triggering Windows Defender SmartScreen blocks or triggering anti-cheat integrity alerts in games (Valorant / Vanguard, Fortnite / Easy Anti-Cheat).
+### 2.7 Antivirus & Game Integrity System Safety
+- **Risk:** Aggressive debloat scripts often execute PowerShell one-liners or download unsigned binaries from third-party hosts, triggering Windows Defender SmartScreen blocks or triggering game integrity alerts in competitive games.
 - **Architectural Solution:**
   - **Zero External Script Downloads:** WinCraft is self-contained; it never downloads unsigned `.ps1`, `.bat`, or `.exe` payloads from the internet at runtime.
   - **Direct Win32 API Execution:** Modifications are performed directly via native Rust Win32 API bindings (`Advapi32.dll`, `Kernel32.dll`) rather than spawning hidden PowerShell child processes that trigger heuristic malware flags.
-  - **Clean Anti-Cheat Compatibility:** WinCraft preserves all kernel integrity protections (HVCI, Core Isolation, Secure Boot) and leaves game anti-cheat drivers completely untouched.
+  - **Clean Game Integrity Compatibility:** WinCraft preserves all kernel integrity protections (HVCI, Core Isolation, Secure Boot) and leaves game security drivers completely untouched.
 
 ---
 
