@@ -44,17 +44,46 @@ const files = [
   "backend/src/emails/account.ts",
   "site/src/i18n/dictionary.ts",
   "site/src/pages/practical-guides.ts",
+  // The launch kit for the next Product Hunt / AlternativeTo / YouTube post.
+  // It carried the paid tier pricing, a dead winget identifier and the
+  // pre-1.19 control count for a month after all three had changed, because no
+  // gate read it: marketing copy goes out under this repository's name, so it
+  // is public text and it is scanned like the rest.
+  "marketing/producthunt-assets/SUBMISSION.md",
+  "marketing/producthunt-assets/YOUTUBE.md",
+  "marketing/instagram-upload/auto-upload.js",
   ...listings,
   ...(fs.existsSync(new URL(`../${releaseNotes}`, import.meta.url)) ? [releaseNotes] : []),
 ];
 
+const problems = [];
+
+// The changelog is public text too, and its *current* section is release copy
+// rather than history: 1.19.0's own entry still said "81 controls" (three
+// times) while the catalogue the same build ships held 141. Only the section
+// for the version in package.json is scanned, for the same reason the release
+// notes are: an older section describing an older catalogue is accurate.
+const changelog = read("CHANGELOG.md");
+const shippedHeading = `## v${version}`;
+const shippedAt = changelog.indexOf(shippedHeading);
+if (shippedAt === -1) {
+  problems.push(`CHANGELOG.md: no "${shippedHeading}" section for the version being shipped`);
+}
+const shippedSection =
+  shippedAt === -1 ? "" : changelog.slice(shippedAt).split(/\n## /)[0].trimEnd();
+
 // A number right before a catalog noun, in the six languages the texts use.
 const NOUN = String.raw`(?:Windows[ -])?(?:Free |Pro )?(?:controls?|tweaks?|settings|controlli|impostazioni|réglages|contrôles|ajustes|controles|controlos|Einstellungen)`;
-const claim = new RegExp(String.raw`\b(\d{2,3})\s+${NOUN}`, "gi");
+// Up to two lowercase modifiers may sit between the number and the noun:
+// the launch kit's own phrasing is "141 one-click Windows controls", and a
+// count written that way has to be checked too.
+const claim = new RegExp(String.raw`\b(\d{2,3})((?:\s+[a-z][a-z-]*){0,2})\s+${NOUN}`, "gi");
 const NEW = /^\s*(new|nuovi|nouveaux|nuevos|neue|novos)\b/i;
-const problems = [];
-for (const file of files) {
-  const text = read(file);
+const texts = [
+  ...files.map((file) => [file, read(file)]),
+  [`CHANGELOG.md (${shippedHeading} section)`, shippedSection],
+];
+for (const [file, text] of texts) {
   for (const m of text.matchAll(claim)) {
     const n = Number(m[1]);
     if (n === total) continue;
@@ -93,6 +122,13 @@ for (const file of files) {
     problems.push(
       `${file}: "${m[0]}" — a count labelled Free/Pro; every one of the ${total} controls is free`,
     );
+  }
+  // And the price itself, which outlived the tier in one launch kit: "Pro
+  // (€9.99/mo or €59/yr)". A currency amount that is not zero is a price, and
+  // there is nothing in this product to price — the app's own pricing card
+  // says "€0 / forever".
+  for (const m of text.matchAll(/[€$£]\s?(?!0\b)\d+(?:[.,]\d+)?(?:\s?\/\s?(?:mo|month|yr|year))?|\b\d+[.,]\d{2}\s?(?:€|\$|£)|\bper (?:month|year)\b/gi)) {
+    problems.push(`${file}: "${m[0]}" — a price; every one of the ${total} controls is free`);
   }
 }
 for (const file of listings) {

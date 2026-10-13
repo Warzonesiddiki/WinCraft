@@ -14,7 +14,7 @@
 
 <p align="center">
   <a href="https://github.com/Warzonesiddiki/WinCraft/releases"><img src="https://img.shields.io/github/v/release/Warzonesiddiki/WinCraft" alt="Latest release"></a>
-  <a href="https://github.com/microsoft/winget-pkgs/tree/master/manifests/a/Warzonesiddiki/PCTweaker"><img src="https://img.shields.io/winget/v/Warzonesiddiki.WinCraft?label=WinGet&color=0078D4" alt="Latest version available in WinGet"></a>
+  <a href="https://github.com/microsoft/winget-pkgs/tree/master/manifests/a/AurelioAvila/PCTweaker"><img src="https://img.shields.io/winget/v/AurelioAvila.PCTweaker?label=WinGet&color=0078D4" alt="Latest version available in WinGet"></a>
   <a href="https://community.chocolatey.org/packages/pc-tweaker"><img src="https://img.shields.io/chocolatey/v/pc-tweaker?label=Chocolatey&color=80B5E3" alt="Latest approved version in Chocolatey"></a>
   <a href="https://github.com/Warzonesiddiki/WinCraft/releases"><img src="https://img.shields.io/github/downloads/Warzonesiddiki/WinCraft/total?label=GitHub%20asset%20downloads" alt="GitHub release asset download events"></a>
   <img src="https://img.shields.io/badge/platform-Windows%2010%2F11%20x64-0078D4" alt="Windows 10 and 11 x64">
@@ -66,13 +66,13 @@ irm https://raw.githubusercontent.com/Warzonesiddiki/WinCraft/master/install.ps1
 Download an installer from an official channel above, or use Windows Package Manager:
 
 ```powershell
-winget install --id Warzonesiddiki.WinCraft --exact
+winget install --id AurelioAvila.PCTweaker --exact
 ```
 
 To check for a package update:
 
 ```powershell
-winget upgrade --id Warzonesiddiki.WinCraft --exact
+winget upgrade --id AurelioAvila.PCTweaker --exact
 ```
 
 Package catalogs can lag behind a release. Check the release version before installing. Windows 10/11 x64 is the current binary target; individual features depend on the Windows build, edition, drivers and available hardware. App compatibility does not extend Microsoft's support lifecycle for your operating system.

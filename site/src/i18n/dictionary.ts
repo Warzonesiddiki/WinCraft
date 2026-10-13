@@ -217,7 +217,7 @@ export const engDictionary: Dictionary = {
       "WinCraft Overview screen with processor and memory usage, the number of applied settings and a suggested next step.",
     screenshotCaption: "The Overview screen, as it appears in the app.",
     terminalTitle: "Install with Windows Package Manager",
-    terminalCmd: "winget install --id Warzonesiddiki.WinCraft --exact",
+    terminalCmd: "winget install --id AurelioAvila.PCTweaker --exact",
     terminalHint: "# install the official WinCraft package",
     copy: "COPY",
     copied: "COPIED",

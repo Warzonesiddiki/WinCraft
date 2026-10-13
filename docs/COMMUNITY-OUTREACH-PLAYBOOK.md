@@ -47,7 +47,7 @@ _Why this works:_ System builders, IT admins, and PC enthusiasts love zero-insta
 
 ### 2.2 WinGet & Chocolatey Official Packages
 
-- Update the official WinGet manifest for `Warzonesiddiki.WinCraft` / `WinCraft`.
+- Update the official WinGet manifest for `AurelioAvila.PCTweaker` (the published package identifier; a WinCraft-branded identifier would be a new submission, not a rename).
 - Submit to Chocolatey Community Repository (`choco install wincraft`).
 - Submit to Scoop (`scoop bucket add extras; scoop install wincraft`).
 
