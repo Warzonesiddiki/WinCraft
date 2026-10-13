@@ -30,7 +30,10 @@ pub fn current_user_session_allowed() -> bool {
     if !uac_disabled {
         return false;
     }
-    // SAFETY: ShellExecuteW is called with valid null-terminated strings and a valid HWND (None).
+    // SAFETY: token handles are checked before use and closed on each exit.
+    // GetTokenInformation first reports the required size; usize buffers are
+    // aligned for TOKEN_USER and retained while their embedded SIDs are read.
+    // EqualSid is called only after successful TokenUser reads for both tokens.
     unsafe {
         let shell = GetShellWindow();
         if shell.is_null() {

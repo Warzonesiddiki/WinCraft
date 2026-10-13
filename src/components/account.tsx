@@ -26,6 +26,7 @@ export function AuthSection({
   onLogout,
   onResendVerification,
   onForgotPassword,
+  onDeleteAccount,
 }: {
   s: Strings;
   auth: AuthState;
@@ -43,6 +44,10 @@ export function AuthSection({
   onLogout: () => void;
   onResendVerification: () => Promise<void>;
   onForgotPassword: (email: string) => Promise<void>;
+  /** Deletes the account for good. Refusals arrive as an
+   *  `AccountDeletionError`, whose `problem` this section turns back into a
+   *  sentence in the reader's language. */
+  onDeleteAccount: (password: string, confirm: string) => Promise<void>;
 }) {
   const [mode, setMode] = useState<"login" | "register" | "forgot">("login");
   const [email, setEmail] = useState("");
@@ -56,6 +61,42 @@ export function AuthSection({
   // Defaults on, like every desktop app people already use. Off means the
   // session lives only until the app closes.
   const [remember, setRemember] = useState(true);
+  // The danger zone stays folded away until it is deliberately opened: a
+  // destructive control should not sit one stray click from "Log out".
+  const [deleting, setDeleting] = useState(false);
+  const [deletePassword, setDeletePassword] = useState("");
+  const [deleteConfirm, setDeleteConfirm] = useState("");
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+  const [deleteWorking, setDeleteWorking] = useState(false);
+
+  /** Refusals carry a machine-readable problem; the wording lives here so it
+   *  is translated, and anything unrecognised falls back to the server's own
+   *  message rather than showing nothing. */
+  function deletionMessage(error: unknown): string {
+    const problem = (error as { problem?: string })?.problem;
+    if (problem === "active-subscription") return s.auth.deleteAccountBlocked;
+    if (problem === "password-mismatch") return s.auth.deleteAccountWrongPassword;
+    if (problem === "unauthenticated") return s.auth.deleteAccountNeedsLogin;
+    if (problem === "unreachable") return s.auth.deleteAccountUnreachable;
+    return error instanceof Error ? error.message : String(error);
+  }
+
+  async function submitDeletion(e: React.FormEvent) {
+    e.preventDefault();
+    setDeleteError(null);
+    setDeleteWorking(true);
+    try {
+      await onDeleteAccount(deletePassword, deleteConfirm);
+      // On success the app signs out and this whole section unmounts; the
+      // password is cleared anyway so nothing lingers in a kept-alive tree.
+      setDeletePassword("");
+      setDeleteConfirm("");
+    } catch (err) {
+      setDeleteError(deletionMessage(err));
+    } finally {
+      setDeleteWorking(false);
+    }
+  }
 
   if (auth.status === "authenticated") {
     // "Logged in as name@example.com" as a bare line of text reads like a
@@ -143,6 +184,66 @@ export function AuthSection({
         >
           {s.auth.logout}
         </button>
+
+        {deleting ? (
+          <form onSubmit={submitDeletion} className="mt-3 rounded-lg border border-danger/30 p-2.5">
+            <p className="text-[11px] leading-relaxed text-ink-3">{s.auth.deleteAccountBody}</p>
+            <label className="mt-2 block text-[11px] font-medium text-ink-2">
+              {s.auth.deleteAccountPassword}
+              <input
+                type="password"
+                value={deletePassword}
+                onChange={(e) => setDeletePassword(e.target.value)}
+                autoComplete="current-password"
+                className="mt-1 w-full rounded-md border border-line bg-surface-2 px-2 py-1 text-xs text-ink outline-none focus:border-danger/60"
+              />
+            </label>
+            <label className="mt-2 block text-[11px] font-medium text-ink-2">
+              {s.auth.deleteAccountConfirmLabel}
+              <input
+                type="text"
+                value={deleteConfirm}
+                onChange={(e) => setDeleteConfirm(e.target.value)}
+                autoComplete="off"
+                className="mt-1 w-full rounded-md border border-line bg-surface-2 px-2 py-1 text-xs tracking-[0.2em] text-ink outline-none focus:border-danger/60"
+              />
+            </label>
+            {deleteError && <p className="mt-2 text-[11px] text-danger">{deleteError}</p>}
+            <div className="mt-2 flex gap-2">
+              <button
+                type="submit"
+                disabled={
+                  deleteWorking || deleteConfirm.trim() !== "DELETE" || deletePassword.length < 8
+                }
+                className="flex-1 rounded-lg bg-danger/15 px-2 py-1.5 text-[11px] font-semibold text-danger transition-colors hover:bg-danger/25 disabled:cursor-not-allowed disabled:opacity-40"
+              >
+                {deleteWorking ? s.auth.working : s.auth.deleteAccountSubmit}
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setDeleting(false);
+                  setDeleteError(null);
+                  setDeletePassword("");
+                  setDeleteConfirm("");
+                }}
+                className="rounded-lg bg-surface-2 px-2 py-1.5 text-[11px] font-medium text-ink-3 transition-colors hover:bg-surface-hover hover:text-ink-2"
+              >
+                {s.auth.deleteAccountCancel}
+              </button>
+            </div>
+          </form>
+        ) : (
+          <button
+            onClick={() => {
+              setDeleting(true);
+              setDeleteError(null);
+            }}
+            className="mt-2 w-full rounded-lg px-3 py-1.5 text-left text-[11px] font-medium text-ink-3 transition-colors hover:bg-danger/10 hover:text-danger"
+          >
+            {s.auth.deleteAccount}
+          </button>
+        )}
       </div>
     );
   }
@@ -346,6 +447,7 @@ export function AccountMenu({
   onLogout,
   onResendVerification,
   onForgotPassword,
+  onDeleteAccount,
   onViewPlan,
   pushToast,
 }: {
@@ -370,6 +472,7 @@ export function AccountMenu({
   onLogout: () => void;
   onResendVerification: () => Promise<void>;
   onForgotPassword: (email: string) => Promise<void>;
+  onDeleteAccount: (password: string, confirm: string) => Promise<void>;
   /** Opens the plans screen, which now states the one plan there is. */
   onViewPlan: () => void;
   pushToast: (kind: "success" | "error", message: string) => void;
@@ -540,6 +643,7 @@ export function AccountMenu({
                   onLogout={onLogout}
                   onResendVerification={onResendVerification}
                   onForgotPassword={onForgotPassword}
+                  onDeleteAccount={onDeleteAccount}
                 />
               </div>
             </details>

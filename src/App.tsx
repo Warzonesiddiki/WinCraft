@@ -1,3 +1,4 @@
+import { createAccountRefresh } from "./account-refresh";
 import { tweaksForSection } from "./tweak-list-model";
 import { TweakyDriverPromoCard } from "./components/tweaky-driver-promo";
 import React, { Suspense, lazy, useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -16,11 +17,12 @@ import {
   friendlyError,
   readStoredEmail,
   readToken,
-  adoptRenewedToken,
+  reportError,
   storeSession,
   storedRamAutoMinutes,
   textFor,
 } from "./lib";
+import { requestAccountDeletion } from "./account-deletion";
 import { AuthState, CleanupInfo, CleanupResult, Section, Toast, TweakInfo } from "./types";
 import {
   GemIcon,
@@ -245,47 +247,14 @@ function App() {
   // in), right after login/register, and when the window regains focus.
   // Account status is still useful for profiles, support, and preferences
   // even though Pro gating is gone.
-  async function refreshAccount() {
-    if (!API_BASE_URL) return;
-    const token = readToken();
-    if (!token) return;
-    try {
-      const res = await fetch(`${API_BASE_URL}/api/account`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (res.status === 401) {
-        // Token expired or was invalidated server-side: reflect that in the
-        // UI instead of silently keeping a stale "logged in" state forever.
-        logout();
-        return;
-      }
-      if (!res.ok) {
-        pushToast("error", s.toasts.accountRefreshFailed);
-        return;
-      }
-      adoptRenewedToken(res);
-      const data = (await res.json()) as {
-        email: string;
-        emailVerified: boolean;
-        plan?: string | null;
-        hasBilling?: boolean;
-      };
-      setAuth({
-        status: "authenticated",
-        email: data.email,
-        emailVerified: data.emailVerified,
-        // Optional so a client that is newer than the deployed backend
-        // degrades to hiding the billing button rather than showing one
-        // that cannot work.
-        plan: data.plan ?? null,
-        hasBilling: data.hasBilling ?? false,
-      });
-    } catch {
-      // Network hiccup: keep the account state we already had rather than
-      // signing the user out on a transient failure — but say so, since a
-      // silent failure here is indistinguishable from the token expiring.
-      pushToast("error", s.toasts.accountRefreshFailed);
-    }
+  const [accountRefresh] = useState(createAccountRefresh);
+  function refreshAccount(force = false) {
+    return accountRefresh.refresh(
+      setAuth,
+      logout,
+      () => pushToast("error", s.toasts.accountRefreshFailed),
+      force,
+    );
   }
 
   // The server can hold every runtime adjustment to other apps for everyone
@@ -316,8 +285,7 @@ function App() {
     // Mount-time account refresh. Its state updates land after the await, so
     // this is the documented fetch-then-set pattern rather than a cascading
     // render, which the rule cannot see through.
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    refreshAccount();
+    void refreshAccount();
     // Before this version the profile photo belonged to the computer rather
     // than to an account. Whoever is signed in as the app starts is the one
     // who was using it when the update landed, so the old photo is theirs.
@@ -328,11 +296,16 @@ function App() {
       refreshAccount();
     }
     window.addEventListener("focus", onFocus);
-    return () => window.removeEventListener("focus", onFocus);
+    return () => {
+      window.removeEventListener("focus", onFocus);
+      accountRefresh.cancel();
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   function logout() {
+    authAttempt.current++;
+    accountRefresh.cancel();
     clearSession();
     setAuth({ status: "anonymous" });
     // Same reasoning for the photo: a machine-wide leftover from before
@@ -340,6 +313,8 @@ function App() {
     // in next. Each account's own photo is untouched and waiting for them.
     void discardLegacyAvatar();
   }
+
+  const authAttempt = useRef(0);
 
   async function authenticate(
     mode: "login" | "register",
@@ -351,7 +326,9 @@ function App() {
     if (!API_BASE_URL) {
       throw new Error(s.auth.backendNotConfigured);
     }
+    const attempt = ++authAttempt.current;
     const res = await fetch(`${API_BASE_URL}/api/auth/${mode}`, {
+      signal: AbortSignal.timeout(8000),
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, password, ...registerDetails }),
@@ -365,6 +342,9 @@ function App() {
     // prefill an address: sessionStorage is cleared when the app closes, so
     // unticking it genuinely means "don't keep me signed in on this machine"
     // rather than being a cosmetic checkbox.
+    if (attempt !== authAttempt.current) return;
+    if (typeof data.token !== "string" || !data.token) throw new Error("Invalid session response");
+    accountRefresh.cancel();
     storeSession(data.token, email, remember);
     setAuth({
       status: "authenticated",
@@ -376,7 +356,7 @@ function App() {
     if (mode === "register" && data.verificationEmailSent) {
       pushToast("success", format(s.auth.checkInboxAfterSignup, { email }), 12000);
     }
-    await refreshAccount();
+    await refreshAccount(true);
   }
 
   async function resendVerification() {
@@ -384,6 +364,7 @@ function App() {
     const token = readToken();
     if (!token) throw new Error(s.auth.loginRequiredToResend);
     const res = await fetch(`${API_BASE_URL}/api/auth/resend-verification`, {
+      signal: AbortSignal.timeout(8000),
       method: "POST",
       headers: { Authorization: `Bearer ${token}` },
     });
@@ -396,6 +377,7 @@ function App() {
   async function forgotPassword(email: string) {
     if (!API_BASE_URL) throw new Error(s.auth.backendNotConfigured);
     const res = await fetch(`${API_BASE_URL}/api/auth/forgot-password`, {
+      signal: AbortSignal.timeout(8000),
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email }),
@@ -406,6 +388,24 @@ function App() {
     }
   }
 
+  /**
+   * Deletes the account for good.
+   *
+   * The order matters: the server has already removed everything by the time
+   * this resolves, so the only correct next step is to drop the session this
+   * window is holding and show the signed-out state. A failure leaves the
+   * session exactly as it was, because nothing was deleted; the section in the
+   * account menu turns the refusal into a sentence.
+   */
+  async function deleteAccount(password: string, confirm: string) {
+    if (!API_BASE_URL) throw new Error(s.auth.backendNotConfigured);
+    const token = readToken();
+    if (!token) throw new Error(s.auth.deleteAccountNeedsLogin);
+    await requestAccountDeletion({ apiBase: API_BASE_URL, token, password, confirm });
+    logout();
+    pushToast("success", s.auth.deleteAccountDone, 12000);
+  }
+
   // A one-off tip. No login required — it isn't tied to an account and
   // unlocks nothing, so there's nothing to gate behind sign-in. The count is
   // sent, but the backend clamps it; this side is convenience, not the limit.
@@ -414,6 +414,7 @@ function App() {
       throw new Error(s.auth.backendNotConfigured);
     }
     const res = await fetch(`${API_BASE_URL}/api/tip`, {
+      signal: AbortSignal.timeout(8000),
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ quantity }),
@@ -793,6 +794,7 @@ function App() {
                 onLogout={logout}
                 onResendVerification={resendVerification}
                 onForgotPassword={forgotPassword}
+                onDeleteAccount={deleteAccount}
                 onViewPlan={() => setFilter("pricing")}
                 pushToast={pushToast}
               />

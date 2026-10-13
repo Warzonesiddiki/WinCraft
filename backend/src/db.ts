@@ -1,4 +1,6 @@
-import { Pool } from "pg";
+import { Pool, PoolClient } from "pg";
+import { runMigrations, SCHEMA_MIGRATIONS } from "./migrations";
+import { databaseOptions } from "./db-config";
 
 const connectionString = process.env.DATABASE_URL;
 
@@ -12,6 +14,7 @@ const connectionString = process.env.DATABASE_URL;
 // database installed. Never use this value outside of tests.
 let pool: Pool | null = null;
 if (connectionString === "pgmem") {
+  if (process.env.NODE_ENV === "production") throw new Error("pgmem is test-only");
   // Lazily required: pg-mem is a devDependency, never bundled for a real
   // Postgres deployment, so this branch is the only place that touches it.
   const { newDb } = require("pg-mem");
@@ -20,249 +23,35 @@ if (connectionString === "pgmem") {
   const { Pool: MemPool } = mem.adapters.createPg();
   pool = new MemPool();
 } else if (connectionString) {
-  // Managed Postgres presents a certificate from the provider's own CA, which
-  // the default trust store does not know, so an unverified connection was the
-  // only way to connect out of the box. When DATABASE_CA holds that CA — the
-  // PEM itself or the path to it — verify the server instead of trusting any
-  // certificate. `sslmode=require` in DATABASE_URL is honoured by `pg` on top.
-  const ca = databaseCa();
-  pool = new Pool({
-    connectionString,
-    ssl: connectionString.includes("localhost")
-      ? false
-      : ca
-        ? { ca, rejectUnauthorized: true }
-        : { rejectUnauthorized: false },
-  });
+  pool = new Pool(databaseOptions());
+  pool.on("error", () => console.error("Idle database connection failed"));
 }
 
-/** Reads DATABASE_CA as PEM contents or as a path to a PEM file. */
-function databaseCa(): string | undefined {
-  const value = process.env.DATABASE_CA?.trim();
-  if (!value) return undefined;
-  if (value.includes("BEGIN CERTIFICATE")) return value;
+/** All statements in a transaction must use this one checked-out client. */
+async function withTransaction<T>(work: (client: PoolClient) => Promise<T>): Promise<T> {
+  const client = await getPool().connect();
+  let discard = false;
   try {
-    return require("fs").readFileSync(value, "utf8") as string;
-  } catch (err) {
-    console.error("DATABASE_CA could not be read, continuing without verification:", err);
-    return undefined;
+    await client.query("BEGIN");
+    const result = await work(client);
+    await client.query("COMMIT");
+    return result;
+  } catch (error) {
+    try {
+      await client.query("ROLLBACK");
+    } catch {
+      discard = true;
+      console.error("Database transaction rollback failed");
+    }
+    throw error;
+  } finally {
+    client.release(discard);
   }
 }
 
 async function initSchema(): Promise<void> {
   if (!pool) return;
-  await pool.query(`
-    CREATE TABLE IF NOT EXISTS users (
-      id SERIAL PRIMARY KEY,
-      email TEXT UNIQUE NOT NULL,
-      password_hash TEXT NOT NULL,
-      is_pro BOOLEAN NOT NULL DEFAULT FALSE,
-      email_verified BOOLEAN NOT NULL DEFAULT FALSE,
-      token_version INTEGER NOT NULL DEFAULT 0,
-      created_at TIMESTAMPTZ NOT NULL DEFAULT now()
-    );
-  `);
-  // ALTER ... ADD COLUMN IF NOT EXISTS makes this safe to re-run against a
-  // database created by an older version of this schema.
-  await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS email_verified BOOLEAN NOT NULL DEFAULT FALSE;`);
-  await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS token_version INTEGER NOT NULL DEFAULT 0;`);
-  await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS first_name TEXT;`);
-  await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS last_name TEXT;`);
-  await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS date_of_birth DATE;`);
-  // Subscription bookkeeping. The customer id is what Stripe sends us on
-  // cancellation/payment-failure events — without it we could grant Pro but
-  // never take it back, since those events don't carry our own user id.
-  await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS stripe_customer_id TEXT;`);
-  await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS plan TEXT;`);
-  // When the current billing period runs out. Subscription events refresh it
-  // on every renewal, so Pro lapses on its own if we ever stop hearing from
-  // Stripe. A NULL expiry grants access only for lifetime or an existing
-  // account explicitly marked by the compatibility migration below.
-  await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS pro_expires_at TIMESTAMPTZ;`);
-  // Bind recurring access to its source. A late event for an older purchase
-  // must not replace or revoke the subscription currently granting access.
-  await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS stripe_subscription_id TEXT;`);
-  await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS stripe_subscription_created_at TIMESTAMPTZ;`);
-  await migrateLegacyProGrants(pool);
-  await pool.query(`CREATE TABLE IF NOT EXISTS lifetime_uninstaller_bonus (
-    user_id INTEGER PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
-    activated_at TIMESTAMPTZ NOT NULL,
-    expires_at TIMESTAMPTZ NOT NULL
-  )`);
-  await pool.query(`
-    CREATE TABLE IF NOT EXISTS billing_receipts (
-      receipt_key TEXT PRIMARY KEY,
-      user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-      payload JSONB NOT NULL,
-      attempts INTEGER NOT NULL DEFAULT 0,
-      next_attempt_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-      locked_until TIMESTAMPTZ,
-      lock_token TEXT,
-      delivered_at TIMESTAMPTZ
-    );
-  `);
-
-  await pool.query(
-    `CREATE UNIQUE INDEX IF NOT EXISTS users_stripe_customer_id_idx ON users (stripe_customer_id) WHERE stripe_customer_id IS NOT NULL;`,
-  );
-
-  await pool.query(`
-    CREATE TABLE IF NOT EXISTS action_tokens (
-      id SERIAL PRIMARY KEY,
-      user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-      token_hash TEXT NOT NULL,
-      purpose TEXT NOT NULL,
-      expires_at TIMESTAMPTZ NOT NULL,
-      used_at TIMESTAMPTZ,
-      created_at TIMESTAMPTZ NOT NULL DEFAULT now()
-    );
-  `);
-  await pool.query(`CREATE INDEX IF NOT EXISTS action_tokens_hash_idx ON action_tokens (token_hash);`);
-
-  // Public product reviews left from the website. `email` is collected so a
-  // reviewer can be contacted about a complaint but is never returned by the
-  // read endpoint — see routes/reviews.ts, which selects columns explicitly
-  // rather than SELECT *, so adding a private column here can't leak it.
-  // `published` lets an abusive review be hidden without destroying the
-  // record. The rating range is enforced in the route rather than as a CHECK
-  // constraint: pg-mem (used by the test suite) doesn't implement CHECK.
-  await pool.query(`
-    CREATE TABLE IF NOT EXISTS reviews (
-      id SERIAL PRIMARY KEY,
-      name TEXT NOT NULL,
-      email TEXT,
-      rating SMALLINT NOT NULL,
-      body TEXT NOT NULL,
-      published BOOLEAN NOT NULL DEFAULT TRUE,
-      created_at TIMESTAMPTZ NOT NULL DEFAULT now()
-    );
-  `);
-  await pool.query(`CREATE INDEX IF NOT EXISTS reviews_published_idx ON reviews (published, created_at DESC);`);
-
-  // `confirmed_at` marks a rating as counted towards the public average. It
-  // is set on submission: an email round-trip to confirm a star rating is
-  // friction no product asks for, and it was removed. The column stays
-  // because rows written while it existed were never confirmed, and setting
-  // it now is what keeps those abandoned submissions out of the score.
-  //
-  // pending_rating / confirm_token_hash / confirm_expires_at belonged to that
-  // removed step. They are left in place rather than dropped — dropping
-  // columns is irreversible and these are inert — but nothing reads them.
-  await pool.query(`ALTER TABLE reviews ADD COLUMN IF NOT EXISTS pending_rating SMALLINT;`);
-  await pool.query(`ALTER TABLE reviews ADD COLUMN IF NOT EXISTS confirm_token_hash TEXT;`);
-  await pool.query(`ALTER TABLE reviews ADD COLUMN IF NOT EXISTS confirm_expires_at TIMESTAMPTZ;`);
-  await pool.query(`ALTER TABLE reviews ADD COLUMN IF NOT EXISTS confirmed_at TIMESTAMPTZ;`);
-  // Keyed hash of the submitting IP (routes/reviews.ts), never the address:
-  // lets moderation see that differently-named ratings came from one
-  // connection. NULL on rows written before it existed.
-  await pool.query(`ALTER TABLE reviews ADD COLUMN IF NOT EXISTS ip_hash TEXT;`);
-  // The raw address behind ip_hash, cleared 90 days after the vote.
-  await pool.query(`ALTER TABLE reviews ADD COLUMN IF NOT EXISTS ip TEXT;`);
-  // Deliberately NOT a partial index. Postgres requires ON CONFLICT to repeat
-  // a partial index's predicate for inference to match, and the upsert in
-  // routes/reviews.ts infers on `lower(email)` alone — pg-mem accepts the
-  // mismatch, real Postgres would not, so the partial form would have failed
-  // only once deployed. NULL emails (rows predating confirmation) don't
-  // conflict with each other in a unique index, so nothing is lost.
-  await pool.query(`CREATE UNIQUE INDEX IF NOT EXISTS reviews_email_idx ON reviews (lower(email));`);
-  await pool.query(
-    `CREATE INDEX IF NOT EXISTS reviews_confirm_token_idx ON reviews (confirm_token_hash) WHERE confirm_token_hash IS NOT NULL;`,
-  );
-
-  // Newsletter signups from the website footer. `unsubscribed_at` keeps the
-  // row (so a re-subscribe is an update, not a duplicate) while marking the
-  // address as one that must never be mailed again. `source` records which
-  // form/page captured the address — useful once more than one product feeds
-  // this list. Same lower(email) unique-index pattern as reviews, and for the
-  // same pg-mem reason: the upsert infers on `lower(email)`.
-  await pool.query(`
-    CREATE TABLE IF NOT EXISTS newsletter_subscribers (
-      id SERIAL PRIMARY KEY,
-      email TEXT NOT NULL,
-      source TEXT,
-      unsubscribed_at TIMESTAMPTZ,
-      created_at TIMESTAMPTZ NOT NULL DEFAULT now()
-    );
-  `);
-  await pool.query(
-    `CREATE UNIQUE INDEX IF NOT EXISTS newsletter_subscribers_email_idx ON newsletter_subscribers (lower(email));`,
-  );
-
-  // One row per account: when the last abandoned-Lifetime reminder went out.
-  // Keyed on the user so the 30-day cooldown is a single atomic upsert.
-  await pool.query(`
-    CREATE TABLE IF NOT EXISTS checkout_reminders (
-      user_id INTEGER PRIMARY KEY,
-      session_id TEXT NOT NULL,
-      sent_at TIMESTAMPTZ NOT NULL
-    );
-  `);
-
-  // Anonymous, opt-in error reports from the desktop apps (see
-  // routes/error-reports.ts). No user reference on purpose: the report pipe
-  // is anonymous by design, and a foreign key would tempt someone to join it
-  // back to a person later.
-  await pool.query(`
-    CREATE TABLE IF NOT EXISTS error_reports (
-      id SERIAL PRIMARY KEY,
-      app TEXT NOT NULL,
-      app_version TEXT NOT NULL,
-      context TEXT,
-      message TEXT NOT NULL,
-      created_at TIMESTAMPTZ NOT NULL DEFAULT now()
-    );
-  `);
-
-  // Per-product entitlements for the ecosystem's newer products (Uninstaller,
-  // and whatever comes after). Deliberately NOT a migration of WinCraft Pro:
-  // the `users.is_pro`/`pro_expires_at` columns remain the single source of
-  // truth for product "wincraft", so the live billing path is untouched by
-  // this table's existence. Rows here are written only by the Stripe webhook
-  // for checkouts whose metadata names a non-wincraft product.
-  await pool.query(`
-    CREATE TABLE IF NOT EXISTS entitlements (
-      user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-      product TEXT NOT NULL,
-      plan TEXT,
-      expires_at TIMESTAMPTZ,
-      stripe_subscription_id TEXT,
-      created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-      updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-      PRIMARY KEY (user_id, product)
-    );
-  `);
-
-  // The WinCraft rename changed this table's product id from "pctweaker" to
-  // "wincraft". Existing rows still carry the old id, and a product id is not
-  // cosmetic here: lookups, refund matching and the loyalty discount all key
-  // off it, so a row left under the old name reads as "no entitlement". The
-  // alias in products.ts keeps such rows working, and this rewrites them so
-  // there is exactly one row per (user, product). Idempotent, so it is safe on
-  // every boot; the DELETE first avoids a primary-key clash for the (rare)
-  // account that already holds both names.
-  await pool.query(`
-    DELETE FROM entitlements
-     WHERE product = 'pctweaker'
-       AND user_id IN (SELECT user_id FROM entitlements WHERE product = 'wincraft');
-  `);
-  await pool.query(`
-    UPDATE entitlements SET product = 'wincraft', updated_at = now()
-     WHERE product = 'pctweaker';
-  `);
-
-  // One row per website download click that arrived from a tagged social
-  // post (routes/downloads.ts). Campaign labels and a timestamp only: no IP,
-  // no user agent, no identifier, so a row can never be joined to a person.
-  await pool.query(`
-    CREATE TABLE IF NOT EXISTS download_attributions (
-      id SERIAL PRIMARY KEY,
-      utm_source TEXT NOT NULL,
-      utm_medium TEXT,
-      utm_campaign TEXT,
-      utm_content TEXT,
-      created_at TIMESTAMPTZ NOT NULL DEFAULT now()
-    );
-  `);
+  await runMigrations(pool, SCHEMA_MIGRATIONS, connectionString === "pgmem");
 }
 
 const isConfigured = Boolean(pool);
@@ -290,9 +79,11 @@ async function migrateLegacyProGrants(database: Pick<Pool, "query">): Promise<vo
  */
 function getPool(): Pool {
   if (!pool) {
-    throw new Error("database is not configured (DATABASE_URL missing) — check isConfigured before calling getPool()");
+    throw new Error(
+      "database is not configured (DATABASE_URL missing) — check isConfigured before calling getPool()",
+    );
   }
   return pool;
 }
 
-export { pool, getPool, initSchema, isConfigured, migrateLegacyProGrants };
+export { pool, getPool, initSchema, isConfigured, migrateLegacyProGrants, withTransaction };

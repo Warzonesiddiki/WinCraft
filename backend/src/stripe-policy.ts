@@ -88,7 +88,24 @@ export function formatChargedAmount(
   if (amountInMinorUnits == null || !currency) return null;
   // Zero-decimal currencies (JPY and friends) are not divided by 100. Doing
   // it anyway would quote a hundredth of the real price.
-  const zeroDecimal = new Set(["bif", "clp", "djf", "gnf", "jpy", "kmf", "krw", "mga", "pyg", "rwf", "ugx", "vnd", "vuv", "xaf", "xof", "xpf"]);
+  const zeroDecimal = new Set([
+    "bif",
+    "clp",
+    "djf",
+    "gnf",
+    "jpy",
+    "kmf",
+    "krw",
+    "mga",
+    "pyg",
+    "rwf",
+    "ugx",
+    "vnd",
+    "vuv",
+    "xaf",
+    "xof",
+    "xpf",
+  ]);
   const code = currency.toLowerCase();
   const amount = zeroDecimal.has(code) ? amountInMinorUnits : amountInMinorUnits / 100;
   let formatted: string;
@@ -223,7 +240,12 @@ export function utmMetadata(raw: unknown): Record<string, string> {
   return out;
 }
 
-export function tipSessionParams(priceId: string, appUrl: string, quantity: unknown = 1, utm?: unknown) {
+export function tipSessionParams(
+  priceId: string,
+  appUrl: string,
+  quantity: unknown = 1,
+  utm?: unknown,
+) {
   const qty = tipQuantity(quantity);
   // Campaign labels only, never an identity (see the webhook test on tips).
   const campaign = utmMetadata(utm);

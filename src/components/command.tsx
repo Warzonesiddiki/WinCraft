@@ -33,7 +33,10 @@ export function usePulseSamples(): PulseSample[] {
   const [samples, setSamples] = useState<PulseSample[]>([]);
   useEffect(() => {
     let alive = true;
+    let busy = false;
     const tick = () => {
+      if (busy) return;
+      busy = true;
       invoke<SystemStats>("system_stats")
         .then((v) => {
           if (!alive) return;
@@ -47,6 +50,9 @@ export function usePulseSamples(): PulseSample[] {
         })
         .catch(() => {
           // A missed sample just leaves a shorter trace.
+        })
+        .finally(() => {
+          busy = false;
         });
     };
     tick();

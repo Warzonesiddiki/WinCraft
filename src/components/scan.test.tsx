@@ -162,8 +162,13 @@ describe("ScanPanel", () => {
 
     // Unselect one: a Fix-all run the user trimmed is not the default list.
     // The row's checkbox is labelled with the translated name, not the id.
-    fireEvent.click(screen.getByRole("checkbox", { name: s.tweaks.reduce_input_lag.name }));
-    fireEvent.click(screen.getByRole("button", { name: `${c.apply} (1)` }));
+    //
+    // Both lookups retry instead of throwing on the first paint: the header
+    // ("Fix all (2)") and the rows arrive in the same commit in isolation, but
+    // under a loaded parallel run the rows can land a tick later, and a
+    // one-shot query turned that into a failure that looked like a defect.
+    fireEvent.click(await screen.findByRole("checkbox", { name: s.tweaks.reduce_input_lag.name }));
+    fireEvent.click(await screen.findByRole("button", { name: `${c.apply} (1)` }));
 
     const dialog = screen.getByRole("dialog");
     expect(within(dialog).getByText(c.confirm)).toBeInTheDocument();

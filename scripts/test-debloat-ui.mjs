@@ -18,7 +18,10 @@ for (const lang of Object.keys(DEBLOAT_COPY)) {
   assert.deepEqual(Object.keys(LIBRARY_COPY[lang]).sort(), Object.keys(LIBRARY_COPY.en).sort());
   for (const id of Object.keys(APP_CATEGORIES)) {
     assert.ok(LIBRARY_COPY[lang][APP_CATEGORIES[id]], `${lang}: missing category for ${id}`);
-    assert.ok(DEBLOAT_IMPACT[id] || EXTRA_IMPACTS[lang][id]?.trim(), `${lang}: missing removal consequence for ${id}`);
+    assert.ok(
+      DEBLOAT_IMPACT[id] || EXTRA_IMPACTS[lang][id]?.trim(),
+      `${lang}: missing removal consequence for ${id}`,
+    );
   }
 }
 assert.deepEqual(Object.keys(DEBLOAT_IMPACT).sort(), [

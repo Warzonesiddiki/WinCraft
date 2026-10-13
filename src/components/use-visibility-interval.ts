@@ -1,58 +1,48 @@
 import { useEffect, useRef } from "react";
 
-/**
- * A `setInterval` that pauses when the app window is hidden and resumes
- * when it becomes visible again. Prevents CPU wake-ups and battery drain
- * when the user has minimised or alt-tabbed away from the app.
- *
- * The callback is NOT called while hidden; the first call after becoming
- * visible fires immediately so the UI never shows stale data for longer
- * than one interval.
- *
- * Returns nothing — the interval is managed entirely by the hook.
- */
-export function useVisibilityInterval(callback: () => void, intervalMs: number) {
-  // The latest callback is kept in a ref so the interval below is not torn
-  // down and re-created on every render, while still calling the freshest
-  // closure. The assignment lives in an effect: writing to a ref during
-  // render makes the value the interval reads depend on render timing.
+/** Visual polling only: pause while hidden, catch up on resume and wait for
+ * completion before scheduling another read. Background maintenance has its
+ * own scheduling policy and must not use this hook. Callbacks report errors. */
+export function useVisibilityInterval(callback: () => void | Promise<unknown>, intervalMs: number) {
   const callbackRef = useRef(callback);
-
   useEffect(() => {
     callbackRef.current = callback;
   }, [callback]);
-
   useEffect(() => {
     if (intervalMs <= 0) return;
-
-    let id: ReturnType<typeof setInterval> | null = null;
-
-    function start() {
-      if (id !== null) return;
-      // Fire immediately on resume so the UI catches up without waiting
-      // a full interval for the first tick.
-      callbackRef.current();
-      id = setInterval(() => callbackRef.current(), intervalMs);
+    let timer: ReturnType<typeof setTimeout> | null = null;
+    let active = !document.hidden;
+    let stopped = false;
+    let busy = false;
+    function tick() {
+      if (busy || !active || stopped) return;
+      busy = true;
+      void Promise.resolve()
+        .then(() => {
+          if (active && !stopped) return callbackRef.current();
+        })
+        .catch(() => {
+          // Consumers own their error display; a rejected read must not stop
+          // future polling or create an unhandled promise rejection.
+        })
+        .finally(() => {
+          busy = false;
+          if (active && !stopped) timer = setTimeout(tick, intervalMs);
+        });
     }
-
-    function stop() {
-      if (id !== null) {
-        clearInterval(id);
-        id = null;
-      }
-    }
-
     function onVisibilityChange() {
-      if (document.hidden) stop();
-      else start();
+      active = !document.hidden;
+      if (timer !== null) {
+        clearTimeout(timer);
+        timer = null;
+      }
+      if (active) tick();
     }
-
-    // Start only if the window is currently visible.
-    if (!document.hidden) start();
-
+    tick();
     document.addEventListener("visibilitychange", onVisibilityChange);
     return () => {
-      stop();
+      stopped = true;
+      if (timer !== null) clearTimeout(timer);
       document.removeEventListener("visibilitychange", onVisibilityChange);
     };
   }, [intervalMs]);

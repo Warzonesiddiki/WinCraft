@@ -36,7 +36,8 @@ function isEntitled(row: EntitlementRow | null | undefined, now: Date = new Date
   // The next valid billing event clears this marker and backfills its period.
   if (row.pro_expires_at == null) return row.legacy_pro_grant === true;
 
-  const expiresAt = row.pro_expires_at instanceof Date ? row.pro_expires_at : new Date(row.pro_expires_at);
+  const expiresAt =
+    row.pro_expires_at instanceof Date ? row.pro_expires_at : new Date(row.pro_expires_at);
   if (!Number.isFinite(expiresAt.getTime())) return false;
 
   return expiresAt.getTime() > now.getTime();

@@ -188,271 +188,274 @@ export interface Dictionary {
 }
 
 export const engDictionary: Dictionary = {
-  "coffee": {
-    "pill": "Support WinCraft",
-    "caption": "Optional one-time tip. Your download is free.",
-    "fewer": "One fewer coffee",
-    "more": "One more coffee",
-    "unavailable": "Tipping is temporarily unavailable. You can still download WinCraft."
+  coffee: {
+    pill: "Support WinCraft",
+    caption: "Optional one-time tip. Your download is free.",
+    fewer: "One fewer coffee",
+    more: "One more coffee",
+    unavailable: "Tipping is temporarily unavailable. You can still download WinCraft.",
   },
-  "nav": {
-    "results": "Evidence",
-    "arsenal": "Features",
-    "protocol": "How it works",
-    "access": "Pricing",
-    "faq": "FAQ",
-    "download": "Download Free"
+  nav: {
+    results: "Evidence",
+    arsenal: "Features",
+    protocol: "How it works",
+    access: "Pricing",
+    faq: "FAQ",
+    download: "Download Free",
   },
-  "hero": {
-    "eyebrow": "WINDOWS TUNING YOU CAN INSPECT",
-    "title1": "TUNE FOR",
-    "title2": "STEADIER",
-    "title3": "FRAME TIMES.",
-    "subBold": "Make deliberate changes. Keep what works.",
-    "sub": " Review Windows settings for gaming, privacy and everyday use. See what each tweak changes, save its previous state and restore supported settings when you need to. Start free. No account required.",
-    "cta": "Download Free for Windows",
-    "safetyNote": "WinCraft installers are code-signed. Our signed Windows installers identify Aurelio Avila as the publisher. Older downloads may be unsigned; check the file's Digital Signatures tab. SmartScreen may still show a warning for a new release.",
-    "screenshotAlt": "WinCraft Overview screen with processor and memory usage, the number of applied settings and a suggested next step.",
-    "screenshotCaption": "The Overview screen, as it appears in the app.",
-    "terminalTitle": "Install with Windows Package Manager",
-    "terminalCmd": "winget install --id Warzonesiddiki.WinCraft --exact",
-    "terminalHint": "# install the official WinCraft package",
-    "copy": "COPY",
-    "copied": "COPIED",
-    "badges": [
+  hero: {
+    eyebrow: "WINDOWS TUNING YOU CAN INSPECT",
+    title1: "TUNE FOR",
+    title2: "STEADIER",
+    title3: "FRAME TIMES.",
+    subBold: "Make deliberate changes. Keep what works.",
+    sub: " Review Windows settings for gaming, privacy and everyday use. See what each tweak changes, save its previous state and restore supported settings when you need to. Start free. No account required.",
+    cta: "Download Free for Windows",
+    safetyNote:
+      "WinCraft installers are code-signed. Our signed Windows installers identify Aurelio Avila as the publisher. Older downloads may be unsigned; check the file's Digital Signatures tab. SmartScreen may still show a warning for a new release.",
+    screenshotAlt:
+      "WinCraft Overview screen with processor and memory usage, the number of applied settings and a suggested next step.",
+    screenshotCaption: "The Overview screen, as it appears in the app.",
+    terminalTitle: "Install with Windows Package Manager",
+    terminalCmd: "winget install --id Warzonesiddiki.WinCraft --exact",
+    terminalHint: "# install the official WinCraft package",
+    copy: "COPY",
+    copied: "COPIED",
+    badges: [
       {
-        "label": "MajorGeeks reviews",
-        "href": "https://www.majorgeeks.com/files/details/pc_tweaker.html"
+        label: "MajorGeeks reviews",
+        href: "https://www.majorgeeks.com/files/details/pc_tweaker.html",
       },
       {
-        "label": "Softpedia review: 4.5/5",
-        "href": "https://www.softpedia.com/get/Tweak/System-Tweak/Avila-PC-Tweaker.shtml"
+        label: "Softpedia review: 4.5/5",
+        href: "https://www.softpedia.com/get/Tweak/System-Tweak/Avila-PC-Tweaker.shtml",
       },
       {
-        "label": "Microsoft Store",
-        "href": "https://apps.microsoft.com/detail/9nh3c6dt1g87"
+        label: "Microsoft Store",
+        href: "https://apps.microsoft.com/detail/9nh3c6dt1g87",
       },
       {
-        "label": "Inspect the source",
-        "href": "https://github.com/Warzonesiddiki/WinCraft"
-      }
+        label: "Inspect the source",
+        href: "https://github.com/Warzonesiddiki/WinCraft",
+      },
     ],
-    "themeLabel": "THEMES"
+    themeLabel: "THEMES",
   },
-  "metrics": {
-    "tag": "01 / WHAT TO MEASURE",
-    "title": "Average FPS is only part of the story.",
-    "sub": "Judge a change by repeated runs: frame-time spikes, 1% lows and consistency. Results depend on your hardware, drivers and game. The chart below is a concept sketch, not a captured benchmark or a promised improvement.",
-    "stats": [
+  metrics: {
+    tag: "01 / WHAT TO MEASURE",
+    title: "Average FPS is only part of the story.",
+    sub: "Judge a change by repeated runs: frame-time spikes, 1% lows and consistency. Results depend on your hardware, drivers and game. The chart below is a concept sketch, not a captured benchmark or a promised improvement.",
+    stats: [
       {
-        "value": 141,
-        "unit": "",
-        "label": "CONTROLS IN THIS RELEASE"
+        value: 141,
+        unit: "",
+        label: "CONTROLS IN THIS RELEASE",
       },
       {
-        "value": 0,
-        "unit": "",
-        "label": "ACCOUNTS NEEDED FOR FREE"
+        value: 0,
+        unit: "",
+        label: "ACCOUNTS NEEDED FOR FREE",
       },
       {
-        "value": 1,
-        "unit": "",
-        "label": "PLACE TO REVIEW & RESTORE"
-      }
+        value: 1,
+        unit: "",
+        label: "PLACE TO REVIEW & RESTORE",
+      },
     ],
-    "graphTitle": "EXAMPLE COMPARISON — NOT MEASURED DATA",
-    "graphStock": "EXAMPLE A",
-    "graphTweaked": "EXAMPLE B",
-    "graphNote": "Example traces and FPS values. No measured frame-time, micro-stutter or DPC-latency improvement is claimed by this chart.",
-    "fpsStock": 330,
-    "fpsTweaked": 551
+    graphTitle: "EXAMPLE COMPARISON — NOT MEASURED DATA",
+    graphStock: "EXAMPLE A",
+    graphTweaked: "EXAMPLE B",
+    graphNote:
+      "Example traces and FPS values. No measured frame-time, micro-stutter or DPC-latency improvement is claimed by this chart.",
+    fpsStock: 330,
+    fpsTweaked: 551,
   },
-  "arsenal": {
-    "tag": "02 / YOUR CONTROLS",
-    "title": "Know what changes. Know why.",
-    "cards": [
+  arsenal: {
+    tag: "02 / YOUR CONTROLS",
+    title: "Know what changes. Know why.",
+    cards: [
       {
-        "tag": "PC HEALTH",
-        "title": "Understand the score",
-        "body": "See the settings and observations behind your health score, including startup apps, power configuration and security status. It is a configuration summary, not an FPS benchmark.",
-        "pro": false,
-        "span": "wide"
+        tag: "PC HEALTH",
+        title: "Understand the score",
+        body: "See the settings and observations behind your health score, including startup apps, power configuration and security status. It is a configuration summary, not an FPS benchmark.",
+        pro: false,
+        span: "wide",
       },
       {
-        "tag": "CHANGE TRACKING",
-        "title": "See what moved",
-        "body": "Compare the facts behind your previous and current scores. When startup apps or settings change, see the difference. When the evidence is unchanged, there is no reason to invent a problem.",
-        "pro": false,
-        "span": "wide"
+        tag: "CHANGE TRACKING",
+        title: "See what moved",
+        body: "Compare the facts behind your previous and current scores. When startup apps or settings change, see the difference. When the evidence is unchanged, there is no reason to invent a problem.",
+        pro: false,
+        span: "wide",
       },
       {
-        "tag": "TECHNICAL DETAILS",
-        "title": "Inspect before you apply",
-        "body": "Read the registry path, value type and setting written by a tweak. For other operations, inspect the commands involved. Decide with the details in front of you.",
-        "pro": false,
-        "span": "wide"
+        tag: "TECHNICAL DETAILS",
+        title: "Inspect before you apply",
+        body: "Read the registry path, value type and setting written by a tweak. For other operations, inspect the commands involved. Decide with the details in front of you.",
+        pro: false,
+        span: "wide",
       },
       {
-        "tag": "RESTORE",
-        "title": "Keep a way back",
-        "body": "Supported settings save their previous state before a change. Restore an individual tweak or review Restore All. Restoring settings does not recover permanently deleted caches or replace a full system backup.",
-        "pro": false,
-        "span": "wide"
+        tag: "RESTORE",
+        title: "Keep a way back",
+        body: "Supported settings save their previous state before a change. Restore an individual tweak or review Restore All. Restoring settings does not recover permanently deleted caches or replace a full system backup.",
+        pro: false,
+        span: "wide",
       },
       {
-        "tag": "HARDWARE",
-        "title": "Read the sensors you have",
-        "body": "Monitor available temperatures, utilization, VRAM, fan speed and power readings. Unsupported sensors are identified. Use readings during a real workload to understand heat and load together.",
-        "pro": false,
-        "span": "wide"
+        tag: "HARDWARE",
+        title: "Read the sensors you have",
+        body: "Monitor available temperatures, utilization, VRAM, fan speed and power readings. Unsupported sensors are identified. Use readings during a real workload to understand heat and load together.",
+        pro: false,
+        span: "wide",
       },
       {
-        "tag": "DRIVERS",
-        "title": "Review updates in one place",
-        "body": "Inspect your driver inventory and install available updates through Windows Update. Check the device and update details before proceeding; a newer driver is not automatically a faster one.",
-        "pro": false,
-        "span": "std"
+        tag: "DRIVERS",
+        title: "Review updates in one place",
+        body: "Inspect your driver inventory and install available updates through Windows Update. Check the device and update details before proceeding; a newer driver is not automatically a faster one.",
+        pro: false,
+        span: "std",
       },
       {
-        "tag": "THERMAL PROFILES",
-        "title": "Choose your power trade-off",
-        "body": "Use supported hardware controls to balance noise, temperature and power. Review the limits your device exposes and return to its stock profile. Higher limits can mean more heat and noise.",
-        "pro": false,
-        "span": "std"
+        tag: "THERMAL PROFILES",
+        title: "Choose your power trade-off",
+        body: "Use supported hardware controls to balance noise, temperature and power. Review the limits your device exposes and return to its stock profile. Higher limits can mean more heat and noise.",
+        pro: false,
+        span: "std",
       },
       {
-        "tag": "SCAN",
-        "title": "Start with a clear inventory",
-        "body": "Check CPU, memory, storage and available tweaks. Review your selection before applying changes. An inactive tweak is an option to consider, not proof that your PC is broken.",
-        "pro": false,
-        "span": "std"
+        tag: "SCAN",
+        title: "Start with a clear inventory",
+        body: "Check CPU, memory, storage and available tweaks. Review your selection before applying changes. An inactive tweak is an option to consider, not proof that your PC is broken.",
+        pro: false,
+        span: "std",
       },
       {
-        "tag": "PERFORMANCE",
-        "title": "Tune Windows to your workload",
-        "body": "Review power plans, startup delay and foreground scheduling settings. Compare under the same workload, then retain only the changes that help your machine.",
-        "pro": false,
-        "span": "std"
+        tag: "PERFORMANCE",
+        title: "Tune Windows to your workload",
+        body: "Review power plans, startup delay and foreground scheduling settings. Compare under the same workload, then retain only the changes that help your machine.",
+        pro: false,
+        span: "std",
       },
       {
-        "tag": "GAMING",
-        "title": "Make sessions easier to manage",
-        "body": "Use Game Sessions to apply a gaming preset when a supported game starts and restore its supported settings afterward. Review hardware scheduling and input options individually.",
-        "pro": true,
-        "span": "std"
+        tag: "GAMING",
+        title: "Make sessions easier to manage",
+        body: "Use Game Sessions to apply a gaming preset when a supported game starts and restore its supported settings afterward. Review hardware scheduling and input options individually.",
+        pro: true,
+        span: "std",
       },
       {
-        "tag": "PRIVACY",
-        "title": "Choose what Windows shares",
-        "body": "Review supported advertising, tracking and diagnostic settings. Availability varies by Windows edition. Check password exposure using a hash-prefix lookup; your full password is not sent.",
-        "pro": true,
-        "span": "std"
+        tag: "PRIVACY",
+        title: "Choose what Windows shares",
+        body: "Review supported advertising, tracking and diagnostic settings. Availability varies by Windows edition. Check password exposure using a hash-prefix lookup; your full password is not sent.",
+        pro: true,
+        span: "std",
       },
       {
-        "tag": "NETWORK",
-        "title": "Test your connection settings",
-        "body": "Compare supported TCP congestion settings and restore the previous configuration. TCP tuning does not control every download on your network or guarantee lower latency in UDP-based games.",
-        "pro": false,
-        "span": "std"
+        tag: "NETWORK",
+        title: "Test your connection settings",
+        body: "Compare supported TCP congestion settings and restore the previous configuration. TCP tuning does not control every download on your network or guarantee lower latency in UDP-based games.",
+        pro: false,
+        span: "std",
       },
       {
-        "tag": "RYZEN X3D",
-        "title": "Test cache-aware placement",
-        "body": "On supported dual-die Ryzen X3D processors, inspect the cache topology and test game placement on the cache-equipped die. Single-die chips do not need this adjustment. Compare before keeping it.",
-        "pro": false,
-        "span": "std"
+        tag: "RYZEN X3D",
+        title: "Test cache-aware placement",
+        body: "On supported dual-die Ryzen X3D processors, inspect the cache topology and test game placement on the cache-equipped die. Single-die chips do not need this adjustment. Compare before keeping it.",
+        pro: false,
+        span: "std",
       },
       {
-        "tag": "MAINTENANCE",
-        "title": "Find what is taking up space",
-        "body": "Review large files, duplicates and supported drive tools. Cleanup explains what can be restored and what is deleted permanently. Removing shader caches can cause rebuilding and temporary stutter.",
-        "pro": false,
-        "span": "wide"
+        tag: "MAINTENANCE",
+        title: "Find what is taking up space",
+        body: "Review large files, duplicates and supported drive tools. Cleanup explains what can be restored and what is deleted permanently. Removing shader caches can cause rebuilding and temporary stutter.",
+        pro: false,
+        span: "wide",
       },
       {
-        "tag": "INTERFACE",
-        "title": "Make Windows feel familiar",
-        "body": "Adjust file extensions, taskbar options, appearance and other supported interface settings. Choose your app language and theme while keeping the controls close at hand.",
-        "pro": false,
-        "span": "std"
-      }
-    ]
+        tag: "INTERFACE",
+        title: "Make Windows feel familiar",
+        body: "Adjust file extensions, taskbar options, appearance and other supported interface settings. Choose your app language and theme while keeping the controls close at hand.",
+        pro: false,
+        span: "std",
+      },
+    ],
   },
-  "philosophy": {
-    "tag": "03 / THE STANDARD",
-    "lines": [
+  philosophy: {
+    tag: "03 / THE STANDARD",
+    lines: [
       {
-        "text": "// a setting is not a result.",
-        "kind": "comment"
+        text: "// a setting is not a result.",
+        kind: "comment",
       },
       {
-        "text": "// your workload decides what helps.",
-        "kind": "comment"
+        text: "// your workload decides what helps.",
+        kind: "comment",
       },
       {
-        "text": "",
-        "kind": "plain"
+        text: "",
+        kind: "plain",
       },
       {
-        "text": "Inspect. Change. Compare.",
-        "kind": "strong"
+        text: "Inspect. Change. Compare.",
+        kind: "strong",
       },
       {
-        "text": "See the setting before you apply it.",
-        "kind": "plain"
+        text: "See the setting before you apply it.",
+        kind: "plain",
       },
       {
-        "text": "Keep the changes that earn their place.",
-        "kind": "accent"
+        text: "Keep the changes that earn their place.",
+        kind: "accent",
       },
       {
-        "text": "Restore supported settings when you need to.",
-        "kind": "plain"
+        text: "Restore supported settings when you need to.",
+        kind: "plain",
       },
       {
-        "text": "",
-        "kind": "plain"
+        text: "",
+        kind: "plain",
       },
       {
-        "text": "// clear limits are part of the product.",
-        "kind": "comment"
-      }
-    ]
+        text: "// clear limits are part of the product.",
+        kind: "comment",
+      },
+    ],
   },
-  "protocol": {
-    "tag": "04 / HOW IT WORKS",
-    "title": "Four steps. You stay in control.",
-    "steps": [
+  protocol: {
+    tag: "04 / HOW IT WORKS",
+    title: "Four steps. You stay in control.",
+    steps: [
       {
-        "mono": "REVIEW",
-        "title": "See your starting point",
-        "body": "Run a scan and inspect available settings. Note your hardware, game settings and current performance before changing anything."
+        mono: "REVIEW",
+        title: "See your starting point",
+        body: "Run a scan and inspect available settings. Note your hardware, game settings and current performance before changing anything.",
       },
       {
-        "mono": "APPLY",
-        "title": "Choose the changes",
-        "body": "Read each tweak's effect and trade-offs. Apply your selection; operations that need administrator access request Windows approval."
+        mono: "APPLY",
+        title: "Choose the changes",
+        body: "Read each tweak's effect and trade-offs. Apply your selection; operations that need administrator access request Windows approval.",
       },
       {
-        "mono": "COMPARE",
-        "title": "Run the same workload",
-        "body": "Repeat the same scene or task under comparable conditions. Look at consistency and frame-time spikes alongside average FPS. Game Sessions, included with the app, set a scene up the same way twice."
+        mono: "COMPARE",
+        title: "Run the same workload",
+        body: "Repeat the same scene or task under comparable conditions. Look at consistency and frame-time spikes alongside average FPS. Game Sessions, included with the app, set a scene up the same way twice.",
       },
       {
-        "mono": "RESTORE",
-        "title": "Keep what helps",
-        "body": "Restore supported settings that do not improve your experience. Check the outcome of each restore. Cleanup and repair operations have their own recovery limits."
-      }
-    ]
+        mono: "RESTORE",
+        title: "Keep what helps",
+        body: "Restore supported settings that do not improve your experience. Check the outcome of each restore. Cleanup and repair operations have their own recovery limits.",
+      },
+    ],
   },
-  "pricing": {
-    "tag": "05 / PRICE",
-    "title": "Free for everyone.",
-    "free": {
-      "plan": "EVERYTHING INCLUDED",
-      "price": "€0",
-      "per": "/ forever · no subscription, no account",
-      "features": [
+  pricing: {
+    tag: "05 / PRICE",
+    title: "Free for everyone.",
+    free: {
+      plan: "EVERYTHING INCLUDED",
+      price: "€0",
+      per: "/ forever · no subscription, no account",
+      features: [
         "All 141 Windows controls",
         "Scan and review your settings",
         "Startup tools and Windows integrity checks",
@@ -460,179 +463,184 @@ export const engDictionary: Dictionary = {
         "Guided Windows repair with DISM and SFC",
         "Advanced file and drive tools",
         "Restore supported changes",
-        "Every future update included"
+        "Every future update included",
       ],
-      "cta": "Download for Windows"
+      cta: "Download for Windows",
     },
-    "note": "WinCraft used to have paid plans. Every feature they included is now free for everyone: no licence key, nothing to activate and nothing that expires. Optional tips fund the next release and unlock nothing."
+    note: "WinCraft used to have paid plans. Every feature they included is now free for everyone: no licence key, nothing to activate and nothing that expires. Optional tips fund the next release and unlock nothing.",
   },
-  "faq": {
-    "tag": "07 / BEFORE YOU START",
-    "title": "Clear answers before your first change.",
-    "items": [
+  faq: {
+    tag: "07 / BEFORE YOU START",
+    title: "Clear answers before your first change.",
+    items: [
       {
-        "q": "Will WinCraft improve FPS or remove micro-stutter?",
-        "a": "There is no universal FPS gain. Results depend on the game, hardware, drivers and starting configuration. Compare repeated runs and check frame-time consistency. Shader compilation, thermal limits and driver problems may need a different fix. WinCraft does not promise to eliminate micro-stutter or reduce DPC latency on every system."
+        q: "Will WinCraft improve FPS or remove micro-stutter?",
+        a: "There is no universal FPS gain. Results depend on the game, hardware, drivers and starting configuration. Compare repeated runs and check frame-time consistency. Shader compilation, thermal limits and driver problems may need a different fix. WinCraft does not promise to eliminate micro-stutter or reduce DPC latency on every system.",
       },
       {
-        "q": "Are the sensor readings real, and where do drivers come from?",
-        "a": "Hardware monitoring uses available sensor readings and identifies unsupported values. Driver updates are delivered through Windows Update. Review the target device, keep a recovery path and compare behavior after updating."
+        q: "Are the sensor readings real, and where do drivers come from?",
+        a: "Hardware monitoring uses available sensor readings and identifies unsupported values. Driver updates are delivered through Windows Update. Review the target device, keep a recovery path and compare behavior after updating.",
       },
       {
-        "q": "What can I undo?",
-        "a": "Supported settings store their previous state and can be restored individually or through Restore All. This is not a complete system image. Permanently deleted caches cannot be recovered through setting rollback, and Windows repair and driver changes have separate recovery limits. Review each operation before applying it."
+        q: "What can I undo?",
+        a: "Supported settings store their previous state and can be restored individually or through Restore All. This is not a complete system image. Permanently deleted caches cannot be recovered through setting rollback, and Windows repair and driver changes have separate recovery limits. Review each operation before applying it.",
       },
       {
-        "q": "Can I use it with competitive games?",
-        "a": "WinCraft tunes Windows itself and reads performance data through standard Windows interfaces. It never changes a game's files or gameplay, and a game that manages its own performance is left exactly as it is while it runs."
+        q: "Can I use it with competitive games?",
+        a: "WinCraft tunes Windows itself and reads performance data through standard Windows interfaces. It never changes a game's files or gameplay, and a game that manages its own performance is left exactly as it is while it runs.",
       },
       {
-        "q": "What does WinCraft cost?",
-        "a": "Nothing. Every control and every tool is included: no subscription, no licence key and no account to create. The paid plans that used to exist are gone, and everything they included is free for everyone. You can support the project with a one-off tip, and nothing in the app depends on it."
+        q: "What does WinCraft cost?",
+        a: "Nothing. Every control and every tool is included: no subscription, no licence key and no account to create. The paid plans that used to exist are gone, and everything they included is free for everyone. You can support the project with a one-off tip, and nothing in the app depends on it.",
       },
       {
-        "q": "What leaves my PC?",
-        "a": "Applying local settings is separate from online services. Account, license, update, payment, support and optional breach-check requests contact their respective services. The app also reads one on/off service setting once an hour; that request carries no account or PC details. The breach check sends a hash prefix, not your complete password. Read the Privacy Policy for details. Private feedback is not reused as a public testimonial without permission."
+        q: "What leaves my PC?",
+        a: "Applying local settings is separate from online services. Account, license, update, payment, support and optional breach-check requests contact their respective services. The app also reads one on/off service setting once an hour; that request carries no account or PC details. The breach check sends a hash prefix, not your complete password. Read the Privacy Policy for details. Private feedback is not reused as a public testimonial without permission.",
       },
       {
-        "q": "Is WinCraft code-signed?",
-        "a": "WinCraft ships with Windows application and installer signatures from Aurelio Avila and a trusted timestamp. Older releases may be unsigned. A valid signature identifies the publisher and helps detect changed files. The separate update signature verifies update packages. Neither guarantees performance gains or prevents every SmartScreen prompt."
-      }
-    ]
-  },
-  "reviews": {
-    "tag": "06 / USER FEEDBACK",
-    "title": "See what other users found.",
-    "outOf": "out of 5",
-    "basedOn": "based on {count} site ratings",
-    "note": "Rated 5/5 by users on Softpedia (79 votes) and MajorGeeks (110 votes). Softpedia also awarded WinCraft 4.5/5 in its editorial review. Checked September 9, 2026. These external scores are separate from the site ratings above. Written feedback submitted here goes privately to support.",
-    "writeCta": "Share Your Experience",
-    "formTitle": "How did WinCraft work for you?",
-    "formName": "Name",
-    "formNameHint": "Optional; not displayed publicly.",
-    "formEmail": "Email",
-    "formEmailHint": "Optional; used to identify an updated rating and contact you if needed.",
-    "formRating": "Your rating",
-    "formBody": "Your experience",
-    "formBodyHint": "Optional. Sent privately to support; not posted on this page.",
-    "formBodyPlaceholder": "Tell me your hardware, what you changed and what happened. Improvements, no change and problems are all useful.",
-    "submit": "Submit Rating",
-    "submitting": "Submitting…",
-    "thanks": "Thank you. Your rating has been recorded.",
-    "cancel": "Close"
-  },
-  "support": {
-    "navLabel": "Support",
-    "tag": "SUPPORT / DIRECT LINE",
-    "title": "Something not working? Tell us.",
-    "intro": "Send the details below so Aurelio can investigate the issue. Include your app version, the setting or tool involved, and the exact error message.",
-    "selfServeTitle": "Start with these checks",
-    "selfServe": [
-      {
-        "q": "A tweak made something worse",
-        "a": "Restore that supported setting from its card, or review Restore All. Check the result of the restore. Setting rollback does not recover permanently deleted files or replace the separate recovery procedures for repair, drivers and hardware controls."
+        q: "Is WinCraft code-signed?",
+        a: "WinCraft ships with Windows application and installer signatures from Aurelio Avila and a trusted timestamp. Older releases may be unsigned. A valid signature identifies the publisher and helps detect changed files. The separate update signature verifies update packages. Neither guarantees performance gains or prevents every SmartScreen prompt.",
       },
-      {
-        "q": "Windows blocked the installer (\"unrecognized app\")",
-        "a": "Check that the download came from an official channel and compare the release notes and publisher details. Version 1.9.0 introduces signed Windows installers from Aurelio Avila. Older versions, including v1.8.0, may be unsigned. A valid signature or winget installation does not guarantee that SmartScreen will show no warning."
-      },
-      {
-        "q": "I paid for Pro or Lifetime in the past",
-        "a": "Nothing in the app is gated any more, so there is nothing to activate: every feature those plans included is free for everyone, and no licence is required. Purchase records stay with the account that holds them; support can confirm one if you need a receipt."
-      },
-      {
-        "q": "The app won't start at all",
-        "a": "Confirm that you are using the official Windows x64 build and note any Windows or WebView2 error. If an operation requires administrator access, Windows asks for approval. Send the exact error and app version if the app still will not start."
-      }
     ],
-    "beforeTitle": "Include these details",
-    "beforeItems": [
+  },
+  reviews: {
+    tag: "06 / USER FEEDBACK",
+    title: "See what other users found.",
+    outOf: "out of 5",
+    basedOn: "based on {count} site ratings",
+    note: "Rated 5/5 by users on Softpedia (79 votes) and MajorGeeks (110 votes). Softpedia also awarded WinCraft 4.5/5 in its editorial review. Checked September 9, 2026. These external scores are separate from the site ratings above. Written feedback submitted here goes privately to support.",
+    writeCta: "Share Your Experience",
+    formTitle: "How did WinCraft work for you?",
+    formName: "Name",
+    formNameHint: "Optional; not displayed publicly.",
+    formEmail: "Email",
+    formEmailHint: "Optional; used to identify an updated rating and contact you if needed.",
+    formRating: "Your rating",
+    formBody: "Your experience",
+    formBodyHint: "Optional. Sent privately to support; not posted on this page.",
+    formBodyPlaceholder:
+      "Tell me your hardware, what you changed and what happened. Improvements, no change and problems are all useful.",
+    submit: "Submit Rating",
+    submitting: "Submitting…",
+    thanks: "Thank you. Your rating has been recorded.",
+    cancel: "Close",
+  },
+  support: {
+    navLabel: "Support",
+    tag: "SUPPORT / DIRECT LINE",
+    title: "Something not working? Tell us.",
+    intro:
+      "Send the details below so Aurelio can investigate the issue. Include your app version, the setting or tool involved, and the exact error message.",
+    selfServeTitle: "Start with these checks",
+    selfServe: [
+      {
+        q: "A tweak made something worse",
+        a: "Restore that supported setting from its card, or review Restore All. Check the result of the restore. Setting rollback does not recover permanently deleted files or replace the separate recovery procedures for repair, drivers and hardware controls.",
+      },
+      {
+        q: 'Windows blocked the installer ("unrecognized app")',
+        a: "Check that the download came from an official channel and compare the release notes and publisher details. Version 1.9.0 introduces signed Windows installers from Aurelio Avila. Older versions, including v1.8.0, may be unsigned. A valid signature or winget installation does not guarantee that SmartScreen will show no warning.",
+      },
+      {
+        q: "I paid for Pro or Lifetime in the past",
+        a: "Nothing in the app is gated any more, so there is nothing to activate: every feature those plans included is free for everyone, and no licence is required. Purchase records stay with the account that holds them; support can confirm one if you need a receipt.",
+      },
+      {
+        q: "The app won't start at all",
+        a: "Confirm that you are using the official Windows x64 build and note any Windows or WebView2 error. If an operation requires administrator access, Windows asks for approval. Send the exact error and app version if the app still will not start.",
+      },
+    ],
+    beforeTitle: "Include these details",
+    beforeItems: [
       "Your Windows version (Win + R → type winver)",
       "Which tweak or screen the problem happens on",
       "The exact error text or code, if any appeared",
-      "What you already tried (including Restore All)"
+      "What you already tried (including Restore All)",
     ],
-    "formTitle": "Send a support request",
-    "formIntro": "We reply to the address you enter here.",
-    "name": "Full name",
-    "email": "Email address",
-    "emailHint": "This is where our reply goes. Double-check it.",
-    "category": "What's this about?",
-    "categories": [
+    formTitle: "Send a support request",
+    formIntro: "We reply to the address you enter here.",
+    name: "Full name",
+    email: "Email address",
+    emailHint: "This is where our reply goes. Double-check it.",
+    category: "What's this about?",
+    categories: [
       {
-        "value": "installation",
-        "label": "Installation / update"
+        value: "installation",
+        label: "Installation / update",
       },
       {
-        "value": "activation",
-        "label": "Account or licence"
+        value: "activation",
+        label: "Account or licence",
       },
       {
-        "value": "tweak-issue",
-        "label": "A tweak isn't working"
+        value: "tweak-issue",
+        label: "A tweak isn't working",
       },
       {
-        "value": "rollback",
-        "label": "Rollback / restore"
+        value: "rollback",
+        label: "Rollback / restore",
       },
       {
-        "value": "billing",
-        "label": "Billing / refund"
+        value: "billing",
+        label: "Billing / refund",
       },
       {
-        "value": "bug",
-        "label": "Bug report"
+        value: "bug",
+        label: "Bug report",
       },
       {
-        "value": "other",
-        "label": "Something else"
-      }
+        value: "other",
+        label: "Something else",
+      },
     ],
-    "subject": "Subject",
-    "subjectPlaceholder": "One line: what's wrong",
-    "systemInfo": "System details",
-    "systemInfoHint": "Optional — Windows version, GPU, app version.",
-    "message": "Describe the problem",
-    "messagePlaceholder": "What did you do, what did you expect, and what happened instead? Include any error text exactly as it appeared.",
-    "submit": "Send message",
-    "submitting": "Sending…",
-    "successTitle": "Message sent",
-    "successBody": "Your request has been accepted. Check your inbox for a confirmation; delivery may take a little time.",
-    "responseTime": "Replies are sent to the email address you provide.",
-    "backHome": "Back to home"
+    subject: "Subject",
+    subjectPlaceholder: "One line: what's wrong",
+    systemInfo: "System details",
+    systemInfoHint: "Optional — Windows version, GPU, app version.",
+    message: "Describe the problem",
+    messagePlaceholder:
+      "What did you do, what did you expect, and what happened instead? Include any error text exactly as it appeared.",
+    submit: "Send message",
+    submitting: "Sending…",
+    successTitle: "Message sent",
+    successBody:
+      "Your request has been accepted. Check your inbox for a confirmation; delivery may take a little time.",
+    responseTime: "Replies are sent to the email address you provide.",
+    backHome: "Back to home",
   },
-  "newsletter": {
-    "pitch": "Release notes, test results and practical Windows tuning guides.",
-    "placeholder": "Your email address",
-    "button": "Get Updates",
-    "thanks": "Thank you. Check your inbox for your welcome email.",
-    "genericError": "We could not save your subscription. Please try again."
+  newsletter: {
+    pitch: "Release notes, test results and practical Windows tuning guides.",
+    placeholder: "Your email address",
+    button: "Get Updates",
+    thanks: "Thank you. Check your inbox for your welcome email.",
+    genericError: "We could not save your subscription. Please try again.",
   },
-  "sendToPc": {
-    "pitch": "On your phone? WinCraft runs on Windows. We'll email you the download link so you can open it on your PC.",
-    "placeholder": "Your email address",
-    "button": "Send link",
-    "thanks": "Sent. Open the email on your Windows PC to download WinCraft.",
-    "genericError": "We could not send the link. Please try again."
+  sendToPc: {
+    pitch:
+      "On your phone? WinCraft runs on Windows. We'll email you the download link so you can open it on your PC.",
+    placeholder: "Your email address",
+    button: "Send link",
+    thanks: "Sent. Open the email on your Windows PC to download WinCraft.",
+    genericError: "We could not send the link. Please try again.",
   },
-  "footer": {
-    "tagline": "Windows tuning. Visible changes. Informed decisions.",
-    "product": "PC TWEAKER",
-    "download": "Download for Windows",
-    "changelog": "Release Notes",
-    "source": "Inspect the Source",
-    "reviews": "INDEPENDENT REVIEWS",
-    "legal": "POLICIES",
-    "privacy": "Privacy",
-    "terms": "Terms & Billing",
-    "cookies": "Cookies",
-    "accessibility": "Accessibility",
-    "contact": "Contact Aurelio",
-    "license": "Source-Available License",
-    "copyright": "Created and maintained by Aurelio Avila. © 2026 Aurelio Avila",
-    "motto": "// every millisecond is earned",
-    "tipThanks": "Thank you for supporting WinCraft."
-  }
+  footer: {
+    tagline: "Windows tuning. Visible changes. Informed decisions.",
+    product: "PC TWEAKER",
+    download: "Download for Windows",
+    changelog: "Release Notes",
+    source: "Inspect the Source",
+    reviews: "INDEPENDENT REVIEWS",
+    legal: "POLICIES",
+    privacy: "Privacy",
+    terms: "Terms & Billing",
+    cookies: "Cookies",
+    accessibility: "Accessibility",
+    contact: "Contact Aurelio",
+    license: "Source-Available License",
+    copyright: "Created and maintained by Aurelio Avila. © 2026 Aurelio Avila",
+    motto: "// every millisecond is earned",
+    tipThanks: "Thank you for supporting WinCraft.",
+  },
 };
 
 export const dictionaries = { en: engDictionary } as const;

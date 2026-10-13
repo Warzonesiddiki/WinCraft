@@ -25,27 +25,53 @@ test("registration and reset reject oversized passwords before database work", a
   const module = await import("../dist/routes/auth.js");
   const router = module.default.default;
   for (const path of ["/register", "/reset-password"]) {
-    const layer = router.stack.find((entry) => entry.route?.path === path && entry.route.methods.post);
+    const layer = router.stack.find(
+      (entry) => entry.route?.path === path && entry.route.methods.post,
+    );
     let status;
     let body;
     const response = {
-      status(value) { status = value; return this; },
-      json(value) { body = value; return this; },
+      status(value) {
+        status = value;
+        return this;
+      },
+      json(value) {
+        body = value;
+        return this;
+      },
     };
     // The route's own middleware (auth + per-endpoint rate limiters) sits in
     // front of the handler, so the validation logic under test is the LAST
     // entry. Indexing [0] here would call a limiter with no `next`.
-    await layer.route.stack.at(-1).handle({
-      body: { email: "person@example.com", password: "é".repeat(37), newPassword: "é".repeat(37), token: "test-only" },
-      get() { return "application/json"; },
-    }, response);
+    await layer.route.stack.at(-1).handle(
+      {
+        body: {
+          email: "person@example.com",
+          password: "é".repeat(37),
+          newPassword: "é".repeat(37),
+          token: "test-only",
+        },
+        get() {
+          return "application/json";
+        },
+      },
+      response,
+    );
     assert.equal(status, 400, path);
     assert.match(body.error, /72 UTF-8 bytes/);
   }
 });
 
 test("email validation rejects malformed and oversized input", () => {
-  for (const value of ["", "person", "@example.com", "a@@example.com", "a@b", "a@b.", "a b@example.com"]) {
+  for (const value of [
+    "",
+    "person",
+    "@example.com",
+    "a@@example.com",
+    "a@b",
+    "a@b.",
+    "a b@example.com",
+  ]) {
     assert.equal(isValidEmail(value), false, String(value));
   }
   assert.equal(isValidEmail(`${"a".repeat(250)}@b.co`), false);
@@ -54,19 +80,48 @@ test("email validation rejects malformed and oversized input", () => {
 test("registration accepts only real past dates of birth and bounded names", async () => {
   const module = await import("../dist/routes/auth.js");
   const { isValidDateOfBirth } = module.default;
-  for (const value of ["1990-05-17", "2000-02-29"]) assert.equal(isValidDateOfBirth(value), true, value);
-  for (const value of ["2026-02-31", "1990-13-01", "1899-12-31", "9999-01-01", "1990-5-17", "", null, 19900517]) {
+  for (const value of ["1990-05-17", "2000-02-29"])
+    assert.equal(isValidDateOfBirth(value), true, value);
+  for (const value of [
+    "2026-02-31",
+    "1990-13-01",
+    "1899-12-31",
+    "9999-01-01",
+    "1990-5-17",
+    "",
+    null,
+    19900517,
+  ]) {
     assert.equal(isValidDateOfBirth(value), false, String(value));
   }
   const router = module.default.default;
-  const layer = router.stack.find((entry) => entry.route?.path === "/register" && entry.route.methods.post);
+  const layer = router.stack.find(
+    (entry) => entry.route?.path === "/register" && entry.route.methods.post,
+  );
   let status;
-  const response = { status(value) { status = value; return this; }, json() { return this; } };
+  const response = {
+    status(value) {
+      status = value;
+      return this;
+    },
+    json() {
+      return this;
+    },
+  };
   // The route's own middleware (auth + per-endpoint rate limiters) sits in
-    // front of the handler, so the validation logic under test is the LAST
-    // entry. Indexing [0] here would call a limiter with no `next`.
-    await layer.route.stack.at(-1).handle({ body: {
-    email: "person@example.com", password: "a".repeat(12), firstName: "x".repeat(101), lastName: "Doe", dateOfBirth: "1990-05-17",
-  } }, response);
+  // front of the handler, so the validation logic under test is the LAST
+  // entry. Indexing [0] here would call a limiter with no `next`.
+  await layer.route.stack.at(-1).handle(
+    {
+      body: {
+        email: "person@example.com",
+        password: "a".repeat(12),
+        firstName: "x".repeat(101),
+        lastName: "Doe",
+        dateOfBirth: "1990-05-17",
+      },
+    },
+    response,
+  );
   assert.equal(status, 400);
 });

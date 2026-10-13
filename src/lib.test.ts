@@ -10,11 +10,13 @@ import {
   gbPair,
   loadColor,
   polar,
+  clearCachedDriverAudit,
+  hardwareSignature,
   readCachedDriverAudit,
   textFor,
   writeCachedDriverAudit,
 } from "./lib";
-import type { DriverAudit } from "./types";
+import type { DriverAudit, SystemProfile } from "./types";
 
 // Every formatter goes through `uiLocale()`, which reads <html lang>. jsdom
 // starts with an empty attribute, so each test states the language it means.
@@ -115,7 +117,7 @@ describe("the cached driver audit", () => {
     total_scanned: 40,
     classes_scanned: 12,
   };
-  const at = new Date("2026-10-12T09:30:00.000Z");
+  const at = new Date(Date.now() - 60_000);
 
   beforeEach(() => localStorage.clear());
   afterEach(() => vi.restoreAllMocks());
@@ -146,6 +148,32 @@ describe("the cached driver audit", () => {
     expect(readCachedDriverAudit()).toBeNull();
   });
 
+  it("rejects parseable but incomplete data, old schemas and stale environments", () => {
+    writeCachedDriverAudit(audit, at);
+    const valid = JSON.parse(localStorage.getItem("wincraft-driver-audit")!);
+    for (const change of [
+      { audit: {} },
+      { version: 0 },
+      { environment: "other OS" },
+      { at: new Date(Date.now() - 8 * 86400_000).toISOString() },
+      { at: new Date(Date.now() + 86400_000).toISOString() },
+      { audit: { ...audit, entries: [{}] } },
+    ]) {
+      localStorage.setItem("wincraft-driver-audit", JSON.stringify({ ...valid, ...change }));
+      expect(readCachedDriverAudit()).toBeNull();
+    }
+  });
+
+  it("survives blocked reads and blocked cleanup", () => {
+    vi.spyOn(Storage.prototype, "getItem").mockImplementation(() => {
+      throw new Error("blocked");
+    });
+    vi.spyOn(Storage.prototype, "removeItem").mockImplementation(() => {
+      throw new Error("blocked");
+    });
+    expect(readCachedDriverAudit()).toBeNull();
+  });
+
   it("stays quiet when storage refuses the write", () => {
     // Private-mode and quota-full browsers throw here; the session cache in
     // memory still works, so this must not reach the user.
@@ -157,5 +185,98 @@ describe("the cached driver audit", () => {
     } finally {
       setItem.mockRestore();
     }
+  });
+});
+
+describe("the hardware signature behind the driver cache", () => {
+  const profile = (extra: Partial<SystemProfile> = {}): SystemProfile => ({
+    windows_version: "Windows 11 24H2",
+    windows_build: "26100.1742",
+    cpu: "AMD Ryzen 7 7800X3D",
+    cpu_physical_cores: 8,
+    cpu_logical_cores: 16,
+    gpu: "NVIDIA GeForce RTX 4070",
+    ram_total_bytes: 34_359_738_368,
+    system_disk: "nvme",
+    form_factor: "desktop",
+    power_plan_guid: "381b4222-f694-41f0-9685-ff5bb260df2e",
+    power_plan: "Balanced",
+    ...extra,
+  });
+
+  it("changes when hardware the scan depends on changes", () => {
+    const base = hardwareSignature(profile());
+    expect(base).toBe(hardwareSignature(profile()));
+    // A replaced card, more memory, a different CPU, a different disk type and
+    // a Windows feature update each describe a different set of devices.
+    for (const change of [
+      { gpu: "AMD Radeon RX 7900 XT" },
+      { ram_total_bytes: 68_719_476_736 },
+      { cpu: "Intel Core i9-14900K" },
+      { cpu_logical_cores: 24 },
+      { system_disk: "hdd" },
+      { windows_build: "26100.2033" },
+      { form_factor: "laptop" },
+    ] as Partial<SystemProfile>[]) {
+      expect(hardwareSignature(profile(change))).not.toBe(base);
+    }
+  });
+
+  it("ignores what a driver list does not depend on", () => {
+    const base = hardwareSignature(profile());
+    // Switching power plan or installing a cumulative-label update changes
+    // neither the installed drivers nor which are stale.
+    expect(
+      hardwareSignature(profile({ power_plan: "High performance", power_plan_guid: "other" })),
+    ).toBe(base);
+    expect(hardwareSignature(profile({ windows_version: "Windows 11 25H2" }))).toBe(base);
+  });
+
+  it("refuses to call an unknown machine a signature", () => {
+    // An all-unknown profile would compare equal everywhere and make the cache
+    // look verified on a machine it knows nothing about.
+    const empty = {
+      windows_version: null,
+      windows_build: null,
+      cpu: null,
+      cpu_physical_cores: null,
+      cpu_logical_cores: null,
+      gpu: null,
+      ram_total_bytes: null,
+      system_disk: "unknown" as const,
+      form_factor: "unknown" as const,
+      power_plan_guid: null,
+      power_plan: null,
+    };
+    expect(hardwareSignature(empty)).toBeNull();
+    expect(hardwareSignature(null)).toBeNull();
+    expect(hardwareSignature(undefined)).toBeNull();
+    // One known field is enough to make it specific.
+    expect(hardwareSignature({ ...empty, gpu: "NVIDIA GeForce RTX 4070" })).toContain("RTX 4070");
+  });
+
+  it("is recorded with the scan and read back with it", () => {
+    const audit: DriverAudit = {
+      entries: [],
+      excluded_inbox: 0,
+      total_scanned: 1,
+      classes_scanned: 1,
+    };
+    const at = new Date(Date.now() - 1000);
+    localStorage.clear();
+    writeCachedDriverAudit(audit, at, "cpu|8|16");
+    expect(readCachedDriverAudit()?.hardware).toBe("cpu|8|16");
+    // A scan stored without one (or by an older version) reads back as unknown
+    // rather than as a wrong answer.
+    writeCachedDriverAudit(audit, at);
+    expect(readCachedDriverAudit()?.hardware).toBeNull();
+    expect(clearCachedDriverAudit()).toBeUndefined();
+    expect(readCachedDriverAudit()).toBeNull();
+    // Blocked storage is not an error worth surfacing: nothing to clear.
+    vi.spyOn(Storage.prototype, "removeItem").mockImplementation(() => {
+      throw new Error("blocked");
+    });
+    expect(clearCachedDriverAudit()).toBeUndefined();
+    vi.restoreAllMocks();
   });
 });

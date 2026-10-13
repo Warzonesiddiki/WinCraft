@@ -50,12 +50,23 @@ class MailError extends Error {
  * would fail SPF/DKIM for a domain we don't own and land the mail in spam.
  */
 type MailInput = {
-  to: string; subject: string; html: string; text?: string; replyTo?: string;
+  to: string;
+  subject: string;
+  html: string;
+  text?: string;
+  replyTo?: string;
   /** Extra MIME headers, e.g. List-Unsubscribe on list mail. */
   headers?: Record<string, string>;
 };
 
-async function sendViaResend({ to, subject, html, text, replyTo, headers }: MailInput): Promise<void> {
+async function sendViaResend({
+  to,
+  subject,
+  html,
+  text,
+  replyTo,
+  headers,
+}: MailInput): Promise<void> {
   const res = await fetch("https://api.resend.com/emails", {
     method: "POST",
     signal: AbortSignal.timeout(30_000),
@@ -92,7 +103,14 @@ async function sendViaResend({ to, subject, html, text, replyTo, headers }: Mail
  * bodies to logs because they can contain password-reset tokens or personal
  * support content.
  */
-async function sendMail({ to, subject, html, text, replyTo = "support@wincraft.app", headers }: MailInput): Promise<{ delivered: boolean }> {
+async function sendMail({
+  to,
+  subject,
+  html,
+  text,
+  replyTo = "support@wincraft.app",
+  headers,
+}: MailInput): Promise<{ delivered: boolean }> {
   if (useResend) {
     await sendViaResend({ to, subject, html, text, replyTo, headers });
     return { delivered: true };

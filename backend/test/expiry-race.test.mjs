@@ -31,7 +31,9 @@ async function createUser(email) {
 }
 
 async function expiryOf(userId) {
-  const { rows } = await getPool().query("SELECT pro_expires_at, is_pro FROM users WHERE id = $1", [userId]);
+  const { rows } = await getPool().query("SELECT pro_expires_at, is_pro FROM users WHERE id = $1", [
+    userId,
+  ]);
   return rows[0];
 }
 
@@ -41,7 +43,12 @@ test("the subscription event landing first is not undone by checkout", async () 
   // customer.subscription.created — the authoritative period end.
   await grantPro(userId, { customerId: "cus_x", plan: "monthly", expiresAt: REAL_PERIOD_END });
   // checkout.session.completed arrives after, knowing only its guess.
-  await grantPro(userId, { customerId: "cus_x", plan: "monthly", expiresAt: PROVISIONAL, provisional: true });
+  await grantPro(userId, {
+    customerId: "cus_x",
+    plan: "monthly",
+    expiresAt: PROVISIONAL,
+    provisional: true,
+  });
 
   const row = await expiryOf(userId);
   assert.equal(row.is_pro, true);
@@ -55,12 +62,23 @@ test("the subscription event landing first is not undone by checkout", async () 
 test("checkout first still gets the real date once the subscription event lands", async () => {
   const userId = await createUser("race-checkout-first@example.com");
 
-  await grantPro(userId, { customerId: "cus_y", plan: "monthly", expiresAt: PROVISIONAL, provisional: true });
-  assert.equal(new Date((await expiryOf(userId)).pro_expires_at).toISOString(), PROVISIONAL.toISOString());
+  await grantPro(userId, {
+    customerId: "cus_y",
+    plan: "monthly",
+    expiresAt: PROVISIONAL,
+    provisional: true,
+  });
+  assert.equal(
+    new Date((await expiryOf(userId)).pro_expires_at).toISOString(),
+    PROVISIONAL.toISOString(),
+  );
 
   await grantPro(userId, { customerId: "cus_y", plan: "monthly", expiresAt: REAL_PERIOD_END });
 
-  assert.equal(new Date((await expiryOf(userId)).pro_expires_at).toISOString(), REAL_PERIOD_END.toISOString());
+  assert.equal(
+    new Date((await expiryOf(userId)).pro_expires_at).toISOString(),
+    REAL_PERIOD_END.toISOString(),
+  );
 });
 
 test("a real subscription event may still shorten an expiry", async () => {
@@ -72,7 +90,10 @@ test("a real subscription event may still shorten an expiry", async () => {
   await grantPro(userId, { customerId: "cus_z", plan: "annual", expiresAt: REAL_PERIOD_END });
   await grantPro(userId, { customerId: "cus_z", plan: "monthly", expiresAt: PROVISIONAL });
 
-  assert.equal(new Date((await expiryOf(userId)).pro_expires_at).toISOString(), PROVISIONAL.toISOString());
+  assert.equal(
+    new Date((await expiryOf(userId)).pro_expires_at).toISOString(),
+    PROVISIONAL.toISOString(),
+  );
 });
 
 test("a lifetime purchase still stores a null expiry", async () => {
@@ -87,7 +108,11 @@ test("the entitlements table has the same guard", async () => {
   const userId = await createUser("uninstaller-race@example.com");
 
   await upsertEntitlement(userId, "uninstaller", { plan: "annual", expiresAt: REAL_PERIOD_END });
-  await upsertEntitlement(userId, "uninstaller", { plan: "annual", expiresAt: PROVISIONAL, provisional: true });
+  await upsertEntitlement(userId, "uninstaller", {
+    plan: "annual",
+    expiresAt: PROVISIONAL,
+    provisional: true,
+  });
 
   const { rows } = await getPool().query(
     "SELECT expires_at FROM entitlements WHERE user_id = $1 AND product = 'uninstaller'",

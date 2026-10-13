@@ -1,8 +1,6 @@
 import { useRef, useState, type MouseEvent } from "react";
-import { motion } from "framer-motion";
 import { text } from "../i18n/dictionary";
 import { ACCENTS, THEME_ORDER, useTheme } from "../theme";
-import { EASE, riseChild, staggerParent } from "../motion";
 import { DOWNLOAD_EXE } from "../constants";
 import { CoffeeTip } from "./CoffeeTip";
 import { NewsletterSignup } from "./NewsletterSignup";
@@ -83,44 +81,42 @@ export function HeroSection() {
   const btnRef = useRef<HTMLAnchorElement>(null);
 
   /* magnetic CTA — follows the cursor inside its hit-area */
+  // The offset goes into custom properties rather than into `transform`,
+  // because the press animation also needs `transform` and an inline value
+  // would win over the stylesheet's (see `.press-tilt`).
   const onMove = (e: MouseEvent<HTMLAnchorElement>) => {
     const el = btnRef.current;
     if (!el) return;
     const r = el.getBoundingClientRect();
-    const x = (e.clientX - r.left - r.width / 2) * 0.35;
-    const y = (e.clientY - r.top - r.height / 2) * 0.35;
-    el.style.transform = `translate(${x}px, ${y}px)`;
+    el.style.setProperty("--tilt-x", `${(e.clientX - r.left - r.width / 2) * 0.35}px`);
+    el.style.setProperty("--tilt-y", `${(e.clientY - r.top - r.height / 2) * 0.35}px`);
   };
   const onLeave = () => {
     const el = btnRef.current;
-    if (el) el.style.transform = "translate(0,0)";
+    if (!el) return;
+    el.style.setProperty("--tilt-x", "0px");
+    el.style.setProperty("--tilt-y", "0px");
   };
 
   return (
     <header className="overflow-hidden px-5 pt-28 pb-24 md:px-12">
-      <motion.div
-        className="mx-auto max-w-7xl"
-        variants={staggerParent}
-        // Rendered visible from the first byte: the prerendered hero is the LCP element, and an
-        // opacity:0 entrance kept it blank until the JS bundle had loaded (~3.6 s FCP on mobile).
-        initial={false}
-        animate="show"
-      >
-        <motion.div
-          variants={riseChild}
-          className="mb-8 flex flex-wrap items-center justify-between gap-4"
-        >
+      {/* Deliberately not a reveal group. The hero is the LCP element and its
+          copy has to be in the first paint: an entrance animation here was
+          measured at ~3.6s FCP on mobile, which is why it renders visible and
+          stays visible. */}
+      <div className="mx-auto max-w-7xl">
+        <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
           <div className="font-mono-t text-accent flex items-center gap-3 text-[12px] tracking-[0.18em]">
             <span className="bg-accent inline-block h-px w-9" />
             {text.hero.eyebrow}
           </div>
           <ThemeSelector />
-        </motion.div>
+        </div>
 
         {/* Copy and download on the left, the real app on the right: a visitor
             sees what they are downloading before deciding to. */}
         <div className="grid gap-12 md:grid-cols-12 md:items-start">
-          <motion.div variants={riseChild} className="md:col-span-6">
+          <div className="md:col-span-6">
             <h1 className="font-display text-[clamp(2.6rem,5.2vw,4.6rem)] leading-[0.98] font-bold tracking-[-0.03em] text-[var(--fg)]">
               {text.hero.title1}
               <br />
@@ -137,18 +133,16 @@ export function HeroSection() {
                 download button while its stepper unfolds under both. */}
             <div className="mt-9">
               <CoffeeTip>
-                <motion.a
+                <a
                   ref={btnRef}
                   href={DOWNLOAD_EXE}
                   onMouseMove={onMove}
                   onMouseLeave={onLeave}
-                  whileTap={{ scale: 0.97 }}
-                  transition={{ duration: 0.6, ease: EASE }}
-                  className="bg-accent glow-accent inline-flex items-center gap-2.5 rounded-xl px-8 py-4 text-[15px] font-bold text-[var(--bg)] transition-transform duration-300 will-change-transform"
+                  className="bg-accent glow-accent press-tilt inline-flex items-center gap-2.5 rounded-xl px-8 py-4 text-[15px] font-bold text-[var(--bg)] transition-transform duration-300 will-change-transform"
                 >
                   {text.hero.cta}
                   <span className="font-mono-t text-[12px]">↓</span>
-                </motion.a>
+                </a>
               </CoffeeTip>
             </div>
 
@@ -188,8 +182,8 @@ export function HeroSection() {
                 </a>
               ))}
             </div>
-          </motion.div>
-          <motion.figure variants={riseChild} className="md:col-span-6 md:mt-4">
+          </div>
+          <figure className="md:col-span-6 md:mt-4">
             <div className="ring-accent-soft overflow-hidden rounded-2xl border border-white/10 bg-[var(--bg-2)] shadow-[0_30px_80px_-20px_rgba(0,0,0,0.75)]">
               <img
                 src="/images/app-overview-20261011.webp"
@@ -202,9 +196,9 @@ export function HeroSection() {
             <figcaption className="font-mono-t mt-3 text-[11.5px] text-[var(--fg-dim)]">
               {text.hero.screenshotCaption}
             </figcaption>
-          </motion.figure>
+          </figure>
         </div>
-      </motion.div>
+      </div>
     </header>
   );
 }

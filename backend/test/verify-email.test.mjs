@@ -17,10 +17,13 @@ const app = express();
 app.use("/api/auth", authModule.default.default);
 const server = app.listen(0);
 after(() => server.close());
-const verify = (token) => fetch(`http://127.0.0.1:${server.address().port}/api/auth/verify-email?token=${token}`);
+const verify = (token) =>
+  fetch(`http://127.0.0.1:${server.address().port}/api/auth/verify-email?token=${token}`);
 
 test("the second open of a used link confirms instead of failing", async () => {
-  const { rows } = await getPool().query("INSERT INTO users (email, password_hash) VALUES ('scan@example.com', 'x') RETURNING id");
+  const { rows } = await getPool().query(
+    "INSERT INTO users (email, password_hash) VALUES ('scan@example.com', 'x') RETURNING id",
+  );
   const token = await createActionToken(rows[0].id, "email_verify", 86_400_000);
 
   const first = await verify(token);
@@ -35,7 +38,9 @@ test("the second open of a used link confirms instead of failing", async () => {
 });
 
 test("a used link for an address that is still unconfirmed stays an error", async () => {
-  const { rows } = await getPool().query("INSERT INTO users (email, password_hash) VALUES ('other@example.com', 'x') RETURNING id");
+  const { rows } = await getPool().query(
+    "INSERT INTO users (email, password_hash) VALUES ('other@example.com', 'x') RETURNING id",
+  );
   const token = await createActionToken(rows[0].id, "email_verify", 86_400_000);
   await getPool().query("UPDATE action_tokens SET used_at = now()");
   const res = await verify(token);

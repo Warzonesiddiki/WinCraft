@@ -13,7 +13,7 @@ const reviewRoutes = reviewsModule.default.default ?? reviewsModule.default;
 await initSchema();
 
 const app = express();
-app.set("trust proxy", 1);
+app.set("trust proxy", ["loopback", "10.0.0.1"]);
 app.use(express.json());
 app.use("/api/reviews", reviewRoutes);
 app.use((_err, _req, res, _next) => res.status(500).send("error"));
@@ -49,9 +49,16 @@ test("the raw address is stored, and cleared once it is past retention", async (
   const ip = async (email) =>
     (await getPool().query("SELECT ip FROM reviews WHERE email = $1", [email])).rows[0].ip;
   assert.equal(await ip("c@example.com"), "198.51.100.9");
-  await getPool().query("UPDATE reviews SET confirmed_at = now() - interval '91 days' WHERE email = 'c@example.com'");
+  await getPool().query(
+    "UPDATE reviews SET confirmed_at = now() - interval '91 days' WHERE email = 'c@example.com'",
+  );
   assert.equal((await rate("d@example.com", "192.0.2.1")).status, 201);
   assert.equal(await ip("c@example.com"), null);
   assert.equal(await ip("d@example.com"), "192.0.2.1");
   assert.match(await hashOf("c@example.com"), /^[0-9a-f]{16}$/);
+});
+
+test("a forged leftmost forwarding entry cannot change the resolved voter", async () => {
+  assert.equal((await rate("e@example.com", "198.51.100.200, 203.0.113.7")).status, 201);
+  assert.equal(await hashOf("e@example.com"), await hashOf("a@example.com"));
 });

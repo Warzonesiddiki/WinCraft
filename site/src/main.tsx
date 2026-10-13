@@ -7,15 +7,33 @@ import { API_BASE, DOWNLOAD_EXE } from "./constants";
 // Self-hosted fonts (previously Google Fonts <link>s): keeps every visitor
 // request on our own origin — no IPs sent to Google, nothing to consent to.
 // Weights match what the old fonts.googleapis.com URL loaded.
-import "@fontsource/space-grotesk/500.css";
-import "@fontsource/space-grotesk/600.css";
-import "@fontsource/space-grotesk/700.css";
-import "@fontsource/jetbrains-mono/400.css";
-import "@fontsource/jetbrains-mono/500.css";
-import "@fontsource/jetbrains-mono/700.css";
-import "@fontsource/inter/400.css";
-import "@fontsource/inter/500.css";
-import "@fontsource/inter/600.css";
+//
+// Subsets are named explicitly instead of importing each package's default
+// entry, which pulls every subset the family ships. The default entry emitted
+// 48 @font-face rules, and those rules are render-blocking CSS: about 17 KB of
+// the 57 KB stylesheet described Cyrillic, Greek and Vietnamese text this site
+// has never had a character of. `latin-ext` is kept on purpose — it carries
+// the accents in names and European place names — while the scripts the site
+// cannot render are gone. The rule below is what keeps this honest: a build
+// that reintroduces an unused subset fails `npm run check:fonts`.
+import "@fontsource/space-grotesk/latin-500.css";
+import "@fontsource/space-grotesk/latin-600.css";
+import "@fontsource/space-grotesk/latin-700.css";
+import "@fontsource/space-grotesk/latin-ext-500.css";
+import "@fontsource/space-grotesk/latin-ext-600.css";
+import "@fontsource/space-grotesk/latin-ext-700.css";
+import "@fontsource/jetbrains-mono/latin-400.css";
+import "@fontsource/jetbrains-mono/latin-500.css";
+import "@fontsource/jetbrains-mono/latin-700.css";
+import "@fontsource/jetbrains-mono/latin-ext-400.css";
+import "@fontsource/jetbrains-mono/latin-ext-500.css";
+import "@fontsource/jetbrains-mono/latin-ext-700.css";
+import "@fontsource/inter/latin-400.css";
+import "@fontsource/inter/latin-500.css";
+import "@fontsource/inter/latin-600.css";
+import "@fontsource/inter/latin-ext-400.css";
+import "@fontsource/inter/latin-ext-500.css";
+import "@fontsource/inter/latin-ext-600.css";
 import "./index.css";
 import faviconUrl from "./assets/favicon.png";
 

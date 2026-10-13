@@ -68,7 +68,10 @@ type EntitlementTableRow = {
  * rows in this table have no legacy: a NULL expiry grants access only for
  * explicitly perpetual plans. Everything else fails closed.
  */
-export function isProductRowEntitled(row: EntitlementTableRow | null | undefined, now: Date = new Date()): boolean {
+export function isProductRowEntitled(
+  row: EntitlementTableRow | null | undefined,
+  now: Date = new Date(),
+): boolean {
   if (!row) return false;
   if (row.plan && PERPETUAL_PLANS.has(row.plan)) return true;
   if (row.expires_at == null) return false;
@@ -78,7 +81,11 @@ export function isProductRowEntitled(row: EntitlementTableRow | null | undefined
 }
 
 /** Resolves one product's entitlement for a user, whichever store backs it. */
-export async function productEntitlement(userId: number | string, product: ProductId, activateBonus = false): Promise<ProductEntitlement> {
+export async function productEntitlement(
+  userId: number | string,
+  product: ProductId,
+  activateBonus = false,
+): Promise<ProductEntitlement> {
   // A legacy id must read the rows its canonical product owns: "pctweaker" and
   // "wincraft" are one product with two names, not two products.
   const canonical = canonicalProduct(product) as Product;
@@ -89,9 +96,15 @@ export async function productEntitlement(userId: number | string, product: Produ
     );
     const row = rows[0];
     return {
-      product: canonical, active: isEntitled(row), plan: row?.plan ?? null,
-      expiresAt: row?.plan && PERPETUAL_PLANS.has(row.plan) ? null
-        : row?.pro_expires_at ? new Date(row.pro_expires_at).toISOString() : null,
+      product: canonical,
+      active: isEntitled(row),
+      plan: row?.plan ?? null,
+      expiresAt:
+        row?.plan && PERPETUAL_PLANS.has(row.plan)
+          ? null
+          : row?.pro_expires_at
+            ? new Date(row.pro_expires_at).toISOString()
+            : null,
     };
   }
   const { rows } = await getPool().query(
@@ -100,23 +113,45 @@ export async function productEntitlement(userId: number | string, product: Produ
   );
   const row = rows[0];
   const paidActive = isProductRowEntitled(row);
-  const { rows: owners } = await getPool().query("SELECT is_pro, plan FROM users WHERE id = $1", [userId]);
+  const { rows: owners } = await getPool().query("SELECT is_pro, plan FROM users WHERE id = $1", [
+    userId,
+  ]);
   const lifetime = owners[0]?.is_pro === true && owners[0]?.plan === "lifetime";
   if (lifetime && activateBonus) {
     const start = new Date();
     const end = new Date(start);
     end.setUTCFullYear(end.getUTCFullYear() + 1);
-    await getPool().query(`INSERT INTO lifetime_uninstaller_bonus (user_id, activated_at, expires_at)
-      VALUES ($1, $2, $3) ON CONFLICT (user_id) DO NOTHING`, [userId, start, end]);
+    await getPool().query(
+      `INSERT INTO lifetime_uninstaller_bonus (user_id, activated_at, expires_at)
+      VALUES ($1, $2, $3) ON CONFLICT (user_id) DO NOTHING`,
+      [userId, start, end],
+    );
   }
-  const { rows: bonuses } = await getPool().query("SELECT expires_at FROM lifetime_uninstaller_bonus WHERE user_id = $1", [userId]);
+  const { rows: bonuses } = await getPool().query(
+    "SELECT expires_at FROM lifetime_uninstaller_bonus WHERE user_id = $1",
+    [userId],
+  );
   const bonusExpiry = bonuses[0]?.expires_at ? new Date(bonuses[0].expires_at) : null;
   const bonusActive = lifetime && bonusExpiry !== null && bonusExpiry.getTime() > Date.now();
   const paidExpiry = row?.expires_at ? new Date(row.expires_at) : null;
-  if (paidActive && (row.plan === "lifetime" || !bonusActive || (paidExpiry && paidExpiry >= bonusExpiry!))) {
-    return { product: canonical, active: true, plan: row.plan, expiresAt: row.plan === "lifetime" ? null : paidExpiry?.toISOString() };
+  if (
+    paidActive &&
+    (row.plan === "lifetime" || !bonusActive || (paidExpiry && paidExpiry >= bonusExpiry!))
+  ) {
+    return {
+      product: canonical,
+      active: true,
+      plan: row.plan,
+      expiresAt: row.plan === "lifetime" ? null : paidExpiry?.toISOString(),
+    };
   }
-  if (bonusActive) return { product: canonical, active: true, plan: "lifetime_bonus", expiresAt: bonusExpiry!.toISOString() };
+  if (bonusActive)
+    return {
+      product: canonical,
+      active: true,
+      plan: "lifetime_bonus",
+      expiresAt: bonusExpiry!.toISOString(),
+    };
   return { product: canonical, active: false, plan: row?.plan ?? null, expiresAt: null };
 }
 
@@ -143,7 +178,17 @@ export async function hasAnyActiveEntitlement(userId: number | string): Promise<
 export async function upsertEntitlement(
   userId: number | string,
   product: ProductId,
-  { plan, expiresAt, stripeSubscriptionId, provisional }: { plan: string | null; expiresAt: Date | null; stripeSubscriptionId?: string | null; provisional?: boolean },
+  {
+    plan,
+    expiresAt,
+    stripeSubscriptionId,
+    provisional,
+  }: {
+    plan: string | null;
+    expiresAt: Date | null;
+    stripeSubscriptionId?: string | null;
+    provisional?: boolean;
+  },
 ): Promise<void> {
   await getPool().query(
     `INSERT INTO entitlements (user_id, product, plan, expires_at, stripe_subscription_id, updated_at)
@@ -158,7 +203,14 @@ export async function upsertEntitlement(
             END,
             stripe_subscription_id = COALESCE(EXCLUDED.stripe_subscription_id, entitlements.stripe_subscription_id),
             updated_at = now()`,
-    [userId, canonicalProduct(product) as Product, plan, expiresAt, stripeSubscriptionId ?? null, provisional === true],
+    [
+      userId,
+      canonicalProduct(product) as Product,
+      plan,
+      expiresAt,
+      stripeSubscriptionId ?? null,
+      provisional === true,
+    ],
   );
 }
 
@@ -166,7 +218,11 @@ export async function upsertEntitlement(
  *  The row is kept — history matters for support — but the expiry is now.
  *  Given a subscription, only that subscription's grant ends: a late event
  *  for an old subscription must not cut off the one that replaced it. */
-export async function revokeEntitlement(userId: number | string, product: ProductId, subscriptionId?: string): Promise<void> {
+export async function revokeEntitlement(
+  userId: number | string,
+  product: ProductId,
+  subscriptionId?: string,
+): Promise<void> {
   await getPool().query(
     `UPDATE entitlements SET expires_at = now(), updated_at = now()
       WHERE user_id = $1 AND product = $2

@@ -1,7 +1,6 @@
 import { useEffect, useState, type FormEvent } from "react";
-import { motion } from "framer-motion";
 import { text } from "../i18n/dictionary";
-import { EASE, riseChild, staggerParent, viewportOnce } from "../motion";
+import { Reveal, RevealGroup } from "../reveal";
 import { ApiError, fetchReviews, postReview, type ReviewSummary } from "../api";
 import {
   Field,
@@ -152,27 +151,18 @@ export function ReviewsSection() {
 
   return (
     <section id="reviews" className="border-t border-white/5 px-5 py-24 md:px-12">
-      <motion.div
-        className="mx-auto max-w-7xl"
-        variants={staggerParent}
-        initial="hidden"
-        whileInView="show"
-        viewport={viewportOnce}
-      >
-        <motion.div
-          variants={riseChild}
-          className="font-mono-t mb-4 text-[11.5px] tracking-[0.18em] text-[var(--fg-dim)]"
-        >
+      <RevealGroup className="mx-auto max-w-7xl">
+        <Reveal className="font-mono-t mb-4 text-[11.5px] tracking-[0.18em] text-[var(--fg-dim)]">
           <span className="text-accent">{t.tag.split(" / ")[0]}</span> / {t.tag.split(" / ")[1]}
-        </motion.div>
-        <motion.h2
-          variants={riseChild}
+        </Reveal>
+        <Reveal
+          as="h2"
           className="font-display text-[clamp(1.8rem,3.6vw,2.8rem)] font-bold tracking-tight text-[var(--fg)]"
         >
           {t.title}
-        </motion.h2>
+        </Reveal>
 
-        <motion.div variants={riseChild} className="mt-10 flex flex-wrap items-end gap-x-8 gap-y-4">
+        <Reveal className="mt-10 flex flex-wrap items-end gap-x-8 gap-y-4">
           <div className="flex items-end gap-4">
             <div className="font-display text-accent text-[64px] leading-none font-bold">
               {average.toFixed(1)}
@@ -197,23 +187,14 @@ export function ReviewsSection() {
               {t.writeCta}
             </button>
           )}
-        </motion.div>
+        </Reveal>
 
-        <motion.p
-          variants={riseChild}
-          className="mt-6 max-w-xl text-[13.5px] leading-relaxed text-[var(--fg-dim)]"
-        >
+        <Reveal as="p" className="mt-6 max-w-xl text-[13.5px] leading-relaxed text-[var(--fg-dim)]">
           {t.note}
-        </motion.p>
+        </Reveal>
 
         {thanked && (
-          <motion.p
-            initial={{ opacity: 0, y: -4 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-accent mt-6 text-[14px]"
-          >
-            {t.thanks}
-          </motion.p>
+          <p className="fade-in-up fade-in-up--tighter text-accent mt-6 text-[14px]">{t.thanks}</p>
         )}
 
         {/* Deliberately not wrapped in AnimatePresence: this subtree sits
@@ -222,12 +203,7 @@ export function ReviewsSection() {
             completes and the form is never unmounted. Animating only the
             entrance sidesteps that and makes closing instant and reliable. */}
         {formOpen && (
-          <motion.div
-            initial={{ opacity: 0, y: -8 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.45, ease: EASE }}
-            className="mt-8 max-w-3xl"
-          >
+          <div className="fade-in-up mt-8 max-w-3xl">
             <RatingForm onCounted={handleCounted} />
             <button
               onClick={() => setFormOpen(false)}
@@ -235,9 +211,9 @@ export function ReviewsSection() {
             >
               {t.cancel}
             </button>
-          </motion.div>
+          </div>
         )}
-      </motion.div>
+      </RevealGroup>
     </section>
   );
 }

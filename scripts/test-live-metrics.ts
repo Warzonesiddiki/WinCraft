@@ -14,6 +14,7 @@ import {
   push,
   sparkPoints,
   verdict,
+  windowDelta,
 } from "../src/live-metrics";
 import { friendlyError } from "../src/lib";
 import { STRINGS } from "../src/i18n-tables";
@@ -128,6 +129,25 @@ test("the peak is the highest real reading, and nothing when there is none", () 
   assert.ok(HISTORY >= WINDOW_SHORT * 5, "five minutes of history behind the one-minute view");
 });
 
+test("windowDelta measures the change across the visible window, or nothing", () => {
+  assert.equal(windowDelta(Array(60).fill(50)), 0);
+  assert.equal(windowDelta([80, ...Array(58).fill(70), 20]), -60);
+  assert.equal(windowDelta([10, ...Array(58).fill(70), 90]), 80);
+  // Not enough history, a null inside the window, or a nonsense window: no
+  // number, because half a window is not a trend.
+  assert.equal(windowDelta(Array(59).fill(50)), null);
+  // A missing reading at either end of the window: no trend to report. A gap
+  // in the middle still has two real ends, and the chart already draws it.
+  assert.equal(windowDelta([null, ...Array(59).fill(50)]), null);
+  assert.equal(windowDelta([...Array(59).fill(50), null]), null);
+  assert.equal(windowDelta([50, null, ...Array(58).fill(50)]), 0);
+  assert.equal(windowDelta([80, ...Array(59).fill(50)], 1), null);
+  // The default window is the chart's short zoom, so the arrow and the line
+  // describe the same span.
+  assert.equal(windowDelta([90, ...Array(10).fill(80)]), null);
+  assert.equal(windowDelta([90, ...Array(59).fill(80)]), -10);
+});
+
 test("insights speak only about real pressure, and say calm once otherwise", () => {
   const calm = insights({ cpu: Array(30).fill(20), memoryPct: 50, drivePct: 60 });
   assert.deepEqual(calm, [{ id: "calm", tone: "ok" }]);
@@ -156,6 +176,27 @@ test("insights speak only about real pressure, and say calm once otherwise", () 
     })[0].id,
     "calm",
     "only the last 30 seconds count",
+  );
+  // A busy half-minute that is visibly coming down is reported as easing, with
+  // the latest reading — not as an alarm repeating the average.
+  // Average 76% (busy) but the latest reading is 60% and the window fell 32
+  // points: the honest note is "coming down", quoting the latest reading.
+  const easing = insights({
+    cpu: [...Array(30).fill(92), ...Array(15).fill(60)],
+    memoryPct: 40,
+    drivePct: 40,
+    cpuDelta: -32,
+  });
+  assert.deepEqual(easing[0], { id: "recovering", tone: "ok", pct: 60 });
+  // Danger-level averages keep their alarm note even while falling.
+  assert.equal(
+    insights({ cpu: Array(30).fill(97), memoryPct: 40, drivePct: 40, cpuDelta: -20 })[0].tone,
+    "danger",
+  );
+  // A high but flat average is not described as easing.
+  assert.equal(
+    insights({ cpu: Array(30).fill(80), memoryPct: 40, drivePct: 40, cpuDelta: 0 })[0].id,
+    "cpu",
   );
 });
 

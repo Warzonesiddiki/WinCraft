@@ -12,22 +12,46 @@ const { productEntitlement } = await import("../dist/products.js");
 await initSchema();
 
 test("checkout ignores another account and client-supplied price or premium claims", async () => {
-  const { rows } = await getPool().query("INSERT INTO users (email, password_hash, email_verified) VALUES ('boundary-a@example.com', 'fixture', TRUE), ('boundary-b@example.com', 'fixture', TRUE) RETURNING id");
-  const [a, b] = rows.map(row => row.id);
+  const { rows } = await getPool().query(
+    "INSERT INTO users (email, password_hash, email_verified) VALUES ('boundary-a@example.com', 'fixture', TRUE), ('boundary-b@example.com', 'fixture', TRUE) RETURNING id",
+  );
+  const [a, b] = rows.map((row) => row.id);
   const req = {
     headers: { authorization: `Bearer ${signToken(a, 0)}` },
-    body: { plan: "annual", product: "pctweaker", userId: b, customer: "cus_other", price: "price_free", isPro: true },
+    body: {
+      plan: "annual",
+      product: "pctweaker",
+      userId: b,
+      customer: "cus_other",
+      price: "price_free",
+      isPro: true,
+    },
   };
-  const res = { statusCode: 200, status(code) { this.statusCode = code; return this; }, json(body) { this.body = body; return this; } };
+  const res = {
+    statusCode: 200,
+    status(code) {
+      this.statusCode = code;
+      return this;
+    },
+    json(body) {
+      this.body = body;
+      return this;
+    },
+  };
   let authenticated = false;
-  await requireAuth(req, res, () => { authenticated = true; });
+  await requireAuth(req, res, () => {
+    authenticated = true;
+  });
   assert.equal(authenticated, true);
   assert.equal(req.userId, a);
   let checkout;
   await createCheckoutHandler({
     environment: { STRIPE_PRICE_ANNUAL: "price_server_annual" },
     now: Date.now,
-    async createSession(params) { checkout = params; return { url: "https://example.com/test-checkout" }; },
+    async createSession(params) {
+      checkout = params;
+      return { url: "https://example.com/test-checkout" };
+    },
   })(req, res);
   assert.equal(res.statusCode, 200);
   assert.equal(checkout.client_reference_id, String(a));
@@ -38,20 +62,39 @@ test("checkout ignores another account and client-supplied price or premium clai
 
   await getPool().query("UPDATE users SET token_version = 1 WHERE id = $1", [a]);
   authenticated = false;
-  await requireAuth(req, res, () => { authenticated = true; });
+  await requireAuth(req, res, () => {
+    authenticated = true;
+  });
   assert.equal(authenticated, false);
   assert.equal(res.statusCode, 401);
 });
 
 test("checkout refuses accounts that have not verified their email", async () => {
-  const { rows: [{ id }] } = await getPool().query("INSERT INTO users (email, password_hash) VALUES ('unverified-buyer@example.com', 'fixture') RETURNING id");
+  const {
+    rows: [{ id }],
+  } = await getPool().query(
+    "INSERT INTO users (email, password_hash) VALUES ('unverified-buyer@example.com', 'fixture') RETURNING id",
+  );
   const req = { userId: id, body: { plan: "annual", product: "pctweaker" } };
-  const res = { statusCode: 200, status(code) { this.statusCode = code; return this; }, json(body) { this.body = body; return this; } };
+  const res = {
+    statusCode: 200,
+    status(code) {
+      this.statusCode = code;
+      return this;
+    },
+    json(body) {
+      this.body = body;
+      return this;
+    },
+  };
   let created = false;
   await createCheckoutHandler({
     environment: { STRIPE_PRICE_ANNUAL: "price_server_annual" },
     now: Date.now,
-    async createSession() { created = true; return { url: "https://example.com/test-checkout" }; },
+    async createSession() {
+      created = true;
+      return { url: "https://example.com/test-checkout" };
+    },
   })(req, res);
   assert.equal(res.statusCode, 403);
   assert.equal(res.body.code, "email_unverified");

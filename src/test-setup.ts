@@ -10,6 +10,10 @@ if (!Element.prototype.scrollIntoView) {
   Element.prototype.scrollIntoView = () => {};
 }
 
+if (!Element.prototype.scrollTo) {
+  Element.prototype.scrollTo = () => {};
+}
+
 // jsdom does not implement the modal dialog API either. The scan panel opens
 // its review dialog with showModal()/close(), so the two methods are mapped to
 // the `open` attribute the element already has.

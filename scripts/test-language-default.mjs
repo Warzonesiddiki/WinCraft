@@ -39,7 +39,11 @@ function windowsLanguage(tag) {
 for (const tag of ["it-IT", "pt-PT", "pt-BR", "de-DE", "fr-FR", "es-ES", "en-US"]) {
   windowsLanguage(tag);
   store.clear();
-  assert.equal(detectInitialLang(), "en", `no saved choice on a ${tag} system must open in English`);
+  assert.equal(
+    detectInitialLang(),
+    "en",
+    `no saved choice on a ${tag} system must open in English`,
+  );
 }
 
 // 2. An explicit choice is kept, on any system language.
@@ -66,13 +70,17 @@ assert.equal(localeOf("en"), "en");
 //    localStorage to exercise the reader, and a *.d.ts declaration is not
 //    code at all. Neither reaches a build, so neither is a second writer.
 const files = (dir) =>
-  fs.readdirSync(dir, { withFileTypes: true }).flatMap((e) =>
-    e.isDirectory()
-      ? files(`${dir}/${e.name}`)
-      : /\.(ts|tsx)$/.test(e.name) && !/\.(test|spec)\.(ts|tsx)$/.test(e.name) && !/\.d\.ts$/.test(e.name)
-        ? [`${dir}/${e.name}`]
-        : [],
-  );
+  fs
+    .readdirSync(dir, { withFileTypes: true })
+    .flatMap((e) =>
+      e.isDirectory()
+        ? files(`${dir}/${e.name}`)
+        : /\.(ts|tsx)$/.test(e.name) &&
+            !/\.(test|spec)\.(ts|tsx)$/.test(e.name) &&
+            !/\.d\.ts$/.test(e.name)
+          ? [`${dir}/${e.name}`]
+          : [],
+    );
 const sources = files(`${root}src`).map((f) => [f, fs.readFileSync(f, "utf8")]);
 const writers = sources.filter(([, s]) => /setItem\(\s*["']wincraft-lang["']/.test(s));
 assert.deepEqual(
@@ -81,9 +89,18 @@ assert.deepEqual(
   "only App.tsx may save the language",
 );
 const app = writers[0][1];
-assert.match(app, /function setLang\(l: Lang\) \{\s*setLangState\(l\);\s*localStorage\.setItem\("wincraft-lang", l\);/);
+assert.match(
+  app,
+  /function setLang\(l: Lang\) \{\s*setLangState\(l\);\s*localStorage\.setItem\("wincraft-lang", l\);/,
+);
 assert.match(app, /import\.meta\.env\.DEV && \(import\.meta\.env\.VITE_START_LANG/);
-const callers = sources.filter(([, s]) => /\bsetLang\(/.test(s)).map(([f]) => f.slice(root.length).replace(/\\/g, "/"));
-assert.deepEqual(callers.sort(), ["src/App.tsx", "src/components/account.tsx"], "setLang is called only by the language menu");
+const callers = sources
+  .filter(([, s]) => /\bsetLang\(/.test(s))
+  .map(([f]) => f.slice(root.length).replace(/\\/g, "/"));
+assert.deepEqual(
+  callers.sort(),
+  ["src/App.tsx", "src/components/account.tsx"],
+  "setLang is called only by the language menu",
+);
 
 console.log("language default test passed: English first, explicit choice kept, pt is pt-PT.");

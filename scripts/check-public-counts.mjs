@@ -41,6 +41,7 @@ const releaseNotes = `release-notes/RELEASE-NOTES-${version}.md`;
 
 const files = [
   "README.md",
+  "backend/src/emails/account.ts",
   "site/src/i18n/dictionary.ts",
   "site/src/pages/practical-guides.ts",
   ...listings,
@@ -88,9 +89,7 @@ for (const file of files) {
   // scan is skipped precisely when free === total, so the sentence that should
   // never have been published passed every gate. Matched unconditionally, and
   // without naming the old numbers so it keeps working if the catalogue moves.
-  for (const m of text.matchAll(
-    /\b\d{1,3}\s+(?:Free|Pro)\b|\b(?:Free|Pro)\s*[:/]\s*\d{1,3}\b/gi,
-  )) {
+  for (const m of text.matchAll(/\b\d{1,3}\s+(?:Free|Pro)\b|\b(?:Free|Pro)\s*[:/]\s*\d{1,3}\b/gi)) {
     problems.push(
       `${file}: "${m[0]}" — a count labelled Free/Pro; every one of the ${total} controls is free`,
     );
@@ -117,3 +116,7 @@ console.log(
     : `Public counts match the catalog: ${total} controls, published without a Free/Pro split ` +
         `(the ${free}/${pro} flags stay metadata; ${files.length} files checked).`,
 );
+
+if (/FREE_TWEAK_COUNT/.test(read("backend/src/routes/auth.ts"))) {
+  throw new Error("Backend welcome must not reintroduce an independently maintained catalog count");
+}

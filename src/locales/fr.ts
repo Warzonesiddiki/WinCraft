@@ -857,6 +857,8 @@ export const fr: Strings = {
     zoomLong: "5 min",
     minutesAgo: "il y a {n} min",
     peak: "Pic {value}",
+    insightRecovering:
+      "Le processeur redescend : il tournait au-dessus de 75 % en moyenne et la dernière mesure est de {pct} %.",
     insightCalm: "Tout est calme. Rien ne demande votre attention pour le moment.",
     insightMemory:
       "La mémoire est très sollicitée ({pct} %). Fermez les applications inutilisées ou vérifiez ce qui démarre avec Windows.",
@@ -1060,6 +1062,8 @@ export const fr: Strings = {
     profileDefaultIsMax:
       "Sur cette carte, la limite de puissance d'usine égale déjà le maximum : Silencieux est donc le seul profil qui change les watts, Gaming se distingue en relevant le plafond d'horloge.",
     driverInstalled: "installé v{version} le {date}",
+    driversHardwareChanged:
+      "Cette liste a été analysée sur un matériel différent de celui de cet ordinateur (par exemple une carte graphique remplacée) : elle a donc été effacée. Relancez l’analyse pour lire les périphériques réellement installés.",
     driversNoUpdateCheck:
       "Cet écran ne contacte aucun fabricant et ne peut pas savoir s'il existe une version plus récente : il affiche la version installée et son âge, et vous conduit à la page officielle pour vérifier vous-même.",
     driversCheckedAt: "Lu le {time}",
@@ -1141,6 +1145,20 @@ export const fr: Strings = {
     emailVerified: "E-mail vérifié",
     resendVerification: "Renvoyer",
     verificationSent: "E-mail de vérification envoyé.",
+    deleteAccount: "Supprimer le compte",
+    deleteAccountBody:
+      "Cela supprime votre adresse e-mail, votre mot de passe et vos informations enregistrées, déconnecte tous les appareils et est irréversible. Un avis que vous avez publié reste visible, mais l’adresse en est détachée.",
+    deleteAccountPassword: "Votre mot de passe actuel",
+    deleteAccountConfirmLabel: "Tapez DELETE pour confirmer",
+    deleteAccountSubmit: "Supprimer définitivement mon compte",
+    deleteAccountCancel: "Annuler",
+    deleteAccountDone: "Votre compte a été supprimé. Tous les appareils ont été déconnectés.",
+    deleteAccountBlocked:
+      "Ce compte a un abonnement actif. Annulez-le depuis Gérer l’abonnement, sinon supprimer le compte laisserait votre carte débitée.",
+    deleteAccountWrongPassword: "Ce mot de passe ne correspond pas à ce compte.",
+    deleteAccountNeedsLogin: "Votre session a expiré. Reconnectez-vous pour supprimer le compte.",
+    deleteAccountUnreachable:
+      "Le serveur est injoignable. Rien n’a été supprimé : vérifiez votre connexion et réessayez.",
   },
   driftWatch: {
     title: "Surveiller les mises à jour Windows",
@@ -1560,7 +1578,7 @@ export const fr: Strings = {
     auto_end_frozen_tasks: {
       name: "Empêcher une application figée de bloquer l'arrêt",
       description:
-        "Quand une application cesse de répondre pendant l'arrêt, Windows attend et affiche l'écran \"Cette application empêche l'arrêt\" jusqu'à ce que quelqu'un clique. Ceci ferme automatiquement les applications qui ne répondent plus, pour qu'un programme figé ne laisse pas la machine allumée.",
+        "Quand une application cesse de répondre pendant l'arrêt, Windows attend et affiche l'écran \"Cette application empêche l'arrêt\" jusqu'à ce que quelqu'un clique. Ceci ferme automatiquement les applications qui ne répondent plus, pour qu'un programme figé ne laisse pas la machine allumée. Attention : la fermeture automatique des applications peut entraîner la perte du travail non enregistré. Restaurer ce réglage ne récupère pas ce travail.",
     },
     instant_folder_loading: {
       name: "Ouvrir chaque dossier instantanément",
@@ -1758,8 +1776,7 @@ export const fr: Strings = {
     },
     disable_edge_hub_sidebar: {
       name: "Désactiver la barre latérale de Microsoft Edge",
-      description:
-        "Désactive la barre latérale Edge et ses widgets web intégrés en arrière-plan.",
+      description: "Désactive la barre latérale Edge et ses widgets web intégrés en arrière-plan.",
     },
     disable_edge_wallet: {
       name: "Désactiver les suggestions de portefeuille d'Edge",

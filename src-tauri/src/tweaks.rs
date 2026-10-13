@@ -225,7 +225,7 @@ pub fn all_tweaks() -> Vec<RegistryTweak> {
         RegistryTweak {
             id: "auto_end_frozen_tasks",
             name: "Don't let a frozen app block shutdown",
-            description: "When an application stops responding during shutdown, Windows waits and shows the \"This app is preventing shutdown\" screen until someone clicks it. This closes unresponsive apps automatically instead, so a hung program cannot leave the machine sitting powered on.",
+            description: "When an application stops responding during shutdown, Windows waits and shows the \"This app is preventing shutdown\" screen until someone clicks it. This closes unresponsive apps automatically instead, so a hung program cannot leave the machine sitting powered on. Warning: automatically closing apps can lose unsaved work. Restoring this setting cannot recover that work.",
             category: Category::Maintenance,
             hive: Hive::Hkcu,
             key_path: r"Control Panel\Desktop",

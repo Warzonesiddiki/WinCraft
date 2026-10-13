@@ -11,8 +11,7 @@ export const DOWNLOAD_EXE =
 export const UNINSTALLER_DOWNLOAD_EXE =
   "https://github.com/Warzonesiddiki/WinCraft/releases/latest/download/WinCraftUninstaller-Setup.exe";
 
-export const UNINSTALLER_RELEASES =
-  "https://github.com/Warzonesiddiki/WinCraft/releases/latest";
+export const UNINSTALLER_RELEASES = "https://github.com/Warzonesiddiki/WinCraft/releases/latest";
 
 /** The Microsoft Store listing. It has existed and been live all along, and
  *  appeared only inside the JSON-LD `sameAs` array — invisible to a human

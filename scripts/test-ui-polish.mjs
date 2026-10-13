@@ -62,7 +62,11 @@ assert.match(mainSource, /<PageBoundary[^>]*scope="app"[^>]*>\s*<App \/>/, "the 
       !f.startsWith("src-tauri/") &&
       !f.includes("node_modules/") &&
       !/(^|\/)package(-lock)?\.json$/.test(f) &&
-      f !== "scripts/test-ui-polish.mjs",
+      f !== "scripts/test-ui-polish.mjs" &&
+      // `git ls-files` lists the index, which still names files that a change
+      // in progress has deleted. There is no public text in a file that is not
+      // there, and reading it should not take the whole check down.
+      fs.existsSync(new URL(`../${f}`, import.meta.url)),
   );
   const forbidden = [
     /anti-?cheat/i,

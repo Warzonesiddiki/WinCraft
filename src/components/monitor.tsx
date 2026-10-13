@@ -1,4 +1,5 @@
 import "./tool-surfaces.css";
+import { useVisibilityInterval } from "./use-visibility-interval";
 import { useEffect, useRef, useState } from "react";
 import { invoke } from "@tauri-apps/api/core";
 import { format, Strings } from "../i18n";
@@ -44,12 +45,8 @@ export async function runRamClean(scheduled = false): Promise<RamCleanResult | n
  */
 function useNow(everyMs: number): number {
   const [now, setNow] = useState(() => Date.now());
-  useEffect(() => {
-    const id = window.setInterval(() => {
-      if (!document.hidden) setNow(Date.now());
-    }, everyMs);
-    return () => window.clearInterval(id);
-  }, [everyMs]);
+  useVisibilityInterval(() => setNow(Date.now()), everyMs);
+
   return now;
 }
 
@@ -115,26 +112,21 @@ export function StatRing({
 export function SystemMonitor({ s }: { s: Strings }) {
   const [stats, setStats] = useState<SystemStats | null>(null);
 
+  const alive = useRef(true);
   useEffect(() => {
-    let alive = true;
-    const tick = () => {
-      invoke<SystemStats>("system_stats")
-        .then((v) => {
-          // The backend call takes ~200ms (it needs two CPU samples), so the
-          // component can unmount mid-flight — don't set state after that.
-          if (alive) setStats(v);
-        })
-        .catch(() => {});
-    };
-    tick();
-    const id = window.setInterval(() => {
-      if (!document.hidden) tick();
-    }, 2500);
+    alive.current = true;
     return () => {
-      alive = false;
-      window.clearInterval(id);
+      alive.current = false;
     };
   }, []);
+  useVisibilityInterval(async () => {
+    try {
+      const value = await invoke<SystemStats>("system_stats");
+      if (alive.current) setStats(value);
+    } catch {
+      /* A missed sample leaves the previous value visible. */
+    }
+  }, 2500);
 
   if (!stats) {
     return (

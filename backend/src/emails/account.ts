@@ -32,8 +32,8 @@ export function passwordChangedText(when: string): string {
   return `Your WinCraft password was changed on ${when}. Every device that was signed in has been signed out.\n\nIf this was not you, request a new reset link from the app immediately and contact support: https://wincraft.app/support\n\nWe will never ask you for your password by email.`;
 }
 
-export function accountWelcomeText(freeTweakCount: number): string {
-  return `Your WinCraft account is ready\n\nYour email is confirmed. Sign in from the app to get started.\n\nYour free account includes ${freeTweakCount} tweaks, live processor, memory and disk monitoring, a startup manager, temporary file cleanup and a password breach check.\n\nOpen WinCraft: https://wincraft.app\nSupport: https://wincraft.app/support`;
+export function accountWelcomeText(): string {
+  return `Your WinCraft account is ready\n\nYour email is confirmed. Sign in from the app to get started.\n\nAll WinCraft controls are free, with supported settings backed up before changes. Features include, live processor, memory and disk monitoring, a startup manager, temporary file cleanup and a password breach check.\n\nOpen WinCraft: https://wincraft.app\nSupport: https://wincraft.app/support`;
 }
 
 /** The URL under the button, shown so it can be read rather than trusted. */
@@ -55,7 +55,8 @@ export function verificationSubject(): string {
 export function verificationHtml(firstName: string, link: string): string {
   const name = (firstName || "").trim().split(/\s+/)[0];
   return emailShell({
-    preheader: "Confirm this address to activate your WinCraft account. The link works for 24 hours.",
+    preheader:
+      "Confirm this address to activate your WinCraft account. The link works for 24 hours.",
     eyebrow: "Confirm your email",
     headline: name ? `One step left, ${name}.` : "One step left.",
     intro:
@@ -63,7 +64,8 @@ export function verificationHtml(firstName: string, link: string): string {
     action: { label: "Confirm my email", url: link },
     afterActionHtml: linkFallback(link),
     note: "The link works for 24 hours.",
-    footerNote: "If you did not create a WinCraft account, ignore this message and nothing happens.",
+    footerNote:
+      "If you did not create a WinCraft account, ignore this message and nothing happens.",
     accent: ACCENT,
   });
 }
@@ -123,15 +125,15 @@ export function passwordChangedHtml(firstName: string, when: string): string {
           </td>
         </tr>`;
   return emailShell({
-    preheader: "Every signed-in device has been signed out. If this was not you, contact support now.",
+    preheader:
+      "Every signed-in device has been signed out. If this was not you, contact support now.",
     eyebrow: "Security notice",
     headline: name ? `Your password was changed, ${name}.` : "Your password was changed.",
     intro: `The password on your WinCraft account was changed on ${when}. Every device that was signed in has been signed out.`,
     bodyHtml: body,
     action: { label: "Contact support", url: "https://wincraft.app/support" },
     note: "We will never ask you for your password by email.",
-    footerNote:
-      "This notice is sent every time the password changes and cannot be turned off.",
+    footerNote: "This notice is sent every time the password changes and cannot be turned off.",
     accent: ACCENT,
   });
 }
@@ -148,7 +150,7 @@ export function accountWelcomeSubject(): string {
  * on easier to miss. This one also has something the other cannot have: an
  * account that actually works.
  */
-export function accountWelcomeHtml(firstName: string, freeTweakCount: number): string {
+export function accountWelcomeHtml(firstName: string): string {
   const name = (firstName || "").trim().split(/\s+/)[0];
   const body = `
         <tr><td style="padding:32px 40px 0;"><div style="height:1px; background:#2a2d33;"></div></td></tr>
@@ -157,7 +159,7 @@ export function accountWelcomeHtml(firstName: string, freeTweakCount: number): s
           <td style="padding:28px 40px 0;">
             <div style="font-size:13px; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:${EMAIL_MUTED_TEXT}; margin-bottom:16px;">Yours without paying anything</div>
             <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
-${bulletRow(ACCENT, `${freeTweakCount} tweaks, each backed up before it is applied and revertible in one click`)}
+${bulletRow(ACCENT, "All WinCraft controls are free; supported settings are backed up before changes")}
 ${bulletRow(ACCENT, "Live monitoring of processor, memory and disk")}
 ${bulletRow(ACCENT, "Startup manager, temporary file cleanup and a password breach check")}
             </table>
@@ -172,6 +174,66 @@ ${bulletRow(ACCENT, "Startup manager, temporary file cleanup and a password brea
     bodyHtml: body,
     action: { label: "Open WinCraft", url: "https://wincraft.app" },
     footerNote: "Questions? Just reply to this email.",
+    accent: ACCENT,
+  });
+}
+
+/**
+ * The confirmation that an account was removed.
+ *
+ * Two facts belong in it, and both are there so the reader can act if the
+ * deletion was not theirs: what was removed, and that a published review they
+ * wrote stays visible with the address detached from it. The message carries
+ * no link back into the account — there is no account left to link to — so the
+ * only action is the support page.
+ */
+export function accountDeletedText(detail: {
+  reviewsKept: number;
+  reviewsDiscarded: number;
+}): string {
+  const reviewLine =
+    detail.reviewsKept > 0
+      ? `\n\nA review you published stays visible with your name, but the address attached to it has been removed, so it can no longer be linked back to you.`
+      : "";
+  return `Your WinCraft account has been deleted\n\nYour email address, password and account details have been removed, and every device that was signed in has been signed out.${reviewLine}\n\nNothing further will be emailed to this address. If you did not ask for this, contact us right away: https://wincraft.app/support`;
+}
+
+export function accountDeletedSubject(): string {
+  return "Your WinCraft account has been deleted";
+}
+
+export function accountDeletedHtml(detail: {
+  reviewsKept: number;
+  reviewsDiscarded: number;
+}): string {
+  const body = `
+        <tr>
+          <td style="padding:28px 40px 0;">
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#0f0f12; border:1px solid #2a2d33; border-radius:12px;">
+              <tr>
+                <td style="padding:18px; color:#9ca3af; font-size:15px; line-height:1.6;">
+                  ${
+                    detail.reviewsKept > 0
+                      ? "A review you published stays visible with your name, but the address attached to it has been removed, so it can no longer be linked back to you."
+                      : "Nothing you wrote is published under this address."
+                  }<br>
+                  If you did not ask for this, contact us right away.
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>`;
+  return emailShell({
+    preheader:
+      "Your account and its details have been removed. Every signed-in device has been signed out.",
+    eyebrow: "Account closed",
+    headline: "Your account has been deleted.",
+    intro:
+      "Your email address, password and account details have been removed, and every device that was signed in has been signed out. Nothing further will be emailed to this address.",
+    bodyHtml: body,
+    action: { label: "Contact support", url: "https://wincraft.app/support" },
+    note: "This is the last message this address will receive from us.",
+    footerNote: "This notice cannot be switched off: it confirms a change to your account.",
     accent: ACCENT,
   });
 }

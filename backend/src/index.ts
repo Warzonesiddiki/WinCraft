@@ -20,18 +20,25 @@ import supportRoutes from "./routes/support";
 import offerRoutes from "./routes/offers";
 import flagRoutes from "./routes/flags";
 import downloadRoutes from "./routes/downloads";
-import { router as stripeRoutes, webhookHandler, deliverProReceipt, listExpiredCheckouts, recordSelfReportedSource, SELF_REPORTED_SOURCES } from "./routes/stripe";
+import {
+  router as stripeRoutes,
+  webhookHandler,
+  deliverProReceipt,
+  listExpiredCheckouts,
+  recordSelfReportedSource,
+  SELF_REPORTED_SOURCES,
+} from "./routes/stripe";
 import { consumeGlobalBudget } from "./public-form-guard";
 import { lifetimeReminderEmail, startCheckoutReminderWorker } from "./checkout-recovery";
+import { trustedProxies } from "./proxy-policy";
 import { startReceiptWorker } from "./receipt-outbox";
+import { purgeExpiredData, startRetentionWorker } from "./retention";
 
 const app = express();
 
-// Railway (like Heroku) puts the app behind a reverse proxy that sets
-// X-Forwarded-For. Without this, express-rate-limit v7 throws at request
-// time instead of silently misbehaving — which would otherwise take down
-// /api/auth/register and /api/auth/login as soon as this is deployed there.
-app.set("trust proxy", 1);
+// Source identity is resolved from verified proxy networks, never a hop count.
+app.set("trust proxy", trustedProxies());
+let schemaReady = false;
 
 app.use(helmet());
 
@@ -42,19 +49,25 @@ app.use(helmet());
 // below keep their own caching behavior.
 app.use("/api", (_req: Request, res: Response, next: express.NextFunction) => {
   res.setHeader("Cache-Control", "no-store");
+  if (isConfigured && !schemaReady) {
+    res.status(503).json({ error: "Service initialization is unavailable" });
+    return;
+  }
   next();
 });
 
 // A generous service-wide ceiling protects every route, including cheap
 // reads and static legal pages that do not warrant a dedicated limiter.
 // Sensitive write endpoints keep their stricter route-specific limits.
-app.use(rateLimit({
-  windowMs: 15 * 60 * 1000,
-  limit: 1_200,
-  standardHeaders: true,
-  legacyHeaders: false,
-  message: { error: "Too many requests. Please try again later." },
-}));
+app.use(
+  rateLimit({
+    windowMs: 15 * 60 * 1000,
+    limit: 1_200,
+    standardHeaders: true,
+    legacyHeaders: false,
+    message: { error: "Too many requests. Please try again later." },
+  }),
+);
 
 // Allow-list the origins our own clients run from instead of falling back to
 // "any origin". No cookies are involved — auth is a bearer header — so a
@@ -82,7 +95,10 @@ const firstPartyOrigins = [
 // var should let an operator allow something extra (a staging domain, a
 // preview deploy) — it should not be able to lock our own site out of our own
 // API by omission.
-const extraOrigins = (process.env.CORS_ORIGINS || "").split(",").map((s) => s.trim()).filter(Boolean);
+const extraOrigins = (process.env.CORS_ORIGINS || "")
+  .split(",")
+  .map((s) => s.trim())
+  .filter(Boolean);
 const allowedOrigins = [...new Set([...firstPartyOrigins, ...extraOrigins])];
 app.use(cors({ origin: allowedOrigins, exposedHeaders: ["X-Session-Token"] }));
 
@@ -108,13 +124,29 @@ app.get("/health", (_req: Request, res: Response) => {
 // Railway uses this endpoint as a deploy readiness gate. Liveness stays
 // intentionally cheap at /health; readiness proves the service can actually
 // reach PostgreSQL before a new deployment receives production traffic.
+/** Bounded readiness probe. A hung or half-open connection must fail the
+ *  deploy gate quickly, not hold it open until the platform's own timeout. */
+const READINESS_TIMEOUT_MS = 4000;
+
 app.get("/ready", async (_req: Request, res: Response) => {
-  if (!isConfigured) {
-    res.status(503).json({ ok: false, database: "not configured" });
+  if (!isConfigured || !schemaReady) {
+    res.status(503).json({ ok: false });
     return;
   }
+  const probe = getPool().query("SELECT 1");
+  // Attach the handler immediately, so a query that fails after the timeout
+  // has already released the response cannot surface as an unhandled rejection.
+  probe.catch(() => undefined);
   try {
-    await getPool().query("SELECT 1");
+    await Promise.race([
+      probe,
+      new Promise((_resolve, reject) =>
+        setTimeout(
+          () => reject(new Error("readiness probe timed out")),
+          READINESS_TIMEOUT_MS,
+        ).unref(),
+      ),
+    ]);
     res.json({ ok: true });
   } catch (err) {
     console.error("readiness database check failed:", err);
@@ -137,19 +169,16 @@ app.get("/", (_req: Request, res: Response) => {
 // the "code" on screen so it can be copied by hand into the terminal. TikTok
 // does not accept localhost redirect URIs, a real HTTPS domain is required -
 // same scheme already used for getcertsprint.com.
-app.get("/tiktok-callback", (_req: Request, res: Response) => {
-  res.type("html").send(`<!DOCTYPE html>
-<html>
-<head><title>TikTok callback</title></head>
-<body style="font-family: monospace; padding: 40px;">
-  <h2>Copy the "code" value below and paste it into the terminal:</h2>
-  <p id="code" style="font-size: 18px; word-break: break-all; background:#eee; padding:12px;"></p>
-  <script>
-    const params = new URLSearchParams(window.location.search);
-    document.getElementById("code").textContent = params.get("code") || "(no code found in URL)";
-  </script>
-</body>
-</html>`);
+app.get("/tiktok-callback", (req: Request, res: Response) => {
+  // One-time local tooling: no script and no caching of OAuth credentials.
+  const code =
+    typeof req.query.code === "string" ? req.query.code.slice(0, 2048) : "(no code found in URL)";
+  res.setHeader("Cache-Control", "no-store");
+  res.setHeader("Referrer-Policy", "no-referrer");
+  res.type("html").send(`<!DOCTYPE html><html lang="en">
+<head><title>TikTok callback</title><meta name="robots" content="noindex"></head>
+<body><h2>Copy the code into your local authorization tool:</h2>
+<pre id="code">${escapeHtml(code)}</pre></body></html>`);
 });
 
 function escapeHtml(s: string): string {
@@ -175,8 +204,16 @@ function serveMarkdownAsHtml(routePath: string, mdFilePath: string, title: strin
 // sync with the root TERMS.md/PRIVACY.md if those are ever edited. Needed as
 // real, our-own-domain URLs for the TikTok developer app review (github.com
 // URLs can't be domain-verified since we don't control that domain).
-serveMarkdownAsHtml("/terms", path.join(__dirname, "..", "legal", "TERMS.md"), "WinCraft - Terms of Service");
-serveMarkdownAsHtml("/privacy", path.join(__dirname, "..", "legal", "PRIVACY.md"), "WinCraft - Privacy Policy");
+serveMarkdownAsHtml(
+  "/terms",
+  path.join(__dirname, "..", "legal", "TERMS.md"),
+  "WinCraft - Terms of Service",
+);
+serveMarkdownAsHtml(
+  "/privacy",
+  path.join(__dirname, "..", "legal", "PRIVACY.md"),
+  "WinCraft - Privacy Policy",
+);
 
 /**
  * Stripe Checkout's success_url/cancel_url — the desktop app opens Checkout
@@ -190,19 +227,26 @@ serveMarkdownAsHtml("/privacy", path.join(__dirname, "..", "legal", "PRIVACY.md"
  * granted by the Stripe webhook independently of this page, so a closed tab
  * here never blocks entitlement — this is purely the human-facing receipt.
  */
-function checkoutResultPage(kind: "success" | "cancel" | "tip" | "noted", sessionId?: string): string {
+function checkoutResultPage(
+  kind: "success" | "cancel" | "tip" | "noted",
+  sessionId?: string,
+): string {
   const isSuccess = kind !== "cancel";
   const isTip = kind === "tip";
   // Optional attribution question: a plain form, so no script, cookie or
   // storage is involved. Shown only when Stripe filled in the session id.
-  const question = kind === "success" && sessionId && /^cs_(test|live)_[A-Za-z0-9]{10,200}$/.test(sessionId)
-    ? `<form class="ask" method="post" action="/checkout-success">
+  const question =
+    kind === "success" && sessionId && /^cs_(test|live)_[A-Za-z0-9]{10,200}$/.test(sessionId)
+      ? `<form class="ask" method="post" action="/checkout-success">
   <p class="q">Optional: how did you find WinCraft?</p>
   <input type="hidden" name="session_id" value="${sessionId}">
   <div class="opts">${Object.entries(SELF_REPORTED_SOURCES)
-    .map(([value, label]) => `<button type="submit" name="source" value="${value}">${label}</button>`).join("")}</div>
+    .map(
+      ([value, label]) => `<button type="submit" name="source" value="${value}">${label}</button>`,
+    )
+    .join("")}</div>
 </form>`
-    : "";
+      : "";
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -237,10 +281,10 @@ function checkoutResultPage(kind: "success" | "cancel" | "tip" | "noted", sessio
     kind === "noted"
       ? "It helps us know where to keep posting. Switch back to WinCraft: your new plan is picked up automatically."
       : isTip
-      ? "Your tip goes straight into new features and daily updates for WinCraft. Stripe will email your receipt."
-      : isSuccess
-      ? "Your Pro tweaks and presets are unlocked. Switch back to WinCraft — the app picks up your new plan automatically the next time it checks your license."
-      : "No charge was made. You can restart checkout from the app whenever you're ready."
+        ? "Your tip goes straight into new features and daily updates for WinCraft. Stripe will email your receipt."
+        : isSuccess
+          ? "Your Pro tweaks and presets are unlocked. Switch back to WinCraft — the app picks up your new plan automatically the next time it checks your license."
+          : "No charge was made. You can restart checkout from the app whenever you're ready."
   }</p>
   ${question}
   <p style="color:#8b87a0; font-size:13px; margin:0;">You can close this tab.</p>
@@ -273,13 +317,17 @@ app.get("/tip-thanks", (_req: Request, res: Response) => {
 // content dictated by TikTok when verifying app_basic_info URLs - safe to
 // leave in place afterward, it's just a static token file).
 app.get("/tiktokpEKDQseFFOg1tBMQ9QvfIZ64fDNQkDLt.txt", (_req: Request, res: Response) => {
-  res.type("text/plain").send("tiktok-developers-site-verification=pEKDQseFFOg1tBMQ9QvfIZ64fDNQkDLt");
+  res
+    .type("text/plain")
+    .send("tiktok-developers-site-verification=pEKDQseFFOg1tBMQ9QvfIZ64fDNQkDLt");
 });
 // TikTok issues a fresh token each time verification is (re)requested - the
 // old one above becomes stale but is left in place (harmless) rather than
 // removed, in case of another retry cycle.
 app.get("/tiktokHeKend3CcpkNmGCjEs2zET0AjYqOWn71.txt", (_req: Request, res: Response) => {
-  res.type("text/plain").send("tiktok-developers-site-verification=HeKend3CcpkNmGCjEs2zET0AjYqOWn71");
+  res
+    .type("text/plain")
+    .send("tiktok-developers-site-verification=HeKend3CcpkNmGCjEs2zET0AjYqOWn71");
 });
 
 app.use("/api/auth", authRoutes);
@@ -342,12 +390,14 @@ const SHUTDOWN_GRACE_MS = 10_000;
 let shuttingDown = false;
 let stopReceiptWorker = () => {};
 let stopReminderWorker = () => {};
+let stopRetentionWorker = () => {};
 
 function shutdown(signal: string, server: import("http").Server): void {
   if (shuttingDown) return; // a second SIGTERM must not restart the sequence
   shuttingDown = true;
   stopReceiptWorker();
   stopReminderWorker();
+  stopRetentionWorker();
   console.log(`${signal} received: refusing new connections, draining in-flight requests`);
 
   const forceExit = setTimeout(() => {
@@ -371,12 +421,18 @@ function shutdown(signal: string, server: import("http").Server): void {
 }
 
 initSchema()
+  .then(() => {
+    schemaReady = isConfigured;
+  })
   .catch((err) => {
     console.error("failed to initialize database schema:", err);
   })
   .finally(() => {
-    if (isConfigured) stopReceiptWorker = startReceiptWorker(deliverProReceipt);
-    if (isConfigured && mailIsConfigured && process.env.STRIPE_SECRET_KEY) {
+    if (schemaReady) stopReceiptWorker = startReceiptWorker(deliverProReceipt);
+    // Retention needs the schema, not the mail or Stripe configuration: it is
+    // about rows this service already owns.
+    if (schemaReady) stopRetentionWorker = startRetentionWorker(() => purgeExpiredData(getPool()));
+    if (schemaReady && mailIsConfigured && process.env.STRIPE_SECRET_KEY) {
       stopReminderWorker = startCheckoutReminderWorker(listExpiredCheckouts, async (to) => {
         await sendMail(lifetimeReminderEmail(to));
       });

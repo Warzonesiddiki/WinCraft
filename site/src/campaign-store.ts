@@ -2,8 +2,12 @@ import { useEffect, useState } from "react";
 import { MICROSOFT_STORE } from "./constants";
 
 const CAMPAIGNS = new Set([
-  "pct-instagram-profile", "pct-youtube-profile", "pct-youtube-profiles-01",
-  "pct-youtube-file-extensions", "pct-youtube-keep-game-clips", "pct-youtube-work-after-gaming",
+  "pct-instagram-profile",
+  "pct-youtube-profile",
+  "pct-youtube-profiles-01",
+  "pct-youtube-file-extensions",
+  "pct-youtube-keep-game-clips",
+  "pct-youtube-work-after-gaming",
 ]);
 const UTM_KEYS = ["utm_source", "utm_medium", "utm_campaign", "utm_content"];
 let entryCampaign: string | undefined;
@@ -17,9 +21,13 @@ export function captureEntry(search: string) {
   const params = new URLSearchParams(search);
   const requested = params.get("cid") || "";
   const source = params.get("utm_source");
-  entryCampaign = CAMPAIGNS.has(requested) ? requested
-    : source === "ig" || source === "instagram" ? "pct-instagram-profile"
-    : source === "youtube" ? "pct-youtube-profile" : "";
+  entryCampaign = CAMPAIGNS.has(requested)
+    ? requested
+    : source === "ig" || source === "instagram"
+      ? "pct-instagram-profile"
+      : source === "youtube"
+        ? "pct-youtube-profile"
+        : "";
   for (const key of UTM_KEYS) {
     const value = params.get(key);
     if (value && /^[A-Za-z0-9_.-]{1,80}$/.test(value)) entryUtm[key] = value;

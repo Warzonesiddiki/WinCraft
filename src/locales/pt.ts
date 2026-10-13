@@ -855,6 +855,8 @@ export const pt: Strings = {
     zoomLong: "5 min",
     minutesAgo: "há {n} min",
     peak: "Pico {value}",
+    insightRecovering:
+      "O processador está a acalmar: estava acima de 75 % em média e a última leitura é {pct} %.",
     insightCalm: "Está tudo calmo. Neste momento nada precisa da sua atenção.",
     insightMemory:
       "A memória está muito ocupada ({pct}%). Feche as aplicações que não está a usar ou veja o que arranca com o Windows.",
@@ -1057,6 +1059,8 @@ export const pt: Strings = {
     profileDefaultIsMax:
       "Nesta placa o limite de energia de fábrica já é igual ao máximo, por isso Silencioso é o único perfil que muda a potência: Jogos distingue-se elevando antes o teto de clock.",
     driverInstalled: "instalado v{version} em {date}",
+    driversHardwareChanged:
+      "Esta lista foi analisada num hardware diferente do que o PC tem agora (por exemplo, uma placa gráfica substituída), por isso foi apagada. Analisa novamente para ler os dispositivos realmente instalados.",
     driversNoUpdateCheck:
       "Este ecrã não contacta nenhum fabricante e não pode saber se existe uma versão mais recente: mostra a versão instalada e a respetiva idade, e leva-o à página oficial para verificar por si.",
     driversCheckedAt: "Lido às {time}",
@@ -1139,6 +1143,21 @@ export const pt: Strings = {
     emailVerified: "E-mail verificado",
     resendVerification: "Reenviar",
     verificationSent: "E-mail de verificação enviado.",
+    deleteAccount: "Eliminar conta",
+    deleteAccountBody:
+      "Remove o teu endereço de email, a palavra-passe e os dados guardados, termina a sessão em todos os dispositivos e não pode ser anulado. Uma avaliação que publicaste continua visível, sem o endereço associado.",
+    deleteAccountPassword: "A tua palavra-passe atual",
+    deleteAccountConfirmLabel: "Escreve DELETE para confirmar",
+    deleteAccountSubmit: "Eliminar a minha conta definitivamente",
+    deleteAccountCancel: "Cancelar",
+    deleteAccountDone:
+      "A tua conta foi eliminada. A sessão foi terminada em todos os dispositivos.",
+    deleteAccountBlocked:
+      "Esta conta tem uma subscrição ativa. Cancela-a em Gerir subscrição; caso contrário, eliminar a conta deixaria o cartão a ser cobrado.",
+    deleteAccountWrongPassword: "Essa palavra-passe não corresponde a esta conta.",
+    deleteAccountNeedsLogin: "A tua sessão expirou. Inicia sessão novamente para eliminar a conta.",
+    deleteAccountUnreachable:
+      "Não foi possível contactar o servidor. Nada foi eliminado — verifica a ligação e tenta de novo.",
   },
   driftWatch: {
     title: "Vigiar as atualizações do Windows",
@@ -1557,7 +1576,7 @@ export const pt: Strings = {
     auto_end_frozen_tasks: {
       name: "Não deixar uma aplicação bloqueada impedir o encerramento",
       description:
-        'Quando uma aplicação deixa de responder durante o encerramento, o Windows espera e mostra o ecrã "Esta aplicação está a impedir o encerramento" até alguém clicar. Isto fecha automaticamente as aplicações que não respondem, para que um programa bloqueado não deixe a máquina ligada.',
+        'Quando uma aplicação deixa de responder durante o encerramento, o Windows espera e mostra o ecrã "Esta aplicação está a impedir o encerramento" até alguém clicar. Isto fecha automaticamente as aplicações que não respondem, para que um programa bloqueado não deixe a máquina ligada. Aviso: fechar aplicações automaticamente pode causar a perda de trabalho não guardado. Repor esta definição não recupera esse trabalho.',
     },
     instant_folder_loading: {
       name: "Abrir todas as pastas instantaneamente",

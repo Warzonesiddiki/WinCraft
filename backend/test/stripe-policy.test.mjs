@@ -195,15 +195,39 @@ test("a quantity that is not a usable number falls back to one coffee", () => {
 });
 
 test("social campaign labels reach session metadata, nothing else does", () => {
-  const utm = { utm_source: "youtube", utm_medium: "social", utm_campaign: "pctweaker_shorts", utm_content: "pc-x-v1", email: "a@b.c" };
+  const utm = {
+    utm_source: "youtube",
+    utm_medium: "social",
+    utm_campaign: "pctweaker_shorts",
+    utm_content: "pc-x-v1",
+    email: "a@b.c",
+  };
   const tip = tipSessionParams("price_coffee", "https://pctweaker.app", 1, utm);
-  assert.deepEqual(tip.metadata, { utm_source: "youtube", utm_medium: "social", utm_campaign: "pctweaker_shorts", utm_content: "pc-x-v1" });
+  assert.deepEqual(tip.metadata, {
+    utm_source: "youtube",
+    utm_medium: "social",
+    utm_campaign: "pctweaker_shorts",
+    utm_content: "pc-x-v1",
+  });
   assert.equal(tip.client_reference_id, undefined);
   const checkout = checkoutSessionParams({
-    priceId: "p", mode: "payment", userId: "7", planKey: "lifetime", product: "pctweaker",
-    customerId: null, customerEmail: undefined, successUrl: "s", cancelUrl: "c", utm: { utm_source: "tiktok" },
+    priceId: "p",
+    mode: "payment",
+    userId: "7",
+    planKey: "lifetime",
+    product: "pctweaker",
+    customerId: null,
+    customerEmail: undefined,
+    successUrl: "s",
+    cancelUrl: "c",
+    utm: { utm_source: "tiktok" },
   });
-  assert.deepEqual(checkout.metadata, { userId: "7", plan: "lifetime", product: "pctweaker", utm_source: "tiktok" });
+  assert.deepEqual(checkout.metadata, {
+    userId: "7",
+    plan: "lifetime",
+    product: "pctweaker",
+    utm_source: "tiktok",
+  });
   assert.deepEqual(utmMetadata({ utm_source: "a b", utm_term: "x" }), {});
   assert.deepEqual(utmMetadata("youtube"), {});
 });

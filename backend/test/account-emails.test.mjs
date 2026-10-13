@@ -2,9 +2,15 @@ import test from "node:test";
 import assert from "node:assert/strict";
 
 const {
-  verificationText, passwordResetText, passwordChangedText, accountWelcomeText,
+  verificationText,
+  passwordResetText,
+  passwordChangedText,
+  accountWelcomeText,
   accountWelcomeHtml,
   accountWelcomeSubject,
+  accountDeletedHtml,
+  accountDeletedSubject,
+  accountDeletedText,
   passwordChangedHtml,
   passwordChangedSubject,
   passwordResetHtml,
@@ -23,7 +29,7 @@ test("plain-text messages preserve action URLs, expiry and account details", () 
   assert.ok(passwordResetText(LINK).includes(LINK));
   assert.match(passwordResetText(LINK), /once.*one hour/);
   assert.ok(passwordChangedText(WHEN).includes(WHEN));
-  assert.match(accountWelcomeText(27), /27 tweaks/);
+  assert.match(accountWelcomeText(), /All WinCraft controls are free/);
 });
 
 test("the confirmation shows the destination as text, after the button", () => {
@@ -39,11 +45,11 @@ test("the confirmation shows the destination as text, after the button", () => {
 test("only the first name is used, and its absence is not an error", () => {
   assert.match(verificationHtml("Marco Rossi", LINK), /One step left, Marco\./);
   assert.match(verificationHtml("", LINK), /One step left\./);
-  assert.match(accountWelcomeHtml("", 35), /You're in\./);
+  assert.match(accountWelcomeHtml(""), /You're in\./);
 });
 
 test("a name cannot carry markup into the message", () => {
-  const html = accountWelcomeHtml("<script>alert(1)</script>", 35);
+  const html = accountWelcomeHtml("<script>alert(1)</script>");
   assert.ok(!html.includes("<script>"));
   assert.ok(html.includes("&lt;script&gt;"));
 });
@@ -56,11 +62,11 @@ test("the reset email states the two limits that matter", () => {
   assert.match(html, /your password stays exactly as it is/);
 });
 
-test("the welcome quotes the free tweak count it was given", () => {
-  // Passed in rather than written into the template, so the email cannot go
-  // on promising a number that stopped being true.
-  assert.match(accountWelcomeHtml("Marco", 35), /35 tweaks/);
-  assert.match(accountWelcomeHtml("Marco", 40), /40 tweaks/);
+test("the welcome describes all-free controls without a stale count or blanket reversibility", () => {
+  const html = accountWelcomeHtml("Marco");
+  assert.match(html, /All WinCraft controls are free/);
+  assert.match(html, /supported settings/);
+  assert.doesNotMatch(html, /\d+ tweaks|each.*revertible/);
 });
 
 test("every subject names the product", () => {
@@ -78,7 +84,7 @@ test("all four are complete documents in the same shell", () => {
   for (const html of [
     verificationHtml("A", LINK),
     passwordResetHtml(LINK),
-    accountWelcomeHtml("A", 35),
+    accountWelcomeHtml("A"),
     passwordChangedHtml("A", WHEN),
   ]) {
     assert.ok(html.startsWith("<!doctype html>"));
@@ -94,7 +100,10 @@ test("the notice carries no link that could change anything", () => {
   const html = passwordChangedHtml("Marco", WHEN);
   assert.ok(!html.includes("reset-password"), "no reset route in a message about a reset");
   assert.ok(!html.includes("token="), "no token, so nothing here is worth stealing");
-  assert.ok(html.includes('href="https://wincraft.app/support"'), "the button goes to a place, not an action");
+  assert.ok(
+    html.includes('href="https://wincraft.app/support"'),
+    "the button goes to a place, not an action",
+  );
 });
 
 test("the notice states when it happened and what it already did", () => {
@@ -111,4 +120,27 @@ test("the notice greets by first name and survives having none", () => {
   assert.match(passwordChangedHtml("", WHEN), /Your password was changed\./);
   const html = passwordChangedHtml("<script>alert(1)</script>", WHEN);
   assert.ok(!html.includes("<script>"));
+});
+
+test("the deletion notice says what was removed and what stays visible", () => {
+  // A reader who did not ask for this needs to know the account is gone; a
+  // reader who did needs to know a published review survived without their
+  // address on it. Both facts belong in the message, and neither needs a link
+  // into an account that no longer exists.
+  const kept = accountDeletedHtml({ reviewsKept: 1, reviewsDiscarded: 2 });
+  assert.match(kept, /review you published stays visible/);
+  assert.ok(!kept.includes("reset-password") && !kept.includes("token="));
+  assert.ok(kept.includes('href="https://wincraft.app/support"'));
+  const none = accountDeletedHtml({ reviewsKept: 0, reviewsDiscarded: 0 });
+  assert.match(none, /Nothing you wrote is published under this address/);
+  assert.ok(!none.includes("review you published stays visible"));
+  assert.match(
+    accountDeletedText({ reviewsKept: 1, reviewsDiscarded: 0 }),
+    /can no longer be linked back to you/,
+  );
+  assert.match(
+    accountDeletedText({ reviewsKept: 0, reviewsDiscarded: 0 }),
+    /account has been deleted/,
+  );
+  assert.match(accountDeletedSubject(), /deleted/);
 });

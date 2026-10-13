@@ -13,7 +13,8 @@
     "dev": "tsx watch src/index.ts",
     "pretest": "npm run build",
     "test": "node --test test/*.test.mjs",
-    "smoke": "node scripts/smoke-test.mjs"
+    "smoke": "node scripts/smoke-test.mjs",
+    "test:tls": "npm run build && node --test test/tls-policy.integration.mjs"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",

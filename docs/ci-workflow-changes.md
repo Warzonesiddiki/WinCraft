@@ -25,11 +25,11 @@ revert the workflows.
 
 Cut against `master` at `fb97d48`, against the workflows as they then stood:
 
-| File | Change |
-| --- | --- |
-| `build.yml` | dropped the release step that ran `check-no-test-pro.mjs`, a script Batch AE deleted; the step was a guaranteed failure |
-| `checks.yml` | added the site build and its SEO gate, ESLint, Prettier, the six remaining model suites, the language-default and change-history models, the component suite with the coverage ratchet, and the isolated native policy tests; dropped the `check-no-test-pro` step |
-| `deploy-site.yml` | rebuild the site when the shared modules it imports from `src/` change |
+| File              | Change                                                                                                                                                                                                                                                             |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `build.yml`       | dropped the release step that ran `check-no-test-pro.mjs`, a script Batch AE deleted; the step was a guaranteed failure                                                                                                                                            |
+| `checks.yml`      | added the site build and its SEO gate, ESLint, Prettier, the six remaining model suites, the language-default and change-history models, the component suite with the coverage ratchet, and the isolated native policy tests; dropped the `check-no-test-pro` step |
+| `deploy-site.yml` | rebuild the site when the shared modules it imports from `src/` change                                                                                                                                                                                             |
 
 That last one is a correctness fix, not a convenience. `site/src/promo.tsx`
 renders the offer banner from `src/components/halloween-offer.tsx` and reads

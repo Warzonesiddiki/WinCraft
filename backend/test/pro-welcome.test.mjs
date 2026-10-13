@@ -71,7 +71,10 @@ test("the reversal notice states the amount, the access change and, for subscrip
     assert.doesNotMatch(body, /refund|money.?back|guarantee/i);
   }
   assert.match(refundHtml({ ...lifetime, plan: "monthly" }), /does not renew/);
-  assert.match(refundText({ ...lifetime, refundedLabel: null }), /^Your payment for WinCraft Pro was reversed by your payment provider\.$/m);
+  assert.match(
+    refundText({ ...lifetime, refundedLabel: null }),
+    /^Your payment for WinCraft Pro was reversed by your payment provider\.$/m,
+  );
   assert.match(refundHtml({ ...lifetime, firstName: "" }), /Your payment was reversed\./);
   assert.doesNotMatch(refundHtml({ ...lifetime, firstName: "<b>x</b>" }), /<b>x<\/b>/);
 });
@@ -79,5 +82,8 @@ test("the reversal notice states the amount, the access change and, for subscrip
 test("every shell carries a hidden preheader and declares its colour scheme", () => {
   const html = refundHtml({ firstName: "Sam", plan: "lifetime", refundedLabel: "€99.00" });
   assert.match(html, /<meta name="color-scheme" content="light dark">/);
-  assert.match(html, /<div style="display:none;[^"]*">Your payment of €99\.00 for WinCraft Pro was reversed/);
+  assert.match(
+    html,
+    /<div style="display:none;[^"]*">Your payment of €99\.00 for WinCraft Pro was reversed/,
+  );
 });

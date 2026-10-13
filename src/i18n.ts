@@ -765,6 +765,7 @@ export interface Strings {
     minutesAgo: string;
     peak: string;
     insightCalm: string;
+    insightRecovering: string;
     insightMemory: string;
     insightCpu: string;
     insightDrive: string;
@@ -938,6 +939,7 @@ export interface Strings {
     profileDefaultIsMax: string;
     driverInstalled: string; // uses {version} and {date}
     driversNoUpdateCheck: string;
+    driversHardwareChanged: string;
     driversCheckedAt: string; // uses {time}
     modeClockLocked: string; // uses {mhz}
     modeClockAuto: string;
@@ -1011,6 +1013,17 @@ export interface Strings {
     emailVerified: string;
     resendVerification: string;
     verificationSent: string;
+    deleteAccount: string;
+    deleteAccountBody: string;
+    deleteAccountPassword: string;
+    deleteAccountConfirmLabel: string;
+    deleteAccountSubmit: string;
+    deleteAccountCancel: string;
+    deleteAccountDone: string;
+    deleteAccountBlocked: string;
+    deleteAccountWrongPassword: string;
+    deleteAccountNeedsLogin: string;
+    deleteAccountUnreachable: string;
   };
   driftWatch: {
     title: string;

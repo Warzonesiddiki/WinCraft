@@ -26,12 +26,16 @@ export async function queueReceipt(key: string, receipt: Receipt): Promise<void>
 /** A lease prevents competing API instances from sending the same row.
  * Delivery is at-least-once: a crash after provider acceptance can duplicate
  * a receipt, but cannot duplicate a charge or grant a different entitlement. */
-export async function deliverReceipts(send: (receipt: Receipt) => Promise<void>, now = new Date()): Promise<number> {
+export async function deliverReceipts(
+  send: (receipt: Receipt) => Promise<void>,
+  now = new Date(),
+): Promise<number> {
   const db = getPool();
   const { rows } = await db.query(
     `SELECT receipt_key FROM billing_receipts WHERE delivered_at IS NULL
      AND next_attempt_at <= $1 AND (locked_until IS NULL OR locked_until < $1)
-     ORDER BY next_attempt_at LIMIT 5`, [now],
+     ORDER BY next_attempt_at LIMIT 5`,
+    [now],
   );
   let delivered = 0;
   for (const row of rows) {
@@ -50,7 +54,8 @@ export async function deliverReceipts(send: (receipt: Receipt) => Promise<void>,
       await send(receipt.payload as Receipt);
       await db.query(
         `UPDATE billing_receipts SET delivered_at = $3, locked_until = NULL, lock_token = NULL
-         WHERE receipt_key = $1 AND lock_token = $2`, [row.receipt_key, token, new Date()],
+         WHERE receipt_key = $1 AND lock_token = $2`,
+        [row.receipt_key, token, new Date()],
       );
       delivered++;
     } catch {
@@ -71,11 +76,17 @@ export function startReceiptWorker(send: (receipt: Receipt) => Promise<void>): (
   const tick = async () => {
     if (running) return;
     running = true;
-    try { await deliverReceipts(send); }
-    catch { console.error("Billing receipt worker failed; will retry"); }
-    finally { running = false; }
+    try {
+      await deliverReceipts(send);
+    } catch {
+      console.error("Billing receipt worker failed; will retry");
+    } finally {
+      running = false;
+    }
   };
-  const timer = setInterval(() => { void tick(); }, 30_000);
+  const timer = setInterval(() => {
+    void tick();
+  }, 30_000);
   timer.unref();
   void tick();
   return () => clearInterval(timer);

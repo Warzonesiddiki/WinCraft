@@ -4,12 +4,19 @@ import { spawn } from "node:child_process";
 import { once } from "node:events";
 import { fileURLToPath } from "node:url";
 
-test("only the retired landing redirects; service routes remain available", { timeout: 20000 }, async (t) => {
-  const env = { PORT: "0", DATABASE_URL: "", NODE_ENV: "test" };
-  for (const key of ["SystemRoot", "WINDIR", "TEMP", "TMP", "PATH"]) {
-    if (process.env[key]) env[key] = process.env[key];
-  }
-  const child = spawn(process.execPath, ["-e", `
+test(
+  "only the retired landing redirects; service routes remain available",
+  { timeout: 20000 },
+  async (t) => {
+    const env = { PORT: "0", DATABASE_URL: "", NODE_ENV: "test" };
+    for (const key of ["SystemRoot", "WINDIR", "TEMP", "TMP", "PATH"]) {
+      if (process.env[key]) env[key] = process.env[key];
+    }
+    const child = spawn(
+      process.execPath,
+      [
+        "-e",
+        `
     const http = require("node:http");
     const listen = http.Server.prototype.listen;
     http.Server.prototype.listen = function (...args) {
@@ -18,49 +25,79 @@ test("only the retired landing redirects; service routes remain available", { ti
     };
     global.fetch = async () => { throw new Error("Outbound requests are disabled in this test"); };
     require("./dist/index.js");
-  `], {
-    cwd: fileURLToPath(new URL("../", import.meta.url)),
-    env,
-    stdio: ["ignore", "ignore", "ignore", "ipc"],
-  });
-  t.after(async () => {
-    if (child.exitCode === null && child.signalCode === null) {
-      const exit = once(child, "exit");
-      child.kill();
-      await exit;
+  `,
+      ],
+      {
+        cwd: fileURLToPath(new URL("../", import.meta.url)),
+        env,
+        stdio: ["ignore", "ignore", "ignore", "ipc"],
+      },
+    );
+    t.after(async () => {
+      if (child.exitCode === null && child.signalCode === null) {
+        const exit = once(child, "exit");
+        child.kill();
+        await exit;
+      }
+    });
+    const [message] = await once(child, "message", { signal: AbortSignal.timeout(10000) });
+    const base = `http://127.0.0.1:${message.port}`;
+    for (const method of ["GET", "HEAD"]) {
+      for (const suffix of ["/", "/?code=do-not-forward&redirect=https://example.com"]) {
+        const response = await fetch(base + suffix, { method, redirect: "manual" });
+        assert.equal(response.status, 301);
+        assert.equal(response.headers.get("location"), "https://wincraft.app/");
+        assert.ok(response.headers.get("content-security-policy"));
+      }
     }
-  });
-  const [message] = await once(child, "message", { signal: AbortSignal.timeout(10000) });
-  const base = `http://127.0.0.1:${message.port}`;
-  for (const method of ["GET", "HEAD"]) {
-    for (const suffix of ["/", "/?code=do-not-forward&redirect=https://example.com"]) {
-      const response = await fetch(base + suffix, { method, redirect: "manual" });
-      assert.equal(response.status, 301);
-      assert.equal(response.headers.get("location"), "https://wincraft.app/");
-      assert.ok(response.headers.get("content-security-policy"));
+    for (const route of [
+      "/health",
+      "/privacy",
+      "/terms",
+      "/tiktok-callback",
+      "/checkout-success",
+      "/checkout-cancel",
+    ]) {
+      const response = await fetch(base + route, { redirect: "manual" });
+      assert.equal(response.status, 200, route);
+      assert.equal(response.headers.get("location"), null, route);
     }
-  }
-  for (const route of ["/health", "/privacy", "/terms", "/tiktok-callback", "/checkout-success", "/checkout-cancel"]) {
-    const response = await fetch(base + route, { redirect: "manual" });
-    assert.equal(response.status, 200, route);
-    assert.equal(response.headers.get("location"), null, route);
-  }
-  const asked = await (await fetch(base + "/checkout-success?session_id=cs_test_a1B2c3D4e5F6g7")).text();
-  assert.match(asked, /name="session_id" value="cs_test_a1B2c3D4e5F6g7"/);
-  assert.match(asked, /name="source" value="youtube"/);
-  const forged = await (await fetch(base + "/checkout-success?session_id=%22%3E%3Cscript%3E")).text();
-  assert.doesNotMatch(forged, /<form|<script/);
-  const noted = await fetch(base + "/checkout-success", {
-    method: "POST", headers: { "content-type": "application/x-www-form-urlencoded" },
-    body: "session_id=cs_test_a1B2c3D4e5F6g7&source=youtube",
-  });
-  assert.equal(noted.status, 200);
-  assert.match(await noted.text(), /Thanks for telling us/);
-  assert.equal((await fetch(base + "/ready")).status, 503);
-  assert.equal((await fetch(base + "/", { method: "POST", redirect: "manual" })).status, 404);
-  assert.equal((await fetch(base + "/missing", { redirect: "manual" })).status, 404);
-  const webhook = await fetch(base + "/api/stripe-webhook", { method: "POST", redirect: "manual" });
-  assert.equal(webhook.status, 503, "Unconfigured billing must not acknowledge events or redirect");
-  assert.equal(webhook.headers.get("location"), null);
-  assert.equal(webhook.headers.get("cache-control"), "no-store");
-});
+    const callback = await fetch(
+      base + "/tiktok-callback?code=%3Cscript%3Esecret%26code%3C%2Fscript%3E",
+    );
+    assert.equal(callback.headers.get("cache-control"), "no-store");
+    const callbackHtml = await callback.text();
+    assert.match(callbackHtml, /&lt;script&gt;secret&amp;code&lt;\/script&gt;/);
+    assert.doesNotMatch(callbackHtml, /<script/);
+    const asked = await (
+      await fetch(base + "/checkout-success?session_id=cs_test_a1B2c3D4e5F6g7")
+    ).text();
+    assert.match(asked, /name="session_id" value="cs_test_a1B2c3D4e5F6g7"/);
+    assert.match(asked, /name="source" value="youtube"/);
+    const forged = await (
+      await fetch(base + "/checkout-success?session_id=%22%3E%3Cscript%3E")
+    ).text();
+    assert.doesNotMatch(forged, /<form|<script/);
+    const noted = await fetch(base + "/checkout-success", {
+      method: "POST",
+      headers: { "content-type": "application/x-www-form-urlencoded" },
+      body: "session_id=cs_test_a1B2c3D4e5F6g7&source=youtube",
+    });
+    assert.equal(noted.status, 200);
+    assert.match(await noted.text(), /Thanks for telling us/);
+    assert.equal((await fetch(base + "/ready")).status, 503);
+    assert.equal((await fetch(base + "/", { method: "POST", redirect: "manual" })).status, 404);
+    assert.equal((await fetch(base + "/missing", { redirect: "manual" })).status, 404);
+    const webhook = await fetch(base + "/api/stripe-webhook", {
+      method: "POST",
+      redirect: "manual",
+    });
+    assert.equal(
+      webhook.status,
+      503,
+      "Unconfigured billing must not acknowledge events or redirect",
+    );
+    assert.equal(webhook.headers.get("location"), null);
+    assert.equal(webhook.headers.get("cache-control"), "no-store");
+  },
+);

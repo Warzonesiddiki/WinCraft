@@ -3,7 +3,7 @@
 **Target Release:** WinCraft 2.0.0 (Next-Generation Major Release)  
 **Status:** In Progress / Active Execution  
 **Document Version:** 1.0.0  
-**Last Updated:** October 13, 2026  
+**Last Updated:** October 13, 2026
 
 ---
 
@@ -68,6 +68,7 @@ This roadmap lays out the sequential engineering milestones, work packages, task
 ## 2. Detailed Milestone & Phase Breakdown
 
 ### Phase 1: Core Engine & Data Type Widening
+
 **Objective:** Upgrade the underlying Rust registry and system adapters to handle all modern Windows registry data types, declarative key operations, and transactional task management.
 
 - **WP-1.1: Rust `RegValue` Enum Expansion (`src-tauri/src/tweaks.rs`, `src-tauri/src/rollback.rs`)**
@@ -84,6 +85,7 @@ This roadmap lays out the sequential engineering milestones, work packages, task
 ---
 
 ### Phase 2: Optimisation Catalogue Expansion (~150 Controls)
+
 **Objective:** Expand the curated tweak catalogue from 81 to ~150 verified controls across privacy, desktop responsiveness, and kernel tuning.
 
 - **WP-2.1: Telemetry & Privacy Hardening (~35 Controls)**
@@ -106,6 +108,7 @@ This roadmap lays out the sequential engineering milestones, work packages, task
 ---
 
 ### Phase 3: Subsystem, SvcHost & Scheduled Tasks
+
 **Objective:** Reduce process counts and background CPU context switching by consolidating services and trimming bloat tasks.
 
 - **WP-3.1: Service Host Splitting Manager (`SvcHostSplitThresholdInKB`)**
@@ -120,6 +123,7 @@ This roadmap lays out the sequential engineering milestones, work packages, task
 ---
 
 ### Phase 4: Adaptive Workflows & Debloat 2.0
+
 **Objective:** Deliver tailored optimization presets for 9 workflow archetypes and a 25-package MSIX debloat suite.
 
 - **WP-4.1: 9 Workflow Archetypes (`src/components/starter-presets.mjs`)**
@@ -140,6 +144,7 @@ This roadmap lays out the sequential engineering milestones, work packages, task
 ---
 
 ### Phase 5: Hardware Intelligence & Empirical Benchmark Suite
+
 **Objective:** Provide real-time hardware latency diagnostics and empirical before-and-after performance validation.
 
 - **WP-5.1: Live Kernel DPC/ISR Latency Real-Time Analyzer (`src-tauri/src/diagnostics/`)**
@@ -156,6 +161,7 @@ This roadmap lays out the sequential engineering milestones, work packages, task
 ---
 
 ### Phase 6: Localization, Documentation, Quality Gates & Release
+
 **Objective:** Complete multi-language localization, comprehensive developer and user documentation, and execute all CI quality gates.
 
 - **WP-6.1: 6-Locale Translation Parity (`src/locales/`, `src/components/*-copy.ts`)**
@@ -174,6 +180,7 @@ This roadmap lays out the sequential engineering milestones, work packages, task
 ## 3. Definition of Done (DoD) for WinCraft 2.0
 
 A feature or work package is considered complete only when:
+
 1. **Code Quality:** Written in strict TypeScript (frontend) and safe Rust (backend) conforming to repository patterns.
 2. **Reversibility:** Every registry, service, task, and AppX operation records a pre-write snapshot and can be rolled back via the Change History ledger.
 3. **Localization:** All user-facing strings are present and audited across all 6 supported languages.
