@@ -167,7 +167,18 @@ body {
 
    The parameters are the ones the design already animated with: 0.9s to settle,
    28px of rise, 90ms between a section's children and a 35ms head start, on an
-   ease-out curve that attacks fast and settles slowly. */
+   ease-out curve that attacks fast and settles slowly.
+
+   The entrance is a *keyframe animation*, not a transition, on purpose. A
+   transition would have to declare `transition-property`, `-duration` and
+   `-delay` on the element, and this stylesheet is unlayered while Tailwind's
+   utilities are not: the card classes carry their own
+   `transition-all duration-500 hover:-translate-y-1 hover:border-white/15`,
+   and a reveal transition silently overwrote the first two of those — the
+   hover lift and the border fade stopped easing and snapped instead. An
+   animation touches none of those properties, and `translate` (which is what
+   the hover utility sets) is a different property from the `transform` used
+   here, so the two compose. */
 :root {
   --reveal-duration: 900ms;
   --reveal-rise: 28px;
@@ -177,13 +188,31 @@ body {
   --reveal-ease: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
+@keyframes reveal-in {
+  from {
+    opacity: 0;
+    transform: translateY(var(--reveal-rise));
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
 [data-reveal-armed] .reveal {
   opacity: 0;
   transform: translateY(var(--reveal-rise));
-  transition:
-    opacity var(--reveal-duration) var(--reveal-ease),
-    transform var(--reveal-duration) var(--reveal-ease);
-  transition-delay: calc(var(--reveal-stagger) * var(--reveal-order, 0) + var(--reveal-delay));
+}
+
+/* Only an element that was actually waiting below the fold animates: a group
+   marks what is already on screen as revealed *before* it arms, and if those
+   ran the animation the reader would watch the page they are looking at
+   disappear and fade back in. `backwards` keeps the waiting elements hidden
+   through their stagger delay and hands the element back to the stylesheet
+   afterwards, so nothing is left pinned by a filled animation. */
+[data-reveal-armed] .reveal[data-reveal-waiting][data-revealed] {
+  animation: reveal-in var(--reveal-duration) var(--reveal-ease) backwards;
+  animation-delay: calc(var(--reveal-stagger) * var(--reveal-order, 0) + var(--reveal-delay));
 }
 
 [data-reveal-armed] .reveal[data-revealed] {
@@ -195,6 +224,7 @@ body {
   [data-reveal-armed] .reveal {
     opacity: 1;
     transform: none;
+    animation: none;
     transition: none;
   }
 }

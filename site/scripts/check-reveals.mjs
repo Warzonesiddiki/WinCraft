@@ -167,7 +167,66 @@ if (!gate) {
   );
 }
 
-/* ── 3. Reduced motion must never be shown a hidden state ───────────────── */
+/* ── 3. The entrance must be an animation, not a transition ─────────────── */
+
+/** Rules that target a `.reveal` element itself rather than something inside
+ *  one: the last compound selector is what the rule styles, so
+ *  `[data-reveal-armed] .reveal .trace-draw` targets the trace while
+ *  `[data-reveal-armed] .reveal[data-revealed]` targets the reveal. */
+function targetsReveal(rule) {
+  return rule.selector.split(",").some((selector) => {
+    const last = selector.trim().split(/\s+/).pop() ?? "";
+    const compound = last.split("[")[0];
+    return compound === ".reveal" || compound.startsWith(".reveal:");
+  });
+}
+
+/** A transition declaration that overrides something. `transition: none` is the
+ *  reduced-motion block switching transitions off on purpose. */
+function declaresTransition(body) {
+  return body
+    .split(";")
+    .map((declaration) => declaration.split(":"))
+    .some(
+      ([property, value]) => property.trim().startsWith("transition") && value.trim() !== "none",
+    );
+}
+
+/**
+ * A transition here silently breaks the animations these elements already had.
+ * This stylesheet is unlayered and Tailwind's utilities are not, so a
+ * `transition:` on `.reveal` beats the `transition-all duration-500` the card
+ * classes carry: the hover lift and the border fade on fifteen cards stopped
+ * easing and started snapping, and the stagger `transition-delay` leaked onto
+ * every property each card transitioned. The entrance is a keyframe animation
+ * instead, which touches none of those properties.
+ */
+const clobbering = rules.filter((rule) => targetsReveal(rule) && declaresTransition(rule.body));
+for (const rule of clobbering) {
+  fail(
+    `"${rule.selector}" puts a transition on the reveal itself, which overrides the transition ` +
+      `utilities the same element carries (unlayered CSS beats @layer utilities), so hover effects on ` +
+      `those elements stop easing. Animate the entrance with @keyframes instead.`,
+  );
+}
+
+/** And the animation has to be wired to something that actually waits. */
+const wired = rules.some(
+  (rule) =>
+    rule.selector.includes("[data-reveal-waiting]") &&
+    rule.selector.includes("[data-revealed]") &&
+    rule.body.includes("animation:") &&
+    rule.body.includes("reveal-in"),
+);
+if (!wired) {
+  fail(
+    "Nothing animates an element that waited below the fold, so the entrance animation is not running " +
+      "at all and the page simply snaps into view. Check that src/index.css still has the reveal-in " +
+      "rule and that src/reveal.tsx sets data-reveal-waiting.",
+  );
+}
+
+/* ── 4. Reduced motion must never be shown a hidden state ───────────────── */
 
 const reduced = rules.filter(
   (rule) =>

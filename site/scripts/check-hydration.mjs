@@ -157,6 +157,10 @@ async function load({ id, source, reducedMotion = false, onScreen = false }) {
     shown: reveals().filter((element) => element.hasAttribute("data-revealed")).length,
     observed: observers.reduce((total, observer) => total + observer.targets.size, 0),
     armed: window.document.querySelectorAll("[data-reveal-armed]").length,
+    // What the entrance animation is wired to: only an element that waited
+    // below the fold animates back in, so this is the count that proves the
+    // animation has a subject and that on-screen content does not animate.
+    waiting: reveals().filter((element) => element.hasAttribute("data-reveal-waiting")).length,
   });
 
   const prerendered = { ...count(), hiddenInline: hiddenInline() };
@@ -263,6 +267,19 @@ if (belowFold.afterScrolling.whileWaiting !== "0") {
     `below the fold: an element waiting to animate computes to opacity ` +
       `${belowFold.afterScrolling.whileWaiting}, so it is either visible before its turn or hidden by ` +
       `something other than the armed reveal rule.`,
+  );
+}
+if (belowFold.mounted.waiting !== belowFold.mounted.total) {
+  fail(
+    `below the fold: ${belowFold.mounted.total - belowFold.mounted.waiting} of ${belowFold.mounted.total} ` +
+      `element(s) were not marked as waiting, so the entrance animation has nothing to run on and the ` +
+      `page would snap into view instead of revealing.`,
+  );
+}
+if (onScreen.mounted.waiting !== 0) {
+  fail(
+    `on screen: ${onScreen.mounted.waiting} element(s) at or above the fold were marked as waiting to ` +
+      `animate in. Content the reader is already looking at must not be part of an entrance.`,
   );
 }
 if (belowFold.afterScrolling.total !== belowFold.afterScrolling.shown) {

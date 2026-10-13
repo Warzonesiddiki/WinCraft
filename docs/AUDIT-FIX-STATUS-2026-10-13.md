@@ -100,15 +100,32 @@ disagreement (it builds a development copy of the bundle as well, because
 production React repairs an attribute mismatch silently instead of reporting it),
 that nothing at or above the fold is ever hidden, that a below-fold element
 computes to `opacity: 0` only while an observer is watching it and to `1` once
-scrolled to, and that reduced motion is never hidden at all. Nine mutations of the
+scrolled to, and that reduced motion is never hidden at all. Twelve mutations of the
 built output — hidden markup, an ungated rule, a missing rule, an un-neutralised
 reduced-motion block, a disagreement in text, a disagreement in an attribute, the
-fold check removed, the reduced-motion check removed, and the hiding rule deleted
-— were each confirmed to fail one of the two gates. Both run as the last step of
+fold check removed, the reduced-motion check removed, the hiding rule deleted, a
+transition put back on `.reveal`, the entrance animation deleted, and the waiting
+marker renamed — were each confirmed to fail one of the two gates. Both run as the last step of
 `npm run build --prefix site` (as `npm run check:output`), which is the step every
 path to production already runs: the CI site job, the Pages deploy and a local
 build all verify the artifact they just produced. Removing the animation library
 also removed an unused module (`site/src/motion.ts`) and 113 KiB of JavaScript.
+
+**The entrance is a keyframe animation, not a transition.** The first version
+animated it with `transition` on `.reveal`, and this stylesheet is unlayered
+while Tailwind's utilities are not: `transition-property`, `-duration` and
+`-delay` on `.reveal` therefore beat the `transition-all duration-500` the card
+classes carry. Fifteen cards hovered with their lift and border fade snapping
+instead of easing, and the `transition-delay` that creates the stagger applied
+to every property each card transitioned. The animation now runs from
+`@keyframes reveal-in`, which none of those utilities can collide with, and it
+is gated on `data-reveal-waiting` — set only for an element that was actually
+hidden below the fold — so marking the fold as shown can never animate content
+the reader is already looking at. `check:reveals` fails if a transition
+reappears on `.reveal` or if the animation is no longer wired to that marker,
+and `check:hydration` fails if the marker stops being set at runtime; three
+further mutations (a transition back on `.reveal`, the animation rule deleted,
+the marker renamed in the built bundle) confirm both fail.
 
 ## Fonts: 96 files for a site with no Cyrillic
 
@@ -187,6 +204,12 @@ quick-installer step, and the `check:no-new-privileges` and `check:data-inventor
 steps — are kept as a ready patch (`wincraft-ci-workflows.patch`, applied in the
 working tree) to push once the permission is granted. Those two gates currently run
 only in the root `npm run check` chain, which CI does not call.
+
+Something outside this branch keeps any of it from being live: the site deploy
+has failed on every run since the site was added, at `actions/configure-pages`,
+with `HttpError: Not Found` from the Pages API — GitHub Pages is not enabled (or
+not reachable) for this repository, so nothing from this branch has been
+published to wincraft.app by it.
 
 The disposable PostgreSQL 18.4 binaries, database files and generated local certificate fixtures stayed outside Git in an excluded cache directory. CI is configured to use PostgreSQL 16; that CI job has not been run from this unpushed working tree. Local databases were stopped after verification.
 

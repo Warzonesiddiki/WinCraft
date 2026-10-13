@@ -28,9 +28,10 @@ import {
  *      is marked shown immediately — never hidden, not even for a frame — so
  *      the fold never flashes and the LCP element is never in question.
  *   3. Only then does the group set `data-reveal-armed`, the one thing that
- *      lets the stylesheet hide an element, and only elements below the fold
- *      are waiting on it. Nothing is hidden unless its observer is already
- *      running, which is the invariant the old version did not have.
+ *      lets the stylesheet hide an element, and only elements below the fold —
+ *      marked `data-reveal-waiting`, the second thing the entrance animation
+ *      needs — are waiting on it. Nothing is hidden unless its observer is
+ *      already running, which is the invariant the old version did not have.
  *   4. `prefers-reduced-motion: reduce` never hides anything, and neither does
  *      a browser without IntersectionObserver: the effect simply returns.
  *
@@ -113,12 +114,29 @@ export function useReveal<T extends HTMLElement = HTMLDivElement>() {
     // is on, nothing is ever hidden, so there is nothing to reveal later.
     if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
 
+    /** Reveals one element and lets the animation go.
+     *
+     *  `data-reveal-waiting` is what tells the stylesheet this element was
+     *  really hidden, so it is the only one that animates back in. It is
+     *  dropped when the animation ends: the element is then a plain visible
+     *  element again, and a later mutation cannot re-order it into a second
+     *  entrance. */
+    const reveal = (element: HTMLElement) => {
+      element.setAttribute("data-revealed", "");
+      const settled = () => {
+        element.removeAttribute("data-reveal-waiting");
+        element.removeEventListener("animationend", settled);
+        element.removeEventListener("animationcancel", settled);
+      };
+      element.addEventListener("animationend", settled);
+      element.addEventListener("animationcancel", settled);
+      observer.unobserve(element);
+    };
+
     const observer = new IntersectionObserver(
       (entries) => {
         for (const entry of entries) {
-          if (!entry.isIntersecting) continue;
-          entry.target.setAttribute("data-revealed", "");
-          observer.unobserve(entry.target);
+          if (entry.isIntersecting) reveal(entry.target as HTMLElement);
         }
       },
       // A section starts animating as its top approaches the viewport; a short
@@ -144,12 +162,18 @@ export function useReveal<T extends HTMLElement = HTMLDivElement>() {
       const fold = window.innerHeight * 0.88;
       const elements = Array.from(root.querySelectorAll<HTMLElement>(".reveal"));
       elements.forEach((element, index) => {
-        // Document order, so the section's children stagger the way the
-        // library's `staggerChildren` used to stagger them.
-        element.style.setProperty("--reveal-order", String(index));
         if (element.hasAttribute("data-revealed")) return;
-        if (element.getBoundingClientRect().top < fold) element.setAttribute("data-revealed", "");
-        else observer.observe(element);
+        // Document order, so the section's children stagger the way the
+        // library's `staggerChildren` used to stagger them. Only elements that
+        // have not been revealed get an order: rewriting it under an element
+        // that already animated would restart its delay.
+        element.style.setProperty("--reveal-order", String(index));
+        if (element.getBoundingClientRect().top < fold) {
+          element.setAttribute("data-revealed", "");
+          return;
+        }
+        element.setAttribute("data-reveal-waiting", "");
+        observer.observe(element);
       });
     };
 
