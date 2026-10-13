@@ -2065,3 +2065,80 @@ Ranked by value per unit of risk. None of these are started.
     what is left there is the part worth testing next: the section routing, the
     mount reads and the toasts. It needs the workspace's own reads mocked and the
     locale table accepted, which makes it the heaviest single test in the tree.
+
+## Third pass — the runs, and the links audit
+
+### CI is green, and four steps ran here for the first time
+
+Run `38432375696` on `arena/0a0ad37e-wincraft` (head `e26aff1`) completed all 26
+steps of `checks.yml`: TypeScript, ESLint, Prettier, the six model suites, the
+component suite with its coverage ratchet, the translation, design-token,
+public-count, workflow and starter-profile gates, the Rust unit tests,
+**Isolated native policy tests** (the 20 `cargo test --lib` filters), **Live DPC
+capture**, **Native power policies on a disposable inactive plan** and **Backend
+unit tests** — the last four never having run in this lineage, because step 22
+failed before them every time.
+
+Two things had to be true for that: the branch had to compile, and a real
+assertion had to hold. It did not compile at `9338a66`'s parent — six
+`Category::System` variants that do not exist, a non-exhaustive `RegValue` match
+in `dns.rs` and a missing import — and once it compiled, step 22 panicked in
+`no_value_is_written_twice_or_by_another_tweak` because `HKLM\SOFTWARE\Policies\Microsoft\Edge\HubsSidebarEnabled`
+had two owners. The value was given back to its dedicated control; the
+assertion was left exactly as it was.
+
+### What the links audit found
+
+Holding the public claims against the published artifacts found one rename
+applied to the reachable half. The alias workflow still uploads
+`PCTweaker-Setup.exe`; the site had been rewritten to ask for
+`WinCraft-Setup.exe`; the Uninstaller card asked for
+`WinCraftUninstaller-Setup.exe` in a repository that has never hosted an
+Uninstaller release; the winget identifier in the README, the site and the
+launch kit (`Warzonesiddiki.WinCraft`) has never existed in winget-pkgs, whose
+package is `AurelioAvila.PCTweaker`; `docs/pad.xml` pointed its 1.18.1 download
+at this repository instead of the one that published it and called the licence
+"Proprietary terms"; and the 1.19.0 changelog entry, the launch kit and an
+Instagram caption still carried 81 controls, a €9.99/month Pro tier, five
+languages and ten themes. All are fixed, and each fix is guarded by a gate that
+was verified by reverting it:
+
+- `scripts/check-download-links.mjs` (`npm run check:download-links`, and inside
+  CI through `src/repo-gates.test.ts`): stable aliases come from the workflow
+  that uploads them, WinGet identifiers from the workflow that submits them,
+  and cross-repository aliases are listed with the reason they cannot be
+  derived.
+- `scripts/check-public-counts.mjs` now also reads the changelog section for the
+  version being shipped and the launch kit, allows a modifier between a number
+  and its noun, and rejects a non-zero price.
+
+### Still open, with the blocker named
+
+14. **GitHub Pages** — owner, or the held patch. Every deploy run fails at
+    `actions/configure-pages` with `Get Pages site failed … Not Found` because
+    the repository has no Pages site; `PUT /pages`, `PATCH has_pages=true` and
+    `POST /pages/builds` all answer 403 "Resource not accessible by integration"
+    for this credential. Settings → Pages → Source = GitHub Actions, once, or
+    apply `docs/workflows-pending.patch`, which passes `enablement: true` so the
+    workflow creates the site itself.
+15. **The two held workflow patches** — `docs/checks-annotation.patch` and
+    `docs/workflows-pending.patch`; see
+    [docs/ci-workflow-changes.md](docs/ci-workflow-changes.md).
+16. **A signature-verified release in this repository** — owner. The published
+    1.19.0 is a pre-release and unsigned (`verify-authenticode.ps1` reports
+    `NotSigned`), so the stable alias does not exist, the updater endpoint has no
+    `latest.json` to serve, and `install.ps1` fails closed by design. Nothing
+    here can sign a Windows binary.
+17. **Backend database tests in CI** — the `backend` job in the held patch starts
+    a `postgres:16` service and sets `TEST_DATABASE_URL`; without it three tests
+    (transaction rollback, account deletion eligibility, retention) skip
+    themselves. Verified locally against PostgreSQL 17: 197 pass, 0 skipped.
+18. **`install.ps1`'s failure message** — it fails closed today, and what a user
+    sees is a raw 404 from the stable alias URL. A clearer message is a small
+    edit to a security-relevant script that cannot be verified in this sandbox
+    (no PowerShell); run `scripts/test-quick-installer.ps1` on Windows with it.
+
+Items 1–13 above stand as written: the clippy and unwrap sweep, the axe pass on
+a real browser, the packaged-build smoke test, mounting `App.tsx`, the Redaxa
+card decision, and the coverage ratchet — all of them needing a tool or a runner
+this environment does not have.

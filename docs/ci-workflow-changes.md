@@ -48,31 +48,47 @@ script, `npm run` and `.ps1` a workflow names against the tree and
 `package.json`, and runs in `checks.yml` as its own step. It is part of
 `npm run check` too, so it is enforced locally as well.
 
-## Pending patch: the Rust-step annotations
+## Pending patches: two files, one blocker
 
-One further change to `checks.yml` is **not applied**, because the connection
-this work runs through is again a GitHub App installation without the
-`workflows` permission:
+Further changes are **not applied**, because the connection this work runs
+through is again a GitHub App installation without the `workflows` permission:
 
 ```
 refusing to allow a GitHub App to create or update workflow
 `.github/workflows/checks.yml` without `workflows` permission
 ```
 
-The change is in `docs/checks-annotation.patch`. It replaces the
-`Rust unit tests` step's plain `npm run check:rust` with a run that captures
-cargo's output, prints it, and re-emits the lines that matter — `error[E…]`,
-`warning: unused`, `panicked at`, `test result: FAILED`, the failing test's
-`----` header — as `::error::` annotations. A failed run's log is a download
-that few people open, and the reason sits hundreds of lines above the last
-line; the annotations are what the run page and the checks API show.
+Both patches are held rather than dropped — they are the two halves of work
+whose point is not to rot:
 
-Apply it on a copy of the repository whose credential has the `workflows`
-permission:
+| Patch                            | Touches                                | What it does                                                                                                                                                                                                                                                                                                       |
+| -------------------------------- | -------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `docs/checks-annotation.patch`   | `checks.yml`                           | Replaces the `Rust unit tests` step's plain `npm run check:rust` with a run that captures cargo's output and re-emits the lines that matter — `error[E…]`, `warning: unused`, `panicked at`, `test result: FAILED`, the failing test's `----` header — as `::error::` annotations. A failed run's log is a download that few people open, and the reason sits hundreds of lines above the last line; annotations are what the run page and the checks API show. |
+| `docs/workflows-pending.patch`   | `checks.yml`, `deploy-site.yml`        | Adds the offline Quick installer regression suite (`scripts/test-quick-installer.ps1`) as a CI step; adds a `backend` job with a `postgres:16` service and `TEST_DATABASE_URL` + `DATABASE_ALLOW_PLAINTEXT` so the three database tests stop being skipped; and passes `enablement: true` to `actions/configure-pages` so the site deploy can create the Pages site, which is the one thing every deploy job has failed on so far.               |
+
+Apply either with:
 
 ```sh
 git apply docs/checks-annotation.patch
+git apply docs/workflows-pending.patch
 ```
+
+The `workflows-pending` patch moves three checks into CI that currently run
+elsewhere or not at all:
+
+- `scripts/check-no-new-privileges.mjs` and `scripts/check-data-inventory.mjs`
+  have no step in `checks.yml`. They are enforced anyway: `src/repo-gates.test.ts`
+  runs them through the Vitest suite, which is a step in that workflow, so a
+  red gate still fails the run. The patch is the tidier home, not the only
+  enforcement.
+- `scripts/test-quick-installer.ps1` is Windows-only and has never run in CI.
+  Until the patch lands, the quick installer's signature checks are covered by
+  reading, not by a runner.
+- the three PostgreSQL-backed backend tests (transaction rollback, account
+  deletion eligibility, retention) skip themselves without `TEST_DATABASE_URL`,
+  which is the state CI has been in: 194 passing, 3 skipped. With the job in
+  the patch they run against a real server, which is how they were verified
+  locally (197 passing, 0 skipped).
 
 It is held back rather than dropped because the two workflow test steps this
 project has already had that "ran" for several releases without ever

@@ -1,12 +1,49 @@
 # Changelog
 
+## Unreleased
+
+Fixes found by holding 1.19.0's published claims against the artifacts it
+actually shipped. Nothing here changes what the app does; every change makes a
+public statement true, and each one has a gate behind it.
+
+- **The Edge sidebar control has one owner again.** `disable_edge_ai` no longer
+  writes `HubsSidebarEnabled`, which `disable_edge_hub_sidebar` sets, and its
+  description says where the sidebar switch lives. The VM matrix records the
+  single owner, and the Rust test that compares it to the catalogue fails if a
+  second control writes the same value.
+- **Six catalogue entries were renamed or retargeted.** `disable_activity_feed`
+  → `disable_consumer_experiences`, `disable_publish_user_activities` →
+  `disable_cloud_clipboard`, `disable_bing_widget_search` →
+  `disable_error_reporting`, `disable_inventory_telemetry` →
+  `disable_diagtrack_autologger`, `disable_sqm_telemetry` → `SQMLogger`, and
+  `disable_ndu` writes the Ndu service key; the web-search control now writes
+  `DisableSearchBoxSuggestions` instead of a value Windows ignores. The six
+  locale tables were renamed with them.
+- **Download links point at files that exist.** The site's download button and
+  its structured data now name the stable alias the release workflow uploads
+  (`PCTweaker-Setup.exe`), the Uninstaller links point at the Uninstaller's own
+  repository (`AurelioAvila/pc-tweaker-uninstaller`), and the Product Hunt and
+  YouTube kit no longer carries a paid tier, a dead WinGet identifier or the
+  pre-1.19 control count. `npm run check:download-links` fails the build when a
+  link and the workflow that publishes its file disagree.
+- **WinGet instructions name the published package**, `AurelioAvila.PCTweaker`.
+  `Warzonesiddiki.WinCraft` was never submitted to winget-pkgs, so the badge,
+  the install command in the README and the one on the website all described a
+  package that does not exist.
+- **`docs/pad.xml`, the publisher PAD feed, points its 1.18.1 download at the
+  repository that published that release** and states the MIT licence instead of
+  "Proprietary terms" — the feed's own hash and file size now match the file it
+  links to.
+- **Dependencies:** `ed25519-dalek` and the five orphaned permission files left
+  behind by the retired licence machinery are gone.
+
 ## v1.19.0
 
-WinCraft 1.19.0 is the first release built after the desktop app was made free and open source. The licence gate is gone from the shipped code, every one of the 81 controls is available to everyone, and the release gates that were supposed to prove it are now wired into CI so a regression is caught on the push that causes it rather than on release day.
+WinCraft 1.19.0 is the first release built after the desktop app was made free and open source. The licence gate is gone from the shipped code, every one of the 141 controls is available to everyone, and the release gates that were supposed to prove it are now wired into CI so a regression is caught on the push that causes it rather than on release day.
 
-- Every feature is free, permanently. All 81 controls, every panel and every tool: no subscription, no licence key, no expiring trial, no account required to tune anything. The desktop app no longer contains a licence check, a signed licence store or a debug-only unlock path; those were removed rather than hidden. The Plans & pricing page states the single plan there is.
+- Every feature is free, permanently. All 141 controls, every panel and every tool: no subscription, no licence key, no expiring trial, no account required to tune anything. The desktop app no longer contains a licence check, a signed licence store or a debug-only unlock path; those were removed rather than hidden. The Plans & pricing page states the single plan there is.
 - Tailored workflow profiles & Barebone (Atlas OS 0.5.2 level) optimization: added "Browser Only", "Browser + MS Office", and "Barebone" starter profiles and debloat presets to cater to diverse user workflows with tailored optimizations while maintaining WinCraft's 100% reversible snapshot engine.
-- The catalogue is no longer split. The `requires_pro` flag was cleared on all 81 controls, so there is no paid/free split left to state anywhere. The build now fails if any public text — the README, the site, the Store listings, or the release notes for the version being shipped — reintroduces a split or quotes a different total.
+- The catalogue is no longer split. The `requires_pro` flag was cleared on all 141 controls, so there is no paid/free split left to state anywhere. The build now fails if any public text — the README, the site, the Store listings, or the release notes for the version being shipped — reintroduces a split or quotes a different total.
 - English is the language on first launch, whatever the Windows or WebView language says; a language you choose in the menu is remembered. Portuguese is European Portuguese, in the menu and for dates and numbers.
 - The other five language tables load on demand instead of shipping in the entry chunk, which is about 228 kB; each non-English table is fetched the first time it is used.
 - Accessibility work: `lifetime-tools`, `starter-profiles` and the Before & After panel now have axe-clean suites, and the heading outline a screen-reader user would have felt was repaired.
