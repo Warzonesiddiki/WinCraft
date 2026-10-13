@@ -1515,7 +1515,8 @@ export const it: Strings = {
     },
     disable_bing_search: {
       name: "Disattiva ricerca Bing nel menu Start",
-      description: "Impedisce che le tue ricerche nel menu Start vengano inviate a Bing.",
+      description:
+        "Applica il criterio Explorer che tiene i risultati web e i suggerimenti di Bing fuori dalla ricerca di Start, così la ricerca resta su questo PC. Impostazioni lo mostrerà come gestito dall'organizzazione: è così che Windows indica i criteri.",
     },
     power_plan_performance: {
       name: "Prestazioni elevate (piano di alimentazione)",
@@ -1810,20 +1811,20 @@ export const it: Strings = {
       description:
         "Impedisce alla telemetria di diagnostica di Windows di riservare e scrivere database di cache locali sul disco.",
     },
-    disable_activity_feed: {
-      name: "Disattiva feed attività e sequenza temporale di Windows",
+    disable_consumer_experiences: {
+      name: "Disattiva le esperienze per i consumatori di Microsoft",
       description:
-        "Impedisce a Windows di generare grafici temporali e tracciare le attività utente tra dispositivi.",
+        "Attiva il criterio che impedisce a Windows di installare automaticamente app dello Store promosse, app suggerite e suggerimenti per i consumatori. Impostazioni lo mostrerà come gestito dall'organizzazione: è così che Windows indica i criteri. Le app installate da te non vengono rimosse.",
     },
-    disable_publish_user_activities: {
-      name: "Disattiva pubblicazione delle attività utente nel cloud",
+    disable_cloud_clipboard: {
+      name: "Disattiva la sincronizzazione degli appunti tra dispositivi",
       description:
-        "Impedisce a Windows di pubblicare la cronologia delle attività nei servizi cloud Microsoft.",
+        "Applica il criterio che impedisce a Windows di sincronizzare il contenuto degli appunti con il tuo account Microsoft e gli altri tuoi dispositivi. Gli appunti di questo PC continuano a funzionare come prima. Il ripristino rimuove il criterio.",
     },
-    disable_bing_widget_search: {
-      name: "Disattiva Widget e feed di Windows 11",
+    disable_error_reporting: {
+      name: "Disattiva la segnalazione errori di Windows",
       description:
-        "Disattiva il riquadro dei widget di Windows 11 e la sincronizzazione dei feed web in background.",
+        "Attiva il criterio che impedisce a Windows di inviare a Microsoft i rapporti sugli arresti anomali e sui blocchi. Windows continua a mostrarti l'errore, ma non viene inviato alcun rapporto. Il ripristino rimuove il criterio.",
     },
     disable_typing_insights: {
       name: "Disattiva dati di digitazione e statistiche",
@@ -1871,14 +1872,14 @@ export const it: Strings = {
         "Impedisce a Microsoft Store di inviare installazioni di app a questo PC da remoto dal Web.",
     },
     disable_sqm_telemetry: {
-      name: "Disattiva client telemetria SQM",
+      name: "Disattiva la sessione di autologging SQM",
       description:
-        "Disattiva l'invio dei dati del client SQM (Software Quality Metrics) nei componenti di Windows.",
+        "Disattiva la sessione di autologging SQMLogger: la traccia Software Quality Metrics che alimenta il client CEIP di Microsoft non parte più all'avvio. Windows può riattivare la sessione con un aggiornamento; riapplica il controllo se ritorna. Il ripristino riscrive il valore Start originale.",
     },
-    disable_inventory_telemetry: {
-      name: "Disattiva inventario compatibilità applicazioni",
+    disable_diagtrack_autologger: {
+      name: "Disattiva la sessione di autologging DiagTrack",
       description:
-        "Impedisce a Windows Application Experience di compilare elenchi di inventario delle app installate.",
+        "Disattiva la sessione AutoLogger-Diagtrack-Listener: la traccia diagnostica usata dal servizio DiagTrack non parte più all'avvio. Il servizio non viene toccato: si ferma solo la sessione di traccia, non il servizio. Il ripristino riscrive il valore Start originale.",
     },
     disable_compatibility_assistant: {
       name: "Disattiva Assistente compatibilità programmi",

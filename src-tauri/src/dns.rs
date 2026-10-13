@@ -208,7 +208,13 @@ fn read_dns(guid: &str) -> Result<(bool, Vec<String>), String> {
     {
         None => configured_dns(None),
         Some(RegValue::Str(value)) => configured_dns(Some(&value)),
-        Some(RegValue::Dword(_)) => Err("The adapter has an unsupported DNS configuration".into()),
+        // Every other registry type — REG_DWORD, REG_QWORD, REG_EXPAND_SZ,
+        // REG_MULTI_SZ, REG_BINARY — is a configuration this control never
+        // writes and could not put back byte-for-byte, so it is reported
+        // rather than rewritten. Keep this arm exhaustive: `RegValue` gained
+        // five variants and a `Some(RegValue::Dword(_))` arm here stopped the
+        // Windows build with E0004.
+        Some(_) => Err("The adapter has an unsupported DNS configuration".into()),
     }
 }
 

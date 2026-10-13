@@ -47,3 +47,33 @@ CI had never executed. `scripts/check-workflow-scripts.mjs` now resolves every
 script, `npm run` and `.ps1` a workflow names against the tree and
 `package.json`, and runs in `checks.yml` as its own step. It is part of
 `npm run check` too, so it is enforced locally as well.
+
+## Pending patch: the Rust-step annotations
+
+One further change to `checks.yml` is **not applied**, because the connection
+this work runs through is again a GitHub App installation without the
+`workflows` permission:
+
+```
+refusing to allow a GitHub App to create or update workflow
+`.github/workflows/checks.yml` without `workflows` permission
+```
+
+The change is in `docs/checks-annotation.patch`. It replaces the
+`Rust unit tests` step's plain `npm run check:rust` with a run that captures
+cargo's output, prints it, and re-emits the lines that matter — `error[E…]`,
+`warning: unused`, `panicked at`, `test result: FAILED`, the failing test's
+`----` header — as `::error::` annotations. A failed run's log is a download
+that few people open, and the reason sits hundreds of lines above the last
+line; the annotations are what the run page and the checks API show.
+
+Apply it on a copy of the repository whose credential has the `workflows`
+permission:
+
+```sh
+git apply docs/checks-annotation.patch
+```
+
+It is held back rather than dropped because the two workflow test steps this
+project has already had that "ran" for several releases without ever
+executing showed what an unread failure costs.
