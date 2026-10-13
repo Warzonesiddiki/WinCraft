@@ -3,6 +3,7 @@
 **Document Version:** 1.0.0  
 **Date:** October 13, 2026  
 **Scope:** Synthesis and integration of proven optimizations, registry keys, and debloat definitions from previous optimization repositories:
+
 1. **`Warzonesiddiki/winforge`** (240 structured tweaks, operation sets, rollback schemas)
 2. **`Warzonesiddiki/Win11Debloat`** (105 `.reg` files, 119 features, AI/Copilot/Recall presets)
 3. **`Warzonesiddiki/Win-Debloat-Tools`** (Low-End PC performance, memory optimization, privacy hardening)
@@ -36,14 +37,15 @@
 ## 2. Key Optimizations Harvested
 
 ### 2.1 Low-End PC & Memory Management (`Win-Debloat-Tools`)
+
 1. **`Ndu` High Non-Paged Pool RAM Leak Fix:**
    - Path: `HKLM\SYSTEM\ControlSet001\Services\Ndu`
    - Name: `Start` = `4` (Disabled)
-   - *Impact:* Prevents Windows Network Diagnostic Usage driver from leaking gigabytes of non-paged RAM during high network throughput.
+   - _Impact:_ Prevents Windows Network Diagnostic Usage driver from leaking gigabytes of non-paged RAM during high network throughput.
 2. **Dynamic `SvcHostSplitThresholdInKB`:**
    - Path: `HKLM\SYSTEM\CurrentControlSet\Control`
    - Name: `SvcHostSplitThresholdInKB` = `0xFFFFFFFF` (or total RAM in KB)
-   - *Impact:* Reduces idle background process count from ~180 down to ~70 on systems with >4 GB RAM.
+   - _Impact:_ Reduces idle background process count from ~180 down to ~70 on systems with >4 GB RAM.
 3. **Visual Performance Acceleration:**
    - Path: `HKCU\Control Panel\Desktop`
    - `MenuShowDelay` = `"10"`, `HungAppTimeout` = `"1000"`, `WaitToKillServiceTimeout` = `"2000"`, `AutoEndTasks` = `"1"`.
@@ -51,6 +53,7 @@
 ---
 
 ### 2.2 Deep Privacy & Telemetry Lockdown (`Win11Debloat` & `winforge`)
+
 1. **Full Content Delivery Manager Teardown:**
    - `ContentDeliveryAllowed = 0`
    - `FeatureManagementEnabled = 0`
@@ -67,6 +70,7 @@
 ---
 
 ### 2.3 Shell & Desktop Modernization (`Win11Debloat`)
+
 1. **Explorer Clutter Removal:**
    - Hide Gallery: `HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Desktop\NameSpace_36329700\{e88865ea-0e1c-4e20-9aa6-ed353b709b61}`
    - Hide Home / Quick Access sync provider notifications: `ShowSyncProviderNotifications = 0`

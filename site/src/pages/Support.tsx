@@ -1,7 +1,6 @@
 import { useState, type FormEvent } from "react";
-import { motion } from "framer-motion";
 import { text } from "../i18n/dictionary";
-import { riseChild, staggerParent, viewportOnce } from "../motion";
+import { Reveal, RevealGroup } from "../reveal";
 import { ApiError, postSupportRequest } from "../api";
 import { Field, FormError, Select, SubmitButton, TextArea, TextInput } from "../components/Form";
 import { Link } from "../router";
@@ -185,46 +184,34 @@ function SupportForm() {
 export function SupportPage({ navigate }: { navigate: (to: string) => void }) {
   return (
     <main id="main-content" className="px-5 pt-32 pb-24 md:px-12">
-      <motion.div
-        className="mx-auto max-w-7xl"
-        variants={staggerParent}
-        initial="hidden"
-        whileInView="show"
-        viewport={viewportOnce}
-      >
-        <motion.div
-          variants={riseChild}
-          className="font-mono-t mb-4 text-[11.5px] tracking-[0.18em] text-[var(--fg-dim)]"
-        >
+      <RevealGroup className="mx-auto max-w-7xl">
+        <Reveal className="font-mono-t mb-4 text-[11.5px] tracking-[0.18em] text-[var(--fg-dim)]">
           <span className="text-accent">{t.tag.split(" / ")[0]}</span> / {t.tag.split(" / ")[1]}
-        </motion.div>
-        <motion.h1
-          variants={riseChild}
+        </Reveal>
+        <Reveal
+          as="h1"
           className="font-display max-w-3xl text-[clamp(2rem,4.4vw,3.4rem)] leading-[1.05] font-bold tracking-tight text-[var(--fg)]"
         >
           {t.title}
-        </motion.h1>
-        <motion.p
-          variants={riseChild}
+        </Reveal>
+        <Reveal
+          as="p"
           className="mt-6 max-w-2xl text-[15.5px] leading-relaxed text-[var(--fg-dim)]"
         >
           {t.intro}
-        </motion.p>
+        </Reveal>
 
-        <motion.h2
-          variants={riseChild}
-          className="font-display mt-16 text-[22px] font-bold text-[var(--fg)]"
-        >
+        <Reveal as="h2" className="font-display mt-16 text-[22px] font-bold text-[var(--fg)]">
           {t.selfServeTitle}
-        </motion.h2>
-        <motion.div variants={riseChild} className="mt-6 grid gap-5 md:grid-cols-2">
+        </Reveal>
+        <Reveal className="mt-6 grid gap-5 md:grid-cols-2">
           {t.selfServe.map((item) => (
             <SelfServeCard key={item.q} q={item.q} a={item.a} />
           ))}
-        </motion.div>
+        </Reveal>
 
         <div className="mt-20 grid gap-12 lg:grid-cols-12">
-          <motion.aside variants={riseChild} className="lg:col-span-4">
+          <Reveal as="aside" className="lg:col-span-4">
             <h2 className="font-display text-[20px] leading-snug font-bold text-[var(--fg)]">
               {t.beforeTitle}
             </h2>
@@ -246,13 +233,13 @@ export function SupportPage({ navigate }: { navigate: (to: string) => void }) {
             >
               ← {t.backHome}
             </Link>
-          </motion.aside>
+          </Reveal>
 
-          <motion.div variants={riseChild} className="lg:col-span-8">
+          <Reveal className="lg:col-span-8">
             <SupportForm />
-          </motion.div>
+          </Reveal>
         </div>
-      </motion.div>
+      </RevealGroup>
     </main>
   );
 }

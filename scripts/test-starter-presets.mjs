@@ -27,11 +27,11 @@ const catalog = preset.tweaks.map((t, i) => ({
   applied: i === 0,
   requires_pro: i === 1,
 }));
-let selection = presetSelection(
-  preset,
-  catalog,
-  ["disable_game_dvr", "reduce_input_lag", "untrusted"],
-);
+let selection = presetSelection(preset, catalog, [
+  "disable_game_dvr",
+  "reduce_input_lag",
+  "untrusted",
+]);
 assert.deepEqual(
   selection.pending.map((t) => t.id),
   ["reduce_input_lag"],
@@ -82,3 +82,10 @@ for (const p of STARTER_PRESETS)
 console.log(
   "Starter profile checks passed: catalog, reachable scope, selection, already applied and unavailable.",
 );
+
+for (const preset of STARTER_PRESETS) {
+  assert.ok(
+    !preset.tweaks.some((t) => t.id === "auto_end_frozen_tasks" && t.selected),
+    "Forced app termination must never be selected by default",
+  );
+}

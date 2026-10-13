@@ -32,6 +32,7 @@ The WinCraft 2.0 architecture was subjected to a rigorous failure-mode, threat-m
 ## 2. In-Depth Domain Risk Analysis & Mitigations
 
 ### 2.1 Privilege Boundaries & Elevation Safety
+
 - **Risk:** Running the entire application with permanent administrative privileges violates the principle of least privilege, exposing the user interface to untrusted web content or elevation exploits. Conversely, requiring repeated UAC prompts frustrates users.
 - **Architectural Solution:**
   - **Dual-Process Architecture:** The React/Tauri UI runs strictly as an **unprivileged medium-integrity process** (`requires_admin: false`).
@@ -41,6 +42,7 @@ The WinCraft 2.0 architecture was subjected to a rigorous failure-mode, threat-m
 ---
 
 ### 2.2 Servicing & Windows Update Compatibility (The "Zero-Brick" Invariant)
+
 - **Risk:** Stripping tools (AtlasOS, Tiny11) remove files from `%SystemRoot%\WinSxS` or disable servicing stack components. When Microsoft releases monthly cumulative updates (LCU), the update installer detects missing manifests, fails with error `0x800f0922` or `0x800f081f`, and rolls back or leaves Windows in an unbootable state.
 - **Architectural Solution:**
   - **Never Delete System Binaries:** WinCraft **never touches `%SystemRoot%\WinSxS`** or deletes DLLs/EXEs from `System32`.
@@ -51,6 +53,7 @@ The WinCraft 2.0 architecture was subjected to a rigorous failure-mode, threat-m
 ---
 
 ### 2.3 Registry & Access Control List (ACL) Edge Cases
+
 - **Risk:** Some Windows keys (e.g. `SYSTEM\CurrentControlSet\Control\WMI\Autologger` or `InprocServer32` CLSIDs) have restrictive ACL permissions (e.g. `TrustedInstaller` ownership) or operate under 32-bit / 64-bit registry reflection (`WOW6432Node`).
 - **Architectural Solution:**
   - **Explicit WOW64 Handling:** The Rust registry adapter uses `KEY_WOW64_64KEY` to ensure 64-bit registry paths are targeted accurately on 64-bit Windows builds.
@@ -60,6 +63,7 @@ The WinCraft 2.0 architecture was subjected to a rigorous failure-mode, threat-m
 ---
 
 ### 2.4 Volume Shadow Copy (VSS) Restore Point Fallbacks
+
 - **Risk:** On Windows Home editions, OEM installations, or devices with low free disk space, System Protection / VSS is frequently turned off by default. Attempting to force a restore point creation via WMI can throw `0x80042306` (VSS provider error) and block the user from optimizing their PC.
 - **Architectural Solution:**
   - **Non-Blocking Pre-Flight Check:** WinCraft checks whether System Protection is enabled on the system drive (`C:`).
@@ -68,17 +72,19 @@ The WinCraft 2.0 architecture was subjected to a rigorous failure-mode, threat-m
 ---
 
 ### 2.5 Windows Version & Build Divergence (Win 11 24H2 vs 23H2 vs Win 10)
+
 - **Risk:** Modern Windows 11 builds (e.g. 24H2 Build 26100+) introduce new AI subsystems (Recall, Click to Do, AI Fabric) that do not exist on Windows 10 (21H2/22H2) or older Windows 11 builds. Applying irrelevant tweaks creates registry clutter or displays confusing options to users.
 - **Architectural Solution:**
   - **Build-Aware Capability Filtering:** The backend detects the OS build number via `RtlGetVersion` and filters the catalogue:
-    - *Windows 11 24H2+ Only:* Windows Recall, Click to Do AI Actions, AI Copilot Fabric.
-    - *Windows 11 (All Builds):* Classic Context Menu CLSID override, Taskbar Widgets (`TaskbarDa`), Centered Taskbar.
-    - *Windows 10 & 11:* Telemetry lockdown, SvcHost splitting, Game DVR, DPC latency tuning, MMCSS.
+    - _Windows 11 24H2+ Only:_ Windows Recall, Click to Do AI Actions, AI Copilot Fabric.
+    - _Windows 11 (All Builds):_ Classic Context Menu CLSID override, Taskbar Widgets (`TaskbarDa`), Centered Taskbar.
+    - _Windows 10 & 11:_ Telemetry lockdown, SvcHost splitting, Game DVR, DPC latency tuning, MMCSS.
   - **Unsupported Tweak Graceful Handling:** Controls incompatible with the active OS build are marked `Unavailable` in the UI with a helpful explanation rather than hidden unpredictably.
 
 ---
 
 ### 2.6 Multi-Architecture Support (x86_64 vs ARM64 Snapdragon X Elite)
+
 - **Risk:** With the emergence of Copilot+ PCs running Qualcomm Snapdragon X Elite (ARM64), certain x86-specific driver and kernel tweaks (such as x86 timer resolution drivers or AMD X3D cache steering) are invalid or behave differently.
 - **Architectural Solution:**
   - **Architecture Probing:** WinCraft queries system architecture at startup (`x86_64` vs `aarch64`).
@@ -90,6 +96,7 @@ The WinCraft 2.0 architecture was subjected to a rigorous failure-mode, threat-m
 ---
 
 ### 2.7 Antivirus & Game Integrity System Safety
+
 - **Risk:** Aggressive debloat scripts often execute PowerShell one-liners or download unsigned binaries from third-party hosts, triggering Windows Defender SmartScreen blocks or triggering game integrity alerts in competitive games.
 - **Architectural Solution:**
   - **Zero External Script Downloads:** WinCraft is self-contained; it never downloads unsigned `.ps1`, `.bat`, or `.exe` payloads from the internet at runtime.
@@ -99,6 +106,7 @@ The WinCraft 2.0 architecture was subjected to a rigorous failure-mode, threat-m
 ---
 
 ### 2.8 Internationalization & Localization Invariants
+
 - **Risk:** Adding ~70 new controls and 9 starter profiles across 6 supported languages (`en`, `it`, `fr`, `es`, `de`, `pt-PT`) can cause translation drift, untranslated English strings leaking into localized interfaces, or broken `{count}` placeholders causing runtime UI crashes.
 - **Architectural Solution:**
   - **Automated Placeholder Linting (`scripts/check-i18n.mjs`):** Enforces 100% key parity across all 6 locales and validates that all interpolation variables match identically.

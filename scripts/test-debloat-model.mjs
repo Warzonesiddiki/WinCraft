@@ -3,7 +3,9 @@ import fs from "node:fs";
 const output = new URL(".debloat-model-test-bundle.mjs", import.meta.url);
 try {
   await build({
-    entryPoints: [new URL("test-debloat-model.ts", import.meta.url).pathname.replace(/^\/(\w:)/, "$1")],
+    entryPoints: [
+      new URL("test-debloat-model.ts", import.meta.url).pathname.replace(/^\/(\w:)/, "$1"),
+    ],
     bundle: true,
     platform: "node",
     format: "esm",

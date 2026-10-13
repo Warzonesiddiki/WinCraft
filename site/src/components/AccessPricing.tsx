@@ -1,6 +1,5 @@
-import { motion } from "framer-motion";
 import { text } from "../i18n/dictionary";
-import { riseChild, staggerParent, viewportOnce } from "../motion";
+import { Reveal, RevealGroup } from "../reveal";
 import { DOWNLOAD_EXE } from "../constants";
 
 /**
@@ -17,29 +16,19 @@ export function AccessPricing() {
 
   return (
     <section id="access" className="border-t border-white/5 px-5 py-24 md:px-12">
-      <motion.div
-        className="mx-auto max-w-7xl"
-        variants={staggerParent}
-        initial="hidden"
-        whileInView="show"
-        viewport={viewportOnce}
-      >
-        <motion.div
-          variants={riseChild}
-          className="font-mono-t mb-4 text-[11.5px] tracking-[0.18em] text-[var(--fg-dim)]"
-        >
+      <RevealGroup className="mx-auto max-w-7xl">
+        <Reveal className="font-mono-t mb-4 text-[11.5px] tracking-[0.18em] text-[var(--fg-dim)]">
           <span className="text-accent">{text.pricing.tag.split(" / ")[0]}</span> /{" "}
           {text.pricing.tag.split(" / ")[1]}
-        </motion.div>
-        <motion.h2
-          variants={riseChild}
+        </Reveal>
+        <Reveal
+          as="h2"
           className="font-display text-[clamp(1.8rem,3.6vw,2.8rem)] font-bold tracking-tight text-[var(--fg)]"
         >
           {text.pricing.title}
-        </motion.h2>
+        </Reveal>
 
-        <motion.div
-          variants={riseChild}
+        <Reveal
           className="glow-accent mt-14 rounded-2xl border p-9"
           style={{
             borderColor: "var(--accent-glow)",
@@ -67,15 +56,12 @@ export function AccessPricing() {
           >
             {free.cta}
           </a>
-        </motion.div>
+        </Reveal>
 
-        <motion.p
-          variants={riseChild}
-          className="mt-5 max-w-3xl text-[13px] leading-relaxed text-[var(--fg-dim)]"
-        >
+        <Reveal as="p" className="mt-5 max-w-3xl text-[13px] leading-relaxed text-[var(--fg-dim)]">
           {note}
-        </motion.p>
-      </motion.div>
+        </Reveal>
+      </RevealGroup>
     </section>
   );
 }

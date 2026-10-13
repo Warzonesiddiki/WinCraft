@@ -119,7 +119,10 @@ const later = m.buildHistory([
   e(T + 60, "tweak-applied", "dark_mode"),
   e(T + 59, "origin", "profile:Work", { detail: "dark_mode" }),
 ]);
-assert.deepEqual(later.map((i) => i.origin.kind), ["switch", "switch", "profile"]);
+assert.deepEqual(
+  later.map((i) => i.origin.kind),
+  ["switch", "switch", "profile"],
+);
 
 // An apply that changed nothing does not make a session the owner.
 const noop = m.buildHistory([

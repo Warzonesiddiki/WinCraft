@@ -50,7 +50,10 @@ for (const filter of filters) {
   if (result.status !== 0) process.exit(result.status ?? 1);
   // A filter that matches nothing passes with "running 0 tests"; a renamed
   // or re-gated module must fail here instead.
-  const ran = [...result.stdout.matchAll(/running (\d+) tests?/g)].reduce((n, m) => n + Number(m[1]), 0);
+  const ran = [...result.stdout.matchAll(/running (\d+) tests?/g)].reduce(
+    (n, m) => n + Number(m[1]),
+    0,
+  );
   if (ran === 0) {
     console.error(`No test matched ${filter}`);
     process.exit(1);

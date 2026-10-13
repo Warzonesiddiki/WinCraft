@@ -30,7 +30,12 @@ const environment = {
 };
 
 test("the offer ends at 23:59:59 on 6 November, Rome time", () => {
-  const rome = (ms) => new Intl.DateTimeFormat("en-GB", { timeZone: "Europe/Rome", dateStyle: "short", timeStyle: "medium" }).format(ms);
+  const rome = (ms) =>
+    new Intl.DateTimeFormat("en-GB", {
+      timeZone: "Europe/Rome",
+      dateStyle: "short",
+      timeStyle: "medium",
+    }).format(ms);
   assert.equal(rome(END - 1000), "06/11/2026, 23:59:59");
   assert.equal(rome(END), "07/11/2026, 00:00:00");
   assert.ok(START <= Date.parse("2026-10-10T12:00:00Z"));
@@ -57,9 +62,11 @@ function bestPromoPrice(reference) {
 
 function lowestBefore(key, startMs) {
   const from = startMs - 30 * 86_400_000;
-  return Math.min(...HISTORY[key]
-    .filter(([a, b]) => Date.parse(a) < startMs && (b === null || Date.parse(b) > from))
-    .map(([, , cents]) => cents));
+  return Math.min(
+    ...HISTORY[key]
+      .filter(([a, b]) => Date.parse(a) < startMs && (b === null || Date.parse(b) > from))
+      .map(([, , cents]) => cents),
+  );
 }
 
 test("every struck price is the lowest charged in the 30 days before the start, and never above it later", () => {
@@ -67,13 +74,28 @@ test("every struck price is the lowest charged in the 30 days before the start, 
     const key = `${offer.product}:${offer.plan}`;
     assert.equal(offer.reference, lowestBefore(key, START), key);
     // A later go-live (up to the end) can only make the lawful reference higher, never lower.
-    for (let t = START; t < END; t += 3_600_000) assert.ok(offer.reference <= lowestBefore(key, t), `${key} at ${new Date(t).toISOString()}`);
+    for (let t = START; t < END; t += 3_600_000)
+      assert.ok(offer.reference <= lowestBefore(key, t), `${key} at ${new Date(t).toISOString()}`);
     assert.ok(offer.price < offer.reference && offer.reference <= offer.regular);
-    assert.equal(offer.price, bestPromoPrice(offer.reference), `${key} is the highest round price at or below half its reference`);
+    assert.equal(
+      offer.price,
+      bestPromoPrice(offer.reference),
+      `${key} is the highest round price at or below half its reference`,
+    );
   }
-  assert.deepEqual(PROMO.offers.map((o) => [o.reference, o.price]), [[999, 499]]);
-  assert.deepEqual(PROMO.offers.map((o) => percentOff(o.reference, o.price)), [50]);
-  assert.deepEqual(PROMO.offers.map((o) => o.product), ["uninstaller"], "the WinCraft offers were retired on 12 October");
+  assert.deepEqual(
+    PROMO.offers.map((o) => [o.reference, o.price]),
+    [[999, 499]],
+  );
+  assert.deepEqual(
+    PROMO.offers.map((o) => percentOff(o.reference, o.price)),
+    [50],
+  );
+  assert.deepEqual(
+    PROMO.offers.map((o) => o.product),
+    ["uninstaller"],
+    "the WinCraft offers were retired on 12 October",
+  );
 });
 
 test("the percentage is rounded down, never up", () => {
@@ -92,24 +114,46 @@ test("simulated clock: nothing before the start, every offer during, nothing fro
     assert.equal(state.status, "active");
     assert.equal(state.offers.length, 1);
     assert.equal(state.endsAt, PROMO.endsAt);
-    assert.deepEqual(state.offers[0],
-      { product: "uninstaller", plan: "annual", currency: "eur", regular: 999, reference: 999, price: 499, percentOff: 50, firstPeriodOnly: true });
+    assert.deepEqual(state.offers[0], {
+      product: "uninstaller",
+      plan: "annual",
+      currency: "eur",
+      regular: 999,
+      reference: 999,
+      price: 499,
+      percentOff: 50,
+      firstPeriodOnly: true,
+    });
   }
   for (const now of [END, END + 86_400_000, Date.parse("2027-10-31T12:00:00Z")]) {
-    assert.deepEqual(promoState(environment, now), { serverTime: new Date(now).toISOString(), id: null, status: "disabled", startsAt: null, endsAt: null, offers: [] });
+    assert.deepEqual(promoState(environment, now), {
+      serverTime: new Date(now).toISOString(),
+      id: null,
+      status: "disabled",
+      startsAt: null,
+      endsAt: null,
+      offers: [],
+    });
   }
 });
 
 test("the kill switch and missing coupons turn offers off", () => {
   assert.equal(promoState({ ...environment, PROMO_DISABLED: "1" }, DURING).status, "disabled");
   assert.equal(promoState({ ...environment, PROMO_DISABLED: "0" }, DURING).status, "active");
-  const noCoupons = Object.fromEntries(Object.entries(environment).filter(([k]) => !k.startsWith("STRIPE_COUPON_") && k !== "STRIPE_PRICE_LIFETIME_PROMO"));
+  const noCoupons = Object.fromEntries(
+    Object.entries(environment).filter(
+      ([k]) => !k.startsWith("STRIPE_COUPON_") && k !== "STRIPE_PRICE_LIFETIME_PROMO",
+    ),
+  );
   assert.equal(promoState(noCoupons, DURING).status, "disabled");
   // The retired WinCraft offers cannot be charged again from their old
   // variables: the campaign has one offer, and only its own coupon makes it
   // live. The Lifetime promo Price keeps working as a Stripe object the webhook
   // resolves, but it buys nothing.
-  const onlyLifetimePrice = { ...noCoupons, STRIPE_PRICE_LIFETIME_PROMO: "price_lifetime_promo_fixture" };
+  const onlyLifetimePrice = {
+    ...noCoupons,
+    STRIPE_PRICE_LIFETIME_PROMO: "price_lifetime_promo_fixture",
+  };
   assert.equal(promoState(onlyLifetimePrice, DURING).status, "disabled");
   for (const priceEnv of ["STRIPE_PRICE_MONTHLY", "STRIPE_PRICE_ANNUAL", "STRIPE_PRICE_LIFETIME"]) {
     assert.equal(promoCheckout(environment, DURING, priceEnv), null, priceEnv);
@@ -119,12 +163,25 @@ test("the kill switch and missing coupons turn offers off", () => {
 test("checkout expiry: none far from the end, then well inside Stripe's 24 hours and the grace", () => {
   // Stripe rejects expires_at even two seconds past 24 hours on its own clock.
   for (const now of [START, DURING, END - 24 * 3600_000, END - 23.5 * 3600_000 - 1000]) {
-    assert.equal(promoCheckout(environment, now, "STRIPE_PRICE_UNINSTALLER_ANNUAL").expiresAt, undefined, new Date(now).toISOString());
+    assert.equal(
+      promoCheckout(environment, now, "STRIPE_PRICE_UNINSTALLER_ANNUAL").expiresAt,
+      undefined,
+      new Date(now).toISOString(),
+    );
   }
-  for (const now of [END - 23.5 * 3600_000, END - 12 * 3600_000, END - 3600_000, END - 31 * 60_000, END - 1000]) {
+  for (const now of [
+    END - 23.5 * 3600_000,
+    END - 12 * 3600_000,
+    END - 3600_000,
+    END - 31 * 60_000,
+    END - 1000,
+  ]) {
     const { expiresAt } = promoCheckout(environment, now, "STRIPE_PRICE_UNINSTALLER_ANNUAL");
     const nowSeconds = Math.floor(now / 1000);
-    assert.ok(expiresAt - nowSeconds <= 23.5 * 3600, "at least 30 minutes of margin for clock skew");
+    assert.ok(
+      expiresAt - nowSeconds <= 23.5 * 3600,
+      "at least 30 minutes of margin for clock skew",
+    );
     assert.ok(expiresAt >= nowSeconds + 30 * 60, "Stripe's 30-minute minimum");
     assert.ok(expiresAt <= END / 1000 + 31 * 60, "never past the deadline plus the grace");
   }
@@ -134,11 +191,22 @@ test("checkout expiry: none far from the end, then well inside Stripe's 24 hours
 });
 
 test("the public route is uncached and carries no Stripe identifiers", () => {
-  const res = { headers: {}, setHeader(k, v) { this.headers[k.toLowerCase()] = v; }, json(b) { this.body = b; } };
+  const res = {
+    headers: {},
+    setHeader(k, v) {
+      this.headers[k.toLowerCase()] = v;
+    },
+    json(b) {
+      this.body = b;
+    },
+  };
   promoHandler(environment, () => DURING)({}, res);
   assert.equal(res.headers["cache-control"], "no-store");
   assert.equal(res.body.status, "active");
-  assert.deepEqual(res.body.offers.map((o) => [o.product, o.plan]), [["uninstaller", "annual"]]);
+  assert.deepEqual(
+    res.body.offers.map((o) => [o.product, o.plan]),
+    [["uninstaller", "annual"]],
+  );
   assert.equal(/coupon_|price_|sk_test/.test(JSON.stringify(res.body)), false);
 });
 
@@ -146,17 +214,38 @@ let sequence = 0;
 async function user({ pctweakerUntil = null } = {}) {
   const { rows } = await getPool().query(
     "INSERT INTO users (email, password_hash, is_pro, plan, pro_expires_at, email_verified) VALUES ($1, 'fixture', $2, $3, $4, TRUE) RETURNING id",
-    [`promo-${++sequence}@example.com`, Boolean(pctweakerUntil), pctweakerUntil ? "annual" : null, pctweakerUntil],
+    [
+      `promo-${++sequence}@example.com`,
+      Boolean(pctweakerUntil),
+      pctweakerUntil ? "annual" : null,
+      pctweakerUntil,
+    ],
   );
   return rows[0].id;
 }
 
 async function checkout(body, now, userId) {
   const calls = [];
-  const handler = createCheckoutHandler({ environment, now: () => now,
-    async createSession(params) { calls.push(params); return { url: "https://example.com/synthetic-checkout" }; } });
-  const res = { statusCode: 200, status(v) { this.statusCode = v; return this; }, json(v) { this.body = v; return this; } };
-  await handler({ userId: userId ?? await user(), body }, res);
+  const handler = createCheckoutHandler({
+    environment,
+    now: () => now,
+    async createSession(params) {
+      calls.push(params);
+      return { url: "https://example.com/synthetic-checkout" };
+    },
+  });
+  const res = {
+    statusCode: 200,
+    status(v) {
+      this.statusCode = v;
+      return this;
+    },
+    json(v) {
+      this.body = v;
+      return this;
+    },
+  };
+  await handler({ userId: userId ?? (await user()), body }, res);
   assert.equal(res.statusCode, 200, JSON.stringify(res.body));
   return calls[0];
 }
@@ -168,7 +257,11 @@ test("checkout applies the Uninstaller's coupon only inside the window", async (
   assert.equal(during.metadata.promo_id, "halloween50r-2026");
   assert.deepEqual(during.after_expiration, { recovery: { enabled: false } });
   assert.equal(during.subscription_data.metadata.promo_id, "halloween50r-2026");
-  assert.equal(during.line_items[0].price.includes("promo"), false, "the plan keeps its regular Price");
+  assert.equal(
+    during.line_items[0].price.includes("promo"),
+    false,
+    "the plan keeps its regular Price",
+  );
   for (const now of [START - 1, END, END + 7 * 86_400_000]) {
     const outside = await checkout(body, now);
     assert.equal(outside.discounts, undefined);

@@ -327,6 +327,24 @@ describe("what the readings say", () => {
     expect(container.querySelector(".live-notes")!.textContent).not.toContain(l.insightCalm);
   });
 
+  it("describes a busy processor that is already coming down as easing, not as an alarm", async () => {
+    // 75 seconds at 92%, then 15 at 60%: the average over the last 30
+    // seconds is still 76% (busy) while the minute-long window has fallen 32
+    // points. The honest sentence is "coming down", quoting the last reading.
+    feed(
+      [
+        ...Array.from({ length: 75 }, () => sample({ cpu: 92 })),
+        ...Array.from({ length: 15 }, () => sample({ cpu: 60 })),
+      ],
+      { users: users(), stats: stats(), report: report() },
+    );
+    const { container } = mount();
+    await settle(90_000);
+    const notes = container.querySelector(".live-notes")!.textContent!;
+    expect(notes).toContain(format(l.insightRecovering, { pct: 60 }));
+    expect(notes).not.toContain(format(l.insightCpu, { pct: 76 }));
+  }, 20_000);
+
   it("says a sensor is absent rather than guessing at one", async () => {
     // No CPU zone and no card with a readable sensor: the page must say so once
     // and stop asking, not keep calling PowerShell and nvidia-smi every tick.

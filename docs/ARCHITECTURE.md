@@ -185,7 +185,7 @@ that are genuinely the same).
 | Frontend tests          | `npm test` (Vitest, jsdom)               | `src/**/*.test.ts(x)`: module helpers, components (Testing Library) and a11y (jest-axe)                                                               |
 | Coverage ratchet        | `npm run test:coverage`                  | thresholds in `vitest.config.ts`, about a point under the measured tree: they refuse a fall, not a target                                             |
 | Source/behaviour suites | `scripts/test-*.mjs`                     | scan pipeline, advisor, thermals, repair ETA, updater, debloat model, download limits, promo rules, language default, change history, UI polish, i18n |
-| Rust tests              | `src-tauri/src/*.rs`, `src-tauri/tests/` | adapters, IPC/capability parity, rollback store, elevation routing, game sessions                                                                      |
+| Rust tests              | `src-tauri/src/*.rs`, `src-tauri/tests/` | adapters, IPC/capability parity, rollback store, elevation routing, game sessions                                                                     |
 | API tests               | `backend/test/*.test.mjs`                | auth, entitlements, Stripe policy, webhooks, mail, offers, admin boundaries                                                                           |
 
 `npm test` is the only layer that renders a component: the script suites run the

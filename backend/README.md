@@ -20,6 +20,7 @@ return a clear 503 instead of crashing, so you can deploy incrementally.
 | GET    | `/api/auth/reset-password`       | —      | `?token=...` from the reset email; HTML form        |
 | POST   | `/api/auth/reset-password`       | —      | `{ token, newPassword }`, invalidates old sessions  |
 | GET    | `/api/account`                   | Bearer | `{ email, isPro, emailVerified }`                   |
+| DELETE | `/api/account`                   | Bearer | `{ password, confirm: "DELETE" }` — deletes the account. `409` while a subscription is still billing; published reviews stay with the address replaced and unconfirmed submissions are discarded |
 | POST   | `/api/checkout`                  | Bearer | `{ }` → `{ url }` (Stripe Checkout URL)             |
 | POST   | `/api/stripe-webhook`            | Stripe signature | called by Stripe, not by the app         |
 | GET    | `/api/reviews`                   | —      | `{ average, count }` — no user text is ever returned |
@@ -158,3 +159,62 @@ Never use `pgmem` outside of local testing — data doesn't persist across resta
 - `is_pro` is a single boolean, not tied to a specific purchase/subscription
   record — sufficient for a one-time lifetime unlock, not for anything more
   complex (seats, renewals, refund tracking).
+
+
+## Audit hardening deployment requirements (2026-10-13)
+
+- Database TLS now verifies certificate and hostname using the system trust store
+  or `DATABASE_CA`. An unreadable CA is a startup error. Remove connection-string
+  SSL query parameters so they cannot override this policy. Obtain the provider's
+  authentic CA before deployment; do not disable verification to restore access.
+- `DATABASE_ALLOW_PLAINTEXT=true` is accepted only for loopback databases outside
+  production. The example is for local development; never copy that opt-in into
+  production. Pool connections and queries have bounded timeouts.
+- Schema initialization must succeed before `/ready`, API routes and billing
+  workers become available. A failed migration leaves `/health` live but readiness
+  and API access at 503. Fix the migration and restart; a connectivity query alone
+  no longer makes the deployment ready.
+- Proxy trust defaults off. Configure `TRUSTED_PROXY_CIDRS` with exact verified
+  ingress networks, and restrict direct backend access. Test X-Forwarded-For
+  rewriting in staging. Do not trust a numeric hop count or a wildcard network.
+  Until configured, clients behind a proxy share its per-IP limit.
+- Authentication work has an instance-wide hourly budget and a concurrency cap,
+  in addition to existing per-account/source limits. **Run one replica** until
+  budgets/rate limits use a shared store. This is a bounded backstop, not a
+  substitute for verified ingress or distributed abuse protection.
+- `npm test` includes fault-injection tests. With `TEST_DATABASE_URL` pointed at a
+  disposable loopback PostgreSQL database, it also runs real rollback/concurrency
+  checks in a temporary schema. That test is explicitly skipped when no database
+  is supplied. CI provides PostgreSQL 16; pg-mem is not used to prove rollback.
+- The quick installer now requires valid Authenticode from the documented
+  publisher and a timestamp. Coordinate certificate/publisher rotation with its
+  consumer policy; never work around rejection using an unverified download.
+
+
+For an explicit local TLS identity fixture, run `npm run test:tls` with
+`TEST_DATABASE_TLS_URL` (a local PostgreSQL TLS URL using `localhost`),
+`TEST_DATABASE_CA` (the server's authentic test CA), and
+`TEST_WRONG_DATABASE_CA` (an unrelated test CA). The server certificate should
+identify `localhost` but not `127.0.0.1`; the test verifies both successful
+identity checking and wrong-CA/wrong-hostname rejection. Without a TLS fixture
+URL this integration test explicitly skips. Never use a production database
+for generated-certificate tests.
+
+Only `application_name` is accepted as a database URL query parameter: arbitrary
+`host`, `port`, or TLS overrides cannot alter the parsed transport policy. TLS
+identity is checked against the configured hostname/IP explicitly, including
+IP-address connections wrapped by `pg`.
+
+## Data retention
+
+`backend/src/retention.ts` runs every six hours and once at startup, deleting
+rows past their documented window: error reports at 180 days, download
+attributions at 400 days, unconfirmed review submissions at 30 days past their
+confirmation window, and action tokens 7 days after expiry. Deletes are batched
+(5,000 rows per statement), so a table that was never pruned cannot turn the
+first run into one enormous transaction.
+
+The same numbers appear in `docs/DATA-INVENTORY.md`, and
+`npm run check:data-inventory` in the repository root fails if the two
+disagree. Change the policy in the module and update the page in the same
+commit.

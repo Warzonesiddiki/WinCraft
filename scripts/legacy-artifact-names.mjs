@@ -14,7 +14,9 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 const root = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
-const { version } = JSON.parse(fs.readFileSync(path.join(root, "src-tauri", "tauri.conf.json"), "utf8"));
+const { version } = JSON.parse(
+  fs.readFileSync(path.join(root, "src-tauri", "tauri.conf.json"), "utf8"),
+);
 const bundle = path.join(root, "src-tauri", "target", "release", "bundle");
 const targets = [
   ["nsis", `WinCraft_${version}_x64-setup.exe`, `pc-tweaker-app_${version}_x64-setup.exe`],
@@ -24,7 +26,10 @@ for (const [dir, built, legacy] of targets) {
   const from = path.join(bundle, dir, built);
   const to = path.join(bundle, dir, legacy);
   if (!fs.existsSync(from)) {
-    if (fs.existsSync(to)) { console.log(`already named: ${legacy}`); continue; }
+    if (fs.existsSync(to)) {
+      console.log(`already named: ${legacy}`);
+      continue;
+    }
     throw new Error(`Missing build output ${from}; run the signed tauri build first.`);
   }
   if (fs.existsSync(to)) throw new Error(`Refusing to overwrite ${to}`);

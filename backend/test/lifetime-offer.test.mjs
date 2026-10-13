@@ -5,7 +5,8 @@ process.env.DATABASE_URL = "pgmem";
 delete process.env.STRIPE_SECRET_KEY;
 delete process.env.RESEND_API_KEY;
 
-const { lifetimeOffer, lifetimeCheckoutDecision, LIFETIME_CHECKOUT_GRACE_SECONDS } = await import("../dist/lifetime-offer.js");
+const { lifetimeOffer, lifetimeCheckoutDecision, LIFETIME_CHECKOUT_GRACE_SECONDS } =
+  await import("../dist/lifetime-offer.js");
 const { lifetimeOfferHandler } = await import("../dist/routes/offers.js");
 const { createCheckoutHandler, handleEvent } = await import("../dist/routes/stripe.js");
 const { getPool, initSchema } = await import("../dist/db.js");
@@ -34,9 +35,18 @@ function response() {
     statusCode: 200,
     headers: {},
     body: undefined,
-    setHeader(name, value) { this.headers[name.toLowerCase()] = value; return this; },
-    status(value) { this.statusCode = value; return this; },
-    json(value) { this.body = value; return this; },
+    setHeader(name, value) {
+      this.headers[name.toLowerCase()] = value;
+      return this;
+    },
+    status(value) {
+      this.statusCode = value;
+      return this;
+    },
+    json(value) {
+      this.body = value;
+      return this;
+    },
   };
 }
 
@@ -49,15 +59,23 @@ async function user({ lifetime = false } = {}) {
   return rows[0].id;
 }
 
-async function startCheckout({ environment = campaignEnvironment, now = START, userId, body = { plan: "lifetime" } } = {}) {
+async function startCheckout({
+  environment = campaignEnvironment,
+  now = START,
+  userId,
+  body = { plan: "lifetime" },
+} = {}) {
   const calls = [];
   const handler = createCheckoutHandler({
     environment,
     now: () => now,
-    async createSession(params) { calls.push(params); return { url: "https://example.com/synthetic-checkout" }; },
+    async createSession(params) {
+      calls.push(params);
+      return { url: "https://example.com/synthetic-checkout" };
+    },
   });
   const res = response();
-  await handler({ userId: userId ?? await user(), body }, res);
+  await handler({ userId: userId ?? (await user()), body }, res);
   return { res, calls };
 }
 
@@ -91,7 +109,10 @@ test("one absolute 48-hour window has exact inclusive start and exclusive end", 
     const offer = lifetimeOffer(campaignEnvironment, now);
     assert.equal(offer.status, status);
     assert.equal(offer.available, available);
-    if (status === "disabled") { assert.equal(offer.endsAt, null); continue; }
+    if (status === "disabled") {
+      assert.equal(offer.endsAt, null);
+      continue;
+    }
     assert.equal(Date.parse(offer.endsAt) - Date.parse(offer.startsAt), 48 * 60 * 60 * 1000);
     assert.equal(offer.serverTime, new Date(now).toISOString());
   }
@@ -127,11 +148,14 @@ test("partial, empty, malformed, impossible, and non-48-hour configurations fail
 });
 
 test("UTC timestamps without fractional seconds are accepted and normalized", () => {
-  const offer = lifetimeOffer({
-    ...campaignEnvironment,
-    LIFETIME_CAMPAIGN_STARTS_AT: "2026-10-01T12:00:00Z",
-    LIFETIME_CAMPAIGN_ENDS_AT: "2026-10-03T12:00:00Z",
-  }, START);
+  const offer = lifetimeOffer(
+    {
+      ...campaignEnvironment,
+      LIFETIME_CAMPAIGN_STARTS_AT: "2026-10-01T12:00:00Z",
+      LIFETIME_CAMPAIGN_ENDS_AT: "2026-10-03T12:00:00Z",
+    },
+    START,
+  );
   assert.equal(offer.status, "active");
   assert.equal(offer.startsAt, "2026-10-01T12:00:00.000Z");
 });
@@ -170,17 +194,29 @@ test("the public invalid endpoint returns 503 and no-store instead of an invente
 });
 
 test("the actual checkout handler enforces server campaign metadata and Stripe expiry", async () => {
-  const { res, calls } = await startCheckout({ now: END - 1, body: {
-    plan: "lifetime", price: "price_forged", campaignId: "forged", endsAt: "2099-01-01T00:00:00Z",
-  } });
+  const { res, calls } = await startCheckout({
+    now: END - 1,
+    body: {
+      plan: "lifetime",
+      price: "price_forged",
+      campaignId: "forged",
+      endsAt: "2099-01-01T00:00:00Z",
+    },
+  });
   assert.equal(res.statusCode, 200);
   assert.equal(calls.length, 1);
   const params = calls[0];
   assert.equal(params.line_items[0].price, checkoutEnvironment.STRIPE_PRICE_LIFETIME);
   assert.equal(params.mode, "payment");
   assert.equal(params.metadata.lifetime_campaign_id, campaignEnvironment.LIFETIME_CAMPAIGN_ID);
-  assert.equal(params.metadata.lifetime_campaign_ends_at, campaignEnvironment.LIFETIME_CAMPAIGN_ENDS_AT);
-  assert.equal(params.payment_intent_data.metadata.lifetime_campaign_id, campaignEnvironment.LIFETIME_CAMPAIGN_ID);
+  assert.equal(
+    params.metadata.lifetime_campaign_ends_at,
+    campaignEnvironment.LIFETIME_CAMPAIGN_ENDS_AT,
+  );
+  assert.equal(
+    params.payment_intent_data.metadata.lifetime_campaign_id,
+    campaignEnvironment.LIFETIME_CAMPAIGN_ID,
+  );
   assert.equal(params.after_expiration.recovery.enabled, false);
   assert.ok(params.expires_at <= END / 1000 + LIFETIME_CHECKOUT_GRACE_SECONDS);
 });
@@ -197,7 +233,12 @@ test("after the campaign Lifetime checkout continues at the normal price without
 test("scheduled and invalid campaigns cannot create Lifetime checkouts", async () => {
   for (const [environment, now, status, code] of [
     [campaignEnvironment, START - 1, 409, "LIFETIME_OFFER_NOT_STARTED"],
-    [{ ...campaignEnvironment, LIFETIME_CAMPAIGN_ENDS_AT: "invalid" }, START, 503, "LIFETIME_OFFER_UNAVAILABLE"],
+    [
+      { ...campaignEnvironment, LIFETIME_CAMPAIGN_ENDS_AT: "invalid" },
+      START,
+      503,
+      "LIFETIME_OFFER_UNAVAILABLE",
+    ],
   ]) {
     const { res, calls } = await startCheckout({ environment, now });
     assert.equal(res.statusCode, status);
@@ -242,26 +283,35 @@ test("a paid pre-deadline session is honored even when settlement arrives after 
   const { calls } = await startCheckout({ userId, now: END - 1000 });
   const params = calls[0];
   assert.equal(lifetimeOffer(campaignEnvironment, END + 3600_000).status, "disabled");
-  await handleEvent({
-    id: "evt_paid_after_campaign_fixture",
-    type: "checkout.session.async_payment_succeeded",
-    created: END / 1000 + 3600,
-    data: { object: {
-      id: "cs_pre_deadline_fixture",
-      created: END / 1000 - 1,
-      client_reference_id: String(userId),
-      mode: "payment",
-      payment_status: "paid",
-      customer: "cus_paid_after_deadline_fixture",
-      metadata: params.metadata,
-    } },
-  }, {
-    async loadCheckout() { throw new Error("Unexpected external call"); },
-    async loadSubscription() { throw new Error("Unexpected external call"); },
-    async stopSubscriptions() {},
-    async welcome() {},
-    notifySale() {},
-  });
+  await handleEvent(
+    {
+      id: "evt_paid_after_campaign_fixture",
+      type: "checkout.session.async_payment_succeeded",
+      created: END / 1000 + 3600,
+      data: {
+        object: {
+          id: "cs_pre_deadline_fixture",
+          created: END / 1000 - 1,
+          client_reference_id: String(userId),
+          mode: "payment",
+          payment_status: "paid",
+          customer: "cus_paid_after_deadline_fixture",
+          metadata: params.metadata,
+        },
+      },
+    },
+    {
+      async loadCheckout() {
+        throw new Error("Unexpected external call");
+      },
+      async loadSubscription() {
+        throw new Error("Unexpected external call");
+      },
+      async stopSubscriptions() {},
+      async welcome() {},
+      notifySale() {},
+    },
+  );
   const entitlement = await productEntitlement(userId, "pctweaker");
   assert.equal(entitlement.active, true);
   assert.equal(entitlement.plan, "lifetime");

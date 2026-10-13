@@ -1,0 +1,262 @@
+# Audit remediation status — 2026-10-13
+
+This records the implementation following [the baseline audit](AUDIT-2026-10-13.md). Changes are on `arena/9dddfe95-wincraft`; no production deployment, release, commit or push was performed.
+
+## Findings addressed
+
+| Finding                            | Implemented change                                                                                                                                                                                                                    | Verification / remaining boundary                                                                                                                                                                                                                                                      |
+| ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| F01: database TLS                  | Verified certificates and explicit hostname/IP identity checking; broken CA fails startup; connection-string overrides rejected; plaintext restricted to explicit local development                                                   | Unit tests plus a real TLS-enabled PostgreSQL fixture accepted the correct CA/hostname and rejected an unrelated CA and wrong hostname                                                                                                                                                 |
+| F02: readiness                     | Successful schema initialization is required for API access, readiness and billing-worker startup                                                                                                                                     | Child-process tests cover both migration failure with successful `SELECT 1` and successful initialization                                                                                                                                                                              |
+| F03: quick installer               | Exact x64 asset selection, unique staging, valid Authenticode/expected publisher/timestamp, read-only mutation lock through launch, fail-closed verification outside the discovery fallback                                           | Offline PowerShell regressions added to Windows CI. **Not executed here:** PowerShell/Windows unavailable. Real signed installers and certificate rotation still require Windows release validation                                                                                    |
+| F04: session race                  | Extracted session-aware refresh controller; generation/token checks before 401, renewal and account updates; timeout, cancellation, deduplication and focus freshness                                                                 | Deferred-request unit tests and real App state/dispatch tests cover old responses after logout/login, delayed JSON and late renewal                                                                                                                                                    |
+| F05: consumed links                | Token consumption and account mutation use one checked-out PostgreSQL transaction; hashing occurs before the short transaction; failed rollback discards the connection                                                               | Route-level fault injection plus real PostgreSQL rollback and concurrent single-use consumption pass                                                                                                                                                                                   |
+| F06: proxy/abuse limits            | Proxy trust defaults off; only explicit IP/CIDR lists accepted; moderation no longer trusts the leftmost raw header; global auth-work budgets and concurrency cap added                                                               | Unit/route tests cover policy, source spoofing, capacity and budgets. **Production ingress rewriting is not verified here.** Configure verified networks and restrict direct ingress before deployment. Still single-replica; distributed limit storage remains a scaling prerequisite |
+| F07: unsafe preset/recovery claims | Forced app termination is no longer selected by default; unsaved-work warnings in all six locales/native fallback; README/installer claims narrowed; Barebone/browser copy describes tradeoffs instead of zero latency/OS equivalence | Preset, locale and public-copy checks pass. Existing per-operation recovery UI remains; a unified recovery-class metadata system is a follow-up, not claimed as complete                                                                                                               |
+| F08: uncovered orchestration       | Added App dispatch/auth, AuthSection, refresh-controller and polling lifecycle tests; raised global coverage floors and added critical-file floors                                                                                    | App line coverage is now 56.12% (previously 0%); account component 23.66% (previously 0%); refresh controller 94.87%. This does not replace Windows/WebView end-to-end tests                                                                                                           |
+| F09: formatting                    | Formatted the failing locale files and modified frontend files                                                                                                                                                                        | Full frontend formatting gate passes                                                                                                                                                                                                                                                   |
+| F10: callback CSP                  | OAuth code rendered as escaped server text, without inline script; no-store/no-referrer/noindex                                                                                                                                       | Response tests check escaped content and no script. Endpoint retained for tooling compatibility                                                                                                                                                                                        |
+| F11: driver cache                  | Complete shape validation, schema version, environment signature, seven-day maximum age, future-date/size limits and guarded storage reads/removal                                                                                    | Malformed/stale/version/environment/blocked-storage tests pass. Hardware replacement within an otherwise identical environment is not detected automatically; timestamp and explicit Rescan remain available                                                                           |
+| F12: welcome count                 | Removed independently maintained count from welcome messages; public-count gate includes backend template and rejects reintroducing the stale constant                                                                                | Email and public-count tests pass; current catalog is 141 controls, all free                                                                                                                                                                                                           |
+
+## Second pass: schema, readiness and evidence gates
+
+| Change                                                   | Why it matters                                                                                                                                                                                                              | Verification                                                                                                                                                                                                           |
+| -------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Versioned migration runner (`backend/src/migrations.ts`) | The schema was applied as one list of `CREATE TABLE IF NOT EXISTS` on every boot: no order, no record of what ran, no way to tell an old database from a new one, and no protection against two instances migrating at once | Real PostgreSQL: concurrent initialization, a failing later migration leaving nothing behind, applied history not replayed, tampered/missing/newer history refused. Runs inside one transaction under an advisory lock |
+| Migration ledger and checksums                           | A deploy can now answer "what is this database running, and has anyone edited history?" — and refuses a schema written by a newer application                                                                               | Ledger rows are checked against the checked-in definitions on every boot; a modified name, checksum, gap or unknown version fails closed                                                                               |
+| Bounded readiness probe                                  | `/ready` awaited a query with no timeout, so a half-open connection held the deploy gate until the platform gave up                                                                                                         | Timed test: a hung query answers `503` in about four seconds, `/health` stays independent and cheap, and the process stays up                                                                                          |
+| `docs/DATA-INVENTORY.md` + gate                          | Nothing recorded which personal data lives where or what removes it. Adding a table now requires classifying it                                                                                                             | `npm run check:data-inventory` cross-checks the inventory against the shipped SQL: 10 tables, each with a retention class and a stated deletion path                                                                   |
+| Renderer privilege envelope gate                         | The webview's privileges (no shell plugin, no shell permission, no global Tauri API, no path-opening permission, no capability naming a permission with no file behind it) were spread across files nobody re-read          | `npm run check:no-new-privileges` checks all four mechanically; it resolves all 150 named permissions against the autogenerated files                                                                                  |
+| Easing reported as easing (`windowDelta`)                | The note about a busy processor repeated a 30-second average as an alarm even while load was visibly falling a minute later                                                                                                 | Model tests (12 in the live-metrics suite) plus a rendered test at 92% for 75 s then 60% for 15 s: the note quotes the latest reading and the verdict is not shown as unchanged                                        |
+
+### Account deletion, end to end
+
+The data inventory found that closing an account was a manual SQL operation. It is now a feature:
+
+| Piece                         | Behaviour                                                                                                                                                                                                                                                                                                                                                   |
+| ----------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `DELETE /api/account`         | Requires the session **and** the current password **and** the word `DELETE` in `confirm`. The bcrypt comparison runs before the transaction opens, so no row is locked while hashing                                                                                                                                                                        |
+| One transaction               | `backend/src/account-deletion.ts` removes action tokens, receipts, entitlements, the lifetime bonus, checkout reminders and the user row, discards never-confirmed review submissions, replaces the address on a published review with `deleted+<id>@wincraft.invalid` and clears any stored IP and its hash, and marks the newsletter address unsubscribed |
+| Refusal while money is moving | A subscription that is still entitled returns `409` with a machine-readable code. Deleting our row cannot cancel a Stripe subscription, so allowing it would leave a closed account being billed                                                                                                                                                            |
+| Notice email                  | Sent only after the commit, and its failure cannot turn a completed deletion into an error the caller retries                                                                                                                                                                                                                                               |
+| App                           | A folded-away danger zone in the account menu: password + typed `DELETE`, submit disabled until both are valid, refusals shown in the reader's language (10 new keys in all six locales), and the session is dropped only on success                                                                                                                        |
+
+Verification: 10 backend tests (`backend/test/account-deletion.test.mjs`) including six real-PostgreSQL cases run against the shipped migration SQL, an email-content test, and 8 frontend tests across the request module (6), the account section (2) and App (2) — the App tests prove the session survives a refused deletion and is cleared after a successful one.
+
+One test-only defect surfaced during this work and was fixed rather than retried: a scan-panel test looked up a checkbox and a button with one-shot queries, and under a loaded parallel run the rows could land a tick after the header, so it failed intermittently while passing in isolation. The lookups now retry, which is the same assertion with a deterministic wait.
+
+The privilege gate deliberately does **not** claim that the pinned Tauri plugin presets grant nothing beyond what the app calls. That needs the crate's permission files, which are not vendored in this environment; the check enforces the parts decidable from the tree and the follow-up list records the review that needs them.
+
+### Retention: the rows nobody was removing
+
+Account deletion only helps people who leave. Nothing expired on its own, so `error_reports` and `download_attributions` accumulated forever, a pending review whose confirmation link had long expired stayed in the table, and dead action tokens were kept indefinitely. `backend/src/retention.ts` now runs every six hours and once at startup:
+
+| Data                    | Window                               | Why that number                                                                                                                                                           |
+| ----------------------- | ------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `error_reports`         | 180 days                             | Long enough to spot a crash pattern across a monthly release and see it fixed, which is the only reason the pipe exists                                                   |
+| `download_attributions` | 400 days                             | Must exceed the widest window the operator report offers (365 days, clamped in `routes/downloads.ts`), or a year-over-year comparison would silently lose its oldest days |
+| unconfirmed `reviews`   | 30 days past the confirmation window | Never published, so there is nothing to moderate — only a typed address waiting to be forgotten                                                                           |
+| `action_tokens`         | 7 days after expiry                  | An expired token can never be consumed (`tokens.ts` requires `expires_at > now()`), so this only bounds how long a dead credential sits in a table                        |
+
+Deliberately not pruned, each with its reason in the module: `billing_receipts` (the durable record that a receipt was sent), `checkout_reminders` (deleting one would re-send a nudge inside its own cooldown), `newsletter_subscribers` (the row _is_ the unsubscribe) and confirmed reviews (public content).
+
+Deletes run in bounded batches of 5,000 rows and are safe to re-run and to run on two replicas. The inventory gate now compares the documented window with the enforced one: a mismatch fails the build, which is how a stale page was caught during this work rather than after a release.
+
+### The driver cache now knows which machine it describes
+
+`system_profile` gives the app CPU, core counts, GPU, RAM, disk kind, form factor and Windows build. A driver scan cached under the old rules survived a graphics card swap, because `navigator.platform` and the user agent do not change when hardware does — so the panel could list devices that were no longer installed. The cache is now keyed to a hardware signature (power plan and marketing OS version deliberately excluded, since neither changes which drivers are stale), and the panel drops a scan whose signature does not match, clears it from disk, and says why in all six locales.
+
+## The homepage was blank without JavaScript
+
+Prerendering the site was not enough on its own. The entrance animations were
+rendered by an animation library, which writes an element's _start_ state into
+the markup, so the prerendered homepage shipped **47 elements** as
+`style="opacity:0;transform:translateY(28px)"` — section headings, feature copy,
+metric labels and both frame-time traces waited for the bundle to arrive and
+animate them in. A crawler that does not run script, a reader whose bundle was
+blocked, and a phone whose bundle was slow all saw the same thing: a navbar over
+an empty page. The bytes were in the response; the content was not on the page.
+
+Nothing about the motion changed. What changed is which state is written down:
+the markup and the stylesheet are both visible, and the hidden state lives only
+under `[data-reveal-armed]`, an attribute a section sets _after_ its
+IntersectionObserver is running and after everything at or above the fold has
+been marked shown. A page that never runs the script shows its content, the fold
+is never hidden even for a frame, and an element that is hidden always has a live
+observer waiting to reveal it — the invariant the old version did not have.
+Reduced motion never hides anything, and neither does a browser without
+IntersectionObserver: the effect simply returns.
+
+Two gates hold this. `npm run check:reveals --prefix site` reads the built output
+and fails on the regression itself: any prerendered page whose markup hides an
+element (unless it also declares `aria-hidden="true"`, which is how the promo
+cards reserve their space while an offer request is in flight), any SVG left in
+its "not yet drawn" state, any stylesheet rule that hides an animated element
+without the armed gate, or a reduced-motion block left showing the hidden state.
+`npm run check:hydration --prefix site` runs the built bundle in a DOM and checks
+what the static read cannot: that the page hydrates without a server/client
+disagreement (it builds a development copy of the bundle as well, because
+production React repairs an attribute mismatch silently instead of reporting it),
+that nothing at or above the fold is ever hidden, that a below-fold element
+computes to `opacity: 0` only while an observer is watching it and to `1` once
+scrolled to, and that reduced motion is never hidden at all. Twelve mutations of the
+built output — hidden markup, an ungated rule, a missing rule, an un-neutralised
+reduced-motion block, a disagreement in text, a disagreement in an attribute, the
+fold check removed, the reduced-motion check removed, the hiding rule deleted, a
+transition put back on `.reveal`, the entrance animation deleted, and the waiting
+marker renamed — were each confirmed to fail one of the two gates. Both run as the last step of
+`npm run build --prefix site` (as `npm run check:output`), which is the step every
+path to production already runs: the CI site job, the Pages deploy and a local
+build all verify the artifact they just produced. Removing the animation library
+also removed an unused module (`site/src/motion.ts`) and 113 KiB of JavaScript.
+
+**The entrance is a keyframe animation, not a transition.** The first version
+animated it with `transition` on `.reveal`, and this stylesheet is unlayered
+while Tailwind's utilities are not: `transition-property`, `-duration` and
+`-delay` on `.reveal` therefore beat the `transition-all duration-500` the card
+classes carry. Fifteen cards hovered with their lift and border fade snapping
+instead of easing, and the `transition-delay` that creates the stagger applied
+to every property each card transitioned. The animation now runs from
+`@keyframes reveal-in`, which none of those utilities can collide with, and it
+is gated on `data-reveal-waiting` — set only for an element that was actually
+hidden below the fold — so marking the fold as shown can never animate content
+the reader is already looking at. `check:reveals` fails if a transition
+reappears on `.reveal` or if the animation is no longer wired to that marker,
+and `check:hydration` fails if the marker stops being set at runtime; three
+further mutations (a transition back on `.reveal`, the animation rule deleted,
+the marker renamed in the built bundle) confirm both fail.
+
+## Fonts: 96 files for a site with no Cyrillic
+
+`@fontsource`'s default entry ships every script a family has, and each subset is
+a render-blocking `@font-face` rule in the critical stylesheet. The site was
+serving **96 font files (1,153 KiB)** and **48 `@font-face` rules — 17,493 of
+58,860 bytes of CSS** — for Cyrillic, Cyrillic Extended, Greek, Greek Extended and
+Vietnamese. A scan of every string in the site found no character from any of
+them; the only non-ASCII characters present were five accented Latin letters.
+
+Importing the named subsets (`latin-*` and `latin-ext-*` for all nine weights)
+takes that to **36 files (777 KiB)** and **4,284 bytes of `@font-face` in 47,892
+bytes of CSS**: 13 KiB of render-blocking CSS removed, and CSS gzip from 10.6 KiB
+to 9.7 KiB. The same scan over the desktop app's six locales found 6,502 accented
+Latin characters and nothing else, but its font import was left alone — the app's
+own bundle is a separate change.
+
+`npm run check:fonts --prefix site` fails on any font file naming a subset the
+site cannot display, and names the import to write instead.
+
+- App error toasts now explicitly import the application telemetry helper. The previous unqualified `reportError` resolved to the browser error-reporting global (or was undefined under jsdom), not the intended opt-in API. A native-write-refusal App test exposed this missing import.
+- Visual system monitoring pauses while hidden and uses completion-based polling. Slow pulse/thermal reads have in-flight guards, preventing overlap. Scheduled background maintenance is deliberately unchanged.
+- Added tests for slow reads, hidden/resumed windows, unmount, callback failures and session lifecycle.
+- Database connection/query/statement timeouts and pool size are bounded; idle pool errors have a handler.
+- Backend tests moved into an independent Linux CI job with disposable PostgreSQL 16; Windows CI retains native tests and now includes quick-installer regressions.
+- Replaced the inaccurate ShellExecute safety comment in the token/SID query block with its actual buffer/handle invariants.
+- A real TLS test exposed `pg`/Node's IP-host identity fallback. TLS options now explicitly bind certificate verification to the database URL's hostname, even for IP literals.
+
+## Website payload, measured
+
+| Measurement                                 | Before                 | After                     |
+| ------------------------------------------- | ---------------------- | ------------------------- |
+| JavaScript (`index-*.js`)                   | 399 KiB / 129 KiB gz   | **286 KiB / 92 KiB gz**   |
+| CSS (`index-*.css`)                         | 57.5 KiB / 10.6 KiB gz | **46.8 KiB / 9.7 KiB gz** |
+| Font files                                  | 96 / 1,153 KiB         | **36 / 777 KiB**          |
+| `@font-face` bytes in the stylesheet        | 17,493 of 58,860       | **4,284 of 47,892**       |
+| Elements hidden in the prerendered homepage | 47                     | **0**                     |
+
+The JavaScript figure is the whole client bundle. The animation library measured
+121 KiB raw / 40 KiB gzip on its own (31% of the previous bundle) for `motion`,
+`AnimatePresence`, about sixty animated elements and no scroll, layout or gesture
+hooks — React plus ReactDOM client is 139 KiB raw / 45 KiB gzip, so the library
+was a near-peer of React in the budget. It is now a stylesheet rule, an
+IntersectionObserver and one inline custom property per element.
+
+These are byte counts and rendered-markup counts from the build. Lighthouse and
+field Core Web Vitals were not measured in this environment, and no real browser
+was available: the scroll-triggered behaviour is exercised by `check:hydration`,
+which hydrates the built bundle in a DOM with an observer the test drives, so
+what is verified is the logic and the computed styles rather than the painting.
+
+## Validation completed
+
+| Check                                                                                  | Result                                                                                            |
+| -------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
+| Desktop TypeScript + Vite production build                                             | PASS                                                                                              |
+| ESLint                                                                                 | PASS, no warnings                                                                                 |
+| Full frontend Prettier check                                                           | PASS                                                                                              |
+| Frontend coverage run                                                                  | **368 tests / 28 files pass**, including raised/per-file coverage gates                           |
+| Frontend line coverage                                                                 | **53.81%**, up from **46.09%**                                                                    |
+| Other frontend coverage                                                                | Statements **52.51%**, branches **51.17%**, functions **49.91%**                                  |
+| Backend build + tests with real PostgreSQL enabled                                     | **197 pass, 0 failures, 0 skipped**; **194 pass / 3 skipped** without one (the 3 need a database) |
+| Explicit PostgreSQL TLS integration                                                    | **1 pass**; correct identity succeeds, wrong CA and hostname fail                                 |
+| Website client/SSR/prerender build + SEO                                               | PASS; 17 sitemap routes checked                                                                   |
+| Website font-subset and reveal-safety gates                                            | PASS; 36 font files, 0 hidden start states across 19 prerendered pages                            |
+| i18n keys/quality, public counts, design-token and workflow-reference checks           | PASS                                                                                              |
+| All existing JS model/script suites and release-verification regression tests          | PASS; release verification 3 pass and 2 skipped (the two that need the Rust toolchain)            |
+| Rust/native tests, actual installer/Authenticode tests, Windows performance benchmarks | **Not run in this Linux environment**                                                             |
+
+One piece of this work could not be pushed with the branch. Creating or updating a
+file under `.github/workflows/` needs the GitHub App's `workflows` permission, and
+the app that pushes this branch does not have it, so the branch carries no workflow
+changes: the site gates run through `npm run build` instead, and the pieces that
+have no other CI path — the standalone PostgreSQL 16 backend job, the Windows
+quick-installer step, and the `check:no-new-privileges` and `check:data-inventory`
+steps — are kept as a ready patch (`wincraft-ci-workflows.patch`, applied in the
+working tree) to push once the permission is granted. Those two gates currently run
+only in the root `npm run check` chain, which CI does not call.
+
+Something outside this branch keeps any of it from being live: the site deploy
+has failed on every run since the site was added, at `actions/configure-pages`,
+with `HttpError: Not Found` from the Pages API — GitHub Pages is not enabled (or
+not reachable) for this repository, so nothing from this branch has been
+published to wincraft.app by it.
+
+The disposable PostgreSQL 18.4 binaries, database files and generated local certificate fixtures stayed outside Git in an excluded cache directory. CI is configured to use PostgreSQL 16; that CI job has not been run from this unpushed working tree. Local databases were stopped after verification.
+
+## Deployment requirements — do not skip
+
+1. **Database:** supply an authentic provider CA if the provider does not use system-trusted certificates. Remove URL TLS overrides; only `application_name` is accepted as a URL query parameter. Remove `DATABASE_ALLOW_PLAINTEXT=true` in production. Do not restore access by disabling verification.
+2. **Proxy:** configure `TRUSTED_PROXY_CIDRS` only after staging proves header sanitization and access is restricted to the ingress. Without configuration, behind-proxy clients share the proxy's per-IP limits. Never use a wildcard or numeric hop count.
+3. **Scaling:** keep one replica until rate-limit/global-budget state is shared across instances.
+4. **Windows:** run the new quick-installer suite and existing native/release-verification suites, including real signed artifacts. These cannot be certified by JS tests or static inspection. The hardware-signature check reads `system_profile`, whose field values were read from the Rust source, not from a running Windows build: confirm on real hardware that a card swap changes the signature and that nothing else does.
+
+## Explicit follow-ups
+
+The confirmed code findings have implementations and targeted regressions, but not every broader architectural/optimization proposal in the audit is complete. Follow-up work still includes production ingress validation, Windows installer/native verification, unified recovery/evidence metadata, distributed budgets before scaling, additional App/account/WebView integration coverage, OS-protected credential storage evaluation, tested Rust toolchain/advisory gates, and the telemetry half of the measurement plan. Hardware-aware cache invalidation, the bundle, the CSS and the font payload are done and measured above.
+
+Two gaps were found while writing the data inventory. The first is now closed; the second is deliberately left visible rather than papered over:
+
+1. ~~There is no account-deletion path.~~ Implemented, with a refusal while a subscription is still billing.
+2. ~~Nothing expires on its own for accounts that still exist.~~ Implemented as the retention worker above, with the windows cross-checked against the data inventory by a gate.
+3. **Receipt payloads store the customer-facing text they were sent** rather than re-deriving it, so a receipt row keeps the amount label of the day it was queued. That is intentional for auditability, and it is why those rows are the one class with no timer.
+
+Reviewing the pinned Tauri plugin presets against the permissions the app actually calls needs the crates checked out; the renderer gate covers everything decidable from this tree.
+
+No universal FPS, RAM, latency or battery improvement is claimed. Preserve the audit's measurement plan and optimize against Windows workload baselines rather than adding speculative tweak defaults.
+
+## Reproduce focused checks
+
+```bash
+npm run build
+npm run lint
+npm run format:check
+npm run test:coverage
+npm test --prefix backend
+npm run build --prefix site
+npm run check:seo --prefix site
+npm run check:fonts --prefix site
+npm run check:reveals --prefix site
+npm run check:hydration --prefix site
+```
+
+For real PostgreSQL rollback/concurrency, set `TEST_DATABASE_URL` to a **disposable loopback database** before `npm test --prefix backend`. Without that variable the PostgreSQL integration test is explicitly skipped.
+
+For TLS identity tests, provide a local TLS PostgreSQL server whose certificate identifies `localhost` (but not `127.0.0.1`), then set `TEST_DATABASE_TLS_URL`, `TEST_DATABASE_CA` and `TEST_WRONG_DATABASE_CA` and run `npm run test:tls --prefix backend`. Do not aim certificate-fixture tests at production.
+
+On x64 Windows, run:
+
+```powershell
+./scripts/test-quick-installer.ps1
+npm run check:rust
+npm run check:native-policy
+```

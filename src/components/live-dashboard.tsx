@@ -24,6 +24,7 @@ import {
   push,
   sparkPoints,
   verdict,
+  windowDelta,
   WINDOW_SHORT,
   type LiveSample,
 } from "../live-metrics";
@@ -460,7 +461,7 @@ export function LiveDashboard({
   const ramPct = latest && latest.ram_total ? (latest.ram_used / latest.ram_total) * 100 : null;
   const drivePct = drive ? (drive.used / drive.total) * 100 : null;
   const judged = verdict(cpu, ramPct);
-  const notes = insights({ cpu, memoryPct: ramPct, drivePct });
+  const notes = insights({ cpu, memoryPct: ramPct, drivePct, cpuDelta: windowDelta(cpu) });
   const split = latest ? memorySplit(latest) : null;
   const diskMax = niceCeiling([...disk.read, ...disk.write].slice(-slots * 2), 1_000_000);
   const netMax = niceCeiling([...net.down, ...net.up].slice(-slots * 2), 200_000);
@@ -495,7 +496,9 @@ export function LiveDashboard({
         ? format(l.insightCpu, { pct: value ?? 0 })
         : id === "drive"
           ? format(l.insightDrive, { pct: value ?? 0 })
-          : l.insightCalm;
+          : id === "recovering"
+            ? format(l.insightRecovering, { pct: value ?? 0 })
+            : l.insightCalm;
   const noteKind: Record<(typeof notes)[number]["tone"], BadgeKind> = {
     ok: "ok",
     warn: "warn",

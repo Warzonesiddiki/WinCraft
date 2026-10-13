@@ -55,16 +55,19 @@ WinCraft/
 To add a new optimization control without breaking any CI quality gates or type contracts, follow this exact 5-step runbook:
 
 ### Step 1: Define Backend Registry Adapter (`src-tauri/src/tweaks.rs`)
+
 1. Add the tweak definition to the `TWEAKS` catalog in `src-tauri/src/tweaks.rs`.
 2. Specify the exact `Hive`, registry `path`, `name`, `target_value`, `default_value`, and `requires_admin` flag.
 3. Ensure the pre-write snapshot handler captures original values.
 
 ### Step 2: Register Frontend Catalog Metadata (`src/catalog.ts`)
+
 1. Add the control to `CATALOG_ITEMS` in `src/catalog.ts`.
 2. Assign the appropriate category (`privacy`, `ui`, `services`, `gaming`, `network`, `storage`, `power`).
 3. Set the `evidence` tier (`Measured`, `Modest`, `Neutral`).
 
 ### Step 3: Add Multi-Language Copy (`src/locales/` or component copy table)
+
 1. Add the translation keys across all 6 locale files:
    - `src/locales/en.ts` (English)
    - `src/locales/it.ts` (Italian)
@@ -75,10 +78,13 @@ To add a new optimization control without breaking any CI quality gates or type 
 2. Ensure interpolation variables (e.g. `{count}`, `{percent}`) match identically across all files.
 
 ### Step 4: Handle Loanwords & Quality Audit (`scripts/audit-i18n.mjs`)
+
 1. If the term is identical to English (e.g. "Office", "Browser", "DPC"), add the translation key to `REVIEWED_AS_CORRECT` in `scripts/audit-i18n.mjs`.
 
 ### Step 5: Run Verification Pipeline
+
 Execute the full local quality gate suite:
+
 ```bash
 ./node_modules/.bin/tsc --noEmit
 npm run check:i18n
@@ -92,6 +98,7 @@ npm test
 ## 4. UI Design Token System Rules
 
 When styling components in `src/components/`:
+
 - **Do not hardcode raw Tailwind hex colors** (e.g. `bg-zinc-900`, `text-slate-400`).
 - **Use WinCraft semantic design tokens** defined in `src/components/ui.tsx` and `src/App.css`:
   - Surfaces: `bg-surface-base`, `bg-surface-elevated`, `bg-surface-card`
@@ -103,11 +110,11 @@ When styling components in `src/components/`:
 
 ## 5. Summary of CI Quality Gate Commands
 
-| Command | Purpose |
-| :--- | :--- |
-| `npm run check:i18n` | Verifies that all 1,598+ keys exist across all 6 locales with identical placeholders. |
-| `npm run check:i18n-quality` | Ensures no untranslated, unaccented, or mispunctuated strings exist. |
-| `npm run check:public-counts` | Validates that public documentation tweak claims match the active catalog. |
-| `npm run test:starter-presets`| Verifies that starter profiles only use non-elevated HKCU keys. |
-| `npm run test:debloat` | Validates that all 25 debloat packages have valid publisher IDs and Store links. |
-| `npm test` | Runs the full Vitest suite (326+ unit and integration tests). |
+| Command                        | Purpose                                                                               |
+| :----------------------------- | :------------------------------------------------------------------------------------ |
+| `npm run check:i18n`           | Verifies that all 1,598+ keys exist across all 6 locales with identical placeholders. |
+| `npm run check:i18n-quality`   | Ensures no untranslated, unaccented, or mispunctuated strings exist.                  |
+| `npm run check:public-counts`  | Validates that public documentation tweak claims match the active catalog.            |
+| `npm run test:starter-presets` | Verifies that starter profiles only use non-elevated HKCU keys.                       |
+| `npm run test:debloat`         | Validates that all 25 debloat packages have valid publisher IDs and Store links.      |
+| `npm test`                     | Runs the full Vitest suite (326+ unit and integration tests).                         |

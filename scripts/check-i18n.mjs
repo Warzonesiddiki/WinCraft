@@ -23,8 +23,7 @@ function flatten(value, prefix = "", out = {}) {
   return out;
 }
 
-const placeholders = (text) =>
-  [...String(text).matchAll(/\{(\w+)\}/g)].map((m) => m[1]).sort();
+const placeholders = (text) => [...String(text).matchAll(/\{(\w+)\}/g)].map((m) => m[1]).sort();
 
 const flat = Object.fromEntries(LANGS.map((lang) => [lang, flatten(STRINGS[lang])]));
 const problems = [];
@@ -57,7 +56,8 @@ for (const key of Object.keys(flat[REFERENCE])) {
     // A leftover "{...}" that isn't a known placeholder is almost always a typo
     // ({conut}, {Name}) that would render literally to the user.
     for (const name of actual) {
-      if (!expected.includes(name)) problems.push(`${lang}: "${key}" has unknown placeholder {${name}}`);
+      if (!expected.includes(name))
+        problems.push(`${lang}: "${key}" has unknown placeholder {${name}}`);
     }
   }
 }
@@ -74,11 +74,33 @@ for (const lang of LANGS) {
 // decision of 11 Oct 2026. Words and constructions that are Brazilian-only,
 // matched as whole words (JavaScript's \b ignores accented letters).
 const BRAZILIAN = [
-  "tela", "telas", "arquivo(?! de componentes)", "arquivos", "usuári[oa]s?", "celular",
-  "aplicativos?", "gerenci\\p{L}*", "salv(ar|e|ou|ando|ei)", "baix(ar|e|ou|ando|ado|ados|ada|adas)",
-  "mouse", "senhas?", "vocês?", "cadastr\\p{L}*", "registr(o|os|ar|ado|ados|ada|adas|ou|e)",
-  "detect\\p{L}*", "contato", "fato", "lixeira", "deletar", "equipe", "câmera",
-  "autônom\\p{L}*", "anônim\\p{L}*", "eletrônic\\p{L}*", "econômic\\p{L}*", "fenômen\\p{L}*",
+  "tela",
+  "telas",
+  "arquivo(?! de componentes)",
+  "arquivos",
+  "usuári[oa]s?",
+  "celular",
+  "aplicativos?",
+  "gerenci\\p{L}*",
+  "salv(ar|e|ou|ando|ei)",
+  "baix(ar|e|ou|ando|ado|ados|ada|adas)",
+  "mouse",
+  "senhas?",
+  "vocês?",
+  "cadastr\\p{L}*",
+  "registr(o|os|ar|ado|ados|ada|adas|ou|e)",
+  "detect\\p{L}*",
+  "contato",
+  "fato",
+  "lixeira",
+  "deletar",
+  "equipe",
+  "câmera",
+  "autônom\\p{L}*",
+  "anônim\\p{L}*",
+  "eletrônic\\p{L}*",
+  "econômic\\p{L}*",
+  "fenômen\\p{L}*",
 ].map((w) => new RegExp(`(?<!\\p{L})(${w})(?!\\p{L})`, "iu"));
 // "está fazendo" (pt-PT: "está a fazer"), a label opening on a gerund
 // ("Verificando..."), and a sentence opening on a bare possessive ("Seu PC").
@@ -90,7 +112,10 @@ const BRAZILIAN_SYNTAX = [
 for (const [key, value] of Object.entries(flat.pt)) {
   if (typeof value !== "string") continue;
   const hit = [...BRAZILIAN, ...BRAZILIAN_SYNTAX].map((re) => value.match(re)).find(Boolean);
-  if (hit) problems.push(`pt: "${key}" is Brazilian Portuguese ("${hit[0].trim()}"), use pt-PT\n      pt: ${value}`);
+  if (hit)
+    problems.push(
+      `pt: "${key}" is Brazilian Portuguese ("${hit[0].trim()}"), use pt-PT\n      pt: ${value}`,
+    );
 }
 
 const keyCount = Object.keys(flat[REFERENCE]).length;
@@ -101,4 +126,6 @@ if (problems.length > 0) {
   process.exit(1);
 }
 
-console.log(`i18n check passed: ${keyCount} keys x ${LANGS.length} languages, all placeholders consistent.`);
+console.log(
+  `i18n check passed: ${keyCount} keys x ${LANGS.length} languages, all placeholders consistent.`,
+);

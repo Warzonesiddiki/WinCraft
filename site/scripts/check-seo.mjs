@@ -37,13 +37,22 @@ for (const url of urls) {
 
   assert.ok(html.includes(`rel="canonical" href="${url.href}"`), `Wrong canonical: ${url}`);
   assert.equal((html.match(/<h1[\s>]/g) ?? []).length, 1, `Expected one rendered H1: ${url}`);
-  assert.ok(!/name="robots" content="[^"\n]*noindex/.test(html), `Indexed route has noindex: ${url}`);
+  assert.ok(
+    !/name="robots" content="[^"\n]*noindex/.test(html),
+    `Indexed route has noindex: ${url}`,
+  );
   assert.ok(!html.includes("__APP_VERSION__"), `Unresolved version: ${url}`);
 
   // The card image every platform reads. Below 1200x630 it is downgraded to a
   // small thumbnail, which is what the previous 1002x702 asset was getting.
-  assert.ok(html.includes('property="og:image:width" content="1200"'), `og:image not 1200 wide: ${url}`);
-  assert.ok(html.includes('property="og:image:height" content="630"'), `og:image not 630 tall: ${url}`);
+  assert.ok(
+    html.includes('property="og:image:width" content="1200"'),
+    `og:image not 1200 wide: ${url}`,
+  );
+  assert.ok(
+    html.includes('property="og:image:height" content="630"'),
+    `og:image not 630 tall: ${url}`,
+  );
 
   for (const [, href] of html.matchAll(/<a[^>]+href="(\/[^"#?]*)"/g)) {
     assert.ok(
@@ -54,8 +63,9 @@ for (const url of urls) {
 
   // Every page carries the sitewide identity graph, so the whole property
   // resolves to one Organization and one WebSite rather than just the homepage.
-  const blocks = [...html.matchAll(/<script type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/g)]
-    .map((match) => JSON.parse(match[1]));
+  const blocks = [
+    ...html.matchAll(/<script type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/g),
+  ].map((match) => JSON.parse(match[1]));
   const graph = blocks.find((block) => Array.isArray(block["@graph"]))?.["@graph"];
   assert.ok(graph, `Missing sitewide JSON-LD graph: ${url}`);
   assert.deepEqual(
@@ -82,11 +92,24 @@ for (const url of urls) {
 
 const home = await readFile(new URL("index.html", dist), "utf8");
 const uninstaller = await readFile(new URL("uninstaller/index.html", dist), "utf8");
-assert.ok(uninstaller.includes("it attempts to create a Windows restore point"), "Restore-point creation must not be guaranteed");
+assert.ok(
+  uninstaller.includes("it attempts to create a Windows restore point"),
+  "Restore-point creation must not be guaranteed",
+);
 assert.ok(uninstaller.includes("can fail or be skipped"), "Restore-point limits must be visible");
-assert.ok(!uninstaller.includes("a restore point taken first"), "Metadata must not promise a restore point");
-for (const [value, label] of [[141, "CONTROLS IN THIS RELEASE"], [1, "PLACE TO REVIEW &amp; RESTORE"]]) {
-  assert.match(home, new RegExp(`<span>${value}</span>[\\s\\S]{0,500}${label}`), `Stat must render its real value in the initial HTML: ${label}`);
+assert.ok(
+  !uninstaller.includes("a restore point taken first"),
+  "Metadata must not promise a restore point",
+);
+for (const [value, label] of [
+  [141, "CONTROLS IN THIS RELEASE"],
+  [1, "PLACE TO REVIEW &amp; RESTORE"],
+]) {
+  assert.match(
+    home,
+    new RegExp(`<span>${value}</span>[\\s\\S]{0,500}${label}`),
+    `Stat must render its real value in the initial HTML: ${label}`,
+  );
 }
 const app = JSON.parse(
   home.match(/<script type="application\/ld\+json" data-ld="app">([\s\S]*?)<\/script>/)[1],
@@ -110,7 +133,9 @@ assert.equal(app.offers[0].name, "Free", "The one offer must be the free one");
 for (const price of ["\u20ac59.99", "\u20ac7.99", "\u20ac99", "\u20ac39.99", "\u20ac49.99"]) {
   assert.ok(!home.includes(price), `Home page must not advertise a paid plan: ${price}`);
 }
-const uninstallerApp = [...uninstaller.matchAll(/<script type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/g)]
+const uninstallerApp = [
+  ...uninstaller.matchAll(/<script type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/g),
+]
   .map((match) => JSON.parse(match[1]))
   .find((item) => item["@type"] === "SoftwareApplication");
 assert.ok(uninstallerApp, "Uninstaller page must carry its own SoftwareApplication");
@@ -120,21 +145,32 @@ assert.deepEqual(
   ["0", "9.99"],
   "Uninstaller offers must match the plan cards on /uninstaller/",
 );
-assert.ok(uninstaller.includes("€9.99 per year"), "Uninstaller Pro price on the page changed; update its offers");
+assert.ok(
+  uninstaller.includes("€9.99 per year"),
+  "Uninstaller Pro price on the page changed; update its offers",
+);
 assert.ok(!home.includes("Free plan — 35 tweaks"), "Stale Free plan count");
 assert.ok(home.includes("/uninstaller/"), "Uninstaller must have an internal link");
-assert.ok(home.match(/<script type="application\/ld\+json">[\s\S]*?FAQPage/), "Homepage FAQ must be marked up");
+assert.ok(
+  home.match(/<script type="application\/ld\+json">[\s\S]*?FAQPage/),
+  "Homepage FAQ must be marked up",
+);
 
 const missing = await readFile(new URL("404.html", dist), "utf8");
 assert.ok(missing.includes('content="noindex,follow"'), "404 must be noindex");
 assert.ok(
-  ![...missing.matchAll(/<script type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/g)]
-    .some((match) => match[1].includes("FAQPage")),
+  ![...missing.matchAll(/<script type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/g)].some(
+    (match) => match[1].includes("FAQPage"),
+  ),
   "404 must not carry route JSON-LD",
 );
 
 const robots = await readFile(new URL("robots.txt", dist), "utf8");
-assert.match(robots, new RegExp(`Sitemap:\\s*${ORIGIN_PATTERN}/sitemap\\.xml`), "robots.txt must point at the sitemap");
+assert.match(
+  robots,
+  new RegExp(`Sitemap:\\s*${ORIGIN_PATTERN}/sitemap\\.xml`),
+  "robots.txt must point at the sitemap",
+);
 assert.match(robots, /^\s*Allow:\s*\/$/m, "robots.txt must allow crawling");
 
 // CNAME is what decides where GitHub Pages answers. If it disagrees with the

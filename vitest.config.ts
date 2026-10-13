@@ -43,13 +43,24 @@ export default defineConfig({
         // The entry point mounts the app and nothing else.
         "src/main.tsx",
       ],
-      // Raised with the tree, never ahead of it: Batch AH's two suites moved
-      // lines 43.94 -> 46.09, so the floor moves with them.
+      // Audit regression suites moved lines from 46.09% to 53.14%. The floors
+      // are raised with the measurement and never lowered to make a red run
+      // green; each keeps about a point of headroom for ordinary refactoring.
       thresholds: {
-        statements: 44,
-        branches: 43,
-        functions: 42,
-        lines: 44,
+        statements: 51,
+        branches: 50,
+        functions: 48,
+        lines: 52,
+        // Critical-path ratchets: unrelated UI tests cannot mask losing these.
+        "**/src/App.tsx": { statements: 48, branches: 54, functions: 24, lines: 55 },
+        "**/src/components/account.tsx": { statements: 20, branches: 25, functions: 13, lines: 22 },
+        "**/src/account-refresh.ts": { statements: 90, branches: 85, functions: 95, lines: 90 },
+        "**/src/components/use-visibility-interval.ts": {
+          statements: 95,
+          branches: 88,
+          functions: 95,
+          lines: 95,
+        },
       },
     },
   },

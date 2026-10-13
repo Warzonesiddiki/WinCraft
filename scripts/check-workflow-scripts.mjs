@@ -105,7 +105,8 @@ for (const file of fs.readdirSync(wfDir).filter((f) => /\.ya?ml$/.test(f))) {
   for (const { run, dir } of runBlocks(text)) {
     for (const m of run.matchAll(/node\s+(?:\.\/)?([\w./-]+\.(?:mjs|cjs|js))/g)) {
       counts.scripts++;
-      if (!fs.existsSync(path.resolve(root, m[1]))) problems.push(`${file}: calls missing script ${m[1]}`);
+      if (!fs.existsSync(path.resolve(root, m[1])))
+        problems.push(`${file}: calls missing script ${m[1]}`);
     }
     for (const m of run.matchAll(/npm run ([\w:-]+)/g)) {
       counts.npm++;
@@ -129,7 +130,8 @@ for (const file of fs.readdirSync(wfDir).filter((f) => /\.ya?ml$/.test(f))) {
     }
     for (const m of run.matchAll(/(?:^|\s)(\.{1,2}[/\\][\w./\\-]+\.ps1)/g)) {
       counts.files++;
-      if (!fs.existsSync(path.resolve(root, m[1]))) problems.push(`${file}: calls missing file ${m[1]}`);
+      if (!fs.existsSync(path.resolve(root, m[1])))
+        problems.push(`${file}: calls missing file ${m[1]}`);
     }
   }
 }

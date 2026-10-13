@@ -29,11 +29,17 @@ export const ROUTE_SEO: Record<string, RouteSeo> = {
   // the title and description are written for someone deciding whether to click
   // from a result page. Where those differ, the guide carries seoTitle/
   // seoDescription and they win here — otherwise the visible copy is reused.
-  ...Object.fromEntries(Object.entries(PRACTICAL_GUIDES).map(([path, guide]) => [path, {
-    title: `${guide.seoTitle ?? guide.title} | WinCraft`,
-    description: guide.seoDescription ?? guide.intro,
-    canonical: `${ORIGIN}${path}/`, ogType: "website" as const,
-  }])),
+  ...Object.fromEntries(
+    Object.entries(PRACTICAL_GUIDES).map(([path, guide]) => [
+      path,
+      {
+        title: `${guide.seoTitle ?? guide.title} | WinCraft`,
+        description: guide.seoDescription ?? guide.intro,
+        canonical: `${ORIGIN}${path}/`,
+        ogType: "website" as const,
+      },
+    ]),
+  ),
   "/": {
     title: "WinCraft | Windows Tuning for Steadier Frame Times",
     description:
@@ -148,21 +154,34 @@ const uninstallerApp = {
   author: { "@type": "Person", name: "Aurelio Avila" },
   publisher: { "@id": `${ORIGIN}/#organization` },
   offers: [
-    { "@type": "Offer", price: "0", priceCurrency: "EUR", name: "Free", description: "Single uninstalls, risk review and the local removal ledger" },
-    { "@type": "Offer", price: "9.99", priceCurrency: "EUR", name: "Uninstaller Pro annual", description: "Pro subscription billed yearly" },
+    {
+      "@type": "Offer",
+      price: "0",
+      priceCurrency: "EUR",
+      name: "Free",
+      description: "Single uninstalls, risk review and the local removal ledger",
+    },
+    {
+      "@type": "Offer",
+      price: "9.99",
+      priceCurrency: "EUR",
+      name: "Uninstaller Pro annual",
+      description: "Pro subscription billed yearly",
+    },
   ],
 };
 
 export const ROUTE_JSONLD: Record<string, readonly object[]> = {
   "/": [faqPage(`${ORIGIN}/#faq`, `${ORIGIN}/`, text.faq.items)],
   "/uninstaller": [uninstallerApp],
-  "/support": [
-    faqPage(`${ORIGIN}/support/#faq`, `${ORIGIN}/support/`, text.support.selfServe),
-  ],
+  "/support": [faqPage(`${ORIGIN}/support/#faq`, `${ORIGIN}/support/`, text.support.selfServe)],
   // Guides that render a "Common questions" section (src/pages/guide-faqs.ts).
-  ...Object.fromEntries(Object.entries(GUIDE_FAQS).map(([path, items]) => [
-    path, [faqPage(`${ORIGIN}${path}/#faq`, `${ORIGIN}${path}/`, items)],
-  ])),
+  ...Object.fromEntries(
+    Object.entries(GUIDE_FAQS).map(([path, items]) => [
+      path,
+      [faqPage(`${ORIGIN}${path}/#faq`, `${ORIGIN}${path}/`, items)],
+    ]),
+  ),
 };
 
 export const NOT_FOUND_SEO: RouteSeo = {

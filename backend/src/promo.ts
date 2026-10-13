@@ -82,12 +82,21 @@ export const PROMO: {
   endsAt: "2026-11-06T23:00:00.000Z",
   offers: [
     // Standard price only: the loyalty price (€4.99) already equals the promo price and is not discounted twice.
-    { product: "uninstaller", plan: "annual", priceEnv: "STRIPE_PRICE_UNINSTALLER_ANNUAL", couponEnv: "STRIPE_COUPON_HALLOWEEN_UNINSTALLER", regular: 999, reference: 999, price: 499 },
+    {
+      product: "uninstaller",
+      plan: "annual",
+      priceEnv: "STRIPE_PRICE_UNINSTALLER_ANNUAL",
+      couponEnv: "STRIPE_COUPON_HALLOWEEN_UNINSTALLER",
+      regular: 999,
+      reference: 999,
+      price: 499,
+    },
   ],
 };
 
 /** The variable that makes an offer chargeable: its coupon, or its own Price. */
-const chargeEnv = (offer: Offer): string => ("couponEnv" in offer ? offer.couponEnv : offer.promoPriceEnv);
+const chargeEnv = (offer: Offer): string =>
+  "couponEnv" in offer ? offer.couponEnv : offer.promoPriceEnv;
 
 export type PublicPromo = {
   serverTime: string;
@@ -115,15 +124,34 @@ export function percentOff(reference: number, price: number): number {
 
 function sellable(offer: Offer, environment: NodeJS.ProcessEnv): boolean {
   // A price that is not below its lawful reference is not a reduction and is never shown as one.
-  return Boolean(environment[chargeEnv(offer)]) && offer.price < offer.reference && offer.price < offer.regular;
+  return (
+    Boolean(environment[chargeEnv(offer)]) &&
+    offer.price < offer.reference &&
+    offer.price < offer.regular
+  );
 }
 
 /** The promotion as of `nowMs`. Off after the end, before the start (no prices
  *  are published early), without coupons, or with PROMO_DISABLED=1. */
-export function promoState(environment: NodeJS.ProcessEnv = process.env, nowMs: number = Date.now()): PublicPromo {
-  const base: PublicPromo = { serverTime: new Date(nowMs).toISOString(), id: null, status: "disabled", startsAt: null, endsAt: null, offers: [] };
+export function promoState(
+  environment: NodeJS.ProcessEnv = process.env,
+  nowMs: number = Date.now(),
+): PublicPromo {
+  const base: PublicPromo = {
+    serverTime: new Date(nowMs).toISOString(),
+    id: null,
+    status: "disabled",
+    startsAt: null,
+    endsAt: null,
+    offers: [],
+  };
   const offers = PROMO.offers.filter((offer) => sellable(offer, environment));
-  if (environment.PROMO_DISABLED === "1" || offers.length === 0 || nowMs >= Date.parse(PROMO.endsAt)) return base;
+  if (
+    environment.PROMO_DISABLED === "1" ||
+    offers.length === 0 ||
+    nowMs >= Date.parse(PROMO.endsAt)
+  )
+    return base;
   const window = { id: PROMO.id, startsAt: PROMO.startsAt, endsAt: PROMO.endsAt };
   if (nowMs < Date.parse(PROMO.startsAt)) return { ...base, ...window, status: "scheduled" };
   return {
@@ -131,7 +159,12 @@ export function promoState(environment: NodeJS.ProcessEnv = process.env, nowMs: 
     ...window,
     status: "active",
     offers: offers.map(({ product, plan, regular, reference, price }) => ({
-      product, plan, currency: "eur" as const, regular, reference, price,
+      product,
+      plan,
+      currency: "eur" as const,
+      regular,
+      reference,
+      price,
       percentOff: percentOff(reference, price),
       firstPeriodOnly: plan !== "lifetime",
     })),
@@ -151,7 +184,9 @@ export const EXPLICIT_EXPIRY_WITHIN_SECONDS = 23.5 * 60 * 60;
  *  payable for the usual grace (Stripe's 30-minute minimum), never longer. */
 export function promoCheckout(environment: NodeJS.ProcessEnv, nowMs: number, priceEnv: string) {
   if (promoState(environment, nowMs).status !== "active") return null;
-  const offer = PROMO.offers.find((candidate) => candidate.priceEnv === priceEnv && sellable(candidate, environment));
+  const offer = PROMO.offers.find(
+    (candidate) => candidate.priceEnv === priceEnv && sellable(candidate, environment),
+  );
   if (!offer) return null;
   const nowSeconds = Math.floor(nowMs / 1000);
   const endSeconds = Math.floor(Date.parse(PROMO.endsAt) / 1000);
@@ -160,8 +195,9 @@ export function promoCheckout(environment: NodeJS.ProcessEnv, nowMs: number, pri
       ? { coupon: environment[offer.couponEnv]!, price: undefined }
       : { coupon: undefined, price: environment[offer.promoPriceEnv]! }),
     id: PROMO.id,
-    expiresAt: endSeconds - nowSeconds > EXPLICIT_EXPIRY_WITHIN_SECONDS
-      ? undefined
-      : Math.max(endSeconds, nowSeconds + LIFETIME_CHECKOUT_GRACE_SECONDS),
+    expiresAt:
+      endSeconds - nowSeconds > EXPLICIT_EXPIRY_WITHIN_SECONDS
+        ? undefined
+        : Math.max(endSeconds, nowSeconds + LIFETIME_CHECKOUT_GRACE_SECONDS),
   };
 }

@@ -14,7 +14,9 @@ const newsletterRoutes = newsletterModule.default.default ?? newsletterModule.de
 await initSchema();
 
 const { getPool } = await import("../dist/db.js");
-const { listUnsubscribeHeaders } = newsletterModule.default.default ? newsletterModule.default : newsletterModule;
+const { listUnsubscribeHeaders } = newsletterModule.default.default
+  ? newsletterModule.default
+  : newsletterModule;
 
 test("list mail carries one-click unsubscribe headers", () => {
   assert.deepEqual(listUnsubscribeHeaders("https://api.pctweaker.app/u?x=1"), {
@@ -37,7 +39,8 @@ const url = (s) => `${base}?email=${encodeURIComponent(email)}&sig=${encodeURICo
 
 const optedOut = async () => {
   const { rows } = await getPool().query(
-    "SELECT unsubscribed_at FROM newsletter_subscribers WHERE lower(email) = $1", [email],
+    "SELECT unsubscribed_at FROM newsletter_subscribers WHERE lower(email) = $1",
+    [email],
   );
   return Boolean(rows[0]?.unsubscribed_at);
 };
@@ -46,7 +49,10 @@ test("opening the link only asks, so mail scanners cannot unsubscribe anyone", a
   const res = await fetch(url(sig));
   assert.equal(res.status, 200);
   const page = await res.text();
-  assert.match(page, /<form method="post" action="\/api\/newsletter\/unsubscribe\?email=reader%40example\.com&amp;sig=/);
+  assert.match(
+    page,
+    /<form method="post" action="\/api\/newsletter\/unsubscribe\?email=reader%40example\.com&amp;sig=/,
+  );
   assert.equal(await optedOut(), false);
 });
 

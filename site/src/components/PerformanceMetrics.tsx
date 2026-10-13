@@ -1,6 +1,5 @@
-import { motion } from "framer-motion";
 import { text } from "../i18n/dictionary";
-import { EASE, riseChild, staggerParent, viewportOnce } from "../motion";
+import { Reveal, RevealGroup } from "../reveal";
 
 /* ---------- deterministic pseudo-random frame-time traces ---------- */
 function buildTrace(jitter: number, base: number, seed: number): string {
@@ -28,42 +27,27 @@ const TWEAKED_TRACE = buildTrace(6, 118, 1337);
 export function PerformanceMetrics() {
   return (
     <section id="results" className="border-t border-white/5 px-5 py-24 md:px-12">
-      <motion.div
-        className="mx-auto max-w-7xl"
-        variants={staggerParent}
-        initial="hidden"
-        whileInView="show"
-        viewport={viewportOnce}
-      >
+      <RevealGroup className="mx-auto max-w-7xl">
         <div className="mb-16 grid items-end gap-10 md:grid-cols-2">
           <div>
-            <motion.div
-              variants={riseChild}
-              className="font-mono-t mb-4 text-[11.5px] tracking-[0.18em] text-[var(--fg-dim)]"
-            >
+            <Reveal className="font-mono-t mb-4 text-[11.5px] tracking-[0.18em] text-[var(--fg-dim)]">
               <span className="text-accent">{text.metrics.tag.split(" / ")[0]}</span> /{" "}
               {text.metrics.tag.split(" / ")[1]}
-            </motion.div>
-            <motion.h2
-              variants={riseChild}
+            </Reveal>
+            <Reveal
+              as="h2"
               className="font-display text-[clamp(1.8rem,3.6vw,2.8rem)] leading-tight font-bold tracking-tight text-[var(--fg)]"
             >
               {text.metrics.title}
-            </motion.h2>
+            </Reveal>
           </div>
-          <motion.p
-            variants={riseChild}
-            className="text-[15px] leading-relaxed text-[var(--fg-dim)]"
-          >
+          <Reveal as="p" className="text-[15px] leading-relaxed text-[var(--fg-dim)]">
             {text.metrics.sub}
-          </motion.p>
+          </Reveal>
         </div>
 
         {/* stat strip */}
-        <motion.div
-          variants={riseChild}
-          className="grid grid-cols-2 gap-px overflow-hidden rounded-2xl border border-white/5 bg-white/5 md:grid-cols-4"
-        >
+        <Reveal className="grid grid-cols-2 gap-px overflow-hidden rounded-2xl border border-white/5 bg-white/5 md:grid-cols-4">
           {text.metrics.stats.map((s) => (
             <div key={s.label} className="bg-[var(--bg)] px-7 py-9">
               <div className="font-mono-t text-[clamp(2rem,3.6vw,3rem)] leading-none font-bold text-[var(--fg)] tabular-nums">
@@ -75,13 +59,10 @@ export function PerformanceMetrics() {
               </div>
             </div>
           ))}
-        </motion.div>
+        </Reveal>
 
         {/* frame-time telemetry graph */}
-        <motion.div
-          variants={riseChild}
-          className="mt-14 overflow-hidden rounded-2xl border border-white/5 bg-[var(--bg-2)] p-7 md:p-9"
-        >
+        <Reveal className="mt-14 overflow-hidden rounded-2xl border border-white/5 bg-[var(--bg-2)] p-7 md:p-9">
           <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
             <span className="font-mono-t text-[11px] tracking-[0.16em] text-[var(--fg-dim)]">
               {text.metrics.graphTitle}
@@ -115,33 +96,29 @@ export function PerformanceMetrics() {
                 strokeWidth="1"
               />
             ))}
-            <motion.polyline
+            <polyline
               points={STOCK_TRACE}
               fill="none"
               stroke="var(--line)"
               strokeWidth="1.6"
-              initial={{ pathLength: 0 }}
-              whileInView={{ pathLength: 1 }}
-              viewport={{ once: true, amount: 0.5 }}
-              transition={{ duration: 1.6, ease: EASE }}
+              pathLength={1}
+              className="trace-draw"
             />
-            <motion.polyline
+            <polyline
               points={TWEAKED_TRACE}
               fill="none"
               stroke="var(--accent)"
               strokeWidth="2"
-              initial={{ pathLength: 0 }}
-              whileInView={{ pathLength: 1 }}
-              viewport={{ once: true, amount: 0.5 }}
-              transition={{ duration: 1.6, ease: EASE, delay: 0.35 }}
+              pathLength={1}
+              className="trace-draw trace-draw--delayed"
             />
           </svg>
 
           <div className="font-mono-t mt-5 text-[11.5px] text-[var(--fg-dim)]">
             {text.metrics.graphNote}
           </div>
-        </motion.div>
-      </motion.div>
+        </Reveal>
+      </RevealGroup>
     </section>
   );
 }

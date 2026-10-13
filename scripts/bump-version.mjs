@@ -38,7 +38,10 @@ const edits = [
       // The root entry carries the version twice: at the top level and under
       // packages[""]. Both have to move or `npm ci` and `npm version` disagree.
       let out = text.replace(`"version": "${before}"`, `"version": "${next}"`);
-      out = out.replace(`"": {\n      "name": "wincraft",\n      "version": "${before}"`, `"": {\n      "name": "wincraft",\n      "version": "${next}"`);
+      out = out.replace(
+        `"": {\n      "name": "wincraft",\n      "version": "${before}"`,
+        `"": {\n      "name": "wincraft",\n      "version": "${next}"`,
+      );
       return out;
     },
   },
@@ -84,10 +87,13 @@ const cargoLock = read("src-tauri/Cargo.lock");
 
 if (pkg.version !== next) problems.push(`package.json reads ${pkg.version}`);
 if (lock.version !== next) problems.push(`package-lock.json reads ${lock.version}`);
-if (lock.packages[""]?.version !== next) problems.push(`package-lock.json packages[""] reads ${lock.packages[""]?.version}`);
+if (lock.packages[""]?.version !== next)
+  problems.push(`package-lock.json packages[""] reads ${lock.packages[""]?.version}`);
 if (conf.version !== next) problems.push(`tauri.conf.json reads ${conf.version}`);
-if (!new RegExp(`^version = "${next}"$`, "m").test(cargoToml)) problems.push(`Cargo.toml does not read ${next}`);
-if (!new RegExp(`name = "tauri-app"\\r?\\nversion = "${next}"`).test(cargoLock)) problems.push(`Cargo.lock does not read ${next}`);
+if (!new RegExp(`^version = "${next}"$`, "m").test(cargoToml))
+  problems.push(`Cargo.toml does not read ${next}`);
+if (!new RegExp(`name = "tauri-app"\\r?\\nversion = "${next}"`).test(cargoLock))
+  problems.push(`Cargo.lock does not read ${next}`);
 
 if (problems.length) {
   console.error("bump-version: the tree is inconsistent:");

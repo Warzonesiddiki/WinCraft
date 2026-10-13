@@ -21,9 +21,7 @@ export function NewsletterSignup({
   const [error, setError] = useState("");
 
   if (state === "done") {
-    return (
-      <p className="mt-5 max-w-xs text-[13px] text-[var(--accent)]">{copy.thanks}</p>
-    );
+    return <p className="mt-5 max-w-xs text-[13px] text-[var(--accent)]">{copy.thanks}</p>;
   }
 
   return (

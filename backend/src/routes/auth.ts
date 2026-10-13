@@ -1,7 +1,8 @@
 import express, { Request, Response } from "express";
 import rateLimit from "express-rate-limit";
-import { getPool, isConfigured } from "../db";
+import { getPool, isConfigured, withTransaction } from "../db";
 import { hashPassword, verifyPassword, signToken, requireAuth, isValidEmail, isValidPassword } from "../auth";
+import { limitAuthWork } from "../auth-work-guard";
 import { createActionToken, consumeActionToken, confirmsVerifiedAddress } from "../tokens";
 import { sendMail, MailError } from "../mailer";
 import {
@@ -19,27 +20,14 @@ import {
   verificationSubject,
 } from "../emails/account";
 
-/** What the free tier includes, quoted in the welcome email. Kept beside the
- *  one place that sends it rather than hidden in the template, so a change to
- *  what is free is a change here. */
-const FREE_TWEAK_COUNT = 39;
-
 const router = express.Router();
 
 // Slows down credential-stuffing / brute-force attempts against these
 // endpoints specifically, without throttling the rest of the API.
 //
-// Keyed on the submitted email/target account rather than req.ip: Railway
-// sits in front as a single proxy hop but does not strip an inbound
-// X-Forwarded-For before appending its own, so with `trust proxy: 1` the
-// attacker-supplied value survives as req.ip — confirmed live, rotating the
-// header on every request bypassed a 20-req/15min IP-keyed limiter entirely
-// (0 blocks across 25 failed logins). The email is the actual asset being
-// protected here (one account's password), and it can't be rotated for
-// free the way a header can, so keying on it closes the bypass regardless
-// of how many IPs an attacker claims to have. Requests with no email in the
-// body (malformed JSON, wrong content-type) fall back to req.ip, which is
-// still meaningful for blanket abuse even if spoofable per-target.
+// Per-account protection stacks with verified proxy-source limiters and the
+// instance-wide work budget. Previously a numeric proxy hop count allowed
+// rotating forwarding headers; proxy-policy.ts now requires explicit networks.
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   limit: 20,
@@ -129,8 +117,8 @@ async function sendAccountWelcome(userId: number): Promise<void> {
   await sendMail({
     to: user.email,
     subject: accountWelcomeSubject(),
-    html: accountWelcomeHtml(user.first_name ?? "", FREE_TWEAK_COUNT),
-    text: accountWelcomeText(FREE_TWEAK_COUNT),
+    html: accountWelcomeHtml(user.first_name ?? ""),
+    text: accountWelcomeText(),
   });
 }
 
@@ -172,7 +160,7 @@ export function isValidDateOfBirth(value: unknown): value is string {
     && date.getTime() <= Date.now();
 }
 
-router.post("/register", registerLimiter, async (req: Request, res: Response) => {
+router.post("/register", registerLimiter, limitAuthWork("register", async (req: Request, res: Response) => {
   const { email, password, firstName, lastName, dateOfBirth } = req.body || {};
   if (!isValidEmail(email)) return res.status(400).json({ error: "invalid email" });
   if (!isValidPassword(password)) return res.status(400).json({ error: "Password must be at least 8 characters and no more than 72 UTF-8 bytes." });
@@ -224,9 +212,9 @@ router.post("/register", registerLimiter, async (req: Request, res: Response) =>
     console.error("register failed:", err);
     res.status(500).json({ error: "registration failed" });
   }
-});
+}));
 
-router.post("/login", async (req: Request, res: Response) => {
+router.post("/login", limitAuthWork("login", async (req: Request, res: Response) => {
   const { email, password } = req.body || {};
   if (!isValidEmail(email) || typeof password !== "string") {
     return res.status(400).json({ error: "invalid email or password" });
@@ -252,7 +240,7 @@ router.post("/login", async (req: Request, res: Response) => {
     console.error("login failed:", err);
     res.status(500).json({ error: "login failed" });
   }
-});
+}));
 
 router.post("/logout-all", requireAuth, async (req: Request, res: Response) => {
   try {
@@ -358,7 +346,11 @@ router.get("/verify-email", async (req: Request, res: Response) => {
   if (typeof token !== "string") return res.status(400).send(htmlPage("Error", "<p class=error>Missing token.</p>"));
 
   try {
-    const userId = await consumeActionToken(token, "email_verify");
+    const userId = await withTransaction(async (client) => {
+      const id = await consumeActionToken(token, "email_verify", client);
+      if (id) await client.query("UPDATE users SET email_verified = TRUE WHERE id = $1", [id]);
+      return id;
+    });
     if (!userId && (await confirmsVerifiedAddress(token))) {
       return res.send(htmlPage("Email verified", "<p class=success>Your email is already verified. You can close this window and return to WinCraft.</p>"));
     }
@@ -367,7 +359,6 @@ router.get("/verify-email", async (req: Request, res: Response) => {
         .status(400)
         .send(htmlPage("Link expired", "<p class=error>This verification link is invalid or has expired. Request a new one from the app.</p>"));
     }
-    await getPool().query("UPDATE users SET email_verified = TRUE WHERE id = $1", [userId]);
     // The welcome waits until here rather than going out at registration,
     // where it would have arrived alongside the message asking the person to
     // confirm — two at once makes the one that needs acting on easier to
@@ -460,7 +451,7 @@ router.get("/reset-password", (req: Request, res: Response) => {
   res.send(resetForm(token));
 });
 
-router.post("/reset-password", resetPasswordLimiter, async (req: Request, res: Response) => {
+router.post("/reset-password", resetPasswordLimiter, limitAuthWork("reset-password", async (req: Request, res: Response) => {
   const { token, newPassword, confirmPassword } = req.body || {};
 
   // The browser form posts url-encoded and expects HTML back; the desktop app
@@ -486,18 +477,22 @@ router.post("/reset-password", resetPasswordLimiter, async (req: Request, res: R
   if (!isConfigured) return fail(503, "database not configured (DATABASE_URL missing)");
 
   try {
-    const userId = await consumeActionToken(token, "password_reset");
+    // CPU work happens before the short database transaction, not while
+    // holding locks. Token consumption and the password write commit together.
+    const passwordHash = await hashPassword(newPassword);
+    const userId = await withTransaction(async (client) => {
+      const id = await consumeActionToken(token, "password_reset", client);
+      if (id) {
+        await client.query(
+          "UPDATE users SET password_hash = $1, token_version = token_version + 1 WHERE id = $2",
+          [passwordHash, id],
+        );
+      }
+      return id;
+    });
     if (!userId) {
       return fail(400, "This reset link is invalid, already used, or has expired.");
     }
-    const passwordHash = await hashPassword(newPassword);
-    // Bumping token_version signs out every session that used the old
-    // password — important since a stolen old token shouldn't survive a
-    // password reset that was presumably triggered because of a compromise.
-    await getPool().query(
-      "UPDATE users SET password_hash = $1, token_version = token_version + 1 WHERE id = $2",
-      [passwordHash, userId],
-    );
 
     // Best-effort, like the welcome: the password has already changed by now,
     // and failing the request would tell the user their reset did not work
@@ -520,6 +515,6 @@ router.post("/reset-password", resetPasswordLimiter, async (req: Request, res: R
     console.error("reset-password failed:", err);
     return fail(500, "Could not reset the password. Please try again.");
   }
-});
+}));
 
 export default router;

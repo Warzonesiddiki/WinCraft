@@ -1,19 +1,9 @@
 /**
  * Abuse controls for the two anonymous public forms (support + reviews).
  *
- * Why this exists on top of express-rate-limit: every per-IP limiter in this
- * app is bypassable. Railway sits in front as a single proxy hop and does not
- * strip an inbound X-Forwarded-For before appending its own, so with
- * `trust proxy: 1` an attacker-supplied value becomes req.ip — rotating the
- * header defeats any IP-keyed limit (confirmed live against the auth routes;
- * see the note in routes/auth.ts). The auth routes solve that by keying on
- * the target email, but an anonymous form has no such stable identity.
- *
- * A *global* ceiling has no key to rotate. It cannot stop one determined
- * abuser from consuming the budget, but it does bound the blast radius of
- * the things that actually hurt: burning the transactional email quota,
- * getting the sending domain flagged as a spam source, and filling the
- * database faster than a human could moderate.
+ * This ceiling does not depend on source identity. It bounds email and
+ * database work even across many legitimate IPs. Proxy trust is configured
+ * separately by proxy-policy.ts; in-memory budgets require a single replica.
  */
 
 type Bucket = { windowStartedAt: number; count: number };

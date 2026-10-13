@@ -852,6 +852,8 @@ export const es: Strings = {
     zoomLong: "5 min",
     minutesAgo: "hace {n} min",
     peak: "Pico {value}",
+    insightRecovering:
+      "El procesador está bajando: promediaba más del 75 % y la última lectura es del {pct} %.",
     insightCalm: "Todo está tranquilo. Ahora mismo nada necesita tu atención.",
     insightMemory:
       "La memoria está muy ocupada ({pct} %). Cierra las apps que no uses o revisa qué se inicia con Windows.",
@@ -1053,6 +1055,8 @@ export const es: Strings = {
     profileDefaultIsMax:
       "En esta tarjeta el límite de potencia de fábrica ya coincide con el máximo, así que Silencioso es el único perfil que cambia los vatios: Gaming se distingue subiendo el techo del reloj.",
     driverInstalled: "instalado v{version} el {date}",
+    driversHardwareChanged:
+      "Esta lista se analizó en un hardware distinto del que tiene el equipo ahora (por ejemplo, una tarjeta gráfica sustituida), así que se ha borrado. Vuelve a analizar para leer los dispositivos realmente instalados.",
     driversNoUpdateCheck:
       "Esta pantalla no contacta con ningún fabricante y no puede saber si existe una versión más reciente: muestra la versión instalada y su antigüedad, y te lleva a la página oficial para que lo compruebes tú.",
     driversCheckedAt: "Leído el {time}",
@@ -1135,6 +1139,22 @@ export const es: Strings = {
     emailVerified: "Correo verificado",
     resendVerification: "Reenviar",
     verificationSent: "Correo de verificación enviado.",
+    deleteAccount: "Eliminar cuenta",
+    deleteAccountBody:
+      "Elimina tu dirección de correo, tu contraseña y los datos guardados, cierra la sesión en todos los dispositivos y no se puede deshacer. Una reseña que publicaste sigue visible, pero sin la dirección asociada.",
+    deleteAccountPassword: "Tu contraseña actual",
+    deleteAccountConfirmLabel: "Escribe DELETE para confirmar",
+    deleteAccountSubmit: "Eliminar mi cuenta definitivamente",
+    deleteAccountCancel: "Cancelar",
+    deleteAccountDone:
+      "Tu cuenta se ha eliminado. Se ha cerrado la sesión en todos los dispositivos.",
+    deleteAccountBlocked:
+      "Esta cuenta tiene una suscripción activa. Cancélala desde Gestionar suscripción; si no, eliminar la cuenta dejaría tu tarjeta con cargos.",
+    deleteAccountWrongPassword: "Esa contraseña no coincide con esta cuenta.",
+    deleteAccountNeedsLogin:
+      "Tu sesión ha caducado. Inicia sesión de nuevo para eliminar la cuenta.",
+    deleteAccountUnreachable:
+      "No se pudo contactar con el servidor. No se eliminó nada: comprueba tu conexión e inténtalo de nuevo.",
   },
   driftWatch: {
     title: "Vigilar las actualizaciones de Windows",
@@ -1554,7 +1574,7 @@ export const es: Strings = {
     auto_end_frozen_tasks: {
       name: "Que una app colgada no bloquee el apagado",
       description:
-        'Cuando una aplicación deja de responder durante el apagado, Windows espera y muestra la pantalla "Esta aplicación impide el apagado" hasta que alguien hace clic. Esto cierra solo las aplicaciones que no responden, para que un programa colgado no deje el equipo encendido.',
+        'Cuando una aplicación deja de responder durante el apagado, Windows espera y muestra la pantalla "Esta aplicación impide el apagado" hasta que alguien hace clic. Esto cierra solo las aplicaciones que no responden, para que un programa colgado no deje el equipo encendido. Advertencia: cerrar aplicaciones automáticamente puede provocar la pérdida del trabajo sin guardar. Restaurar este ajuste no recupera ese trabajo.',
     },
     instant_folder_loading: {
       name: "Abrir cada carpeta al instante",

@@ -1,5 +1,6 @@
 import crypto from "crypto";
 import { getPool } from "./db";
+import type { Pool } from "pg";
 
 function hashToken(rawToken: string): string {
   return crypto.createHash("sha256").update(rawToken).digest("hex");
@@ -30,8 +31,12 @@ async function createActionToken(userId: number, purpose: string, ttlMs: number)
  * null if the token is invalid for any reason (deliberately not distinguishing
  * why, to avoid leaking which case applies).
  */
-async function consumeActionToken(rawToken: string, purpose: string): Promise<number | null> {
-  const result = await getPool().query(
+async function consumeActionToken(
+  rawToken: string,
+  purpose: string,
+  database: Pick<Pool, "query"> = getPool(),
+): Promise<number | null> {
+  const result = await database.query(
     `UPDATE action_tokens
        SET used_at = now()
      WHERE token_hash = $1

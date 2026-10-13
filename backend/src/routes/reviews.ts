@@ -46,11 +46,8 @@ const MAX_BODY = 2000;
 /** Ceiling no amount of header rotation can raise. */
 const GLOBAL_REVIEWS_PER_HOUR = 40;
 
-/**
- * First line of defence, keyed on req.ip. Trivially bypassed by an attacker
- * rotating X-Forwarded-For, which is why the global budget above exists — but
- * it does stop naive scripted floods without touching that shared ceiling.
- */
+/** Per-source defence uses Express's verified proxy policy. The separate
+ * instance-wide budget also bounds anonymous requests across many sources. */
 const writeLimiter = rateLimit({
   windowMs: 60 * 60 * 1000,
   limit: 5,
@@ -67,15 +64,9 @@ function escapeHtml(s: string): string {
     .replace(/"/g, "&quot;");
 }
 
-/**
- * The submitting connection, for moderation. Railway's edge appends the real
- * client as the leftmost X-Forwarded-For entry; req.ip is the fallback for
- * local runs. A determined abuser can still vary it — it's a hint for
- * spotting repeat voters, not an identity, which is why it never gates
- * submission.
- */
+/** Moderation uses the same verified proxy policy as rate limiting. */
 function clientIp(req: Request): string {
-  return (req.get("x-forwarded-for")?.split(",")[0] ?? req.ip ?? "").trim().slice(0, 64);
+  return (req.ip ?? "").trim().slice(0, 64);
 }
 
 /**

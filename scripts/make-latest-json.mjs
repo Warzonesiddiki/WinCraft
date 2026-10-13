@@ -20,14 +20,18 @@ import { signedFileName, verifyUpdater } from "./verify-updater.mjs";
 const root = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
 const conf = JSON.parse(fs.readFileSync(path.join(root, "src-tauri", "tauri.conf.json"), "utf8"));
 const version = conf.version;
-const repoUrl = conf.plugins?.updater?.endpoints?.[0]?.match(/https:\/\/github\.com\/[^/]+\/[^/]+/)?.[0];
+const repoUrl = conf.plugins?.updater?.endpoints?.[0]?.match(
+  /https:\/\/github\.com\/[^/]+\/[^/]+/,
+)?.[0];
 if (!repoUrl) {
   console.error("Could not derive the repo URL from the updater endpoint.");
   process.exit(1);
 }
 
 const nsisDir = path.join(root, "src-tauri", "target", "release", "bundle", "nsis");
-const setups = fs.readdirSync(nsisDir).filter((f) => f.includes(`_${version}_`) && f.endsWith("_x64-setup.exe"));
+const setups = fs
+  .readdirSync(nsisDir)
+  .filter((f) => f.includes(`_${version}_`) && f.endsWith("_x64-setup.exe"));
 if (setups.length !== 1) throw new Error("Expected exactly one current x64 setup.");
 const setup = setups[0];
 if (!setup) {
@@ -67,7 +71,9 @@ if (/[^A-Za-z0-9.\-_]/.test(assetName)) {
 }
 
 const msiDir = path.join(root, "src-tauri", "target", "release", "bundle", "msi");
-const msis = fs.readdirSync(msiDir).filter((file) => file.includes(`_${version}_`) && file.endsWith(".msi"));
+const msis = fs
+  .readdirSync(msiDir)
+  .filter((file) => file.includes(`_${version}_`) && file.endsWith(".msi"));
 if (msis.length !== 1) throw new Error("Expected exactly one current MSI installer.");
 const releaseDir = path.join(root, "src-tauri", "target", "release");
 
@@ -102,7 +108,8 @@ function shippedApplication(msiPath) {
       }
     };
     walk(staging);
-    if (found.length !== 1) throw new Error(`expected one payload executable, found ${found.length}`);
+    if (found.length !== 1)
+      throw new Error(`expected one payload executable, found ${found.length}`);
     // Copied out before the staging directory goes away, and left in place:
     // the verification below reads it, and a human comparing hashes after the
     // fact needs it to still be there.
@@ -110,7 +117,9 @@ function shippedApplication(msiPath) {
     fs.copyFileSync(found[0], destination);
     return destination;
   } catch (error) {
-    console.warn(`Could not unpack the MSI payload (${error.message}); verifying the build output instead.`);
+    console.warn(
+      `Could not unpack the MSI payload (${error.message}); verifying the build output instead.`,
+    );
     return path.join(releaseDir, "WinCraft.exe");
   } finally {
     fs.rmSync(staging, { recursive: true, force: true });
@@ -120,7 +129,10 @@ function shippedApplication(msiPath) {
 const shipped = shippedApplication(path.join(msiDir, msis[0]));
 const binaries = [
   shipped,
-  ...fs.readdirSync(releaseDir).filter((file) => file.endsWith(".dll")).map((file) => path.join(releaseDir, file)),
+  ...fs
+    .readdirSync(releaseDir)
+    .filter((file) => file.endsWith(".dll"))
+    .map((file) => path.join(releaseDir, file)),
   path.join(nsisDir, setup),
   path.join(msiDir, msis[0]),
 ];
@@ -134,8 +146,18 @@ for (const binary of binaries) {
   // tool. RELEASE-VERIFICATION.md is explicit that missing tools stop
   // preparation, so say which one and stop here.
   try {
-    execFileSync("pwsh", ["-NoProfile", "-NonInteractive", "-File",
-      path.join(root, "scripts", "verify-authenticode.ps1"), "-Path", binary], { stdio: "inherit" });
+    execFileSync(
+      "pwsh",
+      [
+        "-NoProfile",
+        "-NonInteractive",
+        "-File",
+        path.join(root, "scripts", "verify-authenticode.ps1"),
+        "-Path",
+        binary,
+      ],
+      { stdio: "inherit" },
+    );
   } catch (e) {
     if (e?.code === "ENOENT") {
       console.error(
@@ -166,7 +188,10 @@ if (setup !== required.setup || msis[0] !== required.msi || downloadUrl !== requ
   );
   process.exit(1);
 }
-for (const [file, signature] of [[setup, updaterSignature], [msis[0], msiSignature]]) {
+for (const [file, signature] of [
+  [setup, updaterSignature],
+  [msis[0], msiSignature],
+]) {
   if (signedFileName(signature) !== file) {
     console.error(
       `${file}: its updater signature is not in the form installed clients accept, so they would ` +
@@ -177,10 +202,13 @@ for (const [file, signature] of [[setup, updaterSignature], [msis[0], msiSignatu
     process.exit(1);
   }
 }
-const frontendEntry = fs.readFileSync(path.join(root, "dist", "index.html"), "utf8")
+const frontendEntry = fs
+  .readFileSync(path.join(root, "dist", "index.html"), "utf8")
   .match(/src="\/assets\/([^" ]+\.js)"/)?.[1];
 if (!frontendEntry || !fs.readFileSync(shipped).includes(Buffer.from(frontendEntry))) {
-  throw new Error("Installer payload is missing the production frontend; rebuild with `tauri build`, not `cargo build`.");
+  throw new Error(
+    "Installer payload is missing the production frontend; rebuild with `tauri build`, not `cargo build`.",
+  );
 }
 for (const [file, hash] of hashes) {
   if (sha256(file) !== hash) throw new Error(`File changed during verification: ${file}`);

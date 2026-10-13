@@ -836,6 +836,8 @@ export const en: Strings = {
     zoomLong: "5 min",
     minutesAgo: "{n} min ago",
     peak: "Peak {value}",
+    insightRecovering:
+      "The processor is easing off: it averaged over 75% and the last reading is {pct}%.",
     insightCalm: "Everything looks calm. Nothing needs your attention right now.",
     insightMemory:
       "Memory is running high ({pct}%). Close apps you aren't using, or check what starts with Windows.",
@@ -1036,6 +1038,8 @@ export const en: Strings = {
     profileDefaultIsMax:
       "On this card the factory power limit already equals the maximum, so Silent is the only profile that changes the wattage: Gaming differs by raising the clock ceiling instead.",
     driverInstalled: "installed v{version} on {date}",
+    driversHardwareChanged:
+      "This list was scanned on different hardware than the PC is running now (for example a replaced graphics card), so it has been cleared. Run Rescan to read the devices actually installed.",
     driversNoUpdateCheck:
       "This screen contacts no vendor and cannot know whether a newer version exists: it shows the installed version and its age, and takes you to the official page to check for yourself.",
     driversCheckedAt: "Read at {time}",
@@ -1116,6 +1120,20 @@ export const en: Strings = {
     emailVerified: "Email verified",
     resendVerification: "Resend",
     verificationSent: "Verification email sent.",
+    deleteAccount: "Delete account",
+    deleteAccountBody:
+      "This removes your email address, password and saved details, signs out every device, and cannot be undone. A review you published stays visible, with the address detached from it.",
+    deleteAccountPassword: "Your current password",
+    deleteAccountConfirmLabel: "Type DELETE to confirm",
+    deleteAccountSubmit: "Delete my account for good",
+    deleteAccountCancel: "Cancel",
+    deleteAccountDone: "Your account has been deleted. Every device has been signed out.",
+    deleteAccountBlocked:
+      "This account has an active subscription. Cancel it from Manage subscription first; deleting the account would otherwise leave your card being charged.",
+    deleteAccountWrongPassword: "That password does not match this account.",
+    deleteAccountNeedsLogin: "Your session has expired. Sign in again to delete the account.",
+    deleteAccountUnreachable:
+      "The server could not be reached. Nothing was deleted — check your connection and try again.",
   },
   driftWatch: {
     title: "Watch for Windows updates",
@@ -1533,7 +1551,7 @@ export const en: Strings = {
     auto_end_frozen_tasks: {
       name: "Don't let a frozen app block shutdown",
       description:
-        'When an application stops responding during shutdown, Windows waits and shows the "This app is preventing shutdown" screen until someone clicks it. This closes unresponsive apps automatically instead, so a hung program cannot leave the machine sitting powered on.',
+        'When an application stops responding during shutdown, Windows waits and shows the "This app is preventing shutdown" screen until someone clicks it. This closes unresponsive apps automatically instead, so a hung program cannot leave the machine sitting powered on. Warning: automatically closing apps can lose unsaved work. Restoring this setting cannot recover that work.',
     },
     instant_folder_loading: {
       name: "Open every folder instantly",
@@ -1705,8 +1723,7 @@ export const en: Strings = {
     },
     disable_edge_shopping: {
       name: "Disable Edge shopping assistant",
-      description:
-        "Disables Microsoft Edge shopping assistant and coupon tracking telemetry.",
+      description: "Disables Microsoft Edge shopping assistant and coupon tracking telemetry.",
     },
     disable_edge_metrics: {
       name: "Disable Edge diagnostic metrics reporting",
@@ -1730,8 +1747,7 @@ export const en: Strings = {
     },
     disable_edge_hub_sidebar: {
       name: "Disable Microsoft Edge sidebar",
-      description:
-        "Disables the Edge sidebar and its integrated background web widgets.",
+      description: "Disables the Edge sidebar and its integrated background web widgets.",
     },
     disable_edge_wallet: {
       name: "Disable Edge wallet autofill suggestions",
@@ -1745,8 +1761,7 @@ export const en: Strings = {
     },
     disable_device_history: {
       name: "Disable Windows device activity history",
-      description:
-        "Stops Windows from recording and tracking app and file history on this device.",
+      description: "Stops Windows from recording and tracking app and file history on this device.",
     },
     disable_search_history: {
       name: "Disable taskbar search history",
@@ -1780,8 +1795,7 @@ export const en: Strings = {
     },
     disable_bing_widget_search: {
       name: "Disable Windows 11 Widgets and feeds",
-      description:
-        "Disables the Windows 11 widgets board and background web feed synchronization.",
+      description: "Disables the Windows 11 widgets board and background web feed synchronization.",
     },
     disable_typing_insights: {
       name: "Disable typing insights telemetry",

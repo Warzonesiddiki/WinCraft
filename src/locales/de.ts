@@ -857,6 +857,8 @@ export const de: Strings = {
     zoomLong: "5 Min.",
     minutesAgo: "vor {n} Min.",
     peak: "Spitze {value}",
+    insightRecovering:
+      "Der Prozessor kommt zur Ruhe: Er lag im Mittel über 75 %, der letzte Messwert beträgt {pct} %.",
     insightCalm: "Alles ruhig. Gerade braucht nichts deine Aufmerksamkeit.",
     insightMemory:
       "Der Arbeitsspeicher ist stark belegt ({pct} %). Schließe Apps, die du nicht nutzt, oder prüfe, was mit Windows startet.",
@@ -1062,6 +1064,8 @@ export const de: Strings = {
     profileDefaultIsMax:
       "Bei dieser Karte entspricht das Werks-Leistungslimit bereits dem Maximum, daher ändert nur Leise die Wattzahl: Gaming unterscheidet sich, indem es die Taktobergrenze anhebt.",
     driverInstalled: "installiert v{version} am {date}",
+    driversHardwareChanged:
+      "Diese Liste wurde auf anderer Hardware erstellt als der, auf der der PC jetzt läuft (zum Beispiel eine getauschte Grafikkarte) und wurde deshalb verworfen. Starte die Analyse neu, um die tatsächlich installierten Geräte zu lesen.",
     driversNoUpdateCheck:
       "Dieser Bildschirm kontaktiert keinen Hersteller und kann nicht wissen, ob eine neuere Version existiert: Er zeigt die installierte Version und ihr Alter und führt Sie zur offiziellen Seite, damit Sie es selbst prüfen.",
     driversCheckedAt: "Gelesen am {time}",
@@ -1144,6 +1148,21 @@ export const de: Strings = {
     emailVerified: "E-Mail bestätigt",
     resendVerification: "Erneut senden",
     verificationSent: "Bestätigungs-E-Mail gesendet.",
+    deleteAccount: "Konto löschen",
+    deleteAccountBody:
+      "Entfernt deine E-Mail-Adresse, dein Passwort und gespeicherte Angaben, meldet alle Geräte ab und lässt sich nicht rückgängig machen. Eine veröffentlichte Bewertung bleibt sichtbar, die Adresse wird davon gelöst.",
+    deleteAccountPassword: "Dein aktuelles Passwort",
+    deleteAccountConfirmLabel: "DELETE eingeben zum Bestätigen",
+    deleteAccountSubmit: "Mein Konto endgültig löschen",
+    deleteAccountCancel: "Abbrechen",
+    deleteAccountDone: "Dein Konto wurde gelöscht. Alle Geräte wurden abgemeldet.",
+    deleteAccountBlocked:
+      "Dieses Konto hat ein aktives Abo. Kündige es zuerst unter Abo verwalten, sonst würde deine Karte nach dem Löschen weiter belastet.",
+    deleteAccountWrongPassword: "Dieses Passwort passt nicht zu diesem Konto.",
+    deleteAccountNeedsLogin:
+      "Deine Sitzung ist abgelaufen. Melde dich erneut an, um das Konto zu löschen.",
+    deleteAccountUnreachable:
+      "Der Server war nicht erreichbar. Es wurde nichts gelöscht — prüfe deine Verbindung und versuche es erneut.",
   },
   driftWatch: {
     title: "Windows-Updates überwachen",
@@ -1564,7 +1583,7 @@ export const de: Strings = {
     auto_end_frozen_tasks: {
       name: "Eine eingefrorene App soll das Herunterfahren nicht blockieren",
       description:
-        'Wenn eine Anwendung beim Herunterfahren nicht mehr reagiert, wartet Windows und zeigt den Bildschirm "Diese App verhindert das Herunterfahren", bis jemand klickt. Dies schließt nicht reagierende Anwendungen automatisch, damit ein hängendes Programm den Rechner nicht eingeschaltet stehen lässt.',
+        'Wenn eine Anwendung beim Herunterfahren nicht mehr reagiert, wartet Windows und zeigt den Bildschirm "Diese App verhindert das Herunterfahren", bis jemand klickt. Dies schließt nicht reagierende Anwendungen automatisch, damit ein hängendes Programm den Rechner nicht eingeschaltet stehen lässt. Warnung: Das automatische Schließen von Apps kann nicht gespeicherte Arbeit verlieren. Das Wiederherstellen dieser Einstellung stellt diese Arbeit nicht wieder her.',
     },
     instant_folder_loading: {
       name: "Jeden Ordner sofort öffnen",
@@ -1677,8 +1696,7 @@ export const de: Strings = {
     },
     disable_app_suggestions_start: {
       name: "Vorschläge und Tipps im Startmenü deaktivieren",
-      description:
-        "Schaltet werbliche App-Vorschläge und Funktionstipps im Windows-Startmenü aus.",
+      description: "Schaltet werbliche App-Vorschläge und Funktionstipps im Windows-Startmenü aus.",
     },
     disable_handwriting_sharing: {
       name: "Teilen von Handschriftfehlerberichten deaktivieren",

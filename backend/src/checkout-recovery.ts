@@ -12,7 +12,11 @@ export type ExpiredCheckout = {
   product?: string;
 };
 
-export type ReminderRecipient = { email: string; firstName: string | null; unsubscribeUrl: string | null };
+export type ReminderRecipient = {
+  email: string;
+  firstName: string | null;
+  unsubscribeUrl: string | null;
+};
 
 const COOLDOWN_MS = 30 * 24 * 60 * 60 * 1000;
 
@@ -34,7 +38,12 @@ export async function remindAbandonedLifetime(
   for (const session of sessions) {
     // Canonical id, not the raw one: sessions created before the WinCraft
     // rename carry "pctweaker" and are still abandoned Lifetime checkouts.
-    if (session.mode !== "payment" || session.plan !== "lifetime" || canonicalProduct(session.product) !== "wincraft") continue;
+    if (
+      session.mode !== "payment" ||
+      session.plan !== "lifetime" ||
+      canonicalProduct(session.product) !== "wincraft"
+    )
+      continue;
     if (!session.userId || !/^\d+$/.test(session.userId)) continue;
     const { rows } = await db.query(
       "SELECT email, first_name FROM users WHERE id = $1 AND email_verified AND NOT is_pro",
@@ -50,7 +59,9 @@ export async function remindAbandonedLifetime(
     // or finds the fresh sent_at and claims nothing. The row is ours only if it
     // carries this session and this run's timestamp.
     const ours = (rows: { session_id: string; sent_at: Date }[]) =>
-      rows.some((r) => r.session_id === session.id && new Date(r.sent_at).getTime() === now.getTime());
+      rows.some(
+        (r) => r.session_id === session.id && new Date(r.sent_at).getTime() === now.getTime(),
+      );
     const inserted = await db.query(
       `INSERT INTO checkout_reminders (user_id, session_id, sent_at) VALUES ($1, $2, $3)
        ON CONFLICT (user_id) DO NOTHING RETURNING session_id, sent_at`,
@@ -65,7 +76,11 @@ export async function remindAbandonedLifetime(
       if (!ours(renewed.rows)) continue;
     }
     try {
-      await send({ email: rows[0].email, firstName: rows[0].first_name, unsubscribeUrl: unsubscribeUrl(rows[0].email) });
+      await send({
+        email: rows[0].email,
+        firstName: rows[0].first_name,
+        unsubscribeUrl: unsubscribeUrl(rows[0].email),
+      });
       sent++;
     } catch {
       console.error("Lifetime checkout reminder failed; not retried");
@@ -99,14 +114,20 @@ export function lifetimeReminderEmail(to: ReminderRecipient) {
     html: emailShell({
       preheader: "Your Lifetime checkout closed before payment, so nothing was charged.",
       eyebrow: "Checkout not completed",
-      headline: to.firstName?.trim() ? `Still want Lifetime, ${to.firstName.trim()}?` : "Still want Lifetime?",
+      headline: to.firstName?.trim()
+        ? `Still want Lifetime, ${to.firstName.trim()}?`
+        : "Still want Lifetime?",
       intro: `${lines[0]} ${lines[1]}`,
       action: { label: "Open WinCraft", url: "https://wincraft.app" },
       note: lines[2],
       afterActionHtml: unsubscribe,
       footerNote: footer,
     }),
-    text: [greeting, ...lines, footer + (to.unsubscribeUrl ? ` Unsubscribe: ${to.unsubscribeUrl}` : "")].join("\n\n"),
+    text: [
+      greeting,
+      ...lines,
+      footer + (to.unsubscribeUrl ? ` Unsubscribe: ${to.unsubscribeUrl}` : ""),
+    ].join("\n\n"),
   };
 }
 
@@ -129,7 +150,12 @@ export function startCheckoutReminderWorker(
       running = false;
     }
   };
-  const timer = setInterval(() => { void tick(); }, 60 * 60 * 1000);
+  const timer = setInterval(
+    () => {
+      void tick();
+    },
+    60 * 60 * 1000,
+  );
   timer.unref();
   void tick();
   return () => clearInterval(timer);

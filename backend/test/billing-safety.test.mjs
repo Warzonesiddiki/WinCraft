@@ -13,7 +13,8 @@ process.env.STRIPE_PRICE_UNINSTALLER_ANNUAL = "price_uninstaller_fixture";
 process.env.STRIPE_PRICE_UNINSTALLER_LOYALTY = "price_uninstaller_loyalty_fixture";
 
 const { getPool, initSchema } = await import("../dist/db.js");
-const { grantPro, revokePro, handleEvent, stopSubscriptionsAfterLifetime } = await import("../dist/routes/stripe.js");
+const { grantPro, revokePro, handleEvent, stopSubscriptionsAfterLifetime } =
+  await import("../dist/routes/stripe.js");
 const { productEntitlement } = await import("../dist/products.js");
 const { billingProductFromEvidence } = await import("../dist/stripe-policy.js");
 await initSchema();
@@ -54,7 +55,14 @@ function subscription(userId, overrides = {}) {
     status: "active",
     cancel_at_period_end: false,
     metadata: { userId, product: "pctweaker", plan: "monthly" },
-    items: { data: [{ current_period_end: periodEnd, price: { id: process.env.STRIPE_PRICE_MONTHLY, recurring: { interval: "month" } } }] },
+    items: {
+      data: [
+        {
+          current_period_end: periodEnd,
+          price: { id: process.env.STRIPE_PRICE_MONTHLY, recurring: { interval: "month" } },
+        },
+      ],
+    },
     ...overrides,
   };
   currentSubscriptions.set(value.id, value);
@@ -62,7 +70,9 @@ function subscription(userId, overrides = {}) {
 }
 function effects(overrides = {}) {
   return {
-    async loadCheckout() { throw new Error("Unexpected Stripe read in fixture"); },
+    async loadCheckout() {
+      throw new Error("Unexpected Stripe read in fixture");
+    },
     async loadSubscription(id) {
       assert.ok(currentSubscriptions.has(id), `Missing current subscription fixture: ${id}`);
       return currentSubscriptions.get(id);
@@ -70,8 +80,12 @@ function effects(overrides = {}) {
     async stopSubscriptions() {},
     async welcome() {},
     notifySale() {},
-    async loadCheckoutForPayment() { return null; },
-    async loadSubscriptionForPayment() { return null; },
+    async loadCheckoutForPayment() {
+      return null;
+    },
+    async loadSubscriptionForPayment() {
+      return null;
+    },
     alertReversal() {},
     async queueRefundNotice() {},
     ...overrides,
@@ -95,7 +109,11 @@ test("an old recurring checkout cannot downgrade a lifetime purchase", async () 
 test("subscription updates and deletion preserve lifetime independently of event order", async () => {
   const id = await user();
   await grantPro(id, { customerId: `cus_fixture_${id}`, plan: "lifetime", expiresAt: null });
-  for (const type of ["customer.subscription.created", "customer.subscription.updated", "customer.subscription.deleted"]) {
+  for (const type of [
+    "customer.subscription.created",
+    "customer.subscription.updated",
+    "customer.subscription.deleted",
+  ]) {
     await handleEvent(event(type, subscription(id)), effects());
     assert.equal((await row(id)).plan, "lifetime");
     assert.equal((await productEntitlement(id, "pctweaker")).active, true);
@@ -116,29 +134,53 @@ test("lifetime conversion cancels only this user's WinCraft subscriptions across
   const pc = (name, extra = {}) => subscription(id, { id: name, ...extra });
   const otherPrice = { data: [{ price: { id: process.env.STRIPE_PRICE_UNINSTALLER_ANNUAL } }] };
   const pages = [
-    { data: [
-      pc("sub_active"),
-      pc("sub_uninstaller", { metadata: { userId: id, product: "uninstaller", plan: "annual" }, items: otherPrice }),
-      pc("sub_unknown_legacy", { metadata: {}, items: { data: [{ price: { id: "price_unrelated" } }] } }),
-      pc("sub_conflict", { items: otherPrice }),
-      pc("sub_other_user", { metadata: { product: "pctweaker", userId: "another-user" } }),
-      pc("sub_already_cancelled", { cancel_at_period_end: true }),
-      pc("sub_ended", { status: "canceled" }),
-    ], has_more: true },
-    { data: [
-      pc("sub_trial", { status: "trialing" }),
-      pc("sub_past_due", { status: "past_due" }),
-      pc("sub_unpaid", { status: "unpaid" }),
-      pc("sub_recognized_legacy", { metadata: {} }),
-    ], has_more: false },
+    {
+      data: [
+        pc("sub_active"),
+        pc("sub_uninstaller", {
+          metadata: { userId: id, product: "uninstaller", plan: "annual" },
+          items: otherPrice,
+        }),
+        pc("sub_unknown_legacy", {
+          metadata: {},
+          items: { data: [{ price: { id: "price_unrelated" } }] },
+        }),
+        pc("sub_conflict", { items: otherPrice }),
+        pc("sub_other_user", { metadata: { product: "pctweaker", userId: "another-user" } }),
+        pc("sub_already_cancelled", { cancel_at_period_end: true }),
+        pc("sub_ended", { status: "canceled" }),
+      ],
+      has_more: true,
+    },
+    {
+      data: [
+        pc("sub_trial", { status: "trialing" }),
+        pc("sub_past_due", { status: "past_due" }),
+        pc("sub_unpaid", { status: "unpaid" }),
+        pc("sub_recognized_legacy", { metadata: {} }),
+      ],
+      has_more: false,
+    },
   ];
   const updated = [];
   const calls = [];
   await stopSubscriptionsAfterLifetime(id, `cus_fixture_${id}`, {
-    async list(params) { calls.push(params); return pages[calls.length - 1]; },
-    async update(subscriptionId, params) { updated.push(subscriptionId); assert.deepEqual(params, { cancel_at_period_end: true }); },
+    async list(params) {
+      calls.push(params);
+      return pages[calls.length - 1];
+    },
+    async update(subscriptionId, params) {
+      updated.push(subscriptionId);
+      assert.deepEqual(params, { cancel_at_period_end: true });
+    },
   });
-  assert.deepEqual(updated, ["sub_active", "sub_trial", "sub_past_due", "sub_unpaid", "sub_recognized_legacy"]);
+  assert.deepEqual(updated, [
+    "sub_active",
+    "sub_trial",
+    "sub_past_due",
+    "sub_unpaid",
+    "sub_recognized_legacy",
+  ]);
   assert.equal(calls[0].status, "all");
   assert.equal(calls[0].limit, 100);
   assert.equal(calls[1].starting_after, "sub_ended");
@@ -147,9 +189,14 @@ test("lifetime conversion cancels only this user's WinCraft subscriptions across
 test("failed lifetime cancellation is retryable and cannot remove the committed grant", async () => {
   const id = await user();
   await assert.rejects(
-    handleEvent(event("checkout.session.completed", checkout(id, "lifetime")), effects({
-      async stopSubscriptions() { throw new Error("Fixture Stripe outage"); },
-    })),
+    handleEvent(
+      event("checkout.session.completed", checkout(id, "lifetime")),
+      effects({
+        async stopSubscriptions() {
+          throw new Error("Fixture Stripe outage");
+        },
+      }),
+    ),
     /Fixture Stripe outage/,
   );
   assert.equal((await productEntitlement(id, "pctweaker")).active, true);
@@ -159,47 +206,92 @@ test("failed lifetime cancellation is retryable and cannot remove the committed 
 
 test("cancellation helper propagates update errors instead of acknowledging success", async () => {
   const id = await user();
-  await assert.rejects(stopSubscriptionsAfterLifetime(id, `cus_fixture_${id}`, {
-    async list() { return { data: [subscription(id)], has_more: false }; },
-    async update() { throw new Error("Fixture cancellation failure"); },
-  }), /Fixture cancellation failure/);
+  await assert.rejects(
+    stopSubscriptionsAfterLifetime(id, `cus_fixture_${id}`, {
+      async list() {
+        return { data: [subscription(id)], has_more: false };
+      },
+      async update() {
+        throw new Error("Fixture cancellation failure");
+      },
+    }),
+    /Fixture cancellation failure/,
+  );
 });
 
 test("uninstaller and unknown legacy events never grant or revoke WinCraft", async () => {
   const id = await user();
   const uninstaller = subscription(id, {
     metadata: { userId: id, plan: "annual" },
-    items: { data: [{ current_period_end: periodEnd, price: { id: process.env.STRIPE_PRICE_UNINSTALLER_ANNUAL, recurring: { interval: "year" } } }] },
+    items: {
+      data: [
+        {
+          current_period_end: periodEnd,
+          price: {
+            id: process.env.STRIPE_PRICE_UNINSTALLER_ANNUAL,
+            recurring: { interval: "year" },
+          },
+        },
+      ],
+    },
   });
   await handleEvent(event("customer.subscription.created", uninstaller), effects());
   assert.equal((await productEntitlement(id, "uninstaller")).active, true);
   assert.equal((await productEntitlement(id, "pctweaker")).active, false);
-  await grantPro(id, { customerId: `cus_fixture_${id}`, plan: "annual", expiresAt: new Date(periodEnd * 1000) });
+  await grantPro(id, {
+    customerId: `cus_fixture_${id}`,
+    plan: "annual",
+    expiresAt: new Date(periodEnd * 1000),
+  });
   await handleEvent(event("customer.subscription.deleted", uninstaller), effects());
   assert.equal((await productEntitlement(id, "pctweaker")).active, true);
-  const unknown = subscription(id, { metadata: { userId: id }, items: { data: [{ price: { id: "price_other" } }] } });
+  const unknown = subscription(id, {
+    metadata: { userId: id },
+    items: { data: [{ price: { id: "price_other" } }] },
+  });
   await handleEvent(event("customer.subscription.deleted", unknown), effects());
   assert.equal((await productEntitlement(id, "pctweaker")).active, true);
 });
 
 test("a late uninstaller update cannot re-grant a cancelled subscription, nor an old deletion end a new one", async () => {
   const id = await user();
-  const uninstallerItems = { data: [{ current_period_end: periodEnd, price: { id: process.env.STRIPE_PRICE_UNINSTALLER_ANNUAL, recurring: { interval: "year" } } }] };
-  const old = subscription(id, { id: "sub_uninstaller_old", metadata: { userId: id, product: "uninstaller", plan: "annual" }, items: uninstallerItems });
+  const uninstallerItems = {
+    data: [
+      {
+        current_period_end: periodEnd,
+        price: { id: process.env.STRIPE_PRICE_UNINSTALLER_ANNUAL, recurring: { interval: "year" } },
+      },
+    ],
+  };
+  const old = subscription(id, {
+    id: "sub_uninstaller_old",
+    metadata: { userId: id, product: "uninstaller", plan: "annual" },
+    items: uninstallerItems,
+  });
   await handleEvent(event("customer.subscription.created", old), effects());
   assert.equal((await productEntitlement(id, "uninstaller")).active, true);
 
   // Cancelled at Stripe; the deletion arrives, then a stale "active" update.
   currentSubscriptions.set(old.id, { ...old, status: "canceled" });
-  await handleEvent(event("customer.subscription.deleted", { ...old, status: "canceled" }), effects());
+  await handleEvent(
+    event("customer.subscription.deleted", { ...old, status: "canceled" }),
+    effects(),
+  );
   await handleEvent(event("customer.subscription.updated", old), effects());
   assert.equal((await productEntitlement(id, "uninstaller")).active, false);
 
   // A new subscription, then a replayed deletion of the old one.
-  const fresh = subscription(id, { id: "sub_uninstaller_new", metadata: { userId: id, product: "uninstaller", plan: "annual" }, items: uninstallerItems });
+  const fresh = subscription(id, {
+    id: "sub_uninstaller_new",
+    metadata: { userId: id, product: "uninstaller", plan: "annual" },
+    items: uninstallerItems,
+  });
   await handleEvent(event("customer.subscription.created", fresh), effects());
   assert.equal((await productEntitlement(id, "uninstaller")).active, true);
-  await handleEvent(event("customer.subscription.deleted", { ...old, status: "canceled" }), effects());
+  await handleEvent(
+    event("customer.subscription.deleted", { ...old, status: "canceled" }),
+    effects(),
+  );
   assert.equal((await productEntitlement(id, "uninstaller")).active, true);
 });
 
@@ -209,26 +301,45 @@ test("product evidence rejects conflicting or ambiguous subscriptions", () => {
   assert.equal(billingProductFromEvidence({}, ["price_unknown"], catalogue), null);
   // "pctweaker" is the pre-rename id for WinCraft, so it still conflicts
   // with an Uninstaller price instead of looking like an unknown product.
-  assert.equal(billingProductFromEvidence({ product: "pctweaker" }, ["price_other"], catalogue), null);
+  assert.equal(
+    billingProductFromEvidence({ product: "pctweaker" }, ["price_other"], catalogue),
+    null,
+  );
   assert.equal(billingProductFromEvidence({ product: "unknown" }, ["price_pc"], catalogue), null);
   assert.equal(billingProductFromEvidence({}, ["price_pc", "price_other"], catalogue), null);
-  assert.equal(billingProductFromEvidence({ product: "pctweaker" }, ["price_pc", "price_unknown"], catalogue), null);
+  assert.equal(
+    billingProductFromEvidence({ product: "pctweaker" }, ["price_pc", "price_unknown"], catalogue),
+    null,
+  );
 });
 
 test("new recurring events without a valid period fail without granting unlimited access", async () => {
   for (const seconds of [undefined, 0, NaN, Infinity, Number.MAX_VALUE]) {
     const id = await user();
-    const malformed = subscription(id, { items: { data: [{ current_period_end: seconds, price: { id: process.env.STRIPE_PRICE_MONTHLY } }] } });
-    await assert.rejects(handleEvent(event("customer.subscription.created", malformed), effects()), /invalid period end/);
+    const malformed = subscription(id, {
+      items: {
+        data: [{ current_period_end: seconds, price: { id: process.env.STRIPE_PRICE_MONTHLY } }],
+      },
+    });
+    await assert.rejects(
+      handleEvent(event("customer.subscription.created", malformed), effects()),
+      /invalid period end/,
+    );
     assert.equal((await productEntitlement(id, "pctweaker")).active, false);
   }
   const id = await user();
-  await assert.rejects(grantPro(id, { customerId: null, plan: "monthly", expiresAt: null }), /valid expiry/);
+  await assert.rejects(
+    grantPro(id, { customerId: null, plan: "monthly", expiresAt: null }),
+    /valid expiry/,
+  );
 });
 
 test("a valid period replaces the explicit legacy compatibility grant", async () => {
   const id = await user();
-  await getPool().query("UPDATE users SET is_pro = TRUE, plan = 'monthly', legacy_pro_grant = TRUE WHERE id = $1", [id]);
+  await getPool().query(
+    "UPDATE users SET is_pro = TRUE, plan = 'monthly', legacy_pro_grant = TRUE WHERE id = $1",
+    [id],
+  );
   assert.equal((await productEntitlement(id, "pctweaker")).active, true);
   await handleEvent(event("customer.subscription.updated", subscription(id)), effects());
   const result = await row(id);
@@ -238,9 +349,15 @@ test("a valid period replaces the explicit legacy compatibility grant", async ()
 
 test("recurring metadata cannot manufacture a lifetime grant", async () => {
   const id = await user();
-  await handleEvent(event("customer.subscription.created", subscription(id, {
-    metadata: { userId: id, product: "pctweaker", plan: "lifetime" },
-  })), effects());
+  await handleEvent(
+    event(
+      "customer.subscription.created",
+      subscription(id, {
+        metadata: { userId: id, product: "pctweaker", plan: "lifetime" },
+      }),
+    ),
+    effects(),
+  );
   assert.equal((await row(id)).plan, "monthly");
   assert.notEqual((await row(id)).pro_expires_at, null);
 });
@@ -248,19 +365,32 @@ test("recurring metadata cannot manufacture a lifetime grant", async () => {
 test("a legacy payment requires recognized price evidence before it becomes lifetime", async () => {
   const id = await user();
   const legacy = checkout(id, "lifetime", { metadata: { userId: id } });
-  await handleEvent(event("checkout.session.completed", legacy), effects({
-    async loadCheckout() { return { line_items: { data: [{ price: { id: "price_unrelated" } }] } }; },
-  }));
+  await handleEvent(
+    event("checkout.session.completed", legacy),
+    effects({
+      async loadCheckout() {
+        return { line_items: { data: [{ price: { id: "price_unrelated" } }] } };
+      },
+    }),
+  );
   assert.equal((await productEntitlement(id, "pctweaker")).active, false);
-  await handleEvent(event("checkout.session.completed", legacy), effects({
-    async loadCheckout() { return { line_items: { data: [{ price: { id: process.env.STRIPE_PRICE_ID } }] } }; },
-  }));
+  await handleEvent(
+    event("checkout.session.completed", legacy),
+    effects({
+      async loadCheckout() {
+        return { line_items: { data: [{ price: { id: process.env.STRIPE_PRICE_ID } }] } };
+      },
+    }),
+  );
   assert.equal((await row(id)).plan, "lifetime");
 });
 
 test("unpaid async checkout remains locked and a paid replay uses the current subscription period", async () => {
   const id = await user();
-  await handleEvent(event("checkout.session.completed", checkout(id, "monthly", { payment_status: "unpaid" })), effects());
+  await handleEvent(
+    event("checkout.session.completed", checkout(id, "monthly", { payment_status: "unpaid" })),
+    effects(),
+  );
   assert.equal((await productEntitlement(id, "pctweaker")).active, false);
   const paid = checkout(id, "monthly", { created: created - 60 });
   await handleEvent(event("checkout.session.async_payment_succeeded", paid), effects());
@@ -275,12 +405,21 @@ test("an old subscription deletion cannot revoke a newer paid checkout's grant",
   const old = subscription(id, { id: "sub_old_deleted", created: created - 86_400 });
   await handleEvent(event("customer.subscription.created", old), effects());
   const current = subscription(id, { id: "sub_new_paid", created });
-  await handleEvent(event("checkout.session.completed", checkout(id, "monthly", { subscription: current.id })), effects());
+  await handleEvent(
+    event("checkout.session.completed", checkout(id, "monthly", { subscription: current.id })),
+    effects(),
+  );
   assert.equal((await row(id)).stripe_subscription_id, current.id);
-  await handleEvent(event("customer.subscription.deleted", { ...old, status: "canceled" }), effects());
+  await handleEvent(
+    event("customer.subscription.deleted", { ...old, status: "canceled" }),
+    effects(),
+  );
   assert.equal((await productEntitlement(id, "pctweaker")).active, true);
   assert.equal((await row(id)).stripe_subscription_id, current.id);
-  await handleEvent(event("customer.subscription.deleted", { ...current, status: "canceled" }), effects());
+  await handleEvent(
+    event("customer.subscription.deleted", { ...current, status: "canceled" }),
+    effects(),
+  );
   assert.equal((await productEntitlement(id, "pctweaker")).active, false);
 });
 
@@ -290,9 +429,15 @@ test("old active events and checkout replays cannot steal a newer subscription b
   const current = subscription(id, { id: "sub_current_active", created });
   await handleEvent(event("customer.subscription.created", current), effects());
   await handleEvent(event("customer.subscription.updated", old), effects());
-  await handleEvent(event("checkout.session.completed", checkout(id, "monthly", { subscription: old.id })), effects());
+  await handleEvent(
+    event("checkout.session.completed", checkout(id, "monthly", { subscription: old.id })),
+    effects(),
+  );
   assert.equal((await row(id)).stripe_subscription_id, current.id);
-  await handleEvent(event("customer.subscription.deleted", { ...old, status: "canceled" }), effects());
+  await handleEvent(
+    event("customer.subscription.deleted", { ...old, status: "canceled" }),
+    effects(),
+  );
   assert.equal((await productEntitlement(id, "pctweaker")).active, true);
 });
 
@@ -321,20 +466,48 @@ test("a replayed active snapshot cannot re-enable a subscription now canceled in
 
 test("canonical lookup failure does not trust a stale subscription snapshot", async () => {
   const id = await user();
-  await assert.rejects(handleEvent(event("customer.subscription.created", subscription(id)), effects({
-    async loadSubscription() { throw new Error("Fixture canonical lookup unavailable"); },
-  })), /canonical lookup unavailable/);
+  await assert.rejects(
+    handleEvent(
+      event("customer.subscription.created", subscription(id)),
+      effects({
+        async loadSubscription() {
+          throw new Error("Fixture canonical lookup unavailable");
+        },
+      }),
+    ),
+    /canonical lookup unavailable/,
+  );
   assert.equal((await productEntitlement(id, "pctweaker")).active, false);
 });
 
 test("recurring checkout requires a matching subscription identity and valid provenance", async () => {
   const id = await user();
-  await assert.rejects(handleEvent(event("checkout.session.completed", checkout(id, "monthly", { subscription: null })), effects()), /no subscription ID/);
+  await assert.rejects(
+    handleEvent(
+      event("checkout.session.completed", checkout(id, "monthly", { subscription: null })),
+      effects(),
+    ),
+    /no subscription ID/,
+  );
   const paid = checkout(id);
-  await assert.rejects(handleEvent(event("checkout.session.completed", paid), effects({
-    async loadSubscription(subscriptionId) { return subscription(id, { id: subscriptionId, customer: "cus_other_fixture" }); },
-  })), /does not match/);
-  await assert.rejects(handleEvent(event("customer.subscription.created", subscription(id, { created: NaN })), effects()), /creation time/);
+  await assert.rejects(
+    handleEvent(
+      event("checkout.session.completed", paid),
+      effects({
+        async loadSubscription(subscriptionId) {
+          return subscription(id, { id: subscriptionId, customer: "cus_other_fixture" });
+        },
+      }),
+    ),
+    /does not match/,
+  );
+  await assert.rejects(
+    handleEvent(
+      event("customer.subscription.created", subscription(id, { created: NaN })),
+      effects(),
+    ),
+    /creation time/,
+  );
   assert.equal((await productEntitlement(id, "pctweaker")).active, false);
 });
 
@@ -345,62 +518,116 @@ const lifetimeSession = (userId) => ({
   line_items: { data: [{ price: { id: process.env.STRIPE_PRICE_LIFETIME } }] },
 });
 const charge = (id, overrides = {}) => ({
-  object: "charge", id, payment_intent: `pi_${id}`, amount: 9900, amount_refunded: 9900, currency: "eur", refunded: true, ...overrides,
+  object: "charge",
+  id,
+  payment_intent: `pi_${id}`,
+  amount: 9900,
+  amount_refunded: 9900,
+  currency: "eur",
+  refunded: true,
+  ...overrides,
 });
-const dispute = (id, status) => ({ object: "dispute", id, charge: `ch_${id}`, payment_intent: `pi_${id}`, status });
+const dispute = (id, status) => ({
+  object: "dispute",
+  id,
+  charge: `ch_${id}`,
+  payment_intent: `pi_${id}`,
+  status,
+});
 
 test("a full refund or a lost dispute of the Lifetime payment revokes Lifetime, nothing else does", async () => {
   const alerts = [];
   const notices = [];
-  const fx = (session) => effects({
-    async loadCheckoutForPayment() { return session; },
-    alertReversal(userId, reason) { alerts.push([userId, reason]); },
-    async queueRefundNotice(key, receipt) { notices.push([key, receipt]); },
-  });
+  const fx = (session) =>
+    effects({
+      async loadCheckoutForPayment() {
+        return session;
+      },
+      alertReversal(userId, reason) {
+        alerts.push([userId, reason]);
+      },
+      async queueRefundNotice(key, receipt) {
+        notices.push([key, receipt]);
+      },
+    });
 
   const refunded = await user();
   await grantPro(refunded, { customerId: `cus_r_${refunded}`, plan: "lifetime", expiresAt: null });
-  await handleEvent(event("charge.refunded", charge("ch_partial", { refunded: false, amount_refunded: 1000 })), fx(lifetimeSession(refunded)));
+  await handleEvent(
+    event("charge.refunded", charge("ch_partial", { refunded: false, amount_refunded: 1000 })),
+    fx(lifetimeSession(refunded)),
+  );
   assert.equal((await row(refunded)).is_pro, true, "partial refund keeps Lifetime");
   assert.equal(notices.length, 0, "a partial refund is only logged");
   await handleEvent(event("charge.refunded", charge("ch_full")), fx(lifetimeSession(refunded)));
   assert.equal((await row(refunded)).is_pro, false);
   assert.deepEqual(alerts, [[refunded, "charge.refunded"]]);
-  assert.deepEqual(notices.map(([key, r]) => [key, r.kind, r.plan, r.chargedLabel]), [["refund:ch_full", "refund", "lifetime", "€99.00"]]);
+  assert.deepEqual(
+    notices.map(([key, r]) => [key, r.kind, r.plan, r.chargedLabel]),
+    [["refund:ch_full", "refund", "lifetime", "€99.00"]],
+  );
 
   const disputed = await user();
   await grantPro(disputed, { customerId: `cus_d_${disputed}`, plan: "lifetime", expiresAt: null });
-  await handleEvent(event("charge.dispute.created", dispute("dp_1", "needs_response")), fx(lifetimeSession(disputed)));
-  await handleEvent(event("charge.dispute.closed", dispute("dp_1", "won")), fx(lifetimeSession(disputed)));
+  await handleEvent(
+    event("charge.dispute.created", dispute("dp_1", "needs_response")),
+    fx(lifetimeSession(disputed)),
+  );
+  await handleEvent(
+    event("charge.dispute.closed", dispute("dp_1", "won")),
+    fx(lifetimeSession(disputed)),
+  );
   assert.equal((await row(disputed)).is_pro, true, "an open or won dispute keeps Lifetime");
-  await handleEvent(event("charge.dispute.closed", dispute("dp_2", "lost")), fx(lifetimeSession(disputed)));
+  await handleEvent(
+    event("charge.dispute.closed", dispute("dp_2", "lost")),
+    fx(lifetimeSession(disputed)),
+  );
   assert.equal((await row(disputed)).is_pro, false);
   assert.equal(notices.length, 1, "a dispute sends the customer no refund notice");
 
   const tipper = await user();
   await grantPro(tipper, { customerId: `cus_t_${tipper}`, plan: "lifetime", expiresAt: null });
   // A real tip carries no account and no product metadata (see tipSessionParams).
-  const tip = { mode: "payment", metadata: {}, line_items: { data: [{ price: { id: "price_tip_fixture" } }] } };
+  const tip = {
+    mode: "payment",
+    metadata: {},
+    line_items: { data: [{ price: { id: "price_tip_fixture" } }] },
+  };
   await handleEvent(event("charge.refunded", charge("ch_tip")), fx(tip));
   await handleEvent(event("charge.refunded", charge("ch_none")), fx(null));
-  assert.equal((await row(tipper)).is_pro, true, "a refunded tip or unrelated payment keeps Lifetime");
+  assert.equal(
+    (await row(tipper)).is_pro,
+    true,
+    "a refunded tip or unrelated payment keeps Lifetime",
+  );
   assert.equal(notices.length, 1);
 });
 
 test("a refunded subscription payment ends only the access that subscription granted", async () => {
   const notices = [];
-  const fx = (sub) => effects({
-    async loadSubscriptionForPayment() { return sub; },
-    async queueRefundNotice(key, receipt) { notices.push([key, receipt]); },
-  });
+  const fx = (sub) =>
+    effects({
+      async loadSubscriptionForPayment() {
+        return sub;
+      },
+      async queueRefundNotice(key, receipt) {
+        notices.push([key, receipt]);
+      },
+    });
 
   const id = await user();
   const sub = subscription(id, { id: "sub_refunded" });
   await handleEvent(event("customer.subscription.created", sub), effects());
   assert.equal((await productEntitlement(id, "pctweaker")).active, true);
-  await handleEvent(event("charge.refunded", charge("ch_sub", { amount: 799, amount_refunded: 799 })), fx(sub));
+  await handleEvent(
+    event("charge.refunded", charge("ch_sub", { amount: 799, amount_refunded: 799 })),
+    fx(sub),
+  );
   assert.equal((await productEntitlement(id, "pctweaker")).active, false);
-  assert.deepEqual(notices.map(([key, r]) => [key, r.plan, r.chargedLabel]), [["refund:ch_sub", "monthly", "€7.99"]]);
+  assert.deepEqual(
+    notices.map(([key, r]) => [key, r.plan, r.chargedLabel]),
+    [["refund:ch_sub", "monthly", "€7.99"]],
+  );
 
   // An old subscription's refund cannot take a newer one's access or Lifetime.
   const other = await user();
@@ -411,14 +638,27 @@ test("a refunded subscription payment ends only the access that subscription gra
   assert.equal((await productEntitlement(other, "pctweaker")).active, true);
   const owner = await user();
   await grantPro(owner, { customerId: null, plan: "lifetime", expiresAt: null });
-  await handleEvent(event("charge.refunded", charge("ch_lifetime_owner_sub")), fx(subscription(owner, { id: "sub_beside_lifetime" })));
+  await handleEvent(
+    event("charge.refunded", charge("ch_lifetime_owner_sub")),
+    fx(subscription(owner, { id: "sub_beside_lifetime" })),
+  );
   assert.equal((await row(owner)).plan, "lifetime");
 
   const buyer = await user();
   const uninstaller = subscription(buyer, {
     id: "sub_uninstaller_refunded",
     metadata: { userId: buyer, product: "uninstaller", plan: "annual" },
-    items: { data: [{ current_period_end: periodEnd, price: { id: process.env.STRIPE_PRICE_UNINSTALLER_ANNUAL, recurring: { interval: "year" } } }] },
+    items: {
+      data: [
+        {
+          current_period_end: periodEnd,
+          price: {
+            id: process.env.STRIPE_PRICE_UNINSTALLER_ANNUAL,
+            recurring: { interval: "year" },
+          },
+        },
+      ],
+    },
   });
   await handleEvent(event("customer.subscription.created", uninstaller), effects());
   assert.equal((await productEntitlement(buyer, "uninstaller")).active, true);
@@ -431,23 +671,44 @@ test("refund notices are queued once per charge however often Stripe retries", a
   const { queueReceipt } = await import("../dist/receipt-outbox.js");
   const id = await user();
   await grantPro(id, { customerId: null, plan: "lifetime", expiresAt: null });
-  const fx = effects({ async loadCheckoutForPayment() { return lifetimeSession(id); }, queueRefundNotice: queueReceipt });
+  const fx = effects({
+    async loadCheckoutForPayment() {
+      return lifetimeSession(id);
+    },
+    queueRefundNotice: queueReceipt,
+  });
   await handleEvent(event("charge.refunded", charge("ch_retry")), fx);
   await handleEvent(event("charge.refunded", charge("ch_retry")), fx);
-  const { rows } = await getPool().query("SELECT payload FROM billing_receipts WHERE receipt_key = 'refund:ch_retry'");
+  const { rows } = await getPool().query(
+    "SELECT payload FROM billing_receipts WHERE receipt_key = 'refund:ch_retry'",
+  );
   assert.equal(rows.length, 1);
   assert.equal(rows[0].payload.kind, "refund");
 });
 
 test("a promotional subscription's welcome email says the first payment was discounted", async () => {
   const labels = [];
-  const welcome = async (_userId, _plan, _expires, _product, label) => { labels.push(label); };
+  const welcome = async (_userId, _plan, _expires, _product, label) => {
+    labels.push(label);
+  };
   for (const metadata of [{ promo_id: "halloween-2026" }, {}]) {
     const id = await user();
     const sub = subscription(id, {
       id: `sub_promo_${id}`,
       metadata: { userId: id, product: "pctweaker", plan: "annual", ...metadata },
-      items: { data: [{ current_period_end: periodEnd, price: { id: process.env.STRIPE_PRICE_ANNUAL, unit_amount: 5999, currency: "eur", recurring: { interval: "year" } } }] },
+      items: {
+        data: [
+          {
+            current_period_end: periodEnd,
+            price: {
+              id: process.env.STRIPE_PRICE_ANNUAL,
+              unit_amount: 5999,
+              currency: "eur",
+              recurring: { interval: "year" },
+            },
+          },
+        ],
+      },
     });
     await handleEvent(event("customer.subscription.created", sub), effects({ welcome }));
   }
@@ -467,10 +728,19 @@ test("Lifetime bought at the promotional Price is granted, and a full refund of 
   assert.equal(granted.is_pro, true);
   assert.equal(granted.plan, "lifetime");
   assert.equal(granted.pro_expires_at, null);
-  await handleEvent(event("charge.refunded", charge("ch_promo", { amount: 3999, amount_refunded: 3999 })), effects({
-    async loadCheckoutForPayment() { return promoSession; },
-  }));
-  assert.equal((await row(id)).is_pro, false, "the promo Price is recognised as Lifetime when refunded");
+  await handleEvent(
+    event("charge.refunded", charge("ch_promo", { amount: 3999, amount_refunded: 3999 })),
+    effects({
+      async loadCheckoutForPayment() {
+        return promoSession;
+      },
+    }),
+  );
+  assert.equal(
+    (await row(id)).is_pro,
+    false,
+    "the promo Price is recognised as Lifetime when refunded",
+  );
 
   // Even with the promo Price variable gone, our Lifetime metadata still identifies the purchase.
   const later = await user();
@@ -478,9 +748,18 @@ test("Lifetime bought at the promotional Price is granted, and a full refund of 
   const saved = process.env.STRIPE_PRICE_LIFETIME_PROMO;
   delete process.env.STRIPE_PRICE_LIFETIME_PROMO;
   try {
-    await handleEvent(event("charge.refunded", charge("ch_promo_later", { amount: 3999, amount_refunded: 3999 })), effects({
-      async loadCheckoutForPayment() { return { ...promoSession, client_reference_id: later, metadata: { userId: later, product: "pctweaker", plan: "lifetime" } }; },
-    }));
+    await handleEvent(
+      event("charge.refunded", charge("ch_promo_later", { amount: 3999, amount_refunded: 3999 })),
+      effects({
+        async loadCheckoutForPayment() {
+          return {
+            ...promoSession,
+            client_reference_id: later,
+            metadata: { userId: later, product: "pctweaker", plan: "lifetime" },
+          };
+        },
+      }),
+    );
   } finally {
     process.env.STRIPE_PRICE_LIFETIME_PROMO = saved;
   }

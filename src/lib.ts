@@ -2,7 +2,7 @@
 import { getVersion } from "@tauri-apps/api/app";
 import { invoke } from "@tauri-apps/api/core";
 import { format, Strings } from "./i18n";
-import { DriverAudit } from "./types";
+import { DriverAudit, SystemProfile } from "./types";
 
 // The first-party Cloudflare hostname is the stable production endpoint.
 // VITE_API_BASE_URL remains available for an explicit local/staging build.
@@ -25,12 +25,17 @@ void getVersion()
   });
 
 export function errorReportsEnabled(): boolean {
-  return localStorage.getItem(ERROR_REPORTS_KEY) === "on";
+  try {
+    return localStorage.getItem(ERROR_REPORTS_KEY) === "on";
+  } catch {
+    return false;
+  }
 }
 
 export function reportError(message: string) {
   if (!API_BASE_URL || !cachedAppVersion || !errorReportsEnabled()) return;
   fetch(`${API_BASE_URL}/api/error-reports`, {
+    signal: AbortSignal.timeout(8000),
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
@@ -157,14 +162,23 @@ export function storeSession(token: string, email: string, remember: boolean) {
 
 /** Keeps a session alive: once the current token is a day old, authenticated
  * API calls return a replacement, stored wherever the old one lives. */
-export function adoptRenewedToken(res: Response) {
+export function adoptRenewedToken(
+  res: Response,
+  expectedToken: string,
+  expectedGeneration: number,
+) {
+  if (readToken() !== expectedToken || sessionGeneration() !== expectedGeneration) return;
   const next = res.headers.get("X-Session-Token");
   if (!next) return;
   if (localStorage.getItem(TOKEN_KEY)) localStorage.setItem(TOKEN_KEY, next);
   else if (sessionStorage.getItem(TOKEN_KEY)) sessionStorage.setItem(TOKEN_KEY, next);
 }
 
+let sessionEpoch = 0;
+export const sessionGeneration = () => sessionEpoch;
+
 export function clearSession() {
+  sessionEpoch++;
   for (const store of [localStorage, sessionStorage]) {
     store.removeItem(TOKEN_KEY);
     store.removeItem(EMAIL_KEY);
@@ -350,28 +364,142 @@ export const FEATURE_INTELLIGENCE = true;
 // seconds again.
 const DRIVER_AUDIT_KEY = "wincraft-driver-audit";
 
-export function readCachedDriverAudit(): { audit: DriverAudit; at: Date } | null {
-  const raw = localStorage.getItem(DRIVER_AUDIT_KEY);
-  if (!raw) return null;
+// v2 added `hardware`: the browser facts alone cannot tell that the graphics
+// card was replaced inside the same Windows install, so a scan could outlive
+// the machine it describes. A v1 entry carries no hardware signature and is
+// simply re-scanned once.
+const DRIVER_CACHE_VERSION = 2;
+const DRIVER_CACHE_MAX_AGE_MS = 7 * 24 * 60 * 60_000;
+const driverEnvironment = () => `${navigator.platform}|${navigator.userAgent}`;
+
+/**
+ * The hardware facts a driver scan depends on, as one comparable string.
+ *
+ * Deliberately excludes the power plan and the marketing Windows version:
+ * switching from Balanced to High performance changes neither which drivers
+ * are installed nor which ones are stale, so including either would throw away
+ * a good scan for no reason. `windows_build` is included because a feature
+ * update does change what a device class reports.
+ */
+export function hardwareSignature(profile: SystemProfile | null | undefined): string | null {
+  if (!profile) return null;
+  // "unknown" is how the Rust side spells "could not read it" for the two
+  // enum fields, and it must not count as a fact here any more than null does.
+  const part = (value: string | number | null | undefined) =>
+    value === null || value === undefined || value === "" || value === "unknown"
+      ? "-"
+      : String(value);
+  const fields = [
+    part(profile.cpu),
+    part(profile.cpu_physical_cores),
+    part(profile.cpu_logical_cores),
+    part(profile.gpu),
+    part(profile.ram_total_bytes),
+    part(profile.system_disk),
+    part(profile.form_factor),
+    part(profile.windows_build),
+  ];
+  // An all-unknown profile is not a signature: it would compare equal across
+  // every machine and re-introduce exactly the staleness this prevents.
+  return fields.every((field) => field === "-") ? null : fields.join("|");
+}
+
+function isDriverAudit(value: unknown): value is DriverAudit {
+  if (!value || typeof value !== "object") return false;
+  const v = value as Record<string, unknown>;
+  const count = (n: unknown) => typeof n === "number" && Number.isSafeInteger(n) && n >= 0;
+  return (
+    count(v.excluded_inbox) &&
+    count(v.total_scanned) &&
+    count(v.classes_scanned) &&
+    Array.isArray(v.entries) &&
+    v.entries.length <= 20_000 &&
+    v.entries.every((entry: unknown) => {
+      if (!entry || typeof entry !== "object") return false;
+      const e = entry as Record<string, unknown>;
+      return (
+        ["device", "version", "date", "class", "provider"].every(
+          (key) => typeof e[key] === "string",
+        ) &&
+        count(e.age_days) &&
+        ["current", "aging", "stale"].includes(String(e.tier)) &&
+        typeof e.important === "boolean" &&
+        (e.vendor_url === null || typeof e.vendor_url === "string")
+      );
+    })
+  );
+}
+
+export function readCachedDriverAudit(): {
+  audit: DriverAudit;
+  at: Date;
+  /** The hardware signature recorded with the scan, when it had one. */
+  hardware: string | null;
+} | null {
   try {
-    const parsed = JSON.parse(raw) as { audit: DriverAudit; at: string };
-    const at = new Date(parsed.at);
-    if (Number.isNaN(at.getTime())) return null;
-    return { audit: parsed.audit, at };
+    const raw = localStorage.getItem(DRIVER_AUDIT_KEY);
+    if (!raw) return null;
+    if (raw.length > 8_000_000) throw new Error("Oversized cache");
+    const parsed = JSON.parse(raw);
+    const at = new Date(parsed?.at);
+    const age = Date.now() - at.getTime();
+    if (
+      parsed?.version !== DRIVER_CACHE_VERSION ||
+      parsed.environment !== driverEnvironment() ||
+      !isDriverAudit(parsed.audit) ||
+      !Number.isFinite(age) ||
+      age < -300_000 ||
+      age > DRIVER_CACHE_MAX_AGE_MS
+    ) {
+      throw new Error("Stale or invalid cache");
+    }
+    return {
+      audit: parsed.audit,
+      at,
+      hardware: typeof parsed.hardware === "string" ? parsed.hardware : null,
+    };
   } catch {
-    // A corrupted or pre-format entry is worth exactly one re-scan, not a
-    // permanently broken cache.
-    localStorage.removeItem(DRIVER_AUDIT_KEY);
+    try {
+      localStorage.removeItem(DRIVER_AUDIT_KEY);
+    } catch {
+      /* Storage can be blocked. */
+    }
     return null;
   }
 }
 
-export function writeCachedDriverAudit(audit: DriverAudit, at: Date) {
+export function writeCachedDriverAudit(
+  audit: DriverAudit,
+  at: Date,
+  hardware: string | null = null,
+) {
   try {
-    localStorage.setItem(DRIVER_AUDIT_KEY, JSON.stringify({ audit, at: at.toISOString() }));
+    if (!isDriverAudit(audit)) return;
+    localStorage.setItem(
+      DRIVER_AUDIT_KEY,
+      JSON.stringify({
+        version: DRIVER_CACHE_VERSION,
+        environment: driverEnvironment(),
+        hardware,
+        audit,
+        at: at.toISOString(),
+      }),
+    );
   } catch {
-    // Over quota or blocked storage: the in-memory cache for this session
-    // still works, only the next relaunch loses it. Not worth surfacing.
+    // Over quota or blocked storage: the current session still works.
+  }
+}
+
+/**
+ * Removes the stored scan. Used when the cache is known to describe different
+ * hardware: leaving it on disk would re-show it on the next launch, after the
+ * in-session check had already decided it was not this machine's.
+ */
+export function clearCachedDriverAudit(): void {
+  try {
+    localStorage.removeItem(DRIVER_AUDIT_KEY);
+  } catch {
+    /* Storage can be blocked. */
   }
 }
 

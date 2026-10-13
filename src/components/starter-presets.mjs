@@ -65,8 +65,8 @@ export const STARTER_PRESETS = [
   },
   {
     // Barebone stripped-down lean profile: strips background app execution,
-    // animations, transparency, Bing search, suggestions, and Game DVR for
-    // Atlas OS-level minimal footprint and zero UI latency.
+    // animations, transparency, Bing search, suggestions, and Game DVR.
+    // Changes preferences; no OS-equivalence or latency gain is promised.
     id: "barebone",
     icon: "disable_background_apps",
     tweaks: [
@@ -82,7 +82,7 @@ export const STARTER_PRESETS = [
       { id: "disable_startup_delay", selected: true },
       { id: "menu_show_delay", selected: true },
       { id: "hide_taskbar_widgets", selected: true },
-      { id: "auto_end_frozen_tasks", selected: true },
+      { id: "auto_end_frozen_tasks", selected: false },
     ],
   },
   {
@@ -112,7 +112,7 @@ export const STARTER_PRESETS = [
       { id: "menu_show_delay", selected: true },
       { id: "disable_start_suggestions", selected: true },
       { id: "disable_feedback_requests", selected: true },
-      { id: "auto_end_frozen_tasks", selected: true },
+      { id: "auto_end_frozen_tasks", selected: false },
     ],
   },
 ];

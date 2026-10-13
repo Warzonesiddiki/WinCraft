@@ -11,7 +11,9 @@ const RENEW_AFTER_SECONDS = 24 * 60 * 60;
 
 function hashPassword(password: string): Promise<string> {
   if (!isValidPassword(password)) {
-    return Promise.reject(new Error("Password must be at least 8 characters and no more than 72 UTF-8 bytes."));
+    return Promise.reject(
+      new Error("Password must be at least 8 characters and no more than 72 UTF-8 bytes."),
+    );
   }
   return bcrypt.hash(password, 12);
 }
@@ -74,7 +76,9 @@ async function requireAuth(req: Request, res: Response, next: NextFunction): Pro
   }
 
   try {
-    const result = await getPool().query("SELECT token_version FROM users WHERE id = $1", [payload.sub]);
+    const result = await getPool().query("SELECT token_version FROM users WHERE id = $1", [
+      payload.sub,
+    ]);
     if (result.rowCount === 0 || result.rows[0].token_version !== payload.tv) {
       res.status(401).json({ error: "invalid or expired token" });
       return;
@@ -105,7 +109,19 @@ function isValidEmail(email: unknown): email is string {
 
 function isValidPassword(password: unknown): password is string {
   // bcrypt silently ignores bytes beyond 72, including part of a Unicode character.
-  return typeof password === "string" && password.length >= 8 && Buffer.byteLength(password, "utf8") <= 72;
+  return (
+    typeof password === "string" &&
+    password.length >= 8 &&
+    Buffer.byteLength(password, "utf8") <= 72
+  );
 }
 
-export { hashPassword, verifyPassword, signToken, requireAuth, isValidEmail, isValidPassword, renewedToken };
+export {
+  hashPassword,
+  verifyPassword,
+  signToken,
+  requireAuth,
+  isValidEmail,
+  isValidPassword,
+  renewedToken,
+};

@@ -7,8 +7,14 @@ function response() {
   return {
     headers: {},
     body: undefined,
-    setHeader(name, value) { this.headers[name.toLowerCase()] = value; return this; },
-    json(value) { this.body = value; return this; },
+    setHeader(name, value) {
+      this.headers[name.toLowerCase()] = value;
+      return this;
+    },
+    json(value) {
+      this.body = value;
+      return this;
+    },
   };
 }
 

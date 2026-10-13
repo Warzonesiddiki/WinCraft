@@ -853,6 +853,8 @@ export const it: Strings = {
     zoomLong: "5 min",
     minutesAgo: "{n} min fa",
     peak: "Picco {value}",
+    insightRecovering:
+      "Il processore si sta scaricando: era sopra il 75% di media e l’ultima lettura è {pct}%.",
     insightCalm: "È tutto tranquillo. Al momento nulla richiede la tua attenzione.",
     insightMemory:
       "La memoria è quasi piena ({pct}%). Chiudi le app che non usi o controlla cosa parte con Windows.",
@@ -1056,6 +1058,8 @@ export const it: Strings = {
     profileDefaultIsMax:
       "Su questa scheda il limite di potenza di fabbrica coincide già con il massimo, quindi Silenzioso è l'unico profilo che cambia i watt: Gaming si distingue alzando il tetto del clock.",
     driverInstalled: "installato v{version} il {date}",
+    driversHardwareChanged:
+      "Questo elenco è stato analizzato su un hardware diverso da quello attuale (ad esempio una scheda grafica sostituita), quindi è stato cancellato. Avvia una nuova scansione per leggere i dispositivi realmente installati.",
     driversNoUpdateCheck:
       "Questa schermata non contatta i produttori e non può sapere se esiste una versione più recente: mostra la versione installata e la sua età, e ti porta alla pagina ufficiale per verificarlo tu.",
     driversCheckedAt: "Letto il {time}",
@@ -1137,6 +1141,21 @@ export const it: Strings = {
     emailVerified: "Email verificata",
     resendVerification: "Invia di nuovo",
     verificationSent: "Email di verifica inviata.",
+    deleteAccount: "Elimina account",
+    deleteAccountBody:
+      "Rimuove il tuo indirizzo email, la password e i dettagli salvati, disconnette tutti i dispositivi e non può essere annullata. Una recensione che hai pubblicato resta visibile, ma l’indirizzo viene rimosso.",
+    deleteAccountPassword: "La tua password attuale",
+    deleteAccountConfirmLabel: "Scrivi DELETE per confermare",
+    deleteAccountSubmit: "Elimina definitivamente il mio account",
+    deleteAccountCancel: "Annulla",
+    deleteAccountDone:
+      "Il tuo account è stato eliminato. Tutti i dispositivi sono stati disconnessi.",
+    deleteAccountBlocked:
+      "Questo account ha un abbonamento attivo. Annullalo da Gestisci abbonamento: altrimenti eliminare l’account lascerebbe la carta ancora addebitata.",
+    deleteAccountWrongPassword: "Questa password non corrisponde all’account.",
+    deleteAccountNeedsLogin: "La sessione è scaduta. Accedi di nuovo per eliminare l’account.",
+    deleteAccountUnreachable:
+      "Impossibile raggiungere il server. Non è stato eliminato nulla: controlla la connessione e riprova.",
   },
   driftWatch: {
     title: "Sorveglia gli aggiornamenti di Windows",
@@ -1556,7 +1575,7 @@ export const it: Strings = {
     auto_end_frozen_tasks: {
       name: "Non far bloccare lo spegnimento da un'app freezata",
       description:
-        'Quando un programma smette di rispondere durante lo spegnimento, Windows aspetta e mostra la schermata "Questa app impedisce l\'arresto" finché qualcuno non clicca. Questo chiude da solo le app bloccate, così un programma piantato non può lasciare il PC acceso.',
+        'Quando un programma smette di rispondere durante lo spegnimento, Windows aspetta e mostra la schermata "Questa app impedisce l\'arresto" finché qualcuno non clicca. Questo chiude da solo le app bloccate, così un programma piantato non può lasciare il PC acceso. Attenzione: la chiusura automatica delle app può causare la perdita del lavoro non salvato. Ripristinare questa impostazione non recupera quel lavoro.',
     },
     instant_folder_loading: {
       name: "Apri ogni cartella all'istante",
@@ -1754,8 +1773,7 @@ export const it: Strings = {
     },
     disable_edge_hub_sidebar: {
       name: "Disattiva barra laterale di Microsoft Edge",
-      description:
-        "Disattiva la barra laterale di Edge e i widget web integrati in background.",
+      description: "Disattiva la barra laterale di Edge e i widget web integrati in background.",
     },
     disable_edge_wallet: {
       name: "Disattiva suggerimenti portafoglio di Edge",

@@ -55,6 +55,23 @@ export function niceCeiling(values: readonly (number | null)[], floor: number): 
 
 export type Verdict = "smooth" | "busy" | "strained";
 
+/** Change between the newest reading and the one `window` samples before it,
+ *  in the units of the series (percentage points for load). `null` until both
+ *  ends of that window are real readings: half a window is not a trend. The
+ *  charts show "how much has this moved", so the answer must come from the
+ *  same readings the line is drawn from. */
+export function windowDelta(
+  values: readonly (number | null)[],
+  window = WINDOW_SHORT,
+): number | null {
+  if (window < 2 || values.length < window) return null;
+  const first = values[values.length - window];
+  const last = values[values.length - 1];
+  if (first === null || last === null || !Number.isFinite(first) || !Number.isFinite(last))
+    return null;
+  return last - first;
+}
+
 /** How the PC is doing, from the last ten seconds of real load. `null` until
  *  there are three readings to judge from. */
 export function verdict(
@@ -143,7 +160,7 @@ export function peakOf(
 }
 
 export type Insight = {
-  id: "memory" | "cpu" | "drive" | "calm";
+  id: "memory" | "cpu" | "recovering" | "drive" | "calm";
   tone: "ok" | "warn" | "danger";
   pct?: number;
 };
@@ -155,6 +172,8 @@ export function insights(input: {
   cpu: readonly number[];
   memoryPct: number | null;
   drivePct: number | null;
+  /** Change across the visible window, computed with `windowDelta`. */
+  cpuDelta?: number | null;
 }): Insight[] {
   const out: Insight[] = [];
   const level = (v: number, warn: number, danger: number) =>
@@ -167,7 +186,20 @@ export function insights(input: {
   if (recent.length >= 10) {
     const average = recent.reduce((a, b) => a + b, 0) / recent.length;
     const tone = level(average, 75, 90);
-    if (tone) out.push({ id: "cpu", tone, pct: Math.round(average) });
+    const easing = (input.cpuDelta ?? 0) <= -12;
+    // A busy half-minute that is visibly coming down is not the same story as
+    // one that just peaked: report the fall and the latest reading instead of
+    // repeating the average as if nothing had changed. A danger-level average
+    // still gets its alarm note even while falling.
+    if (tone === "warn" && easing) {
+      out.push({
+        id: "recovering",
+        tone: "ok",
+        pct: Math.round(recent[recent.length - 1] ?? average),
+      });
+    } else if (tone) {
+      out.push({ id: "cpu", tone, pct: Math.round(average) });
+    }
   }
   if (input.drivePct !== null) {
     const tone = level(input.drivePct, 90, 95);

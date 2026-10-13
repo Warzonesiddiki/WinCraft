@@ -64,11 +64,7 @@ function check(name, got, want) {
 // Picks the recommended, unapplied tweak.
 check(
   "picks recommended unapplied",
-  pick(
-    [tweak("a"), tweak("b")],
-    new Set(["a", "b"]),
-    Object.fromEntries([rec("b")]),
-  )?.id,
+  pick([tweak("a"), tweak("b")], new Set(["a", "b"]), Object.fromEntries([rec("b")]))?.id,
   "b",
 );
 
@@ -93,11 +89,9 @@ check(
 // Not-recommended / neutral verdicts never surface.
 check(
   "non-recommended verdicts never surface",
-  pick(
-    [tweak("a")],
-    new Set(["a"]),
-    { a: { id: "a", verdict: "notrecommended", reason_key: null } },
-  ),
+  pick([tweak("a")], new Set(["a"]), {
+    a: { id: "a", verdict: "notrecommended", reason_key: null },
+  }),
   null,
 );
 

@@ -2,8 +2,15 @@ import { afterEach, beforeEach, describe, expect, it, vi, type Mock } from "vite
 import { act, cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { axe } from "jest-axe";
 import { format } from "../i18n";
+import { hardwareSignature, writeCachedDriverAudit } from "../lib";
 import { STRINGS } from "../i18n-tables";
-import type { DriverAudit, DriverEntry, InstallOutcome, UpdateSearchResult } from "../types";
+import type {
+  DriverAudit,
+  DriverEntry,
+  InstallOutcome,
+  SystemProfile,
+  UpdateSearchResult,
+} from "../types";
 import { HardwarePanel } from "./hardware";
 
 vi.mock("@tauri-apps/api/core", async () => (await import("../test-bridge")).coreModule());
@@ -75,9 +82,26 @@ const searchResult = (extra: Partial<UpdateSearchResult> = {}): UpdateSearchResu
   ...extra,
 });
 
+/** A machine the panel can compare itself against. */
+const profile = (extra: Partial<SystemProfile> = {}): SystemProfile => ({
+  windows_version: "Windows 11 24H2",
+  windows_build: "26100.1742",
+  cpu: "AMD Ryzen 7 7800X3D",
+  cpu_physical_cores: 8,
+  cpu_logical_cores: 16,
+  gpu: "NVIDIA GeForce RTX 4070",
+  ram_total_bytes: 34_359_738_368,
+  system_disk: "nvme",
+  form_factor: "desktop",
+  power_plan_guid: "381b4222-f694-41f0-9685-ff5bb260df2e",
+  power_plan: "Balanced",
+  ...extra,
+});
+
 /** Mounts the panel with the reads its mount path makes already queued. */
-async function mount(rebootPending = false) {
+async function mount(rebootPending = false, systemProfile: SystemProfile = profile()) {
   bridge.reply("reboot_pending", rebootPending);
+  bridge.reply("system_profile", systemProfile);
   const view = render(<DriversPanel s={s} pushToast={pushToast} />);
   await act(async () => {});
   return view;
@@ -434,5 +458,65 @@ describe("accessibility", () => {
     await screen.findByText("NVIDIA High Definition Audio");
     const results = await axe(container);
     expect(results.violations).toEqual([]);
+  });
+});
+
+describe("a scan that belongs to different hardware", () => {
+  const stored = audit([entry()]);
+  const at = new Date();
+
+  it("is dropped when the machine it was scanned on is not this one", async () => {
+    // A replaced graphics card inside the same Windows install: the browser
+    // facts the cache also compares did not change, so nothing else would
+    // notice that this list describes devices that are no longer installed.
+    writeCachedDriverAudit(stored, at, hardwareSignature(profile()));
+    await mount(false, profile({ gpu: "AMD Radeon RX 7900 XT" }));
+    expect(screen.getByText(s.hardware.driversHardwareChanged)).toBeInTheDocument();
+    // The stale list is gone, both from the screen and from the disk, so the
+    // next launch does not show it again.
+    expect(screen.queryByText(stored.entries[0].device)).toBeNull();
+    expect(localStorage.getItem("wincraft-driver-audit")).toBeNull();
+    // Nothing was scanned on its own: the note says what to press.
+    expect(bridge.callsTo("driver_audit")).toHaveLength(0);
+  });
+
+  it("is kept when the hardware is the same", async () => {
+    writeCachedDriverAudit(stored, at, hardwareSignature(profile()));
+    await mount();
+    expect(screen.getByText(stored.entries[0].device)).toBeInTheDocument();
+    expect(screen.queryByText(s.hardware.driversHardwareChanged)).toBeNull();
+    expect(localStorage.getItem("wincraft-driver-audit")).not.toBeNull();
+  });
+
+  it("is kept when this machine's hardware cannot be read", async () => {
+    // No profile, no comparison: the age limit and the browser facts still
+    // apply, and a failed read must not throw away a usable scan.
+    writeCachedDriverAudit(stored, at, hardwareSignature(profile()));
+    bridge.reply("reboot_pending", false);
+    bridge.reply("system_profile", new Error("probe failed"));
+    render(<DriversPanel s={s} pushToast={pushToast} />);
+    await act(async () => {});
+    expect(screen.getByText(stored.entries[0].device)).toBeInTheDocument();
+    expect(screen.queryByText(s.hardware.driversHardwareChanged)).toBeNull();
+  });
+
+  it("is kept when the scan was stored without any hardware signature", async () => {
+    // A cache written before this check existed cannot be compared, so it is
+    // trusted until its age runs out rather than thrown away on arrival.
+    writeCachedDriverAudit(stored, at);
+    await mount(false, profile({ gpu: "AMD Radeon RX 7900 XT" }));
+    expect(screen.getByText(stored.entries[0].device)).toBeInTheDocument();
+    expect(screen.queryByText(s.hardware.driversHardwareChanged)).toBeNull();
+  });
+
+  it("records the hardware when a fresh scan runs, so the next launch can compare", async () => {
+    await mount();
+    bridge.reply("driver_audit", stored);
+    fireEvent.click(screen.getByRole("button", { name: s.hardware.driversRescan }));
+    await act(async () => {});
+    const written = JSON.parse(localStorage.getItem("wincraft-driver-audit")!);
+    expect(written.hardware).toBe(hardwareSignature(profile()));
+    expect(written.version).toBe(2);
+    expect(screen.queryByText(s.hardware.driversHardwareChanged)).toBeNull();
   });
 });

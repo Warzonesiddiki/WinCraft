@@ -6,7 +6,13 @@ import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
 import { openUrl } from "@tauri-apps/plugin-opener";
 import { format, Strings } from "../i18n";
-import { readCachedDriverAudit, writeCachedDriverAudit, uiLocale } from "../lib";
+import {
+  clearCachedDriverAudit,
+  hardwareSignature,
+  readCachedDriverAudit,
+  writeCachedDriverAudit,
+  uiLocale,
+} from "../lib";
 import {
   DriverAudit,
   DriverEntry,
@@ -14,6 +20,7 @@ import {
   GpuPowerInfo,
   InstallOutcome,
   ScanProgress,
+  SystemProfile,
   ThermalReport,
   UpdateSearchResult,
 } from "../types";
@@ -578,8 +585,11 @@ export function ThermalsPanel({
   useEffect(() => {
     let alive = true;
     const started = Date.now();
+    let busy = false;
 
     const tick = () => {
+      if (busy) return;
+      busy = true;
       invoke<ThermalReport>("thermal_report")
         .then((r) => {
           if (!alive) return;
@@ -612,6 +622,9 @@ export function ThermalsPanel({
             if (current === null) setFailed(true);
             return current;
           });
+        })
+        .finally(() => {
+          busy = false;
         });
     };
 
@@ -865,13 +878,30 @@ function DriverRow({ entry, s }: { entry: DriverEntry; s: Strings }) {
 // bundled and imported by the thermals unit tests under Node).
 let cachedAudit: DriverAudit | null = null;
 let cachedAuditAt: Date | null = null;
-let cachedAuditLoaded = false;
+/** The hardware the stored scan was taken on, when it recorded one. */
+let cachedAuditHardware: string | null = null;
 function loadCachedAudit(): void {
-  if (cachedAuditLoaded) return;
-  cachedAuditLoaded = true;
+  // Read on every mount rather than once per module load. The parse is a few
+  // milliseconds on a screen that otherwise spends about sixteen seconds
+  // scanning, and reading once meant a scan cleared elsewhere (another window,
+  // or the hardware check below) could be shown again from a stale module
+  // value. `readCachedDriverAudit` is the single place that decides whether
+  // what is on disk is still usable.
   const storedAudit = readCachedDriverAudit();
   cachedAudit = storedAudit?.audit ?? null;
   cachedAuditAt = storedAudit?.at ?? null;
+  cachedAuditHardware = storedAudit?.hardware ?? null;
+}
+
+/** The signature of the machine this session is running on, once read. */
+let currentHardware: string | null = null;
+
+/** Forgets a scan that describes a machine this is no longer. */
+function forgetCachedAudit(): void {
+  cachedAudit = null;
+  cachedAuditAt = null;
+  cachedAuditHardware = null;
+  clearCachedDriverAudit();
 }
 
 export function DriversPanel({
@@ -886,6 +916,9 @@ export function DriversPanel({
     loadCachedAudit();
     return cachedAudit;
   });
+  // The signature the stored scan was taken on, for the write below: reading
+  // it inside `run` would need the profile again, and it has already been read
+  // by the time anyone can click Rescan.
   const [checkedAt, setCheckedAt] = useState<Date | null>(() => cachedAuditAt);
   const [progress, setProgress] = useState<ScanProgress | null>(null);
   const [updates, setUpdates] = useState<UpdateSearchResult | null>(null);
@@ -903,6 +936,8 @@ export function DriversPanel({
   const [error, setError] = useState<string | null>(null);
   const [showAll, setShowAll] = useState(false);
   const [rebootNeeded, setRebootNeeded] = useState(false);
+  /** Set when the stored scan belongs to different hardware than this one. */
+  const [hardwareChanged, setHardwareChanged] = useState(false);
 
   // Real progress from the Rust side: one event per device class actually
   // read, so the bar tracks work rather than a timer.
@@ -933,7 +968,9 @@ export function DriversPanel({
         const at = new Date();
         cachedAudit = a;
         cachedAuditAt = at;
-        writeCachedDriverAudit(a, at);
+        cachedAuditHardware = currentHardware;
+        writeCachedDriverAudit(a, at, currentHardware);
+        setHardwareChanged(false);
         setAudit(a);
         setCheckedAt(at);
       })
@@ -956,6 +993,33 @@ export function DriversPanel({
         if (alive) setRebootNeeded(v);
       })
       .catch(() => {});
+    return () => {
+      alive = false;
+    };
+  }, []);
+
+  // The stored scan is shown immediately (that is the point of the cache), and
+  // then checked against the hardware it was taken on. A machine whose
+  // graphics card was replaced would otherwise display a day-old list of
+  // devices that are no longer installed — the one case where the browser
+  // facts the cache also compares cannot help, because they did not change.
+  useEffect(() => {
+    let alive = true;
+    invoke<SystemProfile>("system_profile")
+      .then((profile) => {
+        if (!alive) return;
+        const current = hardwareSignature(profile);
+        currentHardware = current;
+        if (!current || !cachedAuditHardware || current === cachedAuditHardware) return;
+        forgetCachedAudit();
+        setAudit(null);
+        setCheckedAt(null);
+        setHardwareChanged(true);
+      })
+      .catch(() => {
+        // No profile, no comparison: the age limit and the browser facts still
+        // apply, and a failed read must not throw away a usable scan.
+      });
     return () => {
       alive = false;
     };
@@ -1017,6 +1081,7 @@ export function DriversPanel({
         </p>
       )}
       {!audit && !busy && !error && <InfoAlert>{s.hardware.driversNoUpdateCheck}</InfoAlert>}
+      {hardwareChanged && !busy && <InfoAlert>{s.hardware.driversHardwareChanged}</InfoAlert>}
 
       {/* Progress is shown as position-in-work: which class, how many of how
           many, and the percentage that follows from those two. */}

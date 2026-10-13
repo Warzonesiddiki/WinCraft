@@ -3,7 +3,9 @@ import fs from "node:fs";
 const output = new URL(".live-metrics-test-bundle.mjs", import.meta.url);
 try {
   await build({
-    entryPoints: [new URL("test-live-metrics.ts", import.meta.url).pathname.replace(/^\/(\w:)/, "$1")],
+    entryPoints: [
+      new URL("test-live-metrics.ts", import.meta.url).pathname.replace(/^\/(\w:)/, "$1"),
+    ],
     bundle: true,
     platform: "node",
     format: "esm",

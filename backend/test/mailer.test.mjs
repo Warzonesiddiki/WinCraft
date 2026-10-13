@@ -59,7 +59,11 @@ test("our own credential and quota problems are not blamed on the address", asyn
     await assert.rejects(
       () => sendWithProviderStatus(status),
       (err) => {
-        assert.equal(err.rejectedAddress, false, `status ${status} is our fault, not the recipient's`);
+        assert.equal(
+          err.rejectedAddress,
+          false,
+          `status ${status} is our fault, not the recipient's`,
+        );
         return true;
       },
     );
@@ -97,7 +101,11 @@ test("customer replies use the branded alias without replacing support-form repl
     const { sendMail } = require("../dist/mailer.js");
     const message = { to: "someone@example.com", subject: "test", html: "<p>test</p>" };
     await sendMail(message);
-    await sendMail({ ...message, replyTo: "customer@example.com", headers: { "List-Unsubscribe": "<https://x.test/u>" } });
+    await sendMail({
+      ...message,
+      replyTo: "customer@example.com",
+      headers: { "List-Unsubscribe": "<https://x.test/u>" },
+    });
     assert.equal(payloads[0].reply_to, "support@wincraft.app");
     assert.equal(payloads[1].reply_to, "customer@example.com");
     assert.equal(payloads[0].headers, undefined);

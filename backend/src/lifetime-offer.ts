@@ -35,7 +35,9 @@ export function lifetimeOffer(
   const rawStart = environment.LIFETIME_CAMPAIGN_STARTS_AT;
   const rawEnd = environment.LIFETIME_CAMPAIGN_ENDS_AT;
   const configured = [rawId, rawStart, rawEnd].some((value) => value !== undefined);
-  const checkoutConfigured = Boolean(environment.STRIPE_SECRET_KEY && environment.STRIPE_PRICE_LIFETIME);
+  const checkoutConfigured = Boolean(
+    environment.STRIPE_SECRET_KEY && environment.STRIPE_PRICE_LIFETIME,
+  );
   const base: LifetimeOffer = {
     serverTime: new Date(nowMs).toISOString(),
     id: null,
@@ -51,8 +53,13 @@ export function lifetimeOffer(
 
   const start = utcTimestamp(rawStart);
   const end = utcTimestamp(rawEnd);
-  if (!rawId || !/^[a-zA-Z0-9][a-zA-Z0-9._-]{0,79}$/.test(rawId) || start === null || end === null ||
-      end - start !== LIFETIME_CAMPAIGN_DURATION_MS) {
+  if (
+    !rawId ||
+    !/^[a-zA-Z0-9][a-zA-Z0-9._-]{0,79}$/.test(rawId) ||
+    start === null ||
+    end === null ||
+    end - start !== LIFETIME_CAMPAIGN_DURATION_MS
+  ) {
     return { ...base, status: "invalid", available: false };
   }
   // After a campaign, Lifetime returns to normal sale at the regular price.
@@ -75,18 +82,41 @@ type CheckoutDecision =
 
 /** Called immediately before creating a session. The client cannot supply
  * the campaign ID, deadline, availability, or lifetime-ownership decision. */
-export function lifetimeCheckoutDecision(offer: LifetimeOffer, alreadyOwnsLifetime: boolean): CheckoutDecision {
+export function lifetimeCheckoutDecision(
+  offer: LifetimeOffer,
+  alreadyOwnsLifetime: boolean,
+): CheckoutDecision {
   if (alreadyOwnsLifetime) {
-    return { allowed: false, status: 409, code: "LIFETIME_ALREADY_OWNED", error: "Your account already has Lifetime access." };
+    return {
+      allowed: false,
+      status: 409,
+      code: "LIFETIME_ALREADY_OWNED",
+      error: "Your account already has Lifetime access.",
+    };
   }
   if (offer.status === "invalid") {
-    return { allowed: false, status: 503, code: "LIFETIME_OFFER_UNAVAILABLE", error: "Lifetime checkout is temporarily unavailable." };
+    return {
+      allowed: false,
+      status: 503,
+      code: "LIFETIME_OFFER_UNAVAILABLE",
+      error: "Lifetime checkout is temporarily unavailable.",
+    };
   }
   if (offer.status === "scheduled") {
-    return { allowed: false, status: 409, code: "LIFETIME_OFFER_NOT_STARTED", error: "The Lifetime offer has not started yet." };
+    return {
+      allowed: false,
+      status: 409,
+      code: "LIFETIME_OFFER_NOT_STARTED",
+      error: "The Lifetime offer has not started yet.",
+    };
   }
   if (!offer.available) {
-    return { allowed: false, status: 503, code: "LIFETIME_OFFER_UNAVAILABLE", error: "Lifetime checkout is temporarily unavailable." };
+    return {
+      allowed: false,
+      status: 503,
+      code: "LIFETIME_OFFER_UNAVAILABLE",
+      error: "Lifetime checkout is temporarily unavailable.",
+    };
   }
   if (offer.status === "disabled") return { allowed: true };
 
@@ -94,7 +124,10 @@ export function lifetimeCheckoutDecision(offer: LifetimeOffer, alreadyOwnsLifeti
   const endSeconds = Math.floor(Date.parse(offer.endsAt!) / 1000);
   // Stripe rejects expires_at even two seconds past 24 hours on its own
   // clock, so the cap keeps an hour of margin.
-  const expiresAt = Math.min(nowSeconds + 23 * 60 * 60, Math.max(endSeconds, nowSeconds + LIFETIME_CHECKOUT_GRACE_SECONDS));
+  const expiresAt = Math.min(
+    nowSeconds + 23 * 60 * 60,
+    Math.max(endSeconds, nowSeconds + LIFETIME_CHECKOUT_GRACE_SECONDS),
+  );
   return {
     allowed: true,
     expiresAt,
