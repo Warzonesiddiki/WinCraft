@@ -78,8 +78,8 @@ function buildDescription(clipMetas) {
   return (
     `${clipMetas.length} quick Windows tweaks you can apply right now, back to back:\n\n${bullets}\n\n` +
     "Try it: https://wincraft.app\n" +
-    "Install: winget install AurelioAvila.PCTweaker\n" +
-    "Project: https://github.com/AurelioAvila/pc-tweaker-app\n\n" +
+    "Install: winget install Warzonesiddiki.WinCraft\n" +
+    "Project: https://github.com/Warzonesiddiki/WinCraft\n\n" +
     "#Windows #PCOptimization #WindowsTips"
   );
 }

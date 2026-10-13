@@ -1600,6 +1600,306 @@ export const es: Strings = {
       description:
         "Detiene y desactiva el servicio de indexación de archivos de Windows, reduciendo la actividad de disco en segundo plano — útil en SSD pequeños o mientras juegas. La búsqueda de archivos en el menú Inicio se vuelve más lenta hasta que lo reactives (requiere privilegios de administrador).",
     },
+    enable_regback: {
+      name: "Activar copia de seguridad del Registro (RegBack)",
+      description:
+        "Reactiva las copias de seguridad periódicas automáticas del Registro de Windows en %SystemRoot%\\System32\\config\\RegBack para recuperación de emergencia.",
+    },
+    explorer_anti_hang: {
+      name: "Evitar bloqueos del Explorador en accesos directos",
+      description:
+        "Desactiva la resolución de rutas y la búsqueda de red al abrir accesos directos, evitando que el Explorador de archivos se congele con unidades o recursos desconectados.",
+    },
+    no_internet_open_with: {
+      name: "Omitir consulta a Microsoft Store para archivos desconocidos",
+      description:
+        "Abre de inmediato el cuadro local «Abrir con» en lugar de sugerir buscar en Microsoft Store al hacer doble clic en extensiones no reconocidas.",
+    },
+    detailed_bsod: {
+      name: "Mostrar parámetros detallados en pantallas azules BSOD",
+      description:
+        "Muestra los códigos de parada hexadecimales exactos, los controladores afectados y las direcciones de memoria en la pantalla azul en vez de ocultarlos tras un código QR.",
+    },
+    disable_wpbt: {
+      name: "Bloquear ejecución de software UEFI WPBT",
+      description:
+        "Impide que el firmware UEFI de la placa base instale automáticamente binarios OEM no deseados en Windows mediante la tabla WPBT.",
+    },
+    disable_ndu: {
+      name: "Desactivar fuga de memoria no paginada de NDU",
+      description:
+        "Deshabilita el controlador Network Diagnostic Usage, evitando la acumulación excesiva de memoria no paginada durante descargas de red intensas.",
+    },
+    disable_search_highlights: {
+      name: "Desactivar destacados e ilustraciones de búsqueda",
+      description:
+        "Elimina las ilustraciones web, los doodles diarios de Bing y las tendencias de la barra de búsqueda de Windows y la barra de tareas.",
+    },
+    auto_complete_run: {
+      name: "Activar autocompletado en el cuadro Ejecutar",
+      description:
+        "Habilita el autocompletado instantáneo de comandos y sugerencias en el cuadro de diálogo Ejecutar de Windows (Win + R).",
+    },
+    disable_aero_shake: {
+      name: "Desactivar minimización por agitación (Aero Shake)",
+      description:
+        "Evita que al sacudir la barra de título de una ventana se minimicen accidentalmente las demás ventanas abiertas en segundo plano.",
+    },
+    disable_remote_assistance: {
+      name: "Desactivar invitaciones de Asistencia remota",
+      description:
+        "Deshabilita las conexiones e invitaciones de Asistencia remota de Windows para proteger el equipo de solicitudes de soporte no autorizadas.",
+    },
+    disable_llmnr: {
+      name: "Desactivar protocolo LLMNR",
+      description:
+        "Deshabilita Link-Local Multicast Name Resolution (LLMNR) para proteger contra suplantaciones de red local e intercepción de credenciales.",
+    },
+    disable_wifi_sense: {
+      name: "Desactivar uso compartido de puntos Wi-Fi Sense",
+      description:
+        "Evita que Windows se conecte automáticamente a redes Wi-Fi abiertas y comparta credenciales de red con tus contactos.",
+    },
+    disable_cloud_search: {
+      name: "Desactivar búsqueda en la nube en Windows",
+      description:
+        "Impide que la búsqueda de Windows consulte el historial en la nube y los registros de la cuenta de Microsoft al buscar archivos locales.",
+    },
+    disable_app_suggestions_start: {
+      name: "Desactivar sugerencias en el menú Inicio",
+      description:
+        "Desactiva las sugerencias promocionales de aplicaciones y consejos de funciones dentro del menú Inicio de Windows.",
+    },
+    disable_handwriting_sharing: {
+      name: "Desactivar envío de errores de escritura manual",
+      description:
+        "Impide que Windows transmita a Microsoft los registros de errores de reconocimiento de escritura manual y muestras de trazos.",
+    },
+    disable_ceip: {
+      name: "Desactivar Programa para la mejora de la experiencia (CEIP)",
+      description:
+        "Desactiva el cliente de telemetría SQM del Programa para la mejora de la experiencia del usuario de Windows (CEIP).",
+    },
+    disable_lockscreen_camera: {
+      name: "Desactivar cámara en la pantalla de bloqueo",
+      description:
+        "Deshabilita el botón y gesto de la cámara en la pantalla de bloqueo para impedir la captura de fotos sin desbloquear el dispositivo.",
+    },
+    disable_cortana_consent: {
+      name: "Desactivar consentimiento de búsqueda de Cortana",
+      description:
+        "Revoca el consentimiento de búsqueda de Cortana para evitar que consultas y datos de voz se compartan con los servicios en la nube de Microsoft.",
+    },
+    disable_wer_queuing: {
+      name: "Desactivar cola de informes de errores de Windows",
+      description:
+        "Impide que Informe de errores de Windows guarde y ponga en cola informes de bloqueo en disco para su envío posterior.",
+    },
+    disable_experimentation: {
+      name: "Desactivar telemetría de experimentación de Windows",
+      description:
+        "Desactiva las pruebas A/B y funciones de experimentación de Microsoft en Windows, manteniendo el sistema consistente y predecible.",
+    },
+    disable_app_inventory_collection: {
+      name: "Desactivar inventario de compatibilidad de aplicaciones",
+      description:
+        "Deshabilita el recopilador de inventario de compatibilidad que analiza el software instalado y lo notifica a Microsoft.",
+    },
+    disable_problem_steps_recorder: {
+      name: "Desactivar telemetría de Grabación de acciones",
+      description:
+        "Deshabilita la captura de errores y el envío de datos de diagnóstico de la Grabación de acciones de usuario (PSR).",
+    },
+    disable_ait_telemetry: {
+      name: "Desactivar telemetría de impacto de aplicaciones (AIT)",
+      description:
+        "Desactiva la recopilación de datos de Application Impact Telemetry (AIT) al iniciar programas.",
+    },
+    disable_smartscreen_app_install: {
+      name: "Desactivar telemetría de instalación de SmartScreen",
+      description:
+        "Deshabilita la telemetría de instalación y las consultas de verificación de URL de SmartScreen.",
+    },
+    disable_online_speech_privacy: {
+      name: "Desactivar recopilación de reconocimiento de voz en línea",
+      description:
+        "Desactiva la recopilación de datos de voz en la nube para el dictado por voz y modelos de voz.",
+    },
+    disable_edge_shopping: {
+      name: "Desactivar asistente de compras de Edge",
+      description:
+        "Deshabilita el asistente de compras y el rastreo de cupones de descuento en Microsoft Edge.",
+    },
+    disable_edge_metrics: {
+      name: "Desactivar métricas de diagnóstico de Edge",
+      description:
+        "Deshabilita la transmisión de métricas de uso e informes de fallos de Microsoft Edge.",
+    },
+    disable_edge_startup_boost: {
+      name: "Desactivar Inicio rápido de Edge",
+      description:
+        "Desactiva el inicio rápido de Microsoft Edge, evitando procesos en segundo plano al arrancar Windows.",
+    },
+    disable_edge_background_mode: {
+      name: "Desactivar modo en segundo plano de Edge",
+      description:
+        "Impide que Microsoft Edge continúe ejecutándose en segundo plano al cerrarlo, liberando memoria del sistema.",
+    },
+    disable_bluetooth_le_discovery: {
+      name: "Desactivar escaneo de Bluetooth LE en segundo plano",
+      description:
+        "Deshabilita el escaneo continuo en segundo plano de dispositivos Bluetooth Low Energy para ahorrar CPU y energía.",
+    },
+    disable_edge_hub_sidebar: {
+      name: "Desactivar barra lateral de Microsoft Edge",
+      description:
+        "Desactiva la barra lateral de Edge y sus widgets web integrados en segundo plano.",
+    },
+    disable_edge_wallet: {
+      name: "Desactivar sugerencias de billetera de Edge",
+      description:
+        "Evita que Microsoft Edge consulte automáticamente los servicios de pago y billetera.",
+    },
+    disable_cortana_above_lock: {
+      name: "Desactivar Cortana sobre la pantalla de bloqueo",
+      description:
+        "Evita que los asistentes de voz y la búsqueda escuchen o se activen mientras la pantalla está bloqueada.",
+    },
+    disable_device_history: {
+      name: "Desactivar historial de actividad del dispositivo",
+      description:
+        "Evita que Windows registre y rastree el historial de aplicaciones y archivos en este dispositivo.",
+    },
+    disable_search_history: {
+      name: "Desactivar historial de búsqueda de la barra de tareas",
+      description:
+        "Desactiva el registro de búsquedas anteriores en la barra de tareas y en el menú Inicio.",
+    },
+    disable_news_and_interests: {
+      name: "Desactivar panel de Noticias e Intereses",
+      description:
+        "Oculta el widget del clima y noticias en la barra de tareas de Windows, ahorrando red y memoria en segundo plano.",
+    },
+    disable_auto_maintenance_wake: {
+      name: "Desactivar reactivación por mantenimiento automático",
+      description:
+        "Evita que el mantenimiento automático de Windows reactive el equipo o consuma la batería por la noche.",
+    },
+    disable_diagnostic_data_viewer: {
+      name: "Desactivar almacén de datos de diagnóstico local",
+      description:
+        "Evita que la telemetría de diagnóstico de Windows reserve y escriba bases de datos de caché locales en disco.",
+    },
+    disable_activity_feed: {
+      name: "Desactivar fuente de actividades y línea de tiempo",
+      description:
+        "Evita que Windows genere gráficos de historial y rastree las actividades del usuario entre dispositivos.",
+    },
+    disable_publish_user_activities: {
+      name: "Desactivar publicación de actividades de usuario en la nube",
+      description:
+        "Evita que Windows sincronice el historial de actividades con los servicios en la nube de Microsoft.",
+    },
+    disable_bing_widget_search: {
+      name: "Desactivar widgets y fuentes de Windows 11",
+      description:
+        "Desactiva el panel de widgets de Windows 11 y la sincronización de noticias en segundo plano.",
+    },
+    disable_typing_insights: {
+      name: "Desactivar información de escritura y telemetría",
+      description:
+        "Evita que Windows analice los patrones de pulsación de teclas y las estadísticas de autocompletado.",
+    },
+    disable_inking_typing_personalization: {
+      name: "Desactivar personalización de entrada manuscrita y teclado",
+      description:
+        "Evita que Windows envíe a Microsoft el diccionario local de escritura a mano y teclado.",
+    },
+    disable_shared_experiences: {
+      name: "Desactivar uso compartido entre dispositivos conectados",
+      description:
+        "Desactiva la sincronización en segundo plano de Connected Devices Platform (CDP) entre cuentas.",
+    },
+    disable_remote_desktop: {
+      name: "Desactivar conexiones entrantes de Escritorio remoto",
+      description:
+        "Bloquea las conexiones entrantes de Escritorio remoto (RDP) para reducir la superficie de ataque.",
+    },
+    disable_edge_collections: {
+      name: "Desactivar Colecciones de Microsoft Edge",
+      description:
+        "Desactiva las Colecciones de Edge y su sincronización en segundo plano para reducir el consumo de recursos.",
+    },
+    disable_edge_quick_search: {
+      name: "Desactivar barra de búsqueda de escritorio de Edge",
+      description:
+        "Evita que Microsoft Edge muestre barras de búsqueda flotantes en el escritorio de Windows.",
+    },
+    disable_edge_personalization: {
+      name: "Desactivar personalización y telemetría de Edge",
+      description:
+        "Desactiva el envío del historial de navegación y perfiles publicitarios en Microsoft Edge.",
+    },
+    disable_lockscreen_spotlight: {
+      name: "Desactivar Contenido destacado de Windows en pantalla de bloqueo",
+      description:
+        "Evita la descarga de fondos de pantalla promocionales y sugerencias en la pantalla de bloqueo.",
+    },
+    disable_push_install_service: {
+      name: "Desactivar servicio de instalación remota PushToInstall",
+      description:
+        "Evita que Microsoft Store envíe instalaciones de aplicaciones a este PC de forma remota.",
+    },
+    disable_sqm_telemetry: {
+      name: "Desactivar cliente de telemetría SQM",
+      description:
+        "Desactiva el envío de datos del cliente SQM (Software Quality Metrics) en Windows.",
+    },
+    disable_inventory_telemetry: {
+      name: "Desactivar inventario de compatibilidad de aplicaciones",
+      description:
+        "Evita que Windows Application Experience recopile inventarios de las aplicaciones instaladas.",
+    },
+    disable_compatibility_assistant: {
+      name: "Desactivar Asistente para la compatibilidad de programas",
+      description:
+        "Desactiva las ventanas emergentes y análisis en segundo plano del Asistente para la compatibilidad de programas.",
+    },
+    disable_cortana_cloud_search: {
+      name: "Desactivar indizador en la nube de Windows Search",
+      description:
+        "Evita que Windows Search consulte índices en la nube y servidores de Bing al buscar archivos locales.",
+    },
+    disable_find_my_device: {
+      name: "Desactivar rastreo de Encontrar mi dispositivo",
+      description:
+        "Desactiva la transmisión continua de ubicación GPS y Wi-Fi para los servicios de Encontrar mi dispositivo.",
+    },
+    disable_sensors_data_collection: {
+      name: "Desactivar recopilación de datos de sensores de hardware",
+      description:
+        "Desactiva la supervisión en segundo plano de sensores (luz ambiental, acelerómetro) y ubicación.",
+    },
+    disable_location_scripting: {
+      name: "Desactivar acceso de scripts a la ubicación",
+      description:
+        "Evita que scripts en segundo plano y motores de navegador consulten la ubicación física del dispositivo.",
+    },
+    disable_advertising_info: {
+      name: "Desactivar directiva de información publicitaria",
+      description:
+        "Aplica un bloqueo de directiva de grupo que desactiva el seguimiento del ID de publicidad para todos los usuarios.",
+    },
+    disable_sync_settings: {
+      name: "Desactivar sincronización de configuración en la nube",
+      description:
+        "Evita que Windows sincronice personalización, contraseñas y preferencias del sistema con los servidores de Microsoft.",
+    },
+    disable_app_diagnostics_access: {
+      name: "Desactivar acceso de aplicaciones a información de diagnóstico",
+      description:
+        "Bloquea que aplicaciones de terceros de la Tienda lean información de diagnóstico y telemetría.",
+    },
   },
   cleanup: {
     temp_cleanup: {

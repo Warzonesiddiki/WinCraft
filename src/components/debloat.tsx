@@ -315,6 +315,7 @@ export function DebloatPanel({
     ["minimal", c.presetMinimal, c.presetMinimalHint],
     ["balanced", c.presetBalanced, c.presetBalancedHint],
     ["aggressive", c.presetAggressive, c.presetAggressiveHint],
+    ["barebone", c.presetBarebone, c.presetBareboneHint],
   ];
   const dateOf = (seconds: number) => new Date(seconds * 1000).toLocaleDateString(localeOf(lang));
   /** Facts about real use: activity, startup, memory. Only what Windows reports. */

@@ -14,8 +14,8 @@ same folder (`01-scan.png` … `05-maintenance.png`), plus `app_icon_1024.png`
 **Topics/categories to select:** Windows, Productivity, Developer Tools, Tech
 
 **Links**
-- Website: https://github.com/AurelioAvila/pc-tweaker-app
-- Download (winget): `winget install AurelioAvila.PCTweaker`
+- Website: https://github.com/Warzonesiddiki/WinCraft
+- Download (winget): `winget install Warzonesiddiki.WinCraft`
 
 **Description** (main body):
 
@@ -40,7 +40,7 @@ same folder (`01-scan.png` … `05-maintenance.png`), plus `app_icon_1024.png`
 > - Free tier covers the basics; Pro (€9.99/mo or €59/yr) unlocks the rest
 >
 > Built solo, Tauri (Rust) + React. Also on winget:
-> `winget install AurelioAvila.PCTweaker`
+> `winget install Warzonesiddiki.WinCraft`
 
 **First comment (post as the maker right after launch):**
 
@@ -94,9 +94,9 @@ For each, when AlternativeTo asks "why is this an alternative", use:
 **License:** Proprietary (Freemium — free tier + paid Pro tier,
 €9.99/mo or €59/yr)
 
-**Official website:** https://github.com/AurelioAvila/pc-tweaker-app
+**Official website:** https://github.com/Warzonesiddiki/WinCraft
 
-**Download link:** https://github.com/AurelioAvila/pc-tweaker-app/releases/latest
+**Download link:** https://github.com/Warzonesiddiki/WinCraft/releases/latest
 
 **Icon to upload:** `app_icon_1024.png`
 

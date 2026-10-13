@@ -4,8 +4,8 @@ $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
 . "$PSScriptRoot/release-safety.ps1"
 if ($Tag) { Assert-ReleaseTag -Tag $Tag }
-$endpoint = 'repos/AurelioAvila/pc-tweaker-app/releases/latest'
-if ($Tag) { $endpoint = 'repos/AurelioAvila/pc-tweaker-app/releases/tags/' + [uri]::EscapeDataString($Tag) }
+$endpoint = 'repos/Warzonesiddiki/WinCraft/releases/latest'
+if ($Tag) { $endpoint = 'repos/Warzonesiddiki/WinCraft/releases/tags/' + [uri]::EscapeDataString($Tag) }
 $json = & gh api $endpoint
 if ($LASTEXITCODE -ne 0) { throw 'Could not retrieve release metadata.' }
 $release = $json | ConvertFrom-Json

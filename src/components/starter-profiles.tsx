@@ -40,6 +40,9 @@ export function StarterProfiles({
     laptop: copy.laptopBody,
     quiet: copy.quietBody,
     streaming: copy.streamingBody,
+    barebone: copy.bareboneBody,
+    browser_only: copy.browser_onlyBody,
+    office: copy.officeBody,
   };
   const note: Record<string, string> = {
     gaming: copy.gamingNote,
@@ -48,6 +51,9 @@ export function StarterProfiles({
     laptop: copy.laptopNote,
     quiet: copy.quietNote,
     streaming: copy.streamingNote,
+    barebone: copy.bareboneNote,
+    browser_only: copy.browser_onlyNote,
+    office: copy.officeNote,
   };
   return (
     <section className="starter-profiles" aria-label={copy.heading}>
@@ -98,6 +104,24 @@ export function StarterProfiles({
                 <>
                   <circle cx="12" cy="12" r="2" />
                   <path d="M8.5 15.5a5 5 0 0 1 0-7m7 0a5 5 0 0 1 0 7M5.6 18.4a9 9 0 0 1 0-12.8m12.8 0a9 9 0 0 1 0 12.8" />
+                </>
+              ) : p.id === "barebone" ? (
+                <>
+                  <path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z" />
+                </>
+              ) : p.id === "browser_only" ? (
+                <>
+                  <circle cx="12" cy="12" r="10" />
+                  <line x1="2" y1="12" x2="22" y2="12" />
+                  <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+                </>
+              ) : p.id === "office" ? (
+                <>
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                  <polyline points="14 2 14 8 20 8" />
+                  <line x1="16" y1="13" x2="8" y2="13" />
+                  <line x1="16" y1="17" x2="8" y2="17" />
+                  <polyline points="10 9 9 9 8 9" />
                 </>
               ) : (
                 <>

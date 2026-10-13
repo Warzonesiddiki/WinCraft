@@ -8,15 +8,30 @@ const en = {
   laptop: "Laptop",
   quiet: "No interruptions",
   streaming: "Streaming",
+  barebone: "Barebone",
+  browser_only: "Browser Only",
+  office: "Browser + MS Office",
   laptopBody: "Fewer visual effects and no apps reopening on their own after sign-in.",
   quietBody: "No feedback surveys, suggested apps or Sticky Keys pop-ups.",
   streamingBody: "Game DVR recording off and fewer Windows pop-ups that could appear on stream.",
+  bareboneBody:
+    "Stripped-down minimal footprint: background apps off, telemetry silenced, and zero UI latency.",
+  browser_onlyBody:
+    "Tuned for pure web use: background apps off, search suggestions stripped, and maximum RAM freed for browser tabs.",
+  officeBody:
+    "Workstation productivity: fast folder loading, visible file extensions, immediate menus, and zero telemetry prompts.",
   laptopNote:
     "Animations and transparency are turned off, so Windows looks plainer; the changes show after you sign out and back in. Whether this saves battery depends on the laptop and is not measured here; power settings are not changed.",
   quietNote:
     "This is about pop-ups, not fan noise: fan and power settings are not changed. Notifications from your own apps keep working.",
   streamingNote:
     "Game Bar background recording stops, so record with your streaming app. Windows feedback surveys and the Sticky Keys pop-up no longer appear over your game.",
+  bareboneNote:
+    "Applies maximum reversible lean configuration: turns off background apps, animations, transparency, Bing search, suggestions, and Game DVR for lowest latency and resource footprint. Reversible at any time.",
+  browser_onlyNote:
+    "Disables background app processes, Start suggestions, Bing web search integration, and taskbar widgets so system resources are fully dedicated to your browser and web applications.",
+  officeNote:
+    "Optimizes desktop and file navigation responsiveness while silencing feedback surveys and recommendations, leaving your office documents, email, and spreadsheets running smoothly.",
   gamingBody: "Consistent Windows pointer movement and control over Game DVR recording.",
   studyBody: "Fewer Windows suggestions, survey prompts and taskbar distractions.",
   workBody: "Visible file extensions, faster menu opening and no startup app delay.",
@@ -51,16 +66,31 @@ export const STARTER_COPY: Record<Lang, Copy> = {
     laptop: "Portatile",
     quiet: "Senza interruzioni",
     streaming: "Streaming",
+    barebone: "Barebone",
+    browser_only: "Solo browser",
+    office: "Browser + MS Office",
     laptopBody: "Meno effetti visivi e nessuna app che si riapre da sola dopo l’accesso.",
     quietBody: "Niente sondaggi di feedback, app suggerite o finestre dei Tasti permanenti.",
     streamingBody:
       "Registrazione Game DVR disattivata e meno finestre di Windows che possono comparire in diretta.",
+    bareboneBody:
+      "Impronta minima essenziale: app in background spente, telemetria silenziata e zero latenza interfaccia.",
+    browser_onlyBody:
+      "Ottimizzato per il web: app in background spente, suggerimenti rimossi e massima RAM per le schede.",
+    officeBody:
+      "Produttività da ufficio: cartelle immediate, estensioni visibili, menu reattivi e zero avvisi di telemetria.",
     laptopNote:
       "Animazioni e trasparenza vengono disattivate, quindi Windows appare più sobrio; le modifiche si vedono dopo essere usciti e rientrati nell’account. Se questo faccia risparmiare batteria dipende dal portatile e qui non viene misurato; le impostazioni di alimentazione non cambiano.",
     quietNote:
       "Riguarda le finestre a comparsa, non il rumore delle ventole: ventole e alimentazione non cambiano. Le notifiche delle tue app continuano a funzionare.",
     streamingNote:
       "La registrazione in background della Game Bar si ferma: per registrare usa la tua app di streaming. I sondaggi di Windows e la finestra dei Tasti permanenti non compaiono più sopra il gioco.",
+    bareboneNote:
+      "Configurazione snella reversibile: disattiva app in background, animazioni, trasparenza, ricerca Bing, suggerimenti e Game DVR per la massima reattività e minor uso di risorse. Reversibile in qualsiasi momento.",
+    browser_onlyNote:
+      "Disattiva le app in background, i suggerimenti di Start, la ricerca Bing e i widget per dedicare le risorse al browser e alle applicazioni web.",
+    officeNote:
+      "Velocizza l'esplorazione dei file e i menu di sistema eliminando sondaggi e suggerimenti per lavorare al meglio su documenti, email e fogli di calcolo.",
     gamingBody: "Movimento del puntatore coerente e controllo della registrazione Game DVR.",
     studyBody:
       "Meno suggerimenti di Windows, sondaggi e distrazioni nella barra delle applicazioni.",
@@ -93,17 +123,32 @@ export const STARTER_COPY: Record<Lang, Copy> = {
     laptop: "Portable",
     quiet: "Sans interruptions",
     streaming: "Streaming",
+    barebone: "Barebone",
+    browser_only: "Navigateur uniquement",
+    office: "Navigateur + MS Office",
     laptopBody:
       "Moins d’effets visuels et aucune application qui se rouvre seule après la connexion.",
     quietBody: "Plus de sondages, d’applications suggérées ni de fenêtre des touches rémanentes.",
     streamingBody:
       "Enregistrement Game DVR désactivé et moins de fenêtres Windows susceptibles d’apparaître en direct.",
+    bareboneBody:
+      "Empreinte minimale épurée : applications en arrière-plan coupées, télémétrie désactivée et zéro latence d’interface.",
+    browser_onlyBody:
+      "Optimisé pour le web : applications en arrière-plan coupées, suggestions supprimées et RAM maximale pour les onglets.",
+    officeBody:
+      "Productivité bureautique : dossiers rapides, extensions visibles, menus immédiats et zéro notification de télémétrie.",
     laptopNote:
       "Les animations et la transparence sont désactivées : Windows paraît plus sobre ; les changements apparaissent après une déconnexion puis une reconnexion. Une éventuelle économie de batterie dépend du portable et n’est pas mesurée ici ; les réglages d’alimentation ne changent pas.",
     quietNote:
       "Il s’agit des fenêtres surgissantes, pas du bruit des ventilateurs : ventilateurs et alimentation ne changent pas. Les notifications de vos applications continuent de fonctionner.",
     streamingNote:
       "L’enregistrement en arrière-plan de la Game Bar s’arrête : enregistrez avec votre logiciel de streaming. Les sondages Windows et la fenêtre des touches rémanentes n’apparaissent plus par-dessus le jeu.",
+    bareboneNote:
+      "Configuration ultra-légère et réversible : désactive les applications en arrière-plan, animations, transparence, recherche Bing, suggestions et Game DVR pour une réactivité maximale et une utilisation minimale des ressources. Réversible à tout moment.",
+    browser_onlyNote:
+      "Désactive les applications en arrière-plan, les suggestions de démarrage, la recherche Bing et les widgets pour réserver les ressources au navigateur et aux applications web.",
+    officeNote:
+      "Accélère la navigation dans les fichiers et les menus tout en supprimant les sondages pour un travail fluide sur vos documents, e-mails et feuilles de calcul.",
     gamingBody: "Un pointeur Windows constant et le contrôle de l’enregistrement Game DVR.",
     studyBody: "Moins de suggestions Windows, de sondages et de distractions.",
     workBody: "Extensions visibles, menus immédiats et applications sans délai au démarrage.",
@@ -135,18 +180,33 @@ export const STARTER_COPY: Record<Lang, Copy> = {
     laptop: "Portátil",
     quiet: "Sin interrupciones",
     streaming: "Streaming",
+    barebone: "Barebone",
+    browser_only: "Solo navegador",
+    office: "Navegador + MS Office",
     laptopBody:
       "Menos efectos visuales y ninguna aplicación que se vuelva a abrir sola al iniciar sesión.",
     quietBody:
       "Sin encuestas de opinión, aplicaciones sugeridas ni la ventana de Teclas especiales.",
     streamingBody:
       "Grabación de Game DVR desactivada y menos ventanas de Windows que puedan aparecer en directo.",
+    bareboneBody:
+      "Huella mínima ultraligera: aplicaciones en segundo plano desactivadas, telemetría silenciada y cero latencia en interfaz.",
+    browser_onlyBody:
+      "Optimizado para la web: aplicaciones en segundo plano desactivadas, sugerencias eliminadas y máxima RAM para pestañas.",
+    officeBody:
+      "Productividad de oficina: carpetas rápidas, extensiones visibles, menús inmediatos y cero avisos de telemetría.",
     laptopNote:
       "Se desactivan las animaciones y la transparencia, así que Windows se ve más sobrio; los cambios se ven después de cerrar sesión y volver a entrar. Si esto ahorra batería depende del portátil y aquí no se mide; la configuración de energía no cambia.",
     quietNote:
       "Se trata de ventanas emergentes, no del ruido de los ventiladores: los ventiladores y la energía no cambian. Las notificaciones de tus aplicaciones siguen funcionando.",
     streamingNote:
       "La grabación en segundo plano de la Game Bar se detiene: graba con tu aplicación de streaming. Las encuestas de Windows y la ventana de Teclas especiales ya no aparecen sobre el juego.",
+    bareboneNote:
+      "Configuración esbelta y reversible: desactiva aplicaciones en segundo plano, animaciones, transparencia, búsqueda de Bing, sugerencias y Game DVR para máxima capacidad de respuesta y menor uso de recursos. Reversible en cualquier momento.",
+    browser_onlyNote:
+      "Desactiva aplicaciones en segundo plano, sugerencias de Inicio, búsqueda de Bing y widgets para dedicar los recursos al navegador y aplicaciones web.",
+    officeNote:
+      "Acelera la navegación de archivos y menús eliminando encuestas para trabajar con fluidez en documentos, correos y hojas de cálculo.",
     gamingBody: "Movimiento constante del puntero y control de la grabación Game DVR.",
     studyBody: "Menos sugerencias de Windows, encuestas y distracciones.",
     workBody: "Extensiones visibles, menús inmediatos y aplicaciones sin demora al iniciar.",
@@ -178,17 +238,32 @@ export const STARTER_COPY: Record<Lang, Copy> = {
     laptop: "Laptop",
     quiet: "Ohne Unterbrechungen",
     streaming: "Streaming",
+    barebone: "Barebone",
+    browser_only: "Nur Browser",
+    office: "Browser + MS Office",
     laptopBody:
       "Weniger visuelle Effekte und keine Apps, die sich nach der Anmeldung von selbst wieder öffnen.",
     quietBody: "Keine Feedback-Umfragen, vorgeschlagenen Apps oder Hinweise der Einrastfunktion.",
     streamingBody:
       "Game-DVR-Aufnahme aus und weniger Windows-Pop-ups, die im Stream erscheinen könnten.",
+    bareboneBody:
+      "Minimaler Ressourcenverbrauch: Hintergrund-Apps aus, Telemetrie stummgeschaltet und null Oberflächenverzögerung.",
+    browser_onlyBody:
+      "Optimiert für reines Web-Surfen: Hintergrund-Apps aus, Suchvorschläge entfernt und maximaler RAM für Tabs.",
+    officeBody:
+      "Büro-Produktivität: Schnelles Laden von Ordnern, sichtbare Dateiendungen, direkte Menüs und keine Telemetrie-Hinweise.",
     laptopNote:
       "Animationen und Transparenz werden abgeschaltet, Windows wirkt dadurch schlichter; die Änderungen werden nach Ab- und erneuter Anmeldung sichtbar. Ob das Akku spart, hängt vom Laptop ab und wird hier nicht gemessen; Energieeinstellungen bleiben unverändert.",
     quietNote:
       "Es geht um Pop-ups, nicht um Lüftergeräusche: Lüfter- und Energieeinstellungen bleiben unverändert. Benachrichtigungen deiner Apps funktionieren weiter.",
     streamingNote:
       "Die Hintergrundaufnahme der Game Bar stoppt, nimm also mit deiner Streaming-App auf. Windows-Umfragen und der Hinweis der Einrastfunktion erscheinen nicht mehr über dem Spiel.",
+    bareboneNote:
+      "Schlanke, umkehrbare Konfiguration: Deaktiviert Hintergrund-Apps, Animationen, Transparenz, Bing-Suche, Vorschläge und Game DVR für maximale Reaktionsgeschwindigkeit und minimalen Ressourcenbedarf. Jederzeit rückgängig machbar.",
+    browser_onlyNote:
+      "Deaktiviert Hintergrund-Apps, Startmenü-Vorschläge, Bing-Suche und Widgets, damit Systemressourcen ganz dem Browser gehören.",
+    officeNote:
+      "Beschleunigt Dateinavigation und Menüs bei stummgeschalteten Umfragen für reibungsloses Arbeiten an Dokumenten, E-Mails und Tabellen.",
     gamingBody: "Gleichmäßige Windows-Zeigerbewegung und Kontrolle über Game-DVR-Aufnahmen.",
     studyBody: "Weniger Windows-Vorschläge, Umfragen und Ablenkungen.",
     workBody: "Sichtbare Dateiendungen, direkte Menüs und Autostart ohne Verzögerung.",
@@ -220,6 +295,9 @@ export const STARTER_COPY: Record<Lang, Copy> = {
     laptop: "Portátil",
     quiet: "Sem interrupções",
     streaming: "Streaming",
+    barebone: "Barebone",
+    browser_only: "Apenas navegador",
+    office: "Navegador + MS Office",
     gamingBody: "Movimento consistente do ponteiro e controlo da gravação Game DVR.",
     studyBody: "Menos sugestões do Windows, questionários e distrações.",
     workBody: "Extensões visíveis, menus imediatos e aplicações sem atraso no arranque.",
@@ -228,6 +306,12 @@ export const STARTER_COPY: Record<Lang, Copy> = {
     quietBody: "Sem questionários de opinião, aplicações sugeridas nem a janela das Teclas Fixas.",
     streamingBody:
       "Gravação Game DVR desativada e menos janelas do Windows que possam aparecer na transmissão.",
+    bareboneBody:
+      "Estrutura mínima essencial: aplicações em segundo plano desligadas, telemetria silenciada e zero latência na interface.",
+    browser_onlyBody:
+      "Otimizado para a Web: aplicações em segundo plano desligadas, sugestões removidas e memória máxima para separadores.",
+    officeBody:
+      "Produtividade de escritório: pastas rápidas, extensões visíveis, menus imediatos e zero notificações de telemetria.",
     gamingNote:
       "Desativa o Game DVR. O rato também muda no ambiente de trabalho; jogos com entrada direta podem ignorar o ajuste. A opção das Teclas Fixas desativa o respetivo atalho.",
     studyNote:
@@ -240,6 +324,12 @@ export const STARTER_COPY: Record<Lang, Copy> = {
       "Trata-se de janelas que surgem no ecrã, não do ruído das ventoinhas: as definições de ventoinhas e de energia não mudam. As notificações das suas aplicações continuam a funcionar.",
     streamingNote:
       "A gravação em segundo plano da Game Bar para, por isso grave com a sua aplicação de streaming. Os questionários do Windows e a janela das Teclas Fixas deixam de aparecer por cima do jogo.",
+    bareboneNote:
+      "Configuração esbelta e reversível: desativa aplicações em segundo plano, animações, transparência, pesquisa Bing, sugestões e Game DVR para máxima resposta e menor consumo de recursos. Reversível em qualquer altura.",
+    browser_onlyNote:
+      "Desativa aplicações em segundo plano, sugestões do menu Iniciar, pesquisa Bing e widgets para dedicar recursos ao navegador.",
+    officeNote:
+      "Acelera a navegação de ficheiros e menus eliminando inquéritos para um trabalho fluido em documentos, correio e folhas de cálculo.",
     apply: "Aplicar seleção",
     applying: "A aplicar…",
     active: "Já aplicado",

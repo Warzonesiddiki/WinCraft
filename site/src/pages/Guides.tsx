@@ -156,7 +156,7 @@ export const GUIDES: Record<string, Guide> = {
         { label: "Microsoft: Delivery Optimization for Windows updates", url: "https://learn.microsoft.com/en-us/windows/deployment/do/waas-delivery-optimization" },
         { label: "Microsoft: manage Recall", url: "https://learn.microsoft.com/en-us/windows/client-management/manage-recall" },
         { label: "Microsoft: startup apps in Windows", url: "https://support.microsoft.com/en-us/windows/add-an-app-to-run-automatically-at-startup-in-windows-10-150da165-dcd9-7230-517b-cf3c295d89dd" },
-        { label: "WinCraft: the tweak catalogue in the source", url: "https://github.com/AurelioAvila/pc-tweaker-app/blob/master/src-tauri/src/tweaks.rs" },
+        { label: "WinCraft: the tweak catalogue in the source", url: "https://github.com/Warzonesiddiki/WinCraft/blob/master/src-tauri/src/tweaks.rs" },
       ],
     },
   },
@@ -443,7 +443,7 @@ export function GuidePage({ path, navigate }: { path: string; navigate: (to: str
             <a href="https://support.microsoft.com/en-us/windows/experience/storage-filemanagement/common-file-name-extensions-in-windows">
               Microsoft: file extensions
             </a>
-            <a href="https://github.com/AurelioAvila/pc-tweaker-app/tree/master/src-tauri/src">
+            <a href="https://github.com/Warzonesiddiki/WinCraft/tree/master/src-tauri/src">
               Inspect the tweak source on GitHub
             </a>
           </nav>

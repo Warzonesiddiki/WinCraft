@@ -96,10 +96,16 @@ test("sorting keeps removable apps first, then follows the chosen key", () => {
   );
 });
 
-test("presets fill only removable apps, from minimal to aggressive", () => {
+test("presets fill only removable apps, from minimal to aggressive and barebone", () => {
   assert.deepEqual(presetSelection(apps, "minimal").sort(), ["pkg.news", "pkg.solitaire"]);
   assert.deepEqual(presetSelection(apps, "balanced").sort(), ["pkg.news", "pkg.solitaire", "pkg.weather"]);
   assert.deepEqual(presetSelection(apps, "aggressive").sort(), [
+    "pkg.clipchamp",
+    "pkg.news",
+    "pkg.solitaire",
+    "pkg.weather",
+  ]);
+  assert.deepEqual(presetSelection(apps, "barebone").sort(), [
     "pkg.clipchamp",
     "pkg.news",
     "pkg.solitaire",

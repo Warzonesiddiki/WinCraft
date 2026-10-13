@@ -174,14 +174,22 @@ pub struct TweakInfo {
 fn reg_value_type(v: &RegValue) -> &'static str {
     match v {
         RegValue::Dword(_) => "REG_DWORD",
+        RegValue::Qword(_) => "REG_QWORD",
         RegValue::Str(_) => "REG_SZ",
+        RegValue::ExpandStr(_) => "REG_EXPAND_SZ",
+        RegValue::MultiSz(_) => "REG_MULTI_SZ",
+        RegValue::Binary(_) => "REG_BINARY",
     }
 }
 
 fn reg_value_display(v: &RegValue) -> String {
     match v {
         RegValue::Dword(n) => format!("{n} (0x{n:X})"),
+        RegValue::Qword(n) => format!("{n} (0x{n:X})"),
         RegValue::Str(s) => format!("\"{s}\""),
+        RegValue::ExpandStr(s) => format!("\"{s}\""),
+        RegValue::MultiSz(lines) => format!("[{}]", lines.join(", ")),
+        RegValue::Binary(bytes) => format!("[{} bytes]", bytes.len()),
     }
 }
 
@@ -2714,12 +2722,12 @@ mod tests {
             + power_tuning::TWEAKS.iter().filter(|t| t.pro).count()
             + settings.iter().filter(|t| t.requires_pro).count();
 
-        assert_eq!(total, 81, "the catalogue no longer has 81 tweaks");
+        assert_eq!(total, 141, "the catalogue no longer has 141 tweaks");
         assert_eq!(
             pro, 0,
             "a control is Pro again: nothing in this build is gated"
         );
-        assert_eq!(total - pro, 81, "every control is free");
+        assert_eq!(total - pro, 141, "every control is free");
 
         // The composite list must stay in step with what list_tweaks builds,
         // otherwise the totals above would quietly stop covering everything.

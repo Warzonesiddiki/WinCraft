@@ -4,7 +4,7 @@
 
 <h1 align="center">WinCraft — free Windows debloat, optimizer and tuning tool</h1>
 
-<p align="center"><strong>Tune Windows with every change in plain sight — and nothing held back.</strong><br>81 controls for Windows 11 and Windows 10: debloat, optimize, turn tracking off and tune for gaming, with restore tools for supported settings. Free and open source, no account required.</p>
+<p align="center"><strong>Tune Windows with every change in plain sight — and nothing held back.</strong><br>141 controls for Windows 11 and Windows 10: debloat, optimize, turn tracking off and tune for gaming, with restore tools for supported settings. Free and open source, no account required.</p>
 
 <p align="center">
   <a href="#reviews-and-distribution"><img src="https://img.shields.io/badge/Total_downloads-120k%2B-2E7D32?style=for-the-badge" alt="120,000+ total downloads across distribution channels"></a>
@@ -13,22 +13,22 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/AurelioAvila/pc-tweaker-app/releases"><img src="https://img.shields.io/github/v/release/AurelioAvila/pc-tweaker-app" alt="Latest release"></a>
-  <a href="https://github.com/microsoft/winget-pkgs/tree/master/manifests/a/AurelioAvila/PCTweaker"><img src="https://img.shields.io/winget/v/AurelioAvila.PCTweaker?label=WinGet&color=0078D4" alt="Latest version available in WinGet"></a>
+  <a href="https://github.com/Warzonesiddiki/WinCraft/releases"><img src="https://img.shields.io/github/v/release/Warzonesiddiki/WinCraft" alt="Latest release"></a>
+  <a href="https://github.com/microsoft/winget-pkgs/tree/master/manifests/a/Warzonesiddiki/PCTweaker"><img src="https://img.shields.io/winget/v/Warzonesiddiki.WinCraft?label=WinGet&color=0078D4" alt="Latest version available in WinGet"></a>
   <a href="https://community.chocolatey.org/packages/pc-tweaker"><img src="https://img.shields.io/chocolatey/v/pc-tweaker?label=Chocolatey&color=80B5E3" alt="Latest approved version in Chocolatey"></a>
-  <a href="https://github.com/AurelioAvila/pc-tweaker-app/releases"><img src="https://img.shields.io/github/downloads/AurelioAvila/pc-tweaker-app/total?label=GitHub%20asset%20downloads" alt="GitHub release asset download events"></a>
+  <a href="https://github.com/Warzonesiddiki/WinCraft/releases"><img src="https://img.shields.io/github/downloads/Warzonesiddiki/WinCraft/total?label=GitHub%20asset%20downloads" alt="GitHub release asset download events"></a>
   <img src="https://img.shields.io/badge/platform-Windows%2010%2F11%20x64-0078D4" alt="Windows 10 and 11 x64">
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-2E7D32" alt="MIT License"></a>
   <a href="#zero-compromises"><img src="https://img.shields.io/badge/every_feature-free-2E7D32" alt="Every feature is free"></a>
 </p>
 
-**[Download for Windows](https://github.com/AurelioAvila/pc-tweaker-app/releases/latest/download/PCTweaker-Setup.exe)** · **[Microsoft Store](https://apps.microsoft.com/detail/9nh3c6dt1g87)** · [Chocolatey](https://community.chocolatey.org/packages/pc-tweaker) · [Website](https://wincraft.app/) · [Support](https://wincraft.app/support/) · [Release notes](CHANGELOG.md)
+**[Download for Windows](https://github.com/Warzonesiddiki/WinCraft/releases/latest/download/PCTweaker-Setup.exe)** · **[Microsoft Store](https://apps.microsoft.com/detail/9nh3c6dt1g87)** · [Chocolatey](https://community.chocolatey.org/packages/pc-tweaker) · [Website](https://wincraft.app/) · [Support](https://wincraft.app/support/) · [Release notes](CHANGELOG.md)
 
 <p align="center"><a href="#zero-compromises">Zero compromises</a> · <a href="#find-your-task">Find your task</a> · <a href="#what-you-can-do">Features</a> · <a href="#what-changes-on-your-system">What changes</a> · <a href="#frequently-asked-questions">FAQ</a> · <a href="#whats-new-in-118">What's new</a> · <a href="#download-integrity-and-code-signing">Code signing</a> · <a href="#build-from-source">Build from source</a></p>
 
 <p align="center"><img src="docs/screenshots/pc-tweaker-1.16-overview.png" alt="WinCraft 1.16 Overview in the default Graphite Ember theme, showing live CPU, memory and applied settings" width="85%"></p>
 
-If you searched for how to **debloat Windows 11**, how to **remove bloatware** from Windows 10, the best **free Windows optimizer**, how to **turn off telemetry in Windows**, how to **reduce input lag** for gaming, or a **Windows tweaking tool that shows what it changes before it changes it** — this page is that answer, with the trade-offs written down. WinCraft is a native Windows 10/11 x64 app that reads the value a setting has now, shows the value it would write, records the original first, and puts it back on request. It is free and open source under the MIT license: all 81 controls, nothing withheld, no account needed.
+If you searched for how to **debloat Windows 11**, how to **remove bloatware** from Windows 10, the best **free Windows optimizer**, how to **turn off telemetry in Windows**, how to **reduce input lag** for gaming, or a **Windows tweaking tool that shows what it changes before it changes it** — this page is that answer, with the trade-offs written down. WinCraft is a native Windows 10/11 x64 app that reads the value a setting has now, shows the value it would write, records the original first, and puts it back on request. It is free and open source under the MIT license: all 141 controls, nothing withheld, no account needed.
 
 **Start with one task:** review a setting, read its trade-offs, apply it if appropriate, and use its restore control when supported. See [what changes on your system](#what-changes-on-your-system) before tuning, or jump straight to [the task you came for](#find-your-task).
 
@@ -36,7 +36,7 @@ If you searched for how to **debloat Windows 11**, how to **remove bloatware** f
 
 Most Windows "optimizers" ask you to trade something away: a paywall in the middle of the feature you came for, an offer in the installer, a background service reporting back, a change you cannot undo, or an FPS number nobody measured. WinCraft does not make those trades, and every claim below is checkable in this repository.
 
-- **Every feature is free, permanently.** All 81 controls, every panel, every tool, in this version and the next: no subscription, no licence key, no expiring trial. The desktop app has no licence check left to run, and its Plans & pricing page states the one plan there is. The build fails if public copy ever splits the catalog into paid and free again.
+- **Every feature is free, permanently.** All 141 controls, every panel, every tool, in this version and the next: no subscription, no licence key, no expiring trial. The desktop app has no licence check left to run, and its Plans & pricing page states the one plan there is. The build fails if public copy ever splits the catalog into paid and free again.
 - **No account required.** Tuning, scanning, cleanup, gaming profiles and reports work signed out. An account is optional, for the account-based features: support, ratings, the newsletter, and the licence of the separate WinCraft Uninstaller product.
 - **Nothing bundled, nothing paid to be there.** The installer installs WinCraft and nothing else: no ads, no sponsored entries in the Debloat list, no offer or discount screen. Three cards inside the app introduce tools from the same publisher — the WinCraft Uninstaller, Tweaky Driver and Redaxa — each of which opens its page only when you click it, with a campaign or referral tag on the link so the publisher can see WinCraft sent you.
 - **No telemetry by default.** Monitoring, scans, history and reports are read and kept on this PC. Anonymous error reporting is off unless you switch it on yourself, and there are no advertising trackers or behavioral analytics in the app or on the website. See [PRIVACY.md](PRIVACY.md).
@@ -48,24 +48,31 @@ Most Windows "optimizers" ask you to trade something away: a paywall in the midd
 - **Easy to leave.** Restore what you applied, quit from the tray icon, uninstall like any other Windows app: no retention offer and no survey gate.
 
 <p align="center">
+  <a href="#quick-install-powershell"><img src="https://img.shields.io/badge/Quick_Launch-PowerShell-0078D4?style=for-the-badge&logo=powershell" alt="Quick launch via PowerShell"></a>
   <a href="#safe-download-via-winget"><img src="https://img.shields.io/badge/Safe_download-via_Winget-1793D1?style=for-the-badge" alt="Safe download via Winget"></a>
   <a href="https://wincraft.app/#tip"><img src="https://img.shields.io/badge/%E2%98%95_Buy_me_a_coffee-Support_development-FF5500?style=for-the-badge&labelColor=1c1c1c" alt="Buy me a coffee — support WinCraft development"></a>
 </p>
 
-<p align="center">Help fund the next release with a <a href="https://wincraft.app/#tip"><strong>one-off coffee tip</strong></a>. No account required, no subscription.</p>
+## Quick Install (PowerShell)
+
+Launch or install WinCraft immediately with a single PowerShell command:
+
+```powershell
+irm https://raw.githubusercontent.com/Warzonesiddiki/WinCraft/master/install.ps1 | iex
+```
 
 ## Safe download via Winget
 
 Download an installer from an official channel above, or use Windows Package Manager:
 
 ```powershell
-winget install --id AurelioAvila.PCTweaker --exact
+winget install --id Warzonesiddiki.WinCraft --exact
 ```
 
 To check for a package update:
 
 ```powershell
-winget upgrade --id AurelioAvila.PCTweaker --exact
+winget upgrade --id Warzonesiddiki.WinCraft --exact
 ```
 
 Package catalogs can lag behind a release. Check the release version before installing. Windows 10/11 x64 is the current binary target; individual features depend on the Windows build, edition, drivers and available hardware. App compatibility does not extend Microsoft's support lifecycle for your operating system.
@@ -78,9 +85,9 @@ Closing the window keeps WinCraft running in the Windows notification area. Clic
 
 - **Before & After is a measured comparison.** Measure, apply your changes, measure again. Each timed test runs at least seven times and reports its median and spread; a difference is called only when the two series are clearly apart (exact rank test, p < 0.01), at least 5% apart and in the same direction. Otherwise it says there is no meaningful change.
 - **Change history is a timeline** by day and session, with the registry values before and after, filters, search, CSV/JSON export, PDF print, and undo for one change, a whole session or everything still in effect.
-- **Debloat now says how each app is really used** — when its data last changed, whether it starts with Windows, how much memory it holds — and adds Minimal, Balanced and Aggressive selections that only fill the list, never remove anything. A selection can be saved as a file and loaded on another PC.
-- **Six starter profiles:** Gaming, Streaming, Work, Study, Laptop and No interruptions, using only reversible per-user switches, with nothing preselected.
-- **Fifteen new controls since 1.17**, including the Windows AI layer: Click to Do, the Windows AI Components Host service, and the AI features in Microsoft Edge, Paint and Notepad — plus Fast Startup, Storage Sense, End task in the taskbar menu, the drag tray, Widgets, File Explorer's opening folder, the Start Recommended section, blocking automatic manufacturer apps, tips and suggestions, and Game Bar captures. The catalog is 81 controls.
+- **Debloat now says how each app is really used** — when its data last changed, whether it starts with Windows, how much memory it holds — covering 25 curated bloatware apps (matching AtlasOS, ReviOS and Tiny11 debloat targets including Cortana, Maps, Quick Assist, Tips, Power Automate, 3D Viewer, and Paint 3D), with Minimal, Balanced, Aggressive and Barebone selections that only stage candidates in preview before removal. A selection can be saved as a file and loaded on another PC.
+- **Nine starter profiles:** Gaming, Streaming, Work, Study, Laptop, No interruptions, Barebone (Atlas OS level), Browser Only and Browser + MS Office, using only reversible per-user switches, with nothing preselected.
+- **Fifteen new controls since 1.17**, including the Windows AI layer: Click to Do, the Windows AI Components Host service, and the AI features in Microsoft Edge, Paint and Notepad — plus Fast Startup, Storage Sense, End task in the taskbar menu, the drag tray, Widgets, File Explorer's opening folder, the Start Recommended section, blocking automatic manufacturer apps, tips and suggestions, and Game Bar captures. The catalog is 141 controls.
 - **Every card states what it needs** — user or machine scope, administrator rights, Windows version and edition — and reports "Not available on this PC" when it does not apply. Every tweak has a "What this changes, exactly" panel listing each value as it is now and as it will be set.
 - **PC Health is a live dashboard:** processor load per core, memory, disk, network, graphics load, temperature, fan and video memory on NVIDIA cards, and "What's using resources" grouped by app, over 1 or 5 minutes.
 - **Scan runs 13 checks** and can be paused, resumed or ended early; a partial result names the checks that did not run instead of passing them.
@@ -125,11 +132,15 @@ Read the effect and trade-offs before applying a setting. A disabled tweak is no
 
 ### Ready-to-use profiles
 
-**Six starter profiles ship with every install: Gaming, Streaming, Work, Study, Laptop and No interruptions.** Open Profiles, choose one, and review or customize the selection before anything is applied. Nothing is selected or applied until you ask; a control this PC's Windows does not support is shown but never applied. Each profile uses reversible, per-user switches only, and adds its settings without undoing your other tweaks. Results depend on your hardware and workload; no FPS gain is promised.
+**Nine starter profiles ship with every install: Gaming, Streaming, Work, Study, Laptop, No interruptions, Barebone (Atlas OS level), Browser Only and Browser + MS Office.** Open Profiles, choose one, and review or customize the selection before anything is applied. Nothing is selected or applied until you ask; a control this PC's Windows does not support is shown but never applied. Each profile uses reversible, per-user switches only, and adds its settings without undoing your other tweaks. Results depend on your hardware and workload; no FPS gain is promised.
+
+- **Browser Only:** Strips background apps, search suggestions, and taskbar widgets so maximum RAM and CPU are reserved for browser tabs and web applications.
+- **Browser + MS Office:** Workstation setup with immediate folder loading, visible file extensions, snappy menus, and silenced telemetry surveys for seamless document editing and email workflows.
+- **Barebone (Atlas OS 0.5.2 level):** Strips background app execution, Windows recommendations, search suggestions, telemetry feedback, transparency, and animation delays for an ultra-lean footprint and lowest desktop latency while keeping all modifications 100% reversible.
 
 ### Native power controls
 
-The catalog contains **81 controls**. The five power-policy controls change only mains-power policy in the selected Windows plan. They record the original plan and value before writing, verify the result, and leave battery policy unchanged.
+The catalog contains **141 controls**. The five power-policy controls change only mains-power policy in the selected Windows plan. They record the original plan and value before writing, verify the result, and leave battery policy unchanged.
 
 | Control                            | Purpose and limits                                                                                                              |
 | ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
@@ -179,7 +190,7 @@ For useful comparisons, keep the game build, scene, settings, drivers, power sou
 
 ## Free for Everyone
 
-WinCraft is completely free and open source under the MIT license. All 81 controls, every tool and every panel — no subscription, no paywall, no licence key, and no account required. Download it and start optimizing.
+WinCraft is completely free and open source under the MIT license. All 141 controls, every tool and every panel — no subscription, no paywall, no licence key, and no account required. Download it and start optimizing.
 
 Every capability that used to be an extra is part of the same free app today:
 
@@ -197,7 +208,7 @@ Existing supporters who previously purchased a licence — thank you for making 
 
 ### Is WinCraft really free?
 
-Yes, permanently, under the MIT license. Every one of the 81 controls is unlocked for every user, there is no tier to buy, and the desktop app no longer checks a licence at all. You can also read and build the source yourself.
+Yes, permanently, under the MIT license. Every one of the 141 controls is unlocked for every user, there is no tier to buy, and the desktop app no longer checks a licence at all. You can also read and build the source yourself.
 
 ### Is it safe to debloat and tweak Windows with it?
 
@@ -229,9 +240,9 @@ By what it refuses to do: a subscription in the middle of a feature, installer o
 
 ## Download integrity and code signing
 
-[Version-specific signing inventory and verification guide](https://github.com/AurelioAvila/.github/blob/master/CODE_SIGNING.md)
+[Version-specific signing inventory and verification guide](https://github.com/Warzonesiddiki/.github/blob/master/CODE_SIGNING.md)
 
-**Verify the release you download.** The [latest release](https://github.com/AurelioAvila/pc-tweaker-app/releases/latest) is the download entry point; the version-specific inventory above records signing evidence. For an official Windows build, verify a valid Authenticode signature identifying **Aurelio Avila** and a trusted timestamp on the exact application and installer. A verification recorded for an older release does not establish the status of a newer file.
+**Verify the release you download.** The [latest release](https://github.com/Warzonesiddiki/WinCraft/releases/latest) is the download entry point; the version-specific inventory above records signing evidence. For an official Windows build, verify a valid Authenticode signature identifying **Aurelio Avila** and a trusted timestamp on the exact application and installer. A verification recorded for an older release does not establish the status of a newer file.
 
 Windows Authenticode and Tauri update signatures have different roles. Authenticode identifies the Windows publisher and detects changes after signing. Tauri's update signature verifies update packages.
 
@@ -263,8 +274,8 @@ The GitHub download badge counts release-asset requests, including assets used f
 Prerequisites: Node.js 22 as used by CI, npm, stable Rust installed with [rustup](https://rustup.rs/), Windows Visual Studio Build Tools with **Desktop development with C++**, a Windows SDK, and Microsoft Edge WebView2. See [Tauri's platform prerequisites](https://v2.tauri.app/start/prerequisites/).
 
 ```powershell
-git clone https://github.com/AurelioAvila/pc-tweaker-app.git
-cd pc-tweaker-app
+git clone https://github.com/Warzonesiddiki/WinCraft.git
+cd WinCraft
 npm ci
 npm run tauri dev
 ```
@@ -310,7 +321,7 @@ The website is in [`site/`](site/): run `npm ci` and `npm run build` from that d
 
 ## Report a problem
 
-Use [support](https://wincraft.app/support/) or email [support@wincraft.app](mailto:support@wincraft.app) for billing or private diagnostics. For a reproducible software bug, open a [GitHub issue](https://github.com/AurelioAvila/pc-tweaker-app/issues) with the app version, Windows build, hardware, selected tweak, steps, expected behavior and actual outcome. Remove tokens, email addresses, licence files and private paths from public attachments.
+Use [support](https://wincraft.app/support/) or email [support@wincraft.app](mailto:support@wincraft.app) for billing or private diagnostics. For a reproducible software bug, open a [GitHub issue](https://github.com/Warzonesiddiki/WinCraft/issues) with the app version, Windows build, hardware, selected tweak, steps, expected behavior and actual outcome. Remove tokens, email addresses, licence files and private paths from public attachments.
 
 ## Source availability and license
 
@@ -318,8 +329,4 @@ Tauri 2 and Rust · React and TypeScript · Express, PostgreSQL and Stripe.
 
 WinCraft is free and open source under the **MIT license**: use it, modify it and redistribute it, including commercially. See [LICENSE](LICENSE), [PRIVACY.md](PRIVACY.md) and [TERMS.md](TERMS.md).
 
-Created and maintained by **Aurelio Avila**.
-
 Everything the app can do is available to everyone: every tweak, every tool, no account, no subscription, no feature gate. Saved-profile comparison and portable tuning reports are part of the app, and a control that once required a licence is simply a control now.
-
-Entitlements granted before WinCraft became free — including Lifetime — remain on the accounts that hold them, and the separate Uninstaller product keeps its own licence. Nothing in this app is withheld, now or later.

@@ -37,12 +37,16 @@ fn matches(platform: &ReleaseManifestPlatform, version: &str) -> bool {
         return false;
     }
     let expected = [
+        format!("WinCraft_{version}_x64-setup.exe"),
+        format!("WinCraft_{version}_x64_en-US.msi"),
         format!("pc-tweaker-app_{version}_x64-setup.exe"),
         format!("pc-tweaker-app_{version}_x64_en-US.msi"),
     ];
-    expected.contains(&filename.to_string())
-        && platform.url.as_str()
-            == format!("https://github.com/AurelioAvila/pc-tweaker-app/releases/download/v{version}/{filename}")
+    let is_valid_url = platform.url.as_str()
+        == format!("https://github.com/Warzonesiddiki/WinCraft/releases/download/v{version}/{filename}")
+        || platform.url.as_str()
+            == format!("https://github.com/AurelioAvila/pc-tweaker-app/releases/download/v{version}/{filename}");
+    expected.contains(&filename.to_string()) && is_valid_url
 }
 
 pub fn release_matches(version: &str, data: &RemoteReleaseInner) -> bool {
@@ -63,14 +67,14 @@ mod tests {
 
     fn platform(signed_version: &str, offered_version: &str) -> ReleaseManifestPlatform {
         signed(
-            &format!("timestamp:123\tfile:pc-tweaker-app_{signed_version}_x64-setup.exe"),
+            &format!("timestamp:123\tfile:WinCraft_{signed_version}_x64-setup.exe"),
             offered_version,
         )
     }
 
     fn signed(trusted_comment: &str, offered_version: &str) -> ReleaseManifestPlatform {
         ReleaseManifestPlatform {
-            url: format!("https://github.com/AurelioAvila/pc-tweaker-app/releases/download/v{offered_version}/pc-tweaker-app_{offered_version}_x64-setup.exe").parse().unwrap(),
+            url: format!("https://github.com/Warzonesiddiki/WinCraft/releases/download/v{offered_version}/WinCraft_{offered_version}_x64-setup.exe").parse().unwrap(),
             // Identity-gate fixture only; the updater must independently reject
             // this non-cryptographic signature before installing any artifact.
             signature: STANDARD.encode(format!("untrusted comment: fixture\nfixture\ntrusted comment: {trusted_comment}\nfixture\n")),
@@ -79,7 +83,7 @@ mod tests {
 
     #[test]
     fn a_signed_version_field_is_accepted_only_when_it_agrees() {
-        let file = "file:pc-tweaker-app_1.15.0_x64-setup.exe";
+        let file = "file:WinCraft_1.15.0_x64-setup.exe";
         assert!(matches(
             &signed(
                 &format!("timestamp:1790508346\t{file}\tversion:1.15.0"),
