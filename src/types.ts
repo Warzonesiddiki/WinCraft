@@ -57,6 +57,10 @@ export type TweakInfo = {
     | "not_present"
     | "windows_protected"
     | null;
+  /** Reversibility tier from Rust. Core catalogue is `reversible`. */
+  tier?: string | null;
+  /** True only for Tier 3 Barebone items needing separate consent. */
+  consentRequired?: boolean | null;
 };
 
 /** One row of the dry run (`preview_tweak`): a change, what is there now and

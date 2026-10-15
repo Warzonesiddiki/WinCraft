@@ -1772,11 +1772,6 @@ export const pt: Strings = {
       description:
         "Desativa a procura contínua em segundo plano de dispositivos Bluetooth Low Energy para poupar processador e energia.",
     },
-    disable_edge_hub_sidebar: {
-      name: "Desativar barra lateral do Microsoft Edge",
-      description:
-        "Desativa a barra lateral do Edge e os seus widgets web integrados em segundo plano.",
-    },
     disable_edge_wallet: {
       name: "Desativar sugestões de carteira do Edge",
       description:
@@ -1822,11 +1817,6 @@ export const pt: Strings = {
       description:
         "Impede o Windows de sincronizar o histórico de atividades com os serviços na nuvem da Microsoft.",
     },
-    disable_bing_widget_search: {
-      name: "Desativar widgets e feeds do Windows 11",
-      description:
-        "Desativa o painel de widgets do Windows 11 e a sincronização de feeds em segundo plano.",
-    },
     disable_typing_insights: {
       name: "Desativar telemetria de informações de escrita",
       description:
@@ -1871,16 +1861,6 @@ export const pt: Strings = {
       name: "Desativar serviço de instalação remota PushToInstall",
       description:
         "Impede a Microsoft Store de instalar aplicações neste PC remotamente a partir da Web.",
-    },
-    disable_sqm_telemetry: {
-      name: "Desativar cliente de telemetria SQM",
-      description:
-        "Desativa o envio de dados do cliente SQM (Software Quality Metrics) nos componentes do Windows.",
-    },
-    disable_inventory_telemetry: {
-      name: "Desativar inventário de compatibilidade de aplicações",
-      description:
-        "Impede o Windows Application Experience de compilar listas de inventário das aplicações instaladas.",
     },
     disable_compatibility_assistant: {
       name: "Desativar Assistente de Compatibilidade de Programas",

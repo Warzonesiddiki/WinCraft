@@ -4,7 +4,7 @@
 
 <h1 align="center">WinCraft — free Windows debloat, optimizer and tuning tool</h1>
 
-<p align="center"><strong>Tune Windows with every change in plain sight — and nothing held back.</strong><br>141 controls for Windows 11 and Windows 10: debloat, optimize, turn tracking off and tune for gaming, with restore tools for supported settings. Free and open source, no account required.</p>
+<p align="center"><strong>Tune Windows with every change in plain sight — and nothing held back.</strong><br>137 controls for Windows 11 and Windows 10: debloat, optimize, turn tracking off and tune for gaming, with restore tools for supported settings. Free and open source, no account required.</p>
 
 <p align="center">
   <a href="#reviews-and-distribution"><img src="https://img.shields.io/badge/Total_downloads-120k%2B-2E7D32?style=for-the-badge" alt="120,000+ total downloads across distribution channels"></a>
@@ -28,7 +28,7 @@
 
 <p align="center"><img src="docs/screenshots/pc-tweaker-1.16-overview.png" alt="WinCraft 1.16 Overview in the default Graphite Ember theme, showing live CPU, memory and applied settings" width="85%"></p>
 
-If you searched for how to **debloat Windows 11**, how to **remove bloatware** from Windows 10, the best **free Windows optimizer**, how to **turn off telemetry in Windows**, how to **reduce input lag** for gaming, or a **Windows tweaking tool that shows what it changes before it changes it** — this page is that answer, with the trade-offs written down. WinCraft is a native Windows 10/11 x64 app that reads the value a setting has now, shows the value it would write, records the original first, and puts it back on request. It is free and open source under the MIT license: all 141 controls, nothing withheld, no account needed.
+If you searched for how to **debloat Windows 11**, how to **remove bloatware** from Windows 10, the best **free Windows optimizer**, how to **turn off telemetry in Windows**, how to **reduce input lag** for gaming, or a **Windows tweaking tool that shows what it changes before it changes it** — this page is that answer, with the trade-offs written down. WinCraft is a native Windows 10/11 x64 app that reads the value a setting has now, shows the value it would write, records the original first, and puts it back on request. It is free and open source under the MIT license: all 137 controls, nothing withheld, no account needed.
 
 **Start with one task:** review a setting, read its trade-offs, apply it if appropriate, and use its restore control when supported. See [what changes on your system](#what-changes-on-your-system) before tuning, or jump straight to [the task you came for](#find-your-task).
 
@@ -36,7 +36,7 @@ If you searched for how to **debloat Windows 11**, how to **remove bloatware** f
 
 Most Windows "optimizers" ask you to trade something away: a paywall in the middle of the feature you came for, an offer in the installer, a background service reporting back, a change you cannot undo, or an FPS number nobody measured. WinCraft does not make those trades, and every claim below is checkable in this repository.
 
-- **Every feature is free, permanently.** All 141 controls, every panel, every tool, in this version and the next: no subscription, no licence key, no expiring trial. The desktop app has no licence check left to run, and its Plans & pricing page states the one plan there is. The build fails if public copy ever splits the catalog into paid and free again.
+- **Every feature is free, permanently.** All 137 controls, every panel, every tool, in this version and the next: no subscription, no licence key, no expiring trial. The desktop app has no licence check left to run, and its Plans & pricing page states the one plan there is. The build fails if public copy ever splits the catalog into paid and free again.
 - **No account required.** Tuning, scanning, cleanup, gaming profiles and reports work signed out. An account is optional, for the account-based features: support, ratings, the newsletter, and the licence of the separate WinCraft Uninstaller product.
 - **Nothing bundled, nothing paid to be there.** The installer installs WinCraft and nothing else: no ads, no sponsored entries in the Debloat list, no offer or discount screen. Three cards inside the app introduce tools from the same publisher — the WinCraft Uninstaller, Tweaky Driver and Redaxa — each of which opens its page only when you click it, with a campaign or referral tag on the link so the publisher can see WinCraft sent you.
 - **No telemetry by default.** Monitoring, scans, history and reports are read and kept on this PC. Anonymous error reporting is off unless you switch it on yourself, and there are no advertising trackers or behavioral analytics in the app or on the website. See [PRIVACY.md](PRIVACY.md).
@@ -87,7 +87,7 @@ Closing the window keeps WinCraft running in the Windows notification area. Clic
 - **Change history is a timeline** by day and session, with the registry values before and after, filters, search, CSV/JSON export, PDF print, and undo for one change, a whole session or everything still in effect.
 - **Debloat now says how each app is really used** — when its data last changed, whether it starts with Windows, how much memory it holds — covering 25 curated bloatware apps (matching AtlasOS, ReviOS and Tiny11 debloat targets including Cortana, Maps, Quick Assist, Tips, Power Automate, 3D Viewer, and Paint 3D), with Minimal, Balanced, Aggressive and Barebone selections that only stage candidates in preview before removal. A selection can be saved as a file and loaded on another PC.
 - **Nine starter profiles:** Gaming, Streaming, Work, Study, Laptop, No interruptions, Barebone, Browser Only and Browser + MS Office, using only reversible per-user switches, with suggested selections shown for review before applying.
-- **Fifteen new controls since 1.17**, including the Windows AI layer: Click to Do, the Windows AI Components Host service, and the AI features in Microsoft Edge, Paint and Notepad — plus Fast Startup, Storage Sense, End task in the taskbar menu, the drag tray, Widgets, File Explorer's opening folder, the Start Recommended section, blocking automatic manufacturer apps, tips and suggestions, and Game Bar captures. The catalog is 141 controls.
+- **Fifteen new controls since 1.17**, including the Windows AI layer: Click to Do, the Windows AI Components Host service, and the AI features in Microsoft Edge, Paint and Notepad — plus Fast Startup, Storage Sense, End task in the taskbar menu, the drag tray, Widgets, File Explorer's opening folder, the Start Recommended section, blocking automatic manufacturer apps, tips and suggestions, and Game Bar captures. The catalog is 137 controls.
 - **Every card states what it needs** — user or machine scope, administrator rights, Windows version and edition — and reports "Not available on this PC" when it does not apply. Every tweak has a "What this changes, exactly" panel listing each value as it is now and as it will be set.
 - **PC Health is a live dashboard:** processor load per core, memory, disk, network, graphics load, temperature, fan and video memory on NVIDIA cards, and "What's using resources" grouped by app, over 1 or 5 minutes.
 - **Scan runs 13 checks** and can be paused, resumed or ended early; a partial result names the checks that did not run instead of passing them.
@@ -140,7 +140,7 @@ Read the effect and trade-offs before applying a setting. A disabled tweak is no
 
 ### Native power controls
 
-The catalog contains **141 controls**. The five power-policy controls change only mains-power policy in the selected Windows plan. They record the original plan and value before writing, verify the result, and leave battery policy unchanged.
+The catalog contains **137 controls**. The five power-policy controls change only mains-power policy in the selected Windows plan. They record the original plan and value before writing, verify the result, and leave battery policy unchanged.
 
 | Control                            | Purpose and limits                                                                                                              |
 | ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
@@ -190,7 +190,7 @@ For useful comparisons, keep the game build, scene, settings, drivers, power sou
 
 ## Free for Everyone
 
-WinCraft is completely free and open source under the MIT license. All 141 controls, every tool and every panel — no subscription, no paywall, no licence key, and no account required. Download it and start optimizing.
+WinCraft is completely free and open source under the MIT license. All 137 controls, every tool and every panel — no subscription, no paywall, no licence key, and no account required. Download it and start optimizing.
 
 Every capability that used to be an extra is part of the same free app today:
 
@@ -208,7 +208,7 @@ Existing supporters who previously purchased a licence — thank you for making 
 
 ### Is WinCraft really free?
 
-Yes, permanently, under the MIT license. Every one of the 141 controls is unlocked for every user, there is no tier to buy, and the desktop app no longer checks a licence at all. You can also read and build the source yourself.
+Yes, permanently, under the MIT license. Every one of the 137 controls is unlocked for every user, there is no tier to buy, and the desktop app no longer checks a licence at all. You can also read and build the source yourself.
 
 ### Is it safe to debloat and tweak Windows with it?
 

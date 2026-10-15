@@ -1778,11 +1778,6 @@ export const de: Strings = {
       description:
         "Deaktiviert die kontinuierliche Hintergrundsuche nach Bluetooth-Low-Energy-Geräten, um CPU-Last und Stromverbrauch zu senken.",
     },
-    disable_edge_hub_sidebar: {
-      name: "Microsoft Edge-Seitenleiste deaktivieren",
-      description:
-        "Deaktiviert die Edge-Seitenleiste und ihre integrierten Hintergrund-Web-Widgets.",
-    },
     disable_edge_wallet: {
       name: "Edge-Wallet-Vorschläge deaktivieren",
       description:
@@ -1828,11 +1823,6 @@ export const de: Strings = {
       description:
         "Verhindert, dass Windows den Aktivitätsverlauf an Microsoft-Clouddienste synchronisiert.",
     },
-    disable_bing_widget_search: {
-      name: "Windows 11-Widgets und Feeds deaktivieren",
-      description:
-        "Deaktiviert das Windows 11-Widget-Board und die Hintergrund-Synchronisierung von Web-Feeds.",
-    },
     disable_typing_insights: {
       name: "Eingabeerkenntnisse-Telemetrie deaktivieren",
       description:
@@ -1877,16 +1867,6 @@ export const de: Strings = {
       name: "PushToInstall-Remoteverteilungsdienst deaktivieren",
       description:
         "Verhindert, dass der Microsoft Store App-Installationen remote aus dem Web auf diesen PC überträgt.",
-    },
-    disable_sqm_telemetry: {
-      name: "SQM-Telemetrie-Client deaktivieren",
-      description:
-        "Deaktiviert die Datenübertragung des Software Quality Metrics (SQM)-Clients in Windows-Komponenten.",
-    },
-    disable_inventory_telemetry: {
-      name: "Anwendungskompatibilitätsinventar deaktivieren",
-      description:
-        "Verhindert, dass die Windows-Anwendungserfahrung Bestandslisten Ihrer installierten Anwendungen erstellt.",
     },
     disable_compatibility_assistant: {
       name: "Programmkompatibilitäts-Assistenten deaktivieren",

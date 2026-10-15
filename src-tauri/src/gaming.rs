@@ -700,13 +700,16 @@ mod tests {
         let scheme = crate::power::active_scheme_guid().expect("active scheme");
         let (ac, dc) = read_boost_indexes(&scheme).expect("read power indexes");
         // Either state is legitimate; what matters is that it returned.
+        // Valid PERFBOOSTMODE values run 0-6; assert against the documented
+        // range rather than the common subset so machines with Aggressive
+        // modes do not fail the test.
         assert!(
-            ac.is_none() || ac.unwrap() <= 4,
+            ac.is_none() || ac.unwrap() <= 6,
             "implausible AC boost index: {:?}",
             ac
         );
         assert!(
-            dc.is_none() || dc.unwrap() <= 4,
+            dc.is_none() || dc.unwrap() <= 6,
             "implausible DC boost index: {:?}",
             dc
         );

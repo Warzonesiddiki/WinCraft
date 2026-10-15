@@ -208,7 +208,7 @@ fn read_dns(guid: &str) -> Result<(bool, Vec<String>), String> {
     {
         None => configured_dns(None),
         Some(RegValue::Str(value)) => configured_dns(Some(&value)),
-        Some(RegValue::Dword(_)) => Err("The adapter has an unsupported DNS configuration".into()),
+        Some(_) => Err("The adapter has an unsupported DNS configuration".into()),
     }
 }
 

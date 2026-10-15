@@ -325,6 +325,19 @@ pub struct DebloatApp {
     /// When this account got the app (its data folder was created), Unix
     /// seconds: with no activity since, "unused since" this date.
     pub data_since: Option<i64>,
+    /// Reversibility tier: current CATALOG is `reinstallable` (Store reinstall,
+    /// settings/data may not return). Barebone Tier 3 is never in this list.
+    #[serde(default = "default_debloat_tier")]
+    pub tier: String,
+    /// Whether applying needs the separate Barebone consent screen. Always
+    /// false here; Tier 3 lives behind a separate confirmation.
+    #[serde(default)]
+    pub consent_required: bool,
+}
+
+#[allow(dead_code)]
+fn default_debloat_tier() -> String {
+    "reinstallable".to_string()
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
@@ -406,6 +419,7 @@ fn inventory(system: &impl PackageSystem) -> Result<Vec<DebloatApp>, String> {
             .filter(|p| p.name == item.package_name)
             .collect();
         if found.is_empty() {
+            let tier = crate::barebone::tier_for_debloat(item.id);
             apps.push(DebloatApp {
                 catalog_id: item.id.into(),
                 name: item.name.into(),
@@ -425,6 +439,8 @@ fn inventory(system: &impl PackageSystem) -> Result<Vec<DebloatApp>, String> {
                 starts_with_windows: None,
                 memory_bytes: None,
                 data_since: None,
+                tier: tier.as_str().to_string(),
+                consent_required: tier.consent_required(),
             });
         }
         for info in found {
@@ -432,6 +448,7 @@ fn inventory(system: &impl PackageSystem) -> Result<Vec<DebloatApp>, String> {
                 .as_ref()
                 .map_err(|_| "unverifiedRemovability".to_string())
                 .and_then(|f| verified_candidate(info, &packages, f).map(|_| ()));
+            let tier = crate::barebone::tier_for_debloat(item.id);
             apps.push(DebloatApp {
                 catalog_id: item.id.into(),
                 name: item.name.into(),
@@ -451,6 +468,8 @@ fn inventory(system: &impl PackageSystem) -> Result<Vec<DebloatApp>, String> {
                 starts_with_windows: None,
                 memory_bytes: None,
                 data_since: None,
+                tier: tier.as_str().to_string(),
+                consent_required: tier.consent_required(),
             });
         }
     }

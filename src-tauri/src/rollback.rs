@@ -148,6 +148,14 @@ pub enum SnapshotEntry {
         creation: u64,
         cpu_sets: Vec<u32>,
     },
+    /// A scheduled task's enabled state before this app changed it. Phase B3
+    /// fills the apply path; B0 adds the kind so the journal shape exists.
+    /// `path` must match `barebone::BAREBONE_TASKS` exactly — no wildcards —
+    /// and `\Microsoft\` is allowed only for listed ids.
+    ScheduledTask {
+        path: String,
+        previously_enabled: bool,
+    },
 }
 
 #[derive(Serialize, Deserialize, Default, Clone)]
@@ -626,7 +634,11 @@ pub(crate) fn validate_snapshot(id: &str, entry: &SnapshotEntry) -> Result<(), S
                         && original_percent_provider == "DefaultProvider"
                         && original_schedule_provider == "DefaultProvider"
                         && (1..=1_000_000).contains(written_kbps)),
-            _ => false,
+            _ => matches!(entry,
+                SnapshotEntry::ScheduledTask { path, .. }
+                    if crate::barebone::BAREBONE_TASKS.contains(&path.as_str())
+                        && path.len() <= 512
+                        && !path.contains('\0')),
         }
     };
     if allowed {
@@ -674,6 +686,9 @@ fn snapshot_targets(entry: &SnapshotEntry) -> Vec<String> {
         SnapshotEntry::Composite { entries } => entries.iter().flat_map(snapshot_targets).collect(),
         SnapshotEntry::ProcessCpuSets { pid, creation, .. } => {
             vec![format!("cpusets:{pid}:{creation}")]
+        }
+        SnapshotEntry::ScheduledTask { path, .. } => {
+            vec![format!("task:{}", path.to_ascii_lowercase())]
         }
     };
     targets.sort();

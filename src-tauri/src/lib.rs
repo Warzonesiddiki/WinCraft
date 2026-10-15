@@ -1,6 +1,7 @@
 mod appcache;
 mod audit;
 mod avatar;
+pub mod barebone;
 pub mod baseline;
 mod browsercleanup;
 mod cleanup;
@@ -169,6 +170,20 @@ pub struct TweakInfo {
     /// `windows_edition`, `windows_edition_enterprise` or `not_present`. The
     /// frontend translates the code.
     unavailable: Option<&'static str>,
+    /// Reversibility tier: `reversible` (rollback store), `reinstallable`
+    /// (Store reinstall), `irreversible` (separate journal, explicit consent).
+    /// Core catalogue is reversible; debloat is reinstallable.
+    #[serde(default = "default_tier")]
+    tier: String,
+    /// Whether applying needs the separate Barebone consent screen. True only
+    /// for Tier 3, which never appears in bulk/scan/reapply.
+    #[serde(default)]
+    consent_required: bool,
+}
+
+#[allow(dead_code)]
+fn default_tier() -> String {
+    "reversible".to_string()
 }
 
 fn reg_value_type(v: &RegValue) -> &'static str {
@@ -306,26 +321,31 @@ fn tweak_infos(store: &RollbackStore) -> Result<Vec<TweakInfo>, String> {
     let mut list: Vec<TweakInfo> = tweaks::all_tweaks()
         .into_iter()
         .filter(|t| t.id != "disable_copilot" || applied_ids.contains(t.id))
-        .map(|t| TweakInfo {
-            applied: in_effect(&t, applied_ids.contains(t.id)),
-            id: t.id.to_string(),
-            name: t.name.to_string(),
-            description: t.description.to_string(),
-            category: category_str(&t.category).to_string(),
-            hive: hive_str(&t.hive).to_string(),
-            requires_admin: t.requires_admin,
-            requires_pro: t.requires_pro,
-            // Derived, not authored: every single-value tweak discloses
-            // itself the moment it exists, with no per-tweak work.
-            changes: vec![technical::TechnicalChange::Registry {
-                path: format!("{}\\{}", hive_str(&t.hive), t.key_path),
-                value_name: t.value_name.to_string(),
-                value_type: reg_value_type(&t.on_value),
-                sets_to: reg_value_display(&t.on_value),
-            }],
-            unavailable: (t.id == TASKBAR_WIDGETS_ID && services::user_choice_protected())
-                .then_some("windows_protected"),
-            ..Default::default()
+        .map(|t| {
+            let tier = barebone::tier_for_tweak(t.id);
+            TweakInfo {
+                applied: in_effect(&t, applied_ids.contains(t.id)),
+                id: t.id.to_string(),
+                name: t.name.to_string(),
+                description: t.description.to_string(),
+                category: category_str(&t.category).to_string(),
+                hive: hive_str(&t.hive).to_string(),
+                requires_admin: t.requires_admin,
+                requires_pro: t.requires_pro,
+                tier: tier.as_str().to_string(),
+                consent_required: tier.consent_required(),
+                // Derived, not authored: every single-value tweak discloses
+                // itself the moment it exists, with no per-tweak work.
+                changes: vec![technical::TechnicalChange::Registry {
+                    path: format!("{}\\{}", hive_str(&t.hive), t.key_path),
+                    value_name: t.value_name.to_string(),
+                    value_type: reg_value_type(&t.on_value),
+                    sets_to: reg_value_display(&t.on_value),
+                }],
+                unavailable: (t.id == TASKBAR_WIDGETS_ID && services::user_choice_protected())
+                    .then_some("windows_protected"),
+                ..Default::default()
+            }
         })
         .collect();
 
@@ -555,22 +575,27 @@ fn tweak_infos(store: &RollbackStore) -> Result<Vec<TweakInfo>, String> {
         let applied = recorded && settings_tweaks::in_effect(t).unwrap_or(true);
         #[cfg(not(windows))]
         let applied = recorded;
-        list.push(TweakInfo {
-            id: t.id.into(),
-            name: t.name.into(),
-            description: t.description.into(),
-            category: category_str(&t.category).into(),
-            hive: hive_str(&t.hive).into(),
-            requires_admin: t.requires_admin(),
-            requires_pro: t.requires_pro,
-            applied,
-            changes: settings_tweaks::changes(t),
-            min_build: (t.min_build > 0).then_some(t.min_build),
-            pro_edition: t.edition == settings_tweaks::Edition::ProOrHigher,
-            enterprise_edition: t.edition == settings_tweaks::Edition::EnterpriseOrEducation,
-            unavailable: settings_tweaks::availability(t, build, edition.as_deref())
-                .err()
-                .map(|why| why.code()),
+        list.push({
+            let tier = barebone::tier_for_tweak(t.id);
+            TweakInfo {
+                id: t.id.into(),
+                name: t.name.into(),
+                description: t.description.into(),
+                category: category_str(&t.category).into(),
+                hive: hive_str(&t.hive).into(),
+                requires_admin: t.requires_admin(),
+                requires_pro: t.requires_pro,
+                applied,
+                changes: settings_tweaks::changes(t),
+                min_build: (t.min_build > 0).then_some(t.min_build),
+                pro_edition: t.edition == settings_tweaks::Edition::ProOrHigher,
+                enterprise_edition: t.edition == settings_tweaks::Edition::EnterpriseOrEducation,
+                unavailable: settings_tweaks::availability(t, build, edition.as_deref())
+                    .err()
+                    .map(|why| why.code()),
+                tier: tier.as_str().to_string(),
+                consent_required: tier.consent_required(),
+            }
         });
     }
 
@@ -2722,12 +2747,12 @@ mod tests {
             + power_tuning::TWEAKS.iter().filter(|t| t.pro).count()
             + settings.iter().filter(|t| t.requires_pro).count();
 
-        assert_eq!(total, 141, "the catalogue no longer has 141 tweaks");
+        assert_eq!(total, 137, "the catalogue no longer has 137 tweaks");
         assert_eq!(
             pro, 0,
             "a control is Pro again: nothing in this build is gated"
         );
-        assert_eq!(total - pro, 141, "every control is free");
+        assert_eq!(total - pro, 137, "every control is free");
 
         // The composite list must stay in step with what list_tweaks builds,
         // otherwise the totals above would quietly stop covering everything.

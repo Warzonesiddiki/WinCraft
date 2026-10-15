@@ -1745,10 +1745,6 @@ export const en: Strings = {
       description:
         "Disables continuous background Bluetooth Low Energy scanning to reduce background CPU cycles and power drain.",
     },
-    disable_edge_hub_sidebar: {
-      name: "Disable Microsoft Edge sidebar",
-      description: "Disables the Edge sidebar and its integrated background web widgets.",
-    },
     disable_edge_wallet: {
       name: "Disable Edge wallet autofill suggestions",
       description:
@@ -1792,10 +1788,6 @@ export const en: Strings = {
       name: "Disable publishing user activities to cloud",
       description:
         "Prevents Windows from publishing activity timeline history to Microsoft cloud services.",
-    },
-    disable_bing_widget_search: {
-      name: "Disable Windows 11 Widgets and feeds",
-      description: "Disables the Windows 11 widgets board and background web feed synchronization.",
     },
     disable_typing_insights: {
       name: "Disable typing insights telemetry",
@@ -1841,16 +1833,6 @@ export const en: Strings = {
       name: "Disable Windows PushToInstall remote app service",
       description:
         "Prevents Microsoft Store from pushing app installations to this PC remotely from the web.",
-    },
-    disable_sqm_telemetry: {
-      name: "Disable SQM telemetry client",
-      description:
-        "Disables Software Quality Metrics (SQM) client data reporting across Windows components.",
-    },
-    disable_inventory_telemetry: {
-      name: "Disable application compatibility inventory",
-      description:
-        "Stops Windows Application Experience from compiling inventory lists of your installed applications.",
     },
     disable_compatibility_assistant: {
       name: "Disable Program Compatibility Assistant",

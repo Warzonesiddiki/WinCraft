@@ -56,6 +56,10 @@ export interface DebloatApp {
   memoryBytes?: number | null;
   /** Unix seconds: when this account got the app (its data folder was made). */
   dataSince?: number | null;
+  /** Reversibility tier from Rust: `reversible` / `reinstallable` / `irreversible`. */
+  tier?: string | null;
+  /** True only for Tier 3, which needs the separate Barebone consent screen. */
+  consentRequired?: boolean | null;
 }
 
 export interface DebloatRecord {
