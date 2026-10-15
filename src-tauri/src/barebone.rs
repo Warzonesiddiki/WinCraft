@@ -57,6 +57,19 @@ pub fn tier_for_debloat(_catalog_id: &str) -> ReversibilityTier {
 pub const BAREBONE_TASKS: &[&str] = &[
     "\\Microsoft\\Windows\\Customer Experience Improvement Program\\Consolidator",
     "\\Microsoft\\Windows\\Customer Experience Improvement Program\\UsbCeip",
+    "\\Microsoft\\Windows\\Customer Experience Improvement Program\\KernelCeipTask",
+    "\\Microsoft\\Windows\\Application Experience\\Microsoft Compatibility Appraiser",
+    "\\Microsoft\\Windows\\Application Experience\\ProgramDataUpdater",
+    "\\Microsoft\\Windows\\Application Experience\\StartupAppTask",
+    "\\Microsoft\\Windows\\Autochk\\Proxy",
+    "\\Microsoft\\Windows\\DiskDiagnostic\\Microsoft-Windows-DiskDiagnosticDataCollector",
+    "\\Microsoft\\Windows\\DiskFootprint\\Diagnostics",
+    "\\Microsoft\\Windows\\Maps\\MapsUpdateTask",
+    "\\Microsoft\\Windows\\Maps\\MapsToastTask",
+    "\\Microsoft\\Windows\\Feedback\\Siuf\\DmClient",
+    "\\Microsoft\\Windows\\Feedback\\Siuf\\DmClientOnScenarioDownload",
+    "\\Microsoft\\EdgeUpdate\\EdgeUpdateTaskMachineCore",
+    "\\Microsoft\\EdgeUpdate\\EdgeUpdateTaskMachineUA",
 ];
 
 /// Whether a scheduler path is on the Barebone allowlist. Exact match only.
@@ -332,8 +345,8 @@ mod tests {
 
     #[test]
     fn barebone_task_allowlist_is_empty_in_b0() {
-        // Phase B3: the two CEIP uploaders. Exact paths, no wildcards.
-        assert_eq!(crate::barebone::BAREBONE_TASKS.len(), 2);
+        // Allowlisted telemetry/diagnostics tasks. Exact paths, no wildcards.
+        assert_eq!(crate::barebone::BAREBONE_TASKS.len(), 15);
         for path in crate::barebone::BAREBONE_TASKS {
             assert!(path.starts_with('\\'), "{path}");
             assert!(!path.contains('\0'));

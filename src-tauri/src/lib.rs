@@ -2586,6 +2586,7 @@ pub fn run() {
             cookies::set_cookie_whitelist,
             scheduledtasks::list_scheduled_tasks,
             scheduledtasks::set_scheduled_task_enabled,
+            scheduledtasks::list_barebone_tasks,
             scheduledtasks::set_barebone_task,
             scheduledtasks::rollback_barebone_task,
             barebone::barebone_preflight,

@@ -129,6 +129,7 @@ pub const APP_COMMANDS: &[&str] = &[
     "set_cookie_whitelist",
     "list_scheduled_tasks",
     "set_scheduled_task_enabled",
+    "list_barebone_tasks",
     "set_barebone_task",
     "rollback_barebone_task",
     "barebone_preflight",

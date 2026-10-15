@@ -399,6 +399,47 @@ pub fn apply_barebone_from_payload(payload: &str) -> Result<(), String> {
 pub struct BareboneTaskOutcome {
     pub restore_point: crate::restore_point::RestorePointOutcome,
 }
+
+#[derive(serde::Serialize, Clone, Debug, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct BareboneTaskEntry {
+    pub path: String,
+    pub name: String,
+    pub enabled: bool,
+    pub present: bool,
+}
+
+/// Lists all allowlisted Barebone tasks with their current enabled/disabled state.
+#[cfg(windows)]
+#[tauri::command(async)]
+pub fn list_barebone_tasks() -> Result<Vec<BareboneTaskEntry>, String> {
+    Ok(crate::barebone::BAREBONE_TASKS
+        .iter()
+        .map(|path| {
+            let name = path.rsplit('\\').next().unwrap_or(path).to_string();
+            match barebone_task_enabled(path) {
+                Ok(enabled) => BareboneTaskEntry {
+                    path: path.to_string(),
+                    name,
+                    enabled,
+                    present: true,
+                },
+                Err(_) => BareboneTaskEntry {
+                    path: path.to_string(),
+                    name,
+                    enabled: false,
+                    present: false,
+                },
+            }
+        })
+        .collect())
+}
+
+#[cfg(not(windows))]
+#[tauri::command(async)]
+pub fn list_barebone_tasks() -> Result<Vec<BareboneTaskEntry>, String> {
+    Ok(Vec::new())
+}
 /// Phase B4 command: disable or re-enable one allowlisted Barebone task.
 /// Blocked without a recorded Tier 3 consent. Attempts a restore point first
 /// (best-effort, reported in the outcome), then tries directly and spends one

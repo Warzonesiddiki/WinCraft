@@ -135,6 +135,7 @@ permissions = [
     "allow-set-cookie-whitelist",
     "allow-list-scheduled-tasks",
     "allow-set-scheduled-task-enabled",
+    "allow-list-barebone-tasks",
     "allow-set-barebone-task",
     "allow-rollback-barebone-task",
     "allow-barebone-preflight",
