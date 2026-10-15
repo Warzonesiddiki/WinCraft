@@ -134,6 +134,7 @@ pub const APP_COMMANDS: &[&str] = &[
     "rollback_barebone_task",
     "disable_all_barebone_tasks",
     "rollback_all_barebone_tasks",
+    "get_process_stats",
     "barebone_preflight",
     "record_barebone_consent",
     "flush_dns_cache",

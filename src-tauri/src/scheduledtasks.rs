@@ -593,6 +593,31 @@ pub fn disable_all_barebone_tasks_inner(store: &crate::rollback::RollbackStore) 
     (modified, failed)
 }
 
+use std::process::Command;
+
+#[derive(Serialize)]
+pub struct ProcessStats {
+    pub current: usize,
+    pub target: usize,
+}
+
+#[cfg(windows)]
+#[tauri::command(async)]
+pub fn get_process_stats(_app: tauri::AppHandle) -> Result<ProcessStats, String> {
+    // Count processes by parsing `tasklist` output. Simple, stdlib only.
+    let output = Command::new("tasklist")
+        .args(["/fo", "csv", "/nh"])
+        .output()
+        .map_err(|e| format!("failed to run tasklist: {e}"))?;
+    if !output.status.success() {
+        return Err("tasklist returned non-zero exit code".into());
+    }
+    // Each line is a process entry. Split lines, remove empty.
+    let stdout = String::from_utf8_lossy(&output.stdout);
+    let count = stdout.lines().filter(|l| !l.trim().is_empty()).count();
+    Ok(ProcessStats { current: count, target: 85 })
+}
+
 #[cfg(windows)]
 pub fn rollback_all_barebone_tasks_inner(store: &crate::rollback::RollbackStore) -> (usize, usize) {
     let mut modified = 0;
@@ -745,6 +770,12 @@ pub fn disable_all_barebone_tasks(
 pub fn rollback_all_barebone_tasks(
     _app: tauri::AppHandle,
 ) -> Result<BatchTaskOutcome, String> {
+    Err("not supported on this platform".to_string())
+}
+
+#[cfg(not(windows))]
+#[tauri::command(async)]
+pub fn get_process_stats(_app: tauri::AppHandle) -> Result<ProcessStats, String> {
     Err("not supported on this platform".to_string())
 }
 

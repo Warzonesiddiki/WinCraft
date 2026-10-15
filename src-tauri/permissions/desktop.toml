@@ -140,6 +140,7 @@ permissions = [
     "allow-rollback-barebone-task",
     "allow-disable-all-barebone-tasks",
     "allow-rollback-all-barebone-tasks",
+    "allow-get-process-stats",
     "allow-barebone-preflight",
     "allow-record-barebone-consent",
     "allow-flush-dns-cache",

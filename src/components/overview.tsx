@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
 import { invoke } from "@tauri-apps/api/core";
 import { localeOf, type Lang, type Strings } from "../i18n";
-import type { AuditEntry, Section, TweakInfo } from "../types";
+import type { AuditEntry, ProcessStats, Section, TweakInfo } from "../types";
 import { textFor } from "../lib";
 import { CATEGORY_STYLE } from "../categories";
 import { CONFIGURABLE_TWEAK_IDS, isCurrentCatalogTweak } from "../catalog";
 import { type PulseSample, tracePoints } from "./command";
-import { ChipIcon, HistoryIcon, LayersIcon, RadarIcon } from "./icons";
+import { ChipIcon, HeartPulseIcon, HistoryIcon, LayersIcon, RadarIcon } from "./icons";
 import "./overview.css";
 
 interface OverviewCopy {
@@ -37,6 +37,8 @@ interface OverviewCopy {
   retry: string;
   activity: string;
   completed: string;
+  processes: string;
+  processesHint: string;
 }
 
 const COPY: Record<Lang, OverviewCopy> = {
@@ -69,6 +71,8 @@ const COPY: Record<Lang, OverviewCopy> = {
     retry: "Try again",
     activity: "System activity",
     completed: "Completed",
+    processes: "Active processes",
+    processesHint: "Target: ~85 (AtlasOS baseline)",
   },
   it: {
     eyebrow: "IL TUO PC, A COLPO D'OCCHIO",
@@ -101,6 +105,8 @@ const COPY: Record<Lang, OverviewCopy> = {
     retry: "Riprova",
     activity: "Attività di sistema",
     completed: "Completata",
+    processes: "Processi attivi",
+    processesHint: "Obiettivo: ~85 (base AtlasOS)",
   },
   fr: {
     eyebrow: "VOTRE PC, EN UN COUP D'ŒIL",
@@ -132,6 +138,8 @@ const COPY: Record<Lang, OverviewCopy> = {
     retry: "Réessayer",
     activity: "Activité du système",
     completed: "Terminée",
+    processes: "Processus actifs",
+    processesHint: "Cible : ~85 (référence AtlasOS)",
   },
   es: {
     eyebrow: "TU PC, DE UN VISTAZO",
@@ -161,6 +169,8 @@ const COPY: Record<Lang, OverviewCopy> = {
     retry: "Reintentar",
     activity: "Actividad del sistema",
     completed: "Completada",
+    processes: "Procesos activos",
+    processesHint: "Objetivo: ~85 (base AtlasOS)",
   },
   de: {
     eyebrow: "DEIN PC IM ÜBERBLICK",
@@ -192,6 +202,8 @@ const COPY: Record<Lang, OverviewCopy> = {
     retry: "Erneut versuchen",
     activity: "Systemaktivität",
     completed: "Abgeschlossen",
+    processes: "Aktive Prozesse",
+    processesHint: "Ziel: ~85 (AtlasOS-Referenz)",
   },
   pt: {
     eyebrow: "O SEU PC NUM RELANCE",
@@ -220,7 +232,9 @@ const COPY: Record<Lang, OverviewCopy> = {
     historyError: "Não foi possível carregar o histórico local.",
     retry: "Tentar novamente",
     activity: "Atividade do sistema",
-    completed: "Concluída",
+    completed: "Concluído",
+    processes: "Processos ativos",
+    processesHint: "Alvo: ~85 (referência AtlasOS)",
   },
 };
 
@@ -275,6 +289,24 @@ export function OverviewPanel({
   const copy = COPY[lang];
   const [history, setHistory] = useState<HistoryState>({ status: "loading" });
   const [historyRequest, setHistoryRequest] = useState(0);
+  const [processStats, setProcessStats] = useState<ProcessStats | null>(null);
+
+  useEffect(() => {
+    let alive = true;
+    const fetchStats = () => {
+      void invoke<ProcessStats>("get_process_stats")
+        .then((stats) => {
+          if (alive) setProcessStats(stats);
+        })
+        .catch(() => {});
+    };
+    fetchStats();
+    const timer = setInterval(fetchStats, 5000);
+    return () => {
+      alive = false;
+      clearInterval(timer);
+    };
+  }, []);
 
   useEffect(() => {
     let alive = true;
@@ -356,6 +388,21 @@ export function OverviewPanel({
               : copy.waiting}
           </p>
           <Trace values={ramValues} />
+        </div>
+        <div className="overview-reading" title={copy.processesHint}>
+          <div className="overview-reading-label">
+            <span aria-hidden="true">
+              <HeartPulseIcon className="overview-icon" />
+            </span>
+            <span>{copy.processes}</span>
+          </div>
+          <p className="overview-value">
+            {processStats ? number.format(processStats.current) : "—"}
+            {processStats && <span>/ {processStats.target}</span>}
+          </p>
+          <p className="overview-reading-caption">
+            {processStats ? copy.processesHint : copy.waiting}
+          </p>
         </div>
         <div className="overview-reading overview-settings">
           <div className="overview-reading-label">

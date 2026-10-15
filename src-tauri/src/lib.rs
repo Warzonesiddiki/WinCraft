@@ -2649,6 +2649,7 @@ pub fn run() {
             scheduledtasks::rollback_barebone_task,
             scheduledtasks::disable_all_barebone_tasks,
             scheduledtasks::rollback_all_barebone_tasks,
+            scheduledtasks::get_process_stats,
             barebone::barebone_preflight,
             barebone::record_barebone_consent,
             netmaintenance::flush_dns_cache,

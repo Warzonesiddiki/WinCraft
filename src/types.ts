@@ -300,6 +300,12 @@ export type BatchTaskOutcome = {
   failed: number;
 };
 
+/** Mirrors Rust `scheduledtasks::ProcessStats`. */
+export type ProcessStats = {
+  current: number;
+  target: number;
+};
+
 /** One read-only Barebone preflight finding (Rust `barebone::PreflightFinding`). */
 export type BarebonePreflightFinding = {
   code: string;
