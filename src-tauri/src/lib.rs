@@ -2749,6 +2749,27 @@ mod tests {
         assert_eq!(bulk_applicable(vec!["barebone_probe".to_string()]).len(), 0);
     }
 
+    /// Phase 0 calibration is complete and must stay complete: every row tweak
+    /// carries an evidence tier, an effect, and a presentational group. Risk
+    /// is legitimately `None` for most rows, so only the always-set fields
+    /// are pinned here.
+    #[test]
+    fn every_row_tweak_carries_evidence_effect_and_group() {
+        for t in tweaks::all_tweaks() {
+            assert!(t.group.is_some(), "{} has no group", t.id);
+            if let Some(risk) = t.risk {
+                assert!(!risk.is_empty(), "{} has an empty risk note", t.id);
+                assert!(!risk.contains('"'), "{} risk note contains a quote", t.id);
+            }
+        }
+        for t in &settings_tweaks::TWEAKS {
+            assert!(t.group.is_some(), "{} has no group", t.id);
+            if let Some(risk) = t.risk {
+                assert!(!risk.is_empty(), "{} has an empty risk note", t.id);
+            }
+        }
+    }
+
     #[test]
     fn admin_tweaks_collapse_into_one_elevated_batch() {
         let ids = all_visible_ids();
