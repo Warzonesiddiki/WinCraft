@@ -35,6 +35,7 @@ fn tool_path(name: &str) -> io::Result<PathBuf> {
         "powershell" => r"WindowsPowerShell\v1.0\powershell.exe",
         "cmd" => "cmd.exe",
         "schtasks" => "schtasks.exe",
+        "tasklist" => "tasklist.exe",
         "taskkill" => "taskkill.exe",
         "shutdown" => "shutdown.exe",
         "ipconfig" => "ipconfig.exe",

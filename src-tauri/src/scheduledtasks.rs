@@ -593,8 +593,6 @@ pub fn disable_all_barebone_tasks_inner(store: &crate::rollback::RollbackStore) 
     (modified, failed)
 }
 
-use std::process::Command;
-
 #[derive(Serialize)]
 pub struct ProcessStats {
     pub current: usize,
@@ -604,11 +602,10 @@ pub struct ProcessStats {
 #[cfg(windows)]
 #[tauri::command(async)]
 pub fn get_process_stats(_app: tauri::AppHandle) -> Result<ProcessStats, String> {
-    // Count processes by parsing `tasklist` output. Simple, stdlib only.
-    let output = Command::new("tasklist")
-        .args(["/fo", "csv", "/nh"])
-        .output()
-        .map_err(|e| format!("failed to run tasklist: {e}"))?;
+    let output = crate::system_tools::run("tasklist", |cmd| {
+        cmd.args(["/fo", "csv", "/nh"]).output()
+    })
+    .map_err(|e| format!("failed to run tasklist: {e}"))?;
     if !output.status.success() {
         return Err("tasklist returned non-zero exit code".into());
     }
