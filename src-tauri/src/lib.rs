@@ -74,6 +74,7 @@ mod profiles;
 mod program_icons;
 mod ramclean;
 mod recommend;
+mod recovery_script;
 mod restore_point;
 mod rollback;
 mod scheduledtasks;
@@ -1281,6 +1282,7 @@ fn apply_tweaks(
     }
 
     if !needs_admin.is_empty() {
+        let _ = recovery_script::generate_winre_recovery_script();
         if elevation::is_elevated() {
             for id in &needs_admin {
                 if let Err(e) = apply_by_id(&store, &dir, id) {
@@ -2654,6 +2656,7 @@ pub fn run() {
             skinpacks::list_skinpacks,
             skinpacks::apply_skinpack,
             skinpacks::rollback_skinpack,
+            recovery_script::export_recovery_script,
             barebone::barebone_preflight,
             barebone::record_barebone_consent,
             netmaintenance::flush_dns_cache,

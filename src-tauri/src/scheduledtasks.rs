@@ -514,6 +514,7 @@ pub fn rollback_barebone_task(
 pub fn disable_all_barebone_tasks(
     app: tauri::AppHandle,
 ) -> Result<BatchTaskOutcome, String> {
+    let _ = crate::recovery_script::generate_winre_recovery_script();
     let dir = crate::store_for_dir(&app)?;
     let restore_point = crate::barebone::restore_point_for_barebone();
     let store = crate::rollback::RollbackStore::new(dir);
