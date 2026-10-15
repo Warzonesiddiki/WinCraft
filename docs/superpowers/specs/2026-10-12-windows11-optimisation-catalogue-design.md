@@ -1,7 +1,7 @@
 # WinCraft 1.20 — Windows 11 Optimisation Catalogue
 
 **Date:** 2026-10-12
-**Status:** Design approved in review; not yet implemented
+**Status:** Design approved in review; not yet implemented. Amended 2026-10-15 with §16 Barebone addendum (Atlas 0.5.x parity, opt-in).
 **Supersedes:** nothing. Extends the 81-tweak catalogue shipped in 1.19.0.
 
 ---
@@ -389,3 +389,84 @@ this PC"; the exclusion page renders in six languages.
 - Independent benchmark: <https://techteamgb.co.uk/2024/01/12/custom-windows-os-claims-lower-latency-and-more-performance-atlas-os>
 - XDA review: <https://www.xda-developers.com/tried-kinder-windows-experience-atlasos-how-should-be>
 - Key issues: AtlasOS #704, #1016, #1556, #1615, #1672; ReviOS #49, #167, #228
+
+---
+
+## 16. Addendum 2026-10-15 — Barebone (Atlas 0.5.x parity, opt-in)
+
+### 16.1 Version correction
+
+There is no modern `0.5.2` AME playbook. Current Atlas line is `0.5.0` +
+`0.5.0-hotfix` (21 Oct 2025) supporting Windows 11 24H2 `26100` + 25H2 `26200`.
+`archive.org/details/atlasos-20h2` labelled `v0.5.2` is the legacy NTLite-ISO era,
+not the current playbook. Where the request says `0.5.2`, this spec reads
+`0.5.x = 0.5.0 / hotfix`.
+
+Playbook conf: `SupportedBuilds 26100,26200`, `UpgradableFrom 0.4.1`.
+
+### 16.2 What Atlas barebone actually is (0.5.x)
+
+Not a deep component strip. Live-system AME Wizard playbook:
+
+- Deprovisions ~30 AppX families (Store-reinstallable), optional Edge + Snipping Tool.
+- Removes 1 DISM capability by default (`App.StepsRecorder`), strips OneDrive setup via script unless set up, installs `Z-Atlas-NoTelemetry-Package` always and `Z-Atlas-NoDefender-Package` only if user picks Disable Defender.
+- Disables ~8 services + 3 drivers (`startup=4`), disables ~7 scheduled tasks, sets ~100 registry policies.
+- Leaves Defender ON by default (recommended), UAC ON, Firewall ON, WinRE ON, Store functional, Windows Update manual-but-present. Security-weakening choices are explicit opt-in radios.
+- Only documented irreversible-without-reinstall item is Smart App Control (`VerifiedAndReputablePolicyState=0`).
+
+Removed-features, security and configuration docs:
+
+- <https://docs.atlasos.net/faq/install-faq/removed-features/>
+- <https://docs.atlasos.net/post-install/atlas-folder/security/>
+- <https://docs.atlasos.net/post-install/atlas-folder/configuration/>
+- <https://docs.atlasos.net/faq/general-faq/atlas-and-security/>
+
+Relevance for WinCraft: Atlas-parity Barebone must be **default-safe + opt-in aggressive**, not default-aggressive.
+
+### 16.3 Reversal of §3, scoped
+
+§3 said not a debloat product and no AppX/WinSxS removal. That thesis stands for the **core catalogue**, which remains Tier 1 reversible-only.
+
+Barebone is a **separate opt-in surface** with its own tier model and consent, so the core promise — every default change is reversible, verifiable, labelled — is intact:
+
+| Tier | Meaning | Examples | Rollback story | UX gate |
+|---|---|---|---|---|
+| 1 Reversible | Rollback store restores exact prior value | All current `tweaks.rs` / `settings_tweaks.rs` / `services.rs` | `rollback_by_id` verified | Standard preview + apply |
+| 2 Reinstallable | No in-place undo; recovery via Store / re-enable | Current `debloat.rs` CATALOG (current-user MSIX, 25 items) | Journal + reinstall link + `impact` copy | Per-app what-you-lose, N-of-M |
+| 3 Irreversible / Barebone-only | Affects other users, provisioning, or servicing | Provisioned-package removal, `\Microsoft\` task disables, `Disabled` services, servicing-tattoo policies | Restore point (best-effort) + export; **no rollback promise** | Separate consent, typed confirm, per-item checkboxes, excluded from bulk/scan/reapply |
+
+Implementation: add `reversibility` / `tier` to `CatalogItem` (`debloat.rs:14`), `ServiceTweak` (`services.rs:10`), `SettingsTweak`, and a `BareboneItem{tier}` for the new surface. Expose `tier` + `consentRequired` via `tweak_infos()` and `DebloatApp`. `rollback::validate_snapshot` rejects Tier 3 from the reversible store — Tier 3 goes to a separate `barebone_history.json` with `Applied / Reverted-Unknown`, never `SnapshotEntry::Registry`.
+
+Licensing guard (binding): AtlasOS GPL-3.0, `meetrevision/packages` CC BY-NC-SA non-commercial, `revision-tool` GPL-3.0. Read for technique classes only. No vendoring. Every candidate independently verified on clean VM.
+
+### 16.4 Barebone scope (Atlas parity)
+
+Default ON (safe, Atlas-default): AppX deprovision list (keep Store, Photos, modern Media Player, Xbox overlay optional), StepsRecorder capability removal, ContentDeliveryManager hardening, `AllowTelemetry=0` + DiagTrack/Wer/CEIP/UCPD-velocity tasks off, Feeds/Copilot/Recall policies, auto-app-archival off, background-apps off, minimal indexing, file-sharing/location off, visual FX off, delivery-optimization off.
+
+Opt-in (radio, default OFF, warn): Defender removal, Edge removal (with WebView keep option), mitigations off, VBS off, auto-updates off, hibernation off, power-saving off, Bluetooth/print stacks off, CPU-Idle off.
+
+Never by default (explicit ack + restore-media check): Smart App Control disable, `Reset this PC` disable, WebExperience firewall blocks, InstallService deletions.
+
+Must implement: service/task backup (`winServices.reg` equivalent), default-user hive handling, per-item state file, Store `wsreset -i` repair path, Bluetooth/Print/FSO/GameBar one-click restores, WU re-enable before Store/Xbox downloads. Order: Tier 1 CDM policies → Tier 2 AppX → Tier 1 service/task so Store does not rehydrate removed apps.
+
+Current WinCraft base already present: `debloat.rs` CATALOG (25 items, publisher + Store URL + journal + `eligible()` / `verified_candidate()` re-checks), `services.rs` snapshot + verify + `not_present` UX, `scheduledtasks.rs` third-party-only guard + XML state read, `restore_point.rs` best-effort checkpoint, `split_by_elevation` single-UAC batch.
+
+### 16.5 Extension points for vibe coding
+
+- **Debloat catalog:** keep `CATALOG` Tier 2 as-is. New `barebone_packages.rs` holds Atlas-class candidates, each with `package_name`, `publisher_id`, `publisher`, `store_url`, `tier`, `min_build`, `edition`, `depends_on`. Reuse `eligible()` verbatim; add `barebone_eligible()` refusing frameworks, Store/DesktopAppInstaller/ShellExperienceHost/StartMenuExperienceHost/UI.Xaml/VCLibs, GamingServices, and dependents. Provisioned removal is Tier 3, admin-only, separate journal + restore-point attempt first.
+- **Services:** grow `SERVICE_TWEAKS` via allowlist only, default `manual:true`. Reuse `apply_service` / `rollback_service`, `installed()` pattern, extend VM matrix + `verify-tweaks.ps1` `Read-Service`.
+- **Tasks:** new `SnapshotEntry::ScheduledTask { path, previously_enabled }`, allowlisted `BAREBONE_TASKS` exact paths (no wildcards), `snapshot_targets: task:{lowercased path}`, XML read → `schtasks /change /disable` → re-read verify. Default `list_scheduled_tasks` keeps hiding `\Microsoft\`; new `list_barebone_tasks()` shows allowlist only.
+- **Preflight `barebone::preflight()` (read-only):** build+edition via `settings_tweaks::machine()` + `availability()`, laptop vs desktop via scan profile, gaming/Xbox/Store deps via installed-package scan, multi-user provisioned check, elevation/session via `elevation::is_elevated()`, UCPD via `user_choice_protected()` → `windows_protected`.
+- **Presets stay selection-only:** Tier-2 subset pre-checked, Tier-3 shown unchecked in gated group, `{selection, missing, unavailable}` + `N-of-M` badge. `bulk_applicable()` / `fits_this_pc()` exclude Tier-3; scan/profiles/reapply never include them. `MANUAL_ONLY_TWEAKS` gains Tier-3 ids. Fix `debloat-copy.ts:138` `presetBareboneHint` wording in all six locales.
+
+### 16.6 Vibe-coding phases (each ends green on `npm run check`)
+
+- **Phase B0 Tier plumbing:** `tier` field + passthrough + `validate_snapshot` rejection. Done: `cargo test` green, count untouched, no new surface.
+- **Phase B1 Package table read-only:** 5–10 VM-verified candidates, list-only command. Done: identity test covers table, VM shows `removable`/`reason`, no removal wired.
+- **Phase B2 Service fan-out 1–2 services:** Manual telemetry-adjacent service, matrix + verify coverage. Done: Baseline→Applied→Reverted PASS on Pro VM, N/A where absent.
+- **Phase B3 Task snapshot 1–2 tasks:** oldest-original + overlap rejection unit tests. Done: VM disable→verify→re-enable restores exact `<Enabled>`.
+- **Phase B4 Preflight + consent + restore-point gating:** Tier-3 blocked without consent, outcome displayed, audit origin logged. Done: Home/Win10/Education show correct `unavailable` codes.
+- **Phase B5 Preset + i18n + counts:** N-of-M, bulk exclusion, six-locale copy, `check-i18n`, `check-public-counts`, count test, `PCT_WRITE_VM_MATRIX=1` refresh. Done: `npm run checks` green.
+- **Phase B6 VM sign-off:** full `verify-tweaks.ps1` Baseline/Applied/Reverted on VMs A–D + Debloat check + result sheets (git-ignored, attached to release). Done: 0 failures.
+
+Explicit non-goals for Barebone: no provisioned removal in default flow, no `\Microsoft\` tasks in Startup screen, no `Disabled` services without per-service VM evidence, no bulk/scan inclusion of Tier 3, no FPS/latency claims.
