@@ -485,6 +485,7 @@ function App() {
   const [inspecting, setInspecting] = useState<string | null>(null);
   const [confirmCleanup, setConfirmCleanup] = useState<CleanupInfo | null>(null);
   const [confirmRestore, setConfirmRestore] = useState(false);
+  const [consentTweak, setConsentTweak] = useState<TweakInfo | null>(null);
   const [restoring, setRestoring] = useState(false);
   // Owned here rather than inside RamCleaner so the schedule keeps running
   // when the user navigates away from the Scan screen.
@@ -534,6 +535,14 @@ function App() {
   }
 
   async function toggle(tweak: TweakInfo) {
+    if (!tweak.applied && tweak.consentRequired) {
+      setConsentTweak(tweak);
+      return;
+    }
+    await performToggle(tweak);
+  }
+
+  async function performToggle(tweak: TweakInfo) {
     const text = textFor(s.tweaks, tweak.id, tweak.name, tweak.description);
     setBusyId(tweak.id);
     try {
@@ -1116,6 +1125,51 @@ function App() {
             >
               {s.restore.cancel}
             </button>
+          </div>
+        </div>
+      )}
+
+      {consentTweak && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-scrim/60 p-6 backdrop-blur-sm">
+          <div className="animate-card w-full max-w-md rounded-2xl border border-line bg-surface-1 p-6 shadow-2xl">
+            <h3 className="text-lg font-bold text-ink">
+              {textFor(s.tweaks, consentTweak.id, consentTweak.name, consentTweak.description).name}
+            </h3>
+            <p className="mt-2 text-sm leading-relaxed text-ink-3">
+              This action requires explicit acknowledgement. It modifies system-level behavior and
+              may require reinstallation or manual configuration to restore.
+            </p>
+            {consentTweak.risk && (
+              <p className="mt-3 text-xs leading-relaxed text-warn">⚠️ {consentTweak.risk}</p>
+            )}
+            <div className="mt-5 flex gap-2">
+              <button
+                onClick={async () => {
+                  const target = consentTweak;
+                  setConsentTweak(null);
+                  try {
+                    if (target.id.startsWith("barebone_")) {
+                      await invoke("record_barebone_consent", {
+                        id: target.id,
+                        text: "Acknowledged",
+                      });
+                    }
+                  } catch {
+                    // Non-fatal if backend has no consent table for this specific tweak
+                  }
+                  await performToggle(target);
+                }}
+                className="w-full rounded-xl bg-accent py-2.5 text-sm font-semibold text-surface-1 transition-colors hover:bg-accent/90"
+              >
+                Acknowledge &amp; Apply
+              </button>
+              <button
+                onClick={() => setConsentTweak(null)}
+                className="w-full rounded-xl py-2.5 text-sm font-medium text-ink-3 hover:text-ink-2"
+              >
+                {s.restore.cancel}
+              </button>
+            </div>
           </div>
         </div>
       )}

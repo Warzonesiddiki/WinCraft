@@ -5,7 +5,7 @@ const native = fs.readFileSync(new URL("../src-tauri/src/lib.rs", import.meta.ur
 const hives = [...native.matchAll(/hive:\s*"([^"]*)"/g)].map((match) => match[1]);
 assert.equal(
   hives.filter((value) => value === "\\u{2014}").length,
-  15,
+  16,
   "All composite tweaks use the encoding-safe sentinel",
 );
 assert.ok(

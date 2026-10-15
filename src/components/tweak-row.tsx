@@ -98,6 +98,18 @@ export function TweakRow({
               tweak.hive !== "—" && <Badge>{tweak.hive}</Badge>
             )}
             {tweak.requires_admin && <Badge kind="admin">{s.badges.admin}</Badge>}
+            {tweak.evidence === "measured" && <Badge kind="ok">Measured</Badge>}
+            {tweak.evidence === "modest" && <Badge kind="neutral">Modest</Badge>}
+            {tweak.effect && tweak.effect !== "immediate" && (
+              <Badge kind="muted">
+                {tweak.effect === "restart"
+                  ? "Restart"
+                  : tweak.effect === "reboot"
+                    ? "Reboot"
+                    : "Sign-out"}
+              </Badge>
+            )}
+            {tweak.consentRequired && <Badge kind="caution">Consent</Badge>}
             {(tweak.min_build || tweak.pro_edition || tweak.enterprise_edition) && (
               <Badge kind="muted">
                 {[
@@ -117,6 +129,9 @@ export function TweakRow({
           <p className="mt-1 max-w-[52ch] text-[12.5px] leading-[1.55] text-ink-3">
             {text.description}
           </p>
+          {tweak.risk && (
+            <p className="mt-1 max-w-[52ch] text-[12px] leading-[1.5] text-warn">⚠️ {tweak.risk}</p>
+          )}
           {tweak.unavailable && !tweak.applied && (
             <p className="mt-1.5 max-w-[52ch] text-[12px] leading-[1.5] text-warn">
               {tweak.unavailable === "windows_version"
