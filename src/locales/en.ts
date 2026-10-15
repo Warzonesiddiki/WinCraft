@@ -1596,6 +1596,16 @@ export const en: Strings = {
       description:
         "Stops and disables Windows' file indexing service, reducing background disk activity — useful on small SSDs or while gaming. Start menu file search becomes slower until you turn it back on (requires administrator rights).",
     },
+    disable_dmwappush_service: {
+      name: "Start the Device Management push service only when needed",
+      description:
+        "Stops the WAP Push Message Routing service and sets it to Manual, so it no longer starts with Windows but anything that asks for it can still start it.",
+    },
+    disable_diagtrack_service: {
+      name: "Disable the telemetry service (Connected User Experiences)",
+      description:
+        "Stops and disables the Connected User Experiences and Telemetry service, which uploads usage and diagnostic data to Microsoft. Windows Update and error reporting keep working.",
+    },
     enable_regback: {
       name: "Enable automatic registry backup (RegBack)",
       description:

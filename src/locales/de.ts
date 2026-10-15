@@ -1629,6 +1629,16 @@ export const de: Strings = {
       description:
         "Stoppt und deaktiviert den Datei-Indizierungsdienst von Windows und reduziert so die Festplattenaktivität im Hintergrund — nützlich bei kleinen SSDs oder beim Spielen. Die Dateisuche im Startmenü wird langsamer, bis du ihn wieder aktivierst (Administratorrechte erforderlich).",
     },
+    disable_dmwappush_service: {
+      name: "Push-Dienst für Geräteverwaltung nur bei Bedarf starten",
+      description:
+        "Stoppt den WAP-Push-Routingdienst und stellt ihn auf Manuell, sodass er nicht mehr mit Windows startet, aber bei Bedarf weiterhin gestartet werden kann.",
+    },
+    disable_diagtrack_service: {
+      name: "Telemetriedienst deaktivieren (Benutzererfahrung)",
+      description:
+        "Stoppt und deaktiviert den Dienst für verbundene Benutzererfahrungen und Telemetrie, der Nutzungs- und Diagnosedaten an Microsoft sendet. Windows Update und Fehlerberichterstattung funktionieren weiterhin.",
+    },
     enable_regback: {
       name: "Automatische Registrierungssicherung aktivieren (RegBack)",
       description:

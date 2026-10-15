@@ -1624,6 +1624,16 @@ export const fr: Strings = {
       description:
         "Arrête et désactive le service d'indexation des fichiers de Windows, réduisant l'activité disque en arrière-plan — utile sur les petits SSD ou pendant le jeu. La recherche de fichiers dans le menu Démarrer devient plus lente jusqu'à sa réactivation (droits administrateur requis).",
     },
+    disable_dmwappush_service: {
+      name: "Démarrer le service de notification push uniquement si nécessaire",
+      description:
+        "Arrête le service de routage push WAP et le règle sur Manuel, pour qu'il ne démarre plus avec Windows tout en restant démarrable à la demande.",
+    },
+    disable_diagtrack_service: {
+      name: "Désactiver le service de télémétrie (expériences connectées)",
+      description:
+        "Arrête et désactive le service d'expériences utilisateur connectées et de télémétrie, qui envoie des données d'utilisation et de diagnostic à Microsoft. Windows Update et les rapports d'erreurs continuent de fonctionner.",
+    },
     enable_regback: {
       name: "Activer la sauvegarde automatique du Registre (RegBack)",
       description:

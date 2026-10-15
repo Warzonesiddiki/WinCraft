@@ -1620,6 +1620,16 @@ export const es: Strings = {
       description:
         "Detiene y desactiva el servicio de indexación de archivos de Windows, reduciendo la actividad de disco en segundo plano — útil en SSD pequeños o mientras juegas. La búsqueda de archivos en el menú Inicio se vuelve más lenta hasta que lo reactives (requiere privilegios de administrador).",
     },
+    disable_dmwappush_service: {
+      name: "Iniciar el servicio de inserción solo cuando se necesite",
+      description:
+        "Detiene el servicio de enrutamiento de inserciones WAP y lo configura como Manual, para que ya no se inicie con Windows pero pueda iniciarse cuando se solicite.",
+    },
+    disable_diagtrack_service: {
+      name: "Desactivar el servicio de telemetría (experiencias conectadas)",
+      description:
+        "Detiene y desactiva el servicio de experiencias de usuario conectadas y telemetría, que envía datos de uso y diagnóstico a Microsoft. Windows Update y los informes de errores siguen funcionando.",
+    },
     enable_regback: {
       name: "Activar copia de seguridad del Registro (RegBack)",
       description:

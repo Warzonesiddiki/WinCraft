@@ -1621,6 +1621,16 @@ export const it: Strings = {
       description:
         "Ferma e disattiva il servizio di indicizzazione dei file di Windows, riducendo l'attività su disco in background — utile su SSD piccoli o mentre giochi. La ricerca file nel menu Start diventa più lenta finché non lo riattivi (richiede privilegi di amministratore).",
     },
+    disable_dmwappush_service: {
+      name: "Avvia il servizio push di gestione solo quando necessario",
+      description:
+        "Ferma il servizio di routing push WAP e lo imposta su Manuale, così non si avvia più con Windows ma può ancora essere avviato su richiesta.",
+    },
+    disable_diagtrack_service: {
+      name: "Disattiva il servizio di telemetria (esperienze connesse)",
+      description:
+        "Ferma e disattiva il servizio esperienze utente connesse e telemetria, che invia dati di utilizzo e diagnostica a Microsoft. Windows Update e la segnalazione errori continuano a funzionare.",
+    },
     enable_regback: {
       name: "Attiva backup automatico del registro (RegBack)",
       description:

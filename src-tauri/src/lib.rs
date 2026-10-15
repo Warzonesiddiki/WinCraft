@@ -617,6 +617,28 @@ fn tweak_infos(store: &RollbackStore) -> Result<Vec<TweakInfo>, String> {
         ..Default::default()
     });
 
+    for info in [services::dmwappush_info(), services::diagtrack_info()] {
+        let tier = barebone::tier_for_tweak(info.id);
+        let applied = applied_ids.contains(info.id);
+        list.push(TweakInfo {
+            applied,
+            id: info.id.to_string(),
+            name: info.name.to_string(),
+            description: info.description.to_string(),
+            category: category_str(&Category::Privacy).to_string(),
+            hive: "\u{2014}".to_string(),
+            changes: Vec::new(), // composite: filled by the pass below
+            requires_admin: info.requires_admin,
+            requires_pro: info.requires_pro,
+            // Present only where the service is installed; never offered
+            // where there is nothing to turn off, unless already applied.
+            unavailable: service_unavailable(info.id, applied),
+            tier: tier.as_str().to_string(),
+            consent_required: tier.consent_required(),
+            ..Default::default()
+        });
+    }
+
     // One pass, not twelve call sites: anything that arrived with no
     // disclosure asks `technical` for its composite one. A tweak whose
     // mechanism we cannot state precisely keeps an empty list and shows no
@@ -663,8 +685,21 @@ fn ai_fabric_unavailable(applied: bool) -> Option<&'static str> {
     (!applied && !services::installed(services::AI_FABRIC_SERVICE)).then_some("not_present")
 }
 
+/// Same `not_present` contract for the Barebone telemetry services: never
+/// offered where the service is not installed, unless already applied.
+#[cfg(windows)]
+fn service_unavailable(id: &str, applied: bool) -> Option<&'static str> {
+    let service = services::find(id).map(|t| t.service).unwrap_or("");
+    (!applied && !services::installed(service)).then_some("not_present")
+}
+
 #[cfg(not(windows))]
 fn ai_fabric_unavailable(_applied: bool) -> Option<&'static str> {
+    Some("not_present")
+}
+
+#[cfg(not(windows))]
+fn service_unavailable(_id: &str, _applied: bool) -> Option<&'static str> {
     Some("not_present")
 }
 
@@ -2571,6 +2606,8 @@ mod tests {
                 privacy_extra::TYPING_PERSONALIZATION_ID,
                 contextmenu::TWEAK_ID,
                 services::WINDOWS_SEARCH_ID,
+                services::DMWAP_PUSH_ID,
+                services::DIAGTRACK_ID,
                 netlatency::TWEAK_ID,
                 netshaper::TWEAK_ID,
                 everyday::DISABLE_FILTER_KEYS_SHORTCUT_ID,
@@ -2734,6 +2771,8 @@ mod tests {
             privacy_extra::typing_personalization_info().requires_pro,
             contextmenu::info().requires_pro,
             services::windows_search_info().requires_pro,
+            services::dmwappush_info().requires_pro,
+            services::diagtrack_info().requires_pro,
             services::ai_fabric_info().requires_pro,
             false, // Filter Keys shortcut
             false, // background app EcoQoS
@@ -2749,12 +2788,12 @@ mod tests {
             + power_tuning::TWEAKS.iter().filter(|t| t.pro).count()
             + settings.iter().filter(|t| t.requires_pro).count();
 
-        assert_eq!(total, 137, "the catalogue no longer has 137 tweaks");
+        assert_eq!(total, 139, "the catalogue no longer has 139 tweaks");
         assert_eq!(
             pro, 0,
             "a control is Pro again: nothing in this build is gated"
         );
-        assert_eq!(total - pro, 137, "every control is free");
+        assert_eq!(total - pro, 139, "every control is free");
 
         // The composite list must stay in step with what list_tweaks builds,
         // otherwise the totals above would quietly stop covering everything.

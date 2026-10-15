@@ -671,19 +671,24 @@ mod tests {
                 })
             })
             .collect();
-        let fabric = crate::services::find(crate::services::AI_FABRIC_ID).unwrap();
+        let services: Vec<serde_json::Value> = crate::services::SERVICE_TWEAKS
+            .iter()
+            .map(|t| {
+                serde_json::json!({
+                    "id": t.id,
+                    "service": t.service,
+                    "startTypeWhenApplied": if t.manual { "DEMAND_START" } else { "DISABLED" },
+                    "expected": "applies where the service is installed; otherwise not_present",
+                })
+            })
+            .collect();
         serde_json::json!({
             "generatedBy": "cargo test settings_tweaks::tests::the_vm_matrix_matches_the_catalogue (PCT_WRITE_VM_MATRIX=1 rewrites it)",
             "targets": VM_TARGETS.iter().map(|(label, build, edition)| serde_json::json!({
                 "label": label, "build": build, "editionId": edition,
             })).collect::<Vec<_>>(),
             "settings": tweaks,
-            "services": [{
-                "id": fabric.id,
-                "service": fabric.service,
-                "startTypeWhenApplied": if fabric.manual { "DEMAND_START" } else { "DISABLED" },
-                "expected": "applies where the service is installed; otherwise not_present",
-            }],
+            "services": services,
         })
     }
 

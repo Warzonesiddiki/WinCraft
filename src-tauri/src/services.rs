@@ -4,6 +4,10 @@ pub const WINDOWS_SEARCH_ID: &str = "disable_windows_search_service";
 pub(crate) const SERVICE_NAME: &str = "WSearch";
 pub const AI_FABRIC_ID: &str = "disable_ai_fabric_service";
 pub(crate) const AI_FABRIC_SERVICE: &str = "WSAIFabricSvc";
+pub const DMWAP_PUSH_ID: &str = "disable_dmwappush_service";
+pub(crate) const DMWAP_PUSH_SERVICE: &str = "dmwappushservice";
+pub const DIAGTRACK_ID: &str = "disable_diagtrack_service";
+pub(crate) const DIAGTRACK_SERVICE: &str = "DiagTrack";
 
 /// A tweak that stops one service and sets its start type, restoring both
 /// its start type and whether it was running.
@@ -15,7 +19,7 @@ pub struct ServiceTweak {
     pub manual: bool,
 }
 
-pub const SERVICE_TWEAKS: [ServiceTweak; 2] = [
+pub const SERVICE_TWEAKS: [ServiceTweak; 4] = [
     ServiceTweak {
         id: WINDOWS_SEARCH_ID,
         service: SERVICE_NAME,
@@ -28,6 +32,22 @@ pub const SERVICE_TWEAKS: [ServiceTweak; 2] = [
         id: AI_FABRIC_ID,
         service: AI_FABRIC_SERVICE,
         manual: true,
+    },
+    // Manual, not Disabled: the WAP Push transport only runs when something
+    // asks for it, so Manual stops it starting with Windows without breaking
+    // the callers that can still start it on demand.
+    ServiceTweak {
+        id: DMWAP_PUSH_ID,
+        service: DMWAP_PUSH_SERVICE,
+        manual: true,
+    },
+    // Disabled, matching AtlasOS: the Connected User Experiences and Telemetry
+    // service exists to upload telemetry, so preventing on-demand starts is
+    // the point. Nothing the user runs needs it.
+    ServiceTweak {
+        id: DIAGTRACK_ID,
+        service: DIAGTRACK_SERVICE,
+        manual: false,
     },
 ];
 
@@ -60,6 +80,26 @@ pub fn windows_search_info() -> ServiceInfo {
         id: WINDOWS_SEARCH_ID,
         name: "Disable the indexing service (Windows Search)",
         description: "Stops and disables the Windows file indexing service, cutting background disk activity - useful on small SSDs or while gaming. File search in the Start menu gets slower until you turn it back on (requires administrator rights).",
+        requires_admin: true,
+        requires_pro: false,
+    }
+}
+
+pub fn dmwappush_info() -> ServiceInfo {
+    ServiceInfo {
+        id: DMWAP_PUSH_ID,
+        name: "Start the Device Management push service only when needed",
+        description: "Stops the WAP Push Message Routing service (dmwappushservice) and sets it to Manual, so it no longer starts with Windows but anything that asks for it can still start it. It exists to deliver management and telemetry pushes to the device. Only present on PCs that have it.",
+        requires_admin: true,
+        requires_pro: false,
+    }
+}
+
+pub fn diagtrack_info() -> ServiceInfo {
+    ServiceInfo {
+        id: DIAGTRACK_ID,
+        name: "Disable the telemetry service (Connected User Experiences)",
+        description: "Stops and disables the Connected User Experiences and Telemetry service (DiagTrack), which uploads usage and diagnostic data to Microsoft. Windows Update and error reporting keep working; feedback and tailored experiences stop. Only present on PCs that have it.",
         requires_admin: true,
         requires_pro: false,
     }
@@ -716,6 +756,36 @@ mod tests {
                 assert_eq!(scm.running.get(), running);
                 assert!(!fixture.store.is_applied(AI_FABRIC_ID));
             }
+        }
+    }
+
+    /// Every entry in SERVICE_TWEAKS round-trips under its own id: the target
+    /// start type follows its `manual` flag, the journal entry names its own
+    /// service, and two entries never share a snapshot.
+    #[test]
+    fn every_service_tweak_round_trips_under_its_own_id() {
+        for tweak in &SERVICE_TWEAKS {
+            let expected = if tweak.manual {
+                StartType::Demand
+            } else {
+                StartType::Disabled
+            };
+            let scm = install(StartType::Auto, true);
+            let fixture = Fixture::new();
+            apply_service(&fixture.store, tweak).unwrap_or_else(|e| panic!("{}: {e}", tweak.id));
+            assert_eq!(scm.start_type.get(), expected, "{}", tweak.id);
+            assert!(!scm.running.get(), "{}", tweak.id);
+            match fixture.snapshot(tweak.id) {
+                Some(SnapshotEntry::Service { name, .. }) => {
+                    assert_eq!(name, tweak.service, "{}", tweak.id)
+                }
+                other => panic!("unexpected snapshot for {}: {other:?}", tweak.id),
+            }
+            crate::rollback_by_id_inner(&fixture.store, tweak.id)
+                .unwrap_or_else(|e| panic!("{}: {e}", tweak.id));
+            assert_eq!(scm.start_type.get(), StartType::Auto, "{}", tweak.id);
+            assert!(scm.running.get(), "{}", tweak.id);
+            assert!(!fixture.store.is_applied(tweak.id), "{}", tweak.id);
         }
     }
 

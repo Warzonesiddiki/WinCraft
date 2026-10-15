@@ -247,7 +247,7 @@ export const engDictionary: Dictionary = {
     sub: "Judge a change by repeated runs: frame-time spikes, 1% lows and consistency. Results depend on your hardware, drivers and game. The chart below is a concept sketch, not a captured benchmark or a promised improvement.",
     stats: [
       {
-        value: 137,
+        value: 139,
         unit: "",
         label: "CONTROLS IN THIS RELEASE",
       },
@@ -456,7 +456,7 @@ export const engDictionary: Dictionary = {
       price: "€0",
       per: "/ forever · no subscription, no account",
       features: [
-        "All 137 Windows controls",
+        "All 139 Windows controls",
         "Scan and review your settings",
         "Startup tools and Windows integrity checks",
         "Turbo Gaming and Game Sessions",

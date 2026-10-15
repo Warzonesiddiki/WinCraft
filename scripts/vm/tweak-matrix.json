@@ -3,9 +3,27 @@
   "services": [
     {
       "expected": "applies where the service is installed; otherwise not_present",
+      "id": "disable_windows_search_service",
+      "service": "WSearch",
+      "startTypeWhenApplied": "DISABLED"
+    },
+    {
+      "expected": "applies where the service is installed; otherwise not_present",
       "id": "disable_ai_fabric_service",
       "service": "WSAIFabricSvc",
       "startTypeWhenApplied": "DEMAND_START"
+    },
+    {
+      "expected": "applies where the service is installed; otherwise not_present",
+      "id": "disable_dmwappush_service",
+      "service": "dmwappushservice",
+      "startTypeWhenApplied": "DEMAND_START"
+    },
+    {
+      "expected": "applies where the service is installed; otherwise not_present",
+      "id": "disable_diagtrack_service",
+      "service": "DiagTrack",
+      "startTypeWhenApplied": "DISABLED"
     }
   ],
   "settings": [
