@@ -2169,6 +2169,28 @@ pub fn run_elevated_headless(action: &str, id: &str) -> ! {
             result
         }
 
+        "--elevated-barebone-task" => {
+            let result = scheduledtasks::apply_barebone_from_payload(id);
+            audit::record(
+                "barebone-task-change",
+                id,
+                result.is_ok(),
+                result.as_ref().err().cloned(),
+            );
+            result
+        }
+
+        "--elevated-barebone-task-rollback" => {
+            let result = scheduledtasks::rollback_barebone_from_payload(id);
+            audit::record(
+                "barebone-task-change",
+                id,
+                result.is_ok(),
+                result.as_ref().err().cloned(),
+            );
+            result
+        }
+
         "--elevated-drift-watch" => match id {
             "enable" => configure_drift_watch(true),
             "disable" => configure_drift_watch(false),
@@ -2528,6 +2550,10 @@ pub fn run() {
             cookies::set_cookie_whitelist,
             scheduledtasks::list_scheduled_tasks,
             scheduledtasks::set_scheduled_task_enabled,
+            scheduledtasks::set_barebone_task,
+            scheduledtasks::rollback_barebone_task,
+            barebone::barebone_preflight,
+            barebone::record_barebone_consent,
             netmaintenance::flush_dns_cache,
             diagnostics::network_verify::verify_network,
             diagnostics::network_verify::last_network_verification,

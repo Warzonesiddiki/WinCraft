@@ -304,6 +304,25 @@ pub fn list_scheduled_tasks() -> Vec<TaskEntry> {
     entries
 }
 
+/// `<path>|<0|1>` for Barebone tasks — same shape as `build_task_payload`,
+/// but validated against the Barebone allowlist instead of the third-party
+/// rule on both sides: the elevated entry point must not assume our own UI
+/// sent it, and the Startup screen's rule would refuse every `\Microsoft\`
+/// path outright.
+pub fn build_barebone_task_payload(path: &str, enabled: bool) -> String {
+    format!("{}|{}", if enabled { 1 } else { 0 }, path)
+}
+
+pub fn parse_barebone_task_payload(payload: &str) -> Result<(String, bool), String> {
+    let (flag, path) = payload
+        .split_once('|')
+        .ok_or_else(|| "invalid barebone task payload".to_string())?;
+    if !crate::barebone::is_barebone_task(path) {
+        return Err("that task is not on the Barebone allowlist".to_string());
+    }
+    Ok((path.to_string(), flag == "1"))
+}
+
 /// `<path>|<0|1>` — the path is taken as the tail so task names containing a
 /// pipe still round-trip through the elevated relaunch intact.
 pub fn build_task_payload(path: &str, enabled: bool) -> String {
@@ -363,6 +382,93 @@ pub fn apply_from_payload(payload: &str) -> Result<(), String> {
     imp::set_enabled(&path, enabled)
 }
 
+/// Elevated-helper entry point for Barebone tasks. Re-validates the allowlist
+/// on this side: the payload arrives as a bare command-line argument.
+#[cfg(windows)]
+pub fn apply_barebone_from_payload(payload: &str) -> Result<(), String> {
+    let (path, enabled) = parse_barebone_task_payload(payload)?;
+    imp::set_enabled(&path, enabled)
+}
+
+/// What a Barebone task change reports: the restore-point outcome is part of
+/// the result so the consent screen can display it (Phase B5 renders this).
+/// Platform-independent so the non-Windows stubs can return it as an error
+/// type without a second definition.
+#[derive(serde::Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct BareboneTaskOutcome {
+    pub restore_point: crate::restore_point::RestorePointOutcome,
+}
+/// Phase B4 command: disable or re-enable one allowlisted Barebone task.
+/// Blocked without a recorded Tier 3 consent. Attempts a restore point first
+/// (best-effort, reported in the outcome), then tries directly and spends one
+/// UAC prompt on the administrator retry only if the direct write was denied.
+#[cfg(windows)]
+#[tauri::command(async)]
+pub fn set_barebone_task(
+    app: tauri::AppHandle,
+    path: String,
+    enabled: bool,
+) -> Result<BareboneTaskOutcome, String> {
+    let dir = crate::store_for_dir(&app)?;
+    crate::barebone::assert_consented(&dir, &path)?;
+    let restore_point = crate::barebone::restore_point_for_barebone();
+    let store = crate::rollback::RollbackStore::new(dir);
+    let result = if crate::elevation::is_elevated() {
+        set_barebone_task_enabled(&store, &path, enabled)
+    } else {
+        match set_barebone_task_enabled(&store, &path, enabled) {
+            Ok(()) => Ok(()),
+            Err(direct) => crate::elevation::run_elevated_action(
+                "--elevated-barebone-task",
+                &build_barebone_task_payload(&path, enabled),
+            )
+            .map_err(|e| format!("{direct}; administrator retry failed: {e}")),
+        }
+    };
+    result.map(|()| BareboneTaskOutcome { restore_point })
+}
+
+/// Phase B4 command: restore one Barebone task to its snapshotted state.
+/// Same consent and elevation routing as the apply command. The elevated
+/// retry re-reads the snapshot on the privileged side, so the payload carries
+/// only the path.
+#[cfg(windows)]
+#[tauri::command(async)]
+pub fn rollback_barebone_task(
+    app: tauri::AppHandle,
+    path: String,
+) -> Result<BareboneTaskOutcome, String> {
+    let dir = crate::store_for_dir(&app)?;
+    crate::barebone::assert_consented(&dir, &path)?;
+    let restore_point = crate::barebone::restore_point_for_barebone();
+    let store = crate::rollback::RollbackStore::new(dir);
+    let result = if crate::elevation::is_elevated() {
+        restore_barebone_task(&store, &path)
+    } else {
+        match restore_barebone_task(&store, &path) {
+            Ok(()) => Ok(()),
+            Err(direct) => {
+                crate::elevation::run_elevated_action("--elevated-barebone-task-rollback", &path)
+                    .map_err(|e| format!("{direct}; administrator retry failed: {e}"))
+            }
+        }
+    };
+    result.map(|()| BareboneTaskOutcome { restore_point })
+}
+
+/// Elevated-helper entry point for Barebone task rollback. Re-validates the
+/// allowlist and re-reads the snapshot here: the payload carries only the
+/// path, never the target state.
+#[cfg(windows)]
+pub fn rollback_barebone_from_payload(payload: &str) -> Result<(), String> {
+    if !crate::barebone::is_barebone_task(payload) {
+        return Err("that task is not on the Barebone allowlist".to_string());
+    }
+    let store = crate::rollback::RollbackStore::new(crate::dirs_app_data_dir());
+    restore_barebone_task(&store, payload)
+}
+
 /// Phase B3: Barebone allowlist reads and writes. Unlike `set_scheduled_task_enabled`,
 /// which refuses everything under `\Microsoft\`, these take only exact
 /// `barebone::BAREBONE_TASKS` paths and journal the previous state first, so a
@@ -371,7 +477,6 @@ pub fn apply_from_payload(payload: &str) -> Result<(), String> {
 /// Elevation routing lands in Phase B4 (preflight + consent): callers must
 /// already be elevated or handle the access-denied error themselves.
 #[cfg(windows)]
-#[allow(dead_code)] // Callers (commands + elevated helper arms) land in Phase B4.
 pub fn barebone_task_enabled(path: &str) -> Result<bool, String> {
     if !crate::barebone::is_barebone_task(path) {
         return Err("that task is not on the Barebone allowlist".into());
@@ -387,7 +492,6 @@ pub fn barebone_task_enabled(path: &str) -> Result<bool, String> {
 /// previous state first. Verifies the write landed by re-reading; on failure
 /// the snapshot is retained for retry.
 #[cfg(windows)]
-#[allow(dead_code)] // Callers (commands + elevated helper arms) land in Phase B4.
 pub fn set_barebone_task_enabled(
     store: &crate::rollback::RollbackStore,
     path: &str,
@@ -425,8 +529,7 @@ pub fn set_barebone_task_enabled(
 
 /// Restore one Barebone task to its snapshotted state. Verifies by re-reading.
 #[cfg(windows)]
-#[allow(dead_code)] // Callers (commands + elevated helper arms) land in Phase B4.
-pub fn rollback_barebone_task(
+pub fn restore_barebone_task(
     store: &crate::rollback::RollbackStore,
     path: &str,
 ) -> Result<(), String> {
@@ -459,9 +562,51 @@ pub fn set_scheduled_task_enabled(_path: String, _enabled: bool) -> Result<(), S
     Err("not supported on this platform".to_string())
 }
 
+#[cfg(not(windows))]
+#[tauri::command(async)]
+pub fn set_barebone_task(
+    _app: tauri::AppHandle,
+    _path: String,
+    _enabled: bool,
+) -> Result<BareboneTaskOutcome, String> {
+    Err("not supported on this platform".to_string())
+}
+
+#[cfg(not(windows))]
+#[tauri::command(async)]
+pub fn rollback_barebone_task(
+    _app: tauri::AppHandle,
+    _path: String,
+) -> Result<BareboneTaskOutcome, String> {
+    Err("not supported on this platform".to_string())
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    /// Barebone payloads round-trip through the allowlist gate: exact listed
+    /// paths pass, everything else — including prefix extensions and the
+    /// Startup screen's own third-party paths — is refused before any write.
+    #[test]
+    fn barebone_payloads_pass_only_allowlisted_paths() {
+        for task in crate::barebone::BAREBONE_TASKS {
+            for enabled in [true, false] {
+                let payload = build_barebone_task_payload(task, enabled);
+                assert_eq!(
+                    parse_barebone_task_payload(&payload).unwrap(),
+                    (task.to_string(), enabled)
+                );
+            }
+        }
+        assert!(parse_barebone_task_payload("1|\\SomeOtherTask").is_err());
+        assert!(parse_barebone_task_payload("no-separator").is_err());
+        assert!(parse_barebone_task_payload("").is_err());
+        // A pipe inside the path still parses (tail rule), then fails the
+        // allowlist — never the other way round.
+        let sneaky = format!("1|{}|evil", crate::barebone::BAREBONE_TASKS[0]);
+        assert!(parse_barebone_task_payload(&sneaky).is_err());
+    }
 
     #[test]
     fn reads_actions_with_context_attributes() {

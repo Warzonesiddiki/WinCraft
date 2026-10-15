@@ -266,6 +266,42 @@ export type SystemStats = {
   uptime_secs: number;
 };
 
+/** Mirrors Rust `restore_point::RestorePointOutcome` (tagged `kind`). */
+export type RestorePointOutcome =
+  { kind: "created" } | { kind: "failed"; reason: string } | { kind: "skipped"; reason: string };
+
+/** Mirrors Rust `scheduledtasks::BareboneTaskOutcome`. */
+export type BareboneTaskOutcome = {
+  restorePoint: RestorePointOutcome;
+};
+
+/** One read-only Barebone preflight finding (Rust `barebone::PreflightFinding`). */
+export type BarebonePreflightFinding = {
+  code: string;
+  message: string;
+};
+
+/** Mirrors Rust `barebone::ConsentRecord`. */
+export type BareboneConsentRecord = {
+  id: string;
+  text: string;
+  timestamp: number;
+};
+
+/** Mirrors Rust `barebone_packages::BareboneListItem` (list-only, B1). */
+export type BareboneListItem = {
+  id: string;
+  packageName: string;
+  name: string;
+  description: string;
+  impact: string;
+  storeUrl: string | null;
+  tier: string;
+  consentRequired: boolean;
+  installed: boolean;
+  removable: boolean;
+  reason: string | null;
+};
 /** Mirrors Rust `thermals::GpuReading`. Every optional field is `null` when
  *  the card exposes no such sensor — which is not the same as a zero reading,
  *  and the UI must keep the two apart. */

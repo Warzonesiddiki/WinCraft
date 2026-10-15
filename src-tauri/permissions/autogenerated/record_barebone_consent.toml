@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-record-barebone-consent"
+description = "Enables the record_barebone_consent command without any pre-configured scope."
+commands.allow = ["record_barebone_consent"]
+
+[[permission]]
+identifier = "deny-record-barebone-consent"
+description = "Denies the record_barebone_consent command without any pre-configured scope."
+commands.deny = ["record_barebone_consent"]

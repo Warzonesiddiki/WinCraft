@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-set-barebone-task"
+description = "Enables the set_barebone_task command without any pre-configured scope."
+commands.allow = ["set_barebone_task"]
+
+[[permission]]
+identifier = "deny-set-barebone-task"
+description = "Denies the set_barebone_task command without any pre-configured scope."
+commands.deny = ["set_barebone_task"]

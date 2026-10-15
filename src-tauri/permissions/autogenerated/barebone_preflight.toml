@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-barebone-preflight"
+description = "Enables the barebone_preflight command without any pre-configured scope."
+commands.allow = ["barebone_preflight"]
+
+[[permission]]
+identifier = "deny-barebone-preflight"
+description = "Denies the barebone_preflight command without any pre-configured scope."
+commands.deny = ["barebone_preflight"]
