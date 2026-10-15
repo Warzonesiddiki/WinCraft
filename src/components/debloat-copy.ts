@@ -102,6 +102,29 @@ const en = {
   lockedBadge: "Can't be removed",
   spaceNote:
     "Windows keeps an app's files while another account still uses it, so this is the most removal can free.",
+  exclusions: "What we won't strip",
+  exclusionsTitle: "What WinCraft deliberately does not do",
+  exclusionsIntro:
+    "Other tools do these things. Each one breaks the promise that every change here can be undone — so none of them ship.",
+  exclusionsNote:
+    "The technique is named so you can research it if you want it anyway. Nothing here will do it for you.",
+  exclusion1Title: "Removing Windows Defender or SmartScreen",
+  exclusion1Why:
+    "A security downgrade, not an optimisation — and the most-requested thing for those tools to stop doing.",
+  exclusion2Title: "Removing Store apps for all users or Windows components",
+  exclusion2Why: "Their own answer to undoing it is reinstalling Windows.",
+  exclusion3Title: "Turning off Smart App Control",
+  exclusion3Why: "One-way by design. Once off, only a clean install turns it back on.",
+  exclusion4Title: "Filesystem tunables",
+  exclusion4Why: "No way to read back the previous value, so no way to put it back.",
+  exclusion5Title: "Boot configuration changes",
+  exclusion5Why: "Invisible to a registry snapshot — and known to break sleep on some laptops.",
+  exclusion6Title: "Network stack disables",
+  exclusion6Why: "Documented to break virtual machines, virtual networks and some games.",
+  exclusion7Title: "Killing processes by image name",
+  exclusion7Why: "Matches any program with that name, and looks exactly like malware persistence.",
+  exclusion8Title: "Disabling virtualization-based security",
+  exclusion8Why: "On by default in Windows 11, and required by the latency tricks that cite it.",
   confirmTitle: "Remove {count} apps?",
   confirmSpace: "Up to {size} of app files and data",
   appFiles: "App files",
@@ -136,7 +159,7 @@ const en = {
   presetAggressiveHint:
     "Every app that can be removed here, including those that keep local data. Check each one in the preview.",
   presetBareboneHint:
-    "Ultra-lean barebone footprint matching Atlas OS: selects all removable bloatware and telemetry packages for maximum stripping.",
+    "Selects every removable app in this list, including ones that keep local data. System-level stripping needs a separate confirmation and is never pre-selected.",
   saveList: "Save list",
   loadList: "Load list",
   listSaved: "List saved.",
@@ -251,6 +274,34 @@ export const DEBLOAT_COPY: Record<Lang, Copy> = {
     lockedBadge: "Non rimovibile",
     spaceNote:
       "Windows conserva i file di un'app finché un altro account la usa, quindi questo è il massimo che la rimozione può liberare.",
+    exclusions: "Cosa non rimuoviamo",
+    exclusionsTitle: "Cosa WinCraft deliberatamente non fa",
+    exclusionsIntro:
+      "Altri strumenti fanno queste cose. Ognuna rompe la promessa che ogni modifica qui si possa annullare — perciò nessuna di esse è inclusa.",
+    exclusionsNote:
+      "La tecnica è nominata così puoi informarti se la vuoi comunque. Niente qui lo farà per te.",
+    exclusion1Title: "Rimuovere Windows Defender o SmartScreen",
+    exclusion1Why:
+      "Un peggioramento della sicurezza, non un'ottimizzazione — e la cosa che più si chiede a quegli strumenti di smettere di fare.",
+    exclusion2Title: "Rimuovere app dello Store per tutti gli utenti o componenti di Windows",
+    exclusion2Why: "La loro risposta per annullarlo è reinstallare Windows.",
+    exclusion3Title: "Disattivare Smart App Control",
+    exclusion3Why:
+      "A senso unico per progettazione. Una volta spento, solo un'installazione pulita lo riattiva.",
+    exclusion4Title: "Regolazioni del filesystem",
+    exclusion4Why:
+      "Nessun modo di rileggere il valore precedente, quindi nessun modo di ripristinarlo.",
+    exclusion5Title: "Modifiche alla configurazione di avvio",
+    exclusion5Why:
+      "Invisibili a uno snapshot del registro — e note per rompere la sospensione su alcuni portatili.",
+    exclusion6Title: "Disabilitazioni dello stack di rete",
+    exclusion6Why: "Documentato che rompe macchine virtuali, reti virtuali e alcuni giochi.",
+    exclusion7Title: "Terminare processi per nome immagine",
+    exclusion7Why:
+      "Colpisce qualsiasi programma con quel nome, e sembra esattamente persistenza malware.",
+    exclusion8Title: "Disattivare la sicurezza basata su virtualizzazione",
+    exclusion8Why:
+      "Attiva per impostazione predefinita in Windows 11, e richiesta dai trucchi di latenza che la citano.",
     confirmTitle: "Rimuovere {count} app?",
     confirmSpace: "Fino a {size} tra file e dati delle app",
     appFiles: "File dell'app",
@@ -285,7 +336,7 @@ export const DEBLOAT_COPY: Record<Lang, Copy> = {
     presetAggressiveHint:
       "Tutte le app che si possono rimuovere qui, anche quelle con dati locali. Controllale una per una nell'anteprima.",
     presetBareboneHint:
-      "Impronta minima essenziale al livello di Atlas OS: seleziona tutti i pacchetti superflui e di telemetria rimovibili.",
+      "Seleziona tutte le app rimovibili di questo elenco, comprese quelle che conservano dati locali. La rimozione a livello di sistema richiede una conferma separata e non è mai preselezionata.",
     saveList: "Salva elenco",
     loadList: "Carica elenco",
     listSaved: "Elenco salvato.",
@@ -400,6 +451,35 @@ export const DEBLOAT_COPY: Record<Lang, Copy> = {
     lockedBadge: "Non supprimable",
     spaceNote:
       "Windows garde les fichiers d'une application tant qu'un autre compte l'utilise : c'est donc le maximum que la suppression peut libérer.",
+    exclusions: "Ce que nous ne supprimons pas",
+    exclusionsTitle: "Ce que WinCraft refuse délibérément de faire",
+    exclusionsIntro:
+      "D'autres outils font ces choses. Chacune brise la promesse que chaque changement ici peut être annulé — aucune n'est donc incluse.",
+    exclusionsNote:
+      "La technique est nommée pour que vous puissiez vous renseigner si vous la voulez quand même. Rien ici ne le fera pour vous.",
+    exclusion1Title: "Supprimer Windows Defender ou SmartScreen",
+    exclusion1Why:
+      "Une dégradation de la sécurité, pas une optimisation — et la chose la plus demandée à ces outils d'arrêter de faire.",
+    exclusion2Title:
+      "Supprimer des applications du Store pour tous les utilisateurs ou des composants Windows",
+    exclusion2Why: "Leur réponse pour l'annuler est de réinstaller Windows.",
+    exclusion3Title: "Désactiver Smart App Control",
+    exclusion3Why:
+      "À sens unique par conception. Une fois désactivé, seule une installation propre le réactive.",
+    exclusion4Title: "Réglages du système de fichiers",
+    exclusion4Why: "Aucun moyen de relire la valeur précédente, donc aucun moyen de la restaurer.",
+    exclusion5Title: "Modifications de la configuration de démarrage",
+    exclusion5Why:
+      "Invisibles pour un instantané du registre — et connues pour casser la mise en veille sur certains portables.",
+    exclusion6Title: "Désactivations de la pile réseau",
+    exclusion6Why:
+      "Documenté comme cassant les machines virtuelles, les réseaux virtuels et certains jeux.",
+    exclusion7Title: "Tuer des processus par nom d'image",
+    exclusion7Why:
+      "Touche tout programme portant ce nom, et ressemble exactement à de la persistance malveillante.",
+    exclusion8Title: "Désactiver la sécurité basée sur la virtualisation",
+    exclusion8Why:
+      "Activée par défaut dans Windows 11, et requise par les astuces de latence qui la citent.",
     confirmTitle: "Supprimer {count} applications ?",
     confirmSpace: "Jusqu'à {size} de fichiers et données d'applications",
     appFiles: "Fichiers de l'application",
@@ -435,7 +515,7 @@ export const DEBLOAT_COPY: Record<Lang, Copy> = {
     presetAggressiveHint:
       "Toutes les applications qu'on peut supprimer ici, y compris celles qui gardent des données locales. Vérifiez-les une par une dans l'aperçu.",
     presetBareboneHint:
-      "Empreinte minimale épurée au niveau d’Atlas OS : sélectionne tous les logiciels superflus et paquets de télémétrie supprimables.",
+      "Sélectionne toutes les applications supprimables de cette liste, y compris celles qui conservent des données locales. Le nettoyage au niveau système demande une confirmation séparée et n'est jamais présélectionné.",
     saveList: "Enregistrer la liste",
     loadList: "Charger une liste",
     listSaved: "Liste enregistrée.",
@@ -550,6 +630,34 @@ export const DEBLOAT_COPY: Record<Lang, Copy> = {
     lockedBadge: "No se puede quitar",
     spaceNote:
       "Windows conserva los archivos de una app mientras otra cuenta la use, así que esto es lo máximo que puede liberar quitarla.",
+    exclusions: "Lo que no quitamos",
+    exclusionsTitle: "Lo que WinCraft deliberadamente no hace",
+    exclusionsIntro:
+      "Otras herramientas hacen estas cosas. Cada una rompe la promesa de que cada cambio aquí puede deshacerse — por eso ninguna está incluida.",
+    exclusionsNote:
+      "La técnica se nombra para que puedas informarte si aun así la quieres. Nada aquí lo hará por ti.",
+    exclusion1Title: "Quitar Windows Defender o SmartScreen",
+    exclusion1Why:
+      "Una degradación de la seguridad, no una optimización — y lo más pedido a esas herramientas que dejen de hacer.",
+    exclusion2Title:
+      "Quitar aplicaciones de la Store para todos los usuarios o componentes de Windows",
+    exclusion2Why: "Su respuesta para deshacerlo es reinstalar Windows.",
+    exclusion3Title: "Desactivar Smart App Control",
+    exclusion3Why:
+      "Unidireccional por diseño. Una vez desactivado, solo una instalación limpia lo reactiva.",
+    exclusion4Title: "Ajustes del sistema de archivos",
+    exclusion4Why: "Sin forma de releer el valor anterior, no hay forma de restaurarlo.",
+    exclusion5Title: "Cambios en la configuración de arranque",
+    exclusion5Why:
+      "Invisibles para una instantánea del registro — y conocidos por romper la suspensión en algunos portátiles.",
+    exclusion6Title: "Desactivaciones de la pila de red",
+    exclusion6Why: "Documentado que rompe máquinas virtuales, redes virtuales y algunos juegos.",
+    exclusion7Title: "Terminar procesos por nombre de imagen",
+    exclusion7Why:
+      "Afecta a cualquier programa con ese nombre, y parece exactamente persistencia de malware.",
+    exclusion8Title: "Desactivar la seguridad basada en virtualización",
+    exclusion8Why:
+      "Activada por defecto en Windows 11, y requerida por los trucos de latencia que la citan.",
     confirmTitle: "¿Quitar {count} apps?",
     confirmSpace: "Hasta {size} entre archivos y datos de apps",
     appFiles: "Archivos de la app",
@@ -585,7 +693,7 @@ export const DEBLOAT_COPY: Record<Lang, Copy> = {
     presetAggressiveHint:
       "Todas las aplicaciones que se pueden quitar aquí, también las que guardan datos locales. Revísalas una a una en la vista previa.",
     presetBareboneHint:
-      "Huella mínima ultraligera al nivel de Atlas OS: selecciona todos los paquetes innecesarios y de telemetría extraíbles.",
+      "Selecciona todas las aplicaciones extraíbles de esta lista, incluidas las que conservan datos locales. La limpieza a nivel de sistema requiere una confirmación aparte y nunca viene preseleccionada.",
     saveList: "Guardar lista",
     loadList: "Cargar lista",
     listSaved: "Lista guardada.",
@@ -701,6 +809,35 @@ export const DEBLOAT_COPY: Record<Lang, Copy> = {
     lockedBadge: "Nicht entfernbar",
     spaceNote:
       "Windows behält die Dateien einer App, solange ein anderes Konto sie nutzt. Mehr kann das Entfernen also nicht freigeben.",
+    exclusions: "Was wir nicht entfernen",
+    exclusionsTitle: "Was WinCraft bewusst nicht tut",
+    exclusionsIntro:
+      "Andere Werkzeuge tun diese Dinge. Jedes bricht das Versprechen, dass sich jede Änderung hier rückgängig machen lässt — darum ist keines davon enthalten.",
+    exclusionsNote:
+      "Die Technik ist benannt, damit du dich informieren kannst, falls du sie trotzdem willst. Nichts hier wird es für dich tun.",
+    exclusion1Title: "Windows Defender oder SmartScreen entfernen",
+    exclusion1Why:
+      "Eine Verschlechterung der Sicherheit, keine Optimierung — und das, womit jene Werkzeuge am häufigsten aufhören sollen.",
+    exclusion2Title: "Store-Apps für alle Benutzer oder Windows-Komponenten entfernen",
+    exclusion2Why: "Ihre Antwort zum Rückgängigmachen lautet, Windows neu zu installieren.",
+    exclusion3Title: "Smart App Control ausschalten",
+    exclusion3Why:
+      "Konstruktionsbedingt Einbahnstraße. Einmal aus, schaltet es nur eine Neuinstallation wieder ein.",
+    exclusion4Title: "Dateisystem-Feineinstellungen",
+    exclusion4Why:
+      "Keine Möglichkeit, den vorherigen Wert zurückzulesen, also keine Möglichkeit, ihn wiederherzustellen.",
+    exclusion5Title: "Änderungen an der Startkonfiguration",
+    exclusion5Why:
+      "Unsichtbar für einen Registrierungs-Snapshot — und bekannt dafür, auf manchen Laptops den Ruhezustand zu brechen.",
+    exclusion6Title: "Deaktivierungen des Netzwerkstapels",
+    exclusion6Why:
+      "Nachweislich Ursache für kaputte virtuelle Maschinen, virtuelle Netzwerke und manche Spiele.",
+    exclusion7Title: "Prozesse per Abbildnamen beenden",
+    exclusion7Why:
+      "Trifft jedes Programm mit diesem Namen und sieht exakt aus wie Malware-Persistenz.",
+    exclusion8Title: "Virtualisierungsbasierte Sicherheit deaktivieren",
+    exclusion8Why:
+      "Standardmäßig an in Windows 11, und vorausgesetzt von den Latenz-Tricks, die sie anführen.",
     confirmTitle: "{count} Apps entfernen?",
     confirmSpace: "Bis zu {size} an App-Dateien und -Daten",
     appFiles: "App-Dateien",
@@ -736,7 +873,7 @@ export const DEBLOAT_COPY: Record<Lang, Copy> = {
     presetAggressiveHint:
       "Jede App, die sich hier entfernen lässt, auch solche mit lokalen Daten. Prüfe jede einzeln in der Vorschau.",
     presetBareboneHint:
-      "Minimaler Barebone-Verbrauch auf Atlas OS-Niveau: wählt alle entfernbaren Bloatware- und Telemetriepakete aus.",
+      "Wählt alle entfernbaren Apps dieser Liste aus, einschließlich solcher mit lokalen Daten. Das Stripping auf Systemebene braucht eine separate Bestätigung und ist nie vorausgewählt.",
     saveList: "Liste speichern",
     loadList: "Liste laden",
     listSaved: "Liste gespeichert.",
@@ -850,6 +987,34 @@ export const DEBLOAT_COPY: Record<Lang, Copy> = {
     lockedBadge: "Não removível",
     spaceNote:
       "O Windows mantém os ficheiros de uma app enquanto outra conta a usar, por isso este é o máximo que a remoção pode libertar.",
+    exclusions: "O que não removemos",
+    exclusionsTitle: "O que o WinCraft deliberadamente não faz",
+    exclusionsIntro:
+      "Outras ferramentas fazem estas coisas. Cada uma quebra a promessa de que cada mudança aqui pode ser anulada — por isso nenhuma está incluída.",
+    exclusionsNote:
+      "A técnica é nomeada para que possas informar-te se mesmo assim a quiseres. Nada aqui o fará por ti.",
+    exclusion1Title: "Remover o Windows Defender ou o SmartScreen",
+    exclusion1Why:
+      "Uma degradação da segurança, não uma otimização — e o mais pedido a essas ferramentas para deixarem de fazer.",
+    exclusion2Title:
+      "Remover aplicações da Store para todos os utilizadores ou componentes do Windows",
+    exclusion2Why: "A resposta deles para anular é reinstalar o Windows.",
+    exclusion3Title: "Desativar o Smart App Control",
+    exclusion3Why:
+      "Unidirecional por conceção. Uma vez desligado, só uma instalação limpa o volta a ligar.",
+    exclusion4Title: "Ajustes do sistema de ficheiros",
+    exclusion4Why: "Sem forma de reler o valor anterior, não há forma de o repor.",
+    exclusion5Title: "Alterações à configuração de arranque",
+    exclusion5Why:
+      "Invisíveis para uma instantânea do registo — e conhecidas por partir a suspensão em alguns portáteis.",
+    exclusion6Title: "Desativações da pilha de rede",
+    exclusion6Why: "Documentado que parte máquinas virtuais, redes virtuais e alguns jogos.",
+    exclusion7Title: "Terminar processos por nome de imagem",
+    exclusion7Why:
+      "Atinge qualquer programa com esse nome, e parece exatamente persistência de malware.",
+    exclusion8Title: "Desativar a segurança baseada em virtualização",
+    exclusion8Why:
+      "Ligada por defeito no Windows 11, e exigida pelos truques de latência que a citam.",
     confirmTitle: "Remover {count} apps?",
     confirmSpace: "Até {size} entre ficheiros e dados de apps",
     appFiles: "Ficheiros da app",
@@ -885,7 +1050,7 @@ export const DEBLOAT_COPY: Record<Lang, Copy> = {
     presetAggressiveHint:
       "Todas as aplicações que se podem remover aqui, incluindo as que guardam dados locais. Verifique cada uma na pré-visualização.",
     presetBareboneHint:
-      "Estrutura mínima essencial ao nível do Atlas OS: seleciona todos os pacotes desnecessários e de telemetria removíveis.",
+      "Seleciona todas as aplicações removíveis desta lista, incluindo as que mantêm dados locais. A remoção ao nível do sistema exige uma confirmação separada e nunca vem pré-selecionada.",
     saveList: "Guardar lista",
     loadList: "Carregar lista",
     listSaved: "Lista guardada.",

@@ -523,6 +523,35 @@ describe("suggestions", () => {
   });
 });
 
+describe("exclusions", () => {
+  it("lists the eight things WinCraft deliberately does not do, with reasons", async () => {
+    const { container } = await mount();
+    fireEvent.click(screen.getByRole("button", { name: new RegExp(c.exclusions) }));
+
+    expect(screen.getByText(c.exclusionsTitle)).toBeInTheDocument();
+    expect(screen.getByText(c.exclusionsIntro)).toBeInTheDocument();
+    // Eight rows, each a title with its reason — and none of them is a control.
+    const rows = [
+      ["exclusion1Title", "exclusion1Why"],
+      ["exclusion2Title", "exclusion2Why"],
+      ["exclusion3Title", "exclusion3Why"],
+      ["exclusion4Title", "exclusion4Why"],
+      ["exclusion5Title", "exclusion5Why"],
+      ["exclusion6Title", "exclusion6Why"],
+      ["exclusion7Title", "exclusion7Why"],
+      ["exclusion8Title", "exclusion8Why"],
+    ] as const;
+    for (const [titleKey, whyKey] of rows) {
+      expect(screen.getByText(c[titleKey])).toBeInTheDocument();
+      expect(screen.getByText(c[whyKey])).toBeInTheDocument();
+    }
+    expect(screen.getByText(c.exclusionsNote)).toBeInTheDocument();
+    // Reading the page changes nothing: no removal is invoked by opening it.
+    expect(bridge.callsTo("remove_debloat_app")).toHaveLength(0);
+    expect((await axe(container)).violations).toEqual([]);
+  });
+});
+
 describe("accessibility", () => {
   it("has no axe violations on the app list", async () => {
     const { container } = await mount([app(), weather]);

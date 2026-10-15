@@ -1157,11 +1157,14 @@ fn rollback_tweak(app: tauri::AppHandle, id: String) -> Result<(), String> {
 pub(crate) const MANUAL_ONLY_TWEAKS: [&str; 1] = ["disable_memory_integrity"];
 
 /// The ids of a bulk request that a bulk request may apply: never the
-/// manual-only ones, and never a setting this PC's Windows build or edition
-/// does not support (a profile made on another PC may name one).
+/// manual-only ones, never Tier 3 (Barebone consent items ride alone behind
+/// their own confirmation, never in a batch, scan or reapply), and never a
+/// setting this PC's Windows build or edition does not support (a profile
+/// made on another PC may name one).
 pub(crate) fn bulk_applicable(ids: Vec<String>) -> Vec<String> {
     ids.into_iter()
         .filter(|id| !MANUAL_ONLY_TWEAKS.contains(&id.as_str()))
+        .filter(|id| barebone::tier_for_tweak(id) != barebone::ReversibilityTier::Irreversible)
         .filter(|id| fits_this_pc(id))
         .collect()
 }
@@ -2699,6 +2702,21 @@ mod tests {
         assert!(MANUAL_ONLY_TWEAKS
             .iter()
             .all(|id| find_tweak(id).is_some_and(|t| t.requires_admin)));
+    }
+
+    /// Tier 3 never rides along in a batch, scan or reapply: a `barebone_`
+    /// id in the input is dropped even though no such tweak id exists yet,
+    /// so the day one does, the batch path already refuses it.
+    #[test]
+    fn tier3_ids_never_ride_along_in_a_batch() {
+        let mut ids = all_visible_ids();
+        ids.push("barebone_probe".to_string());
+        let bulk = bulk_applicable(ids);
+        assert!(!bulk.iter().any(|id| id == "barebone_probe"));
+        assert_eq!(
+            bulk_applicable(vec!["barebone_probe".to_string()]).len(),
+            0
+        );
     }
 
     #[test]

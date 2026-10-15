@@ -73,7 +73,7 @@ export interface DebloatRecord {
 }
 
 type Result = Pick<DebloatRecord, "catalogId" | "packageFullName" | "status" | "error">;
-type View = "apps" | "suggestions" | "history";
+type View = "apps" | "suggestions" | "history" | "exclusions";
 type Step = {
   app: DebloatApp;
   state: "waiting" | "removing" | Result["status"];
@@ -84,6 +84,19 @@ const SUGGESTION_IDS = [
   "disable_suggested_apps",
   "disable_tailored_experiences",
   "disable_feedback_requests",
+] as const;
+/** The eight things WinCraft deliberately does not do, paired title/why
+ *  copy keys. Kept next to the view that renders them so a ninth row cannot
+ *  land in copy without landing here too. */
+const EXCLUSION_ROWS = [
+  ["exclusion1Title", "exclusion1Why"],
+  ["exclusion2Title", "exclusion2Why"],
+  ["exclusion3Title", "exclusion3Why"],
+  ["exclusion4Title", "exclusion4Why"],
+  ["exclusion5Title", "exclusion5Why"],
+  ["exclusion6Title", "exclusion6Why"],
+  ["exclusion7Title", "exclusion7Why"],
+  ["exclusion8Title", "exclusion8Why"],
 ] as const;
 const CATEGORIES: Category[] = ["all", "media", "productivity", "connections", "windows"];
 const TIER_KIND: Record<Tier, BadgeKind> = { recommended: "ok", safe: "info", caution: "warn" };
@@ -392,7 +405,7 @@ export function DebloatPanel({
       </header>
 
       <nav className="debloat-tabs" aria-label={c.title}>
-        {(["apps", "suggestions", "history"] as const).map((tab) => (
+        {(["apps", "suggestions", "history", "exclusions"] as const).map((tab) => (
           <button
             key={tab}
             type="button"
@@ -926,6 +939,24 @@ export function DebloatPanel({
               )}
             </div>
             <p className="debloat-caveat">{c.privacyNote}</p>
+          </div>
+        </div>
+      )}
+
+      {view === "exclusions" && (
+        <div className="debloat-stack">
+          <div className="tool-panel debloat-panel">
+            <h3>{c.exclusionsTitle}</h3>
+            <p className="debloat-muted">{c.exclusionsIntro}</p>
+            <ul className="debloat-controls">
+              {EXCLUSION_ROWS.map(([titleKey, whyKey]) => (
+                <li key={titleKey}>
+                  <strong>{c[titleKey]}</strong>
+                  <span>{c[whyKey]}</span>
+                </li>
+              ))}
+            </ul>
+            <p className="debloat-caveat">{c.exclusionsNote}</p>
           </div>
         </div>
       )}
