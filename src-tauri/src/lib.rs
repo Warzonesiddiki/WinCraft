@@ -2,6 +2,7 @@ mod appcache;
 mod audit;
 mod avatar;
 pub mod barebone;
+pub mod barebone_packages;
 pub mod baseline;
 mod browsercleanup;
 mod cleanup;
@@ -2365,6 +2366,7 @@ pub fn run() {
         })
         .invoke_handler(tauri::generate_handler![
             debloat::list_debloat_apps,
+            barebone_packages::list_barebone_packages,
             debloat::remove_debloat_app,
             debloat::debloat_history,
             debloat::debloat_reinstall_link,

@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-list-barebone-packages"
+description = "Enables the list_barebone_packages command without any pre-configured scope."
+commands.allow = ["list_barebone_packages"]
+
+[[permission]]
+identifier = "deny-list-barebone-packages"
+description = "Denies the list_barebone_packages command without any pre-configured scope."
+commands.deny = ["list_barebone_packages"]

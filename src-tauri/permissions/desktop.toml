@@ -17,6 +17,7 @@ permissions = [
     "allow-set-download-limit",
     "allow-restore-download-limit",
     "allow-list-debloat-apps",
+    "allow-list-barebone-packages",
     "allow-remove-debloat-app",
     "allow-debloat-history",
     "allow-debloat-reinstall-link",

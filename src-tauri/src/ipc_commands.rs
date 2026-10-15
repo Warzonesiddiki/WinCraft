@@ -16,6 +16,7 @@ pub const APP_COMMANDS: &[&str] = &[
     "set_download_limit",
     "restore_download_limit",
     "list_debloat_apps",
+    "list_barebone_packages",
     "remove_debloat_app",
     "debloat_history",
     "debloat_reinstall_link",
