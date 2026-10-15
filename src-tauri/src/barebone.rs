@@ -47,9 +47,22 @@ pub fn tier_for_debloat(_catalog_id: &str) -> ReversibilityTier {
     ReversibilityTier::Reinstallable
 }
 
-/// Tier 3 scheduled-task allowlist. Empty for B0 — Phase B3 fills it with
-/// exact `\…` paths, no wildcards. `\Microsoft\` allowed only for listed ids.
-pub const BAREBONE_TASKS: &[&str] = &[];
+/// Tier 3 scheduled-task allowlist. Exact `\…` paths, no wildcards.
+/// `\Microsoft\` is allowed only for these listed ids — the Startup screen's
+/// `is_third_party` guard still hides everything else.
+///
+/// Both entries are Customer Experience Improvement Program uploaders (Phase
+/// B3). Verified present-or-absent per machine at preflight; absent tasks are
+/// reported, never created.
+pub const BAREBONE_TASKS: &[&str] = &[
+    "\\Microsoft\\Windows\\Customer Experience Improvement Program\\Consolidator",
+    "\\Microsoft\\Windows\\Customer Experience Improvement Program\\UsbCeip",
+];
+
+/// Whether a scheduler path is on the Barebone allowlist. Exact match only.
+pub fn is_barebone_task(path: &str) -> bool {
+    BAREBONE_TASKS.contains(&path)
+}
 
 /// One preflight finding. All checks are read-only.
 #[derive(Serialize, Clone, Debug, PartialEq, Eq)]
@@ -169,7 +182,20 @@ mod tests {
 
     #[test]
     fn barebone_task_allowlist_is_empty_in_b0() {
-        assert!(BAREBONE_TASKS.is_empty());
+        // Phase B3: the two CEIP uploaders. Exact paths, no wildcards.
+        assert_eq!(crate::barebone::BAREBONE_TASKS.len(), 2);
+        for path in crate::barebone::BAREBONE_TASKS {
+            assert!(path.starts_with('\\'), "{path}");
+            assert!(!path.contains('\0'));
+            assert!(path.len() <= 512);
+        }
+        assert!(crate::barebone::is_barebone_task(
+            "\\Microsoft\\Windows\\Customer Experience Improvement Program\\UsbCeip"
+        ));
+        assert!(!crate::barebone::is_barebone_task(
+            "\\Microsoft\\Windows\\Customer Experience Improvement Program\\UsbCeip\\Evil"
+        ));
+        assert!(!crate::barebone::is_barebone_task("\\SomeOtherTask"));
     }
 
     #[test]

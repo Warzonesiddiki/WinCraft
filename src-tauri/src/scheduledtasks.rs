@@ -217,7 +217,7 @@ mod imp {
     /// an empty list on exactly the machines that most need one. A *change*
     /// gets the strict reading — reporting "disabled" for a call that was
     /// denied is the one failure this screen must never have.
-    fn schtasks(args: &[&str], tolerate_partial: bool) -> Result<Vec<u8>, String> {
+    pub(super) fn schtasks(args: &[&str], tolerate_partial: bool) -> Result<Vec<u8>, String> {
         let output = crate::system_tools::run("schtasks", |tool| {
             tool.args(args).creation_flags(CREATE_NO_WINDOW).output()
         })
@@ -361,6 +361,90 @@ pub fn set_scheduled_task_enabled(path: String, enabled: bool) -> Result<(), Str
 pub fn apply_from_payload(payload: &str) -> Result<(), String> {
     let (path, enabled) = parse_task_payload(payload)?;
     imp::set_enabled(&path, enabled)
+}
+
+/// Phase B3: Barebone allowlist reads and writes. Unlike `set_scheduled_task_enabled`,
+/// which refuses everything under `\Microsoft\`, these take only exact
+/// `barebone::BAREBONE_TASKS` paths and journal the previous state first, so a
+/// Barebone task disable is a reversible snapshot rather than a bare write.
+///
+/// Elevation routing lands in Phase B4 (preflight + consent): callers must
+/// already be elevated or handle the access-denied error themselves.
+#[cfg(windows)]
+#[allow(dead_code)] // Callers (commands + elevated helper arms) land in Phase B4.
+pub fn barebone_task_enabled(path: &str) -> Result<bool, String> {
+    if !crate::barebone::is_barebone_task(path) {
+        return Err("that task is not on the Barebone allowlist".into());
+    }
+    let raw = imp::schtasks(&["/query", "/tn", path, "/xml"], true)
+        .map_err(|e| format!("could not read task {path}: {e}"))?;
+    parse_task(path, &crate::sysrepair::decode_chunk(&raw))
+        .map(|entry| entry.enabled)
+        .ok_or_else(|| format!("could not parse task {path}"))
+}
+
+/// Disable or re-enable one allowlisted Barebone task, snapshotting its
+/// previous state first. Verifies the write landed by re-reading; on failure
+/// the snapshot is retained for retry.
+#[cfg(windows)]
+#[allow(dead_code)] // Callers (commands + elevated helper arms) land in Phase B4.
+pub fn set_barebone_task_enabled(
+    store: &crate::rollback::RollbackStore,
+    path: &str,
+    enabled: bool,
+) -> Result<(), String> {
+    use crate::rollback::SnapshotEntry;
+    if !crate::barebone::is_barebone_task(path) {
+        return Err("that task is not on the Barebone allowlist".into());
+    }
+    let previous = barebone_task_enabled(path)?;
+    let mut transaction = store.transaction()?;
+    transaction.save_entry(
+        path,
+        SnapshotEntry::ScheduledTask {
+            path: path.to_string(),
+            previously_enabled: previous,
+        },
+    )?;
+    let result = imp::set_enabled(path, enabled).and_then(|()| {
+        let now = barebone_task_enabled(path)?;
+        if now == enabled {
+            Ok(())
+        } else {
+            Err("task state did not stick; the rollback snapshot was retained".to_string())
+        }
+    });
+    crate::audit::record(
+        "barebone-task-change",
+        path,
+        result.is_ok(),
+        result.as_ref().err().cloned(),
+    );
+    result
+}
+
+/// Restore one Barebone task to its snapshotted state. Verifies by re-reading.
+#[cfg(windows)]
+#[allow(dead_code)] // Callers (commands + elevated helper arms) land in Phase B4.
+pub fn rollback_barebone_task(
+    store: &crate::rollback::RollbackStore,
+    path: &str,
+) -> Result<(), String> {
+    store.restore_entry(path, |entry| {
+        let crate::rollback::SnapshotEntry::ScheduledTask {
+            previously_enabled, ..
+        } = entry
+        else {
+            return Err("unexpected snapshot type for a scheduled task".to_string());
+        };
+        imp::set_enabled(path, previously_enabled)?;
+        let now = barebone_task_enabled(path)?;
+        if now == previously_enabled {
+            Ok(())
+        } else {
+            Err("task restore did not stick; the snapshot was retained".to_string())
+        }
+    })
 }
 
 #[cfg(not(windows))]

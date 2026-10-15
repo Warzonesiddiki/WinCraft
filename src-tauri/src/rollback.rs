@@ -1033,6 +1033,106 @@ mod tests {
         assert_eq!(store.applied_ids().unwrap().len(), 1);
     }
 
+    /// Phase B3: a task snapshot keeps the oldest original across re-saves,
+    /// and a second id claiming the same task is rejected as an overlap.
+    #[test]
+    fn scheduled_task_snapshots_keep_the_oldest_original_and_reject_overlaps() {
+        let temp = TempDir::new();
+        let store = temp.store();
+        let path = crate::barebone::BAREBONE_TASKS[0].to_string();
+        let id = "barebone_task_probe";
+        store
+            .transaction()
+            .unwrap()
+            .save_entry(
+                id,
+                SnapshotEntry::ScheduledTask {
+                    path: path.clone(),
+                    previously_enabled: true,
+                },
+            )
+            .unwrap();
+        // Re-saving the same target is a no-op: the oldest original wins.
+        store
+            .transaction()
+            .unwrap()
+            .save_entry(
+                id,
+                SnapshotEntry::ScheduledTask {
+                    path: path.clone(),
+                    previously_enabled: false,
+                },
+            )
+            .unwrap();
+        let entry = store.transaction().unwrap().entry(id).unwrap();
+        assert!(
+            matches!(
+                entry,
+                SnapshotEntry::ScheduledTask {
+                    previously_enabled: true,
+                    ..
+                }
+            ),
+            "oldest original lost: {entry:?}"
+        );
+        // Another id claiming the same task is an overlap, refused before
+        // any second snapshot exists.
+        assert!(store
+            .transaction()
+            .unwrap()
+            .save_entry(
+                "barebone_task_other",
+                SnapshotEntry::ScheduledTask {
+                    path,
+                    previously_enabled: false,
+                },
+            )
+            .is_err());
+        assert_eq!(store.applied_ids().unwrap().len(), 1);
+    }
+
+    /// Phase B3: only exact allowlist paths validate. Prefix extensions,
+    /// unlisted tasks, empties, NUL bytes and overlong paths all fail closed.
+    #[test]
+    fn scheduled_task_snapshots_reject_unlisted_paths() {
+        let temp = TempDir::new();
+        let store = temp.store();
+        for bad in [
+            "\\SomeOtherTask",
+            "",
+            "\\Microsoft\\Windows\\Customer Experience Improvement Program\\UsbCeip\\Evil",
+            "x\0y",
+        ] {
+            assert!(
+                store
+                    .transaction()
+                    .unwrap()
+                    .save_entry(
+                        "barebone_task_probe",
+                        SnapshotEntry::ScheduledTask {
+                            path: bad.into(),
+                            previously_enabled: true,
+                        },
+                    )
+                    .is_err(),
+                "{bad:?} validated"
+            );
+        }
+        let long = format!("\\{}", "a".repeat(600));
+        assert!(store
+            .transaction()
+            .unwrap()
+            .save_entry(
+                "barebone_task_probe",
+                SnapshotEntry::ScheduledTask {
+                    path: long,
+                    previously_enabled: true,
+                },
+            )
+            .is_err());
+        assert!(store.applied_ids().unwrap().is_empty());
+    }
+
     #[test]
     fn legacy_overlaps_block_restore_without_running_the_fake_mutation_or_losing_either_original() {
         let temp = TempDir::new();
