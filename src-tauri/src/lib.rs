@@ -34,6 +34,7 @@ mod tray;
 mod cpubench;
 mod cpuclock;
 pub mod crash;
+mod deprovision;
 mod diskhealth;
 mod diskinfo;
 mod diskopt;
@@ -2657,6 +2658,7 @@ pub fn run() {
             skinpacks::apply_skinpack,
             skinpacks::rollback_skinpack,
             recovery_script::export_recovery_script,
+            deprovision::deprovision_package,
             barebone::barebone_preflight,
             barebone::record_barebone_consent,
             netmaintenance::flush_dns_cache,

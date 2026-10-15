@@ -2191,6 +2191,9 @@ pub mod windows_impl {
             let res = write_value(self.hive, self.key_path, self.value_name, &self.on_value);
             if res.is_ok() {
                 stop_autologger_session(self.id);
+                if self.id == "svchost_split_threshold" {
+                    let _ = crate::services::apply_svchost_split_fanout();
+                }
             }
             res
         }
@@ -2198,13 +2201,17 @@ pub mod windows_impl {
         /// Restores the value captured before `apply`, or removes it if it
         /// did not exist beforehand.
         pub fn rollback(&self, store: &RollbackStore) -> Result<(), String> {
-            store.restore_entry(self.id, |entry| {
+            let res = store.restore_entry(self.id, |entry| {
                 let SnapshotEntry::Registry(snapshot) = entry else {
                     return Err("unexpected snapshot type for a registry tweak".to_string());
                 };
 
                 restore_value(&snapshot)
-            })
+            });
+            if res.is_ok() && self.id == "svchost_split_threshold" {
+                let _ = crate::services::rollback_svchost_split_fanout();
+            }
+            res
         }
     }
 }

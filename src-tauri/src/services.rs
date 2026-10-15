@@ -637,6 +637,86 @@ pub fn rollback_service(store: &RollbackStore, tweak: &ServiceTweak) -> Result<(
     })
 }
 
+#[cfg(windows)]
+pub fn apply_svchost_split_fanout() -> Result<usize, String> {
+    use winreg::enums::{HKEY_LOCAL_MACHINE, KEY_READ, KEY_SET_VALUE};
+    use winreg::RegKey;
+
+    let hklm = RegKey::predef(HKEY_LOCAL_MACHINE);
+    let services_key = match hklm.open_subkey_with_flags(r"SYSTEM\CurrentControlSet\Services", KEY_READ) {
+        Ok(k) => k,
+        Err(e) => return Err(format!("Failed to open Services hive: {e}")),
+    };
+
+    let mut modified_count = 0;
+
+    for name in services_key.enum_keys().filter_map(Result::ok) {
+        if name.eq_ignore_ascii_case("RpcSs") || name.eq_ignore_ascii_case("DcomLaunch") {
+            continue;
+        }
+
+        let subkey_path = format!(r"SYSTEM\CurrentControlSet\Services\{}", name);
+        let subkey = match hklm.open_subkey_with_flags(&subkey_path, KEY_READ | KEY_SET_VALUE) {
+            Ok(k) => k,
+            Err(_) => continue,
+        };
+
+        let image_path: String = subkey.get_value("ImagePath").unwrap_or_default();
+        if !image_path.to_lowercase().contains("svchost.exe") {
+            continue;
+        }
+
+        let original_val: Option<u32> = subkey.get_value("SvcHostSplitDisable").ok();
+        if original_val == Some(1) {
+            continue;
+        }
+
+        if subkey.set_value("SvcHostSplitDisable", &1u32).is_ok() {
+            modified_count += 1;
+        }
+    }
+
+    Ok(modified_count)
+}
+
+#[cfg(windows)]
+pub fn rollback_svchost_split_fanout() -> Result<usize, String> {
+    use winreg::enums::{HKEY_LOCAL_MACHINE, KEY_READ, KEY_SET_VALUE};
+    use winreg::RegKey;
+
+    let hklm = RegKey::predef(HKEY_LOCAL_MACHINE);
+    let services_key = match hklm.open_subkey_with_flags(r"SYSTEM\CurrentControlSet\Services", KEY_READ) {
+        Ok(k) => k,
+        Err(_) => return Ok(0),
+    };
+
+    let mut restored_count = 0;
+
+    for name in services_key.enum_keys().filter_map(Result::ok) {
+        let path = format!(r"SYSTEM\CurrentControlSet\Services\{}", name);
+        let subkey = match hklm.open_subkey_with_flags(&path, KEY_SET_VALUE) {
+            Ok(k) => k,
+            Err(_) => continue,
+        };
+
+        if subkey.delete_value("SvcHostSplitDisable").is_ok() {
+            restored_count += 1;
+        }
+    }
+
+    Ok(restored_count)
+}
+
+#[cfg(not(windows))]
+pub fn apply_svchost_split_fanout() -> Result<usize, String> {
+    Ok(0)
+}
+
+#[cfg(not(windows))]
+pub fn rollback_svchost_split_fanout() -> Result<usize, String> {
+    Ok(0)
+}
+
 #[cfg(not(windows))]
 pub fn apply_service(_store: &RollbackStore, _tweak: &ServiceTweak) -> Result<(), String> {
     Err("not supported on this platform".to_string())
