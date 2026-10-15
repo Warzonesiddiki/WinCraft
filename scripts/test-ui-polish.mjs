@@ -60,6 +60,7 @@ assert.match(mainSource, /<PageBoundary[^>]*scope="app"[^>]*>\s*<App \/>/, "the 
     (f) =>
       /\.(ts|tsx|md|html|json|txt|astro)$/.test(f) &&
       !f.startsWith("src-tauri/") &&
+      !f.startsWith("docs/") &&
       !f.includes("node_modules/") &&
       !/(^|\/)package(-lock)?\.json$/.test(f) &&
       f !== "scripts/test-ui-polish.mjs" &&

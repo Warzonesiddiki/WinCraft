@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-rollback-all-barebone-tasks"
+description = "Enables the rollback_all_barebone_tasks command without any pre-configured scope."
+commands.allow = ["rollback_all_barebone_tasks"]
+
+[[permission]]
+identifier = "deny-rollback-all-barebone-tasks"
+description = "Denies the rollback_all_barebone_tasks command without any pre-configured scope."
+commands.deny = ["rollback_all_barebone_tasks"]

@@ -40,6 +40,7 @@ fn tool_path(name: &str) -> io::Result<PathBuf> {
         "ipconfig" => "ipconfig.exe",
         "wevtutil" => "wevtutil.exe",
         "defrag" => "defrag.exe",
+        "logman" => "logman.exe",
         "dism" | "dism.exe" => "dism.exe",
         "sfc" | "sfc.exe" => "sfc.exe",
         "nvidia-smi" => "nvidia-smi.exe",

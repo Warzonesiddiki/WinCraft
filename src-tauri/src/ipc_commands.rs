@@ -132,6 +132,8 @@ pub const APP_COMMANDS: &[&str] = &[
     "list_barebone_tasks",
     "set_barebone_task",
     "rollback_barebone_task",
+    "disable_all_barebone_tasks",
+    "rollback_all_barebone_tasks",
     "barebone_preflight",
     "record_barebone_consent",
     "flush_dns_cache",

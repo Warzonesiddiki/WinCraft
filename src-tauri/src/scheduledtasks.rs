@@ -400,6 +400,15 @@ pub struct BareboneTaskOutcome {
     pub restore_point: crate::restore_point::RestorePointOutcome,
 }
 
+#[derive(serde::Serialize, Clone, Debug)]
+#[serde(rename_all = "camelCase")]
+pub struct BatchTaskOutcome {
+    pub restore_point: crate::restore_point::RestorePointOutcome,
+    pub total: usize,
+    pub modified: usize,
+    pub failed: usize,
+}
+
 #[derive(serde::Serialize, Clone, Debug, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 pub struct BareboneTaskEntry {
@@ -496,6 +505,107 @@ pub fn rollback_barebone_task(
         }
     };
     result.map(|()| BareboneTaskOutcome { restore_point })
+}
+
+/// Batch disable all allowlisted telemetry tasks in a single action.
+/// Attempts directly first; if denied, spends one UAC prompt for the entire batch.
+#[cfg(windows)]
+#[tauri::command(async)]
+pub fn disable_all_barebone_tasks(
+    app: tauri::AppHandle,
+) -> Result<BatchTaskOutcome, String> {
+    let dir = crate::store_for_dir(&app)?;
+    let restore_point = crate::barebone::restore_point_for_barebone();
+    let store = crate::rollback::RollbackStore::new(dir);
+    let (modified, failed) = if crate::elevation::is_elevated() {
+        disable_all_barebone_tasks_inner(&store)
+    } else {
+        let (m, f) = disable_all_barebone_tasks_inner(&store);
+        if f > 0 || m == 0 {
+            crate::elevation::run_elevated_action("--elevated-barebone-batch-disable", "all")
+                .map_err(|e| format!("administrator batch execution failed: {e}"))?;
+            let tasks = list_barebone_tasks()?;
+            let disabled = tasks.iter().filter(|t| t.present && !t.enabled).count();
+            (disabled, 0)
+        } else {
+            (m, f)
+        }
+    };
+    Ok(BatchTaskOutcome {
+        restore_point,
+        total: crate::barebone::BAREBONE_TASKS.len(),
+        modified,
+        failed,
+    })
+}
+
+/// Batch rollback all allowlisted telemetry tasks to their snapshotted states.
+#[cfg(windows)]
+#[tauri::command(async)]
+pub fn rollback_all_barebone_tasks(
+    app: tauri::AppHandle,
+) -> Result<BatchTaskOutcome, String> {
+    let dir = crate::store_for_dir(&app)?;
+    let restore_point = crate::barebone::restore_point_for_barebone();
+    let store = crate::rollback::RollbackStore::new(dir);
+    let (modified, failed) = if crate::elevation::is_elevated() {
+        rollback_all_barebone_tasks_inner(&store)
+    } else {
+        let (m, f) = rollback_all_barebone_tasks_inner(&store);
+        if f > 0 {
+            crate::elevation::run_elevated_action("--elevated-barebone-batch-rollback", "all")
+                .map_err(|e| format!("administrator batch rollback failed: {e}"))?;
+            let tasks = list_barebone_tasks()?;
+            let enabled = tasks.iter().filter(|t| t.present && t.enabled).count();
+            (enabled, 0)
+        } else {
+            (m, f)
+        }
+    };
+    Ok(BatchTaskOutcome {
+        restore_point,
+        total: crate::barebone::BAREBONE_TASKS.len(),
+        modified,
+        failed,
+    })
+}
+
+#[cfg(windows)]
+pub fn disable_all_barebone_tasks_inner(store: &crate::rollback::RollbackStore) -> (usize, usize) {
+    let mut modified = 0;
+    let mut failed = 0;
+    for &path in crate::barebone::BAREBONE_TASKS {
+        match barebone_task_enabled(path) {
+            Ok(true) => {
+                match set_barebone_task_enabled(store, path, false) {
+                    Ok(()) => modified += 1,
+                    Err(_) => failed += 1,
+                }
+            }
+            Ok(false) => {
+                // Already disabled
+            }
+            Err(_) => {
+                // Not present on this machine, ignore
+            }
+        }
+    }
+    (modified, failed)
+}
+
+#[cfg(windows)]
+pub fn rollback_all_barebone_tasks_inner(store: &crate::rollback::RollbackStore) -> (usize, usize) {
+    let mut modified = 0;
+    let failed = 0;
+    for &path in crate::barebone::BAREBONE_TASKS {
+        match restore_barebone_task(store, path) {
+            Ok(()) => modified += 1,
+            Err(_) => {
+                // If it wasn't modified or had no snapshot, that's not a failure
+            }
+        }
+    }
+    (modified, failed)
 }
 
 /// Elevated-helper entry point for Barebone task rollback. Re-validates the
@@ -619,6 +729,22 @@ pub fn rollback_barebone_task(
     _app: tauri::AppHandle,
     _path: String,
 ) -> Result<BareboneTaskOutcome, String> {
+    Err("not supported on this platform".to_string())
+}
+
+#[cfg(not(windows))]
+#[tauri::command(async)]
+pub fn disable_all_barebone_tasks(
+    _app: tauri::AppHandle,
+) -> Result<BatchTaskOutcome, String> {
+    Err("not supported on this platform".to_string())
+}
+
+#[cfg(not(windows))]
+#[tauri::command(async)]
+pub fn rollback_all_barebone_tasks(
+    _app: tauri::AppHandle,
+) -> Result<BatchTaskOutcome, String> {
     Err("not supported on this platform".to_string())
 }
 

@@ -138,6 +138,8 @@ permissions = [
     "allow-list-barebone-tasks",
     "allow-set-barebone-task",
     "allow-rollback-barebone-task",
+    "allow-disable-all-barebone-tasks",
+    "allow-rollback-all-barebone-tasks",
     "allow-barebone-preflight",
     "allow-record-barebone-consent",
     "allow-flush-dns-cache",

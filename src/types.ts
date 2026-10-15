@@ -292,6 +292,14 @@ export type BareboneTaskEntry = {
   present: boolean;
 };
 
+/** Mirrors Rust `scheduledtasks::BatchTaskOutcome`. */
+export type BatchTaskOutcome = {
+  restorePoint: unknown;
+  total: number;
+  modified: number;
+  failed: number;
+};
+
 /** One read-only Barebone preflight finding (Rust `barebone::PreflightFinding`). */
 export type BarebonePreflightFinding = {
   code: string;

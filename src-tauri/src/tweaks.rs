@@ -2152,6 +2152,20 @@ pub mod windows_impl {
         Ok(())
     }
 
+    fn stop_autologger_session(id: &str) {
+        let session = match id {
+            "disable_autologger_diagtrack" => "AutoLogger-Diagtrack-Listener",
+            "disable_autologger_sqm" => "SQMLogger",
+            "disable_autologger_ait" => "AITEventLog",
+            "disable_autologger_diaglog" => "DiagLog",
+            "disable_autologger_wifisession" => "WiFiSession",
+            _ => return,
+        };
+        let _ = crate::system_tools::run("logman", |cmd| {
+            cmd.args(["stop", session, "-ets"]).output()
+        });
+    }
+
     impl RegistryTweak {
         /// Reads the current value (if any) without changing anything.
         pub fn read_current(&self) -> std::io::Result<Option<RegValue>> {
@@ -2174,7 +2188,11 @@ pub mod windows_impl {
                     }),
                 )
                 .map_err(|e| e.to_string())?;
-            write_value(self.hive, self.key_path, self.value_name, &self.on_value)
+            let res = write_value(self.hive, self.key_path, self.value_name, &self.on_value);
+            if res.is_ok() {
+                stop_autologger_session(self.id);
+            }
+            res
         }
 
         /// Restores the value captured before `apply`, or removes it if it

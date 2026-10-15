@@ -2245,6 +2245,46 @@ pub fn run_elevated_headless(action: &str, id: &str) -> ! {
             result
         }
 
+        "--elevated-barebone-batch-disable" => {
+            let store = rollback::RollbackStore::new(dirs_app_data_dir());
+            let (modified, failed) = scheduledtasks::disable_all_barebone_tasks_inner(&store);
+            audit::record(
+                "barebone-tasks-batch-disable",
+                "all",
+                failed == 0,
+                if failed > 0 {
+                    Some(format!("modified {modified}, failed {failed}"))
+                } else {
+                    None
+                },
+            );
+            if failed > 0 {
+                Err(format!("failed to disable {failed} tasks"))
+            } else {
+                Ok(())
+            }
+        }
+
+        "--elevated-barebone-batch-rollback" => {
+            let store = rollback::RollbackStore::new(dirs_app_data_dir());
+            let (modified, failed) = scheduledtasks::rollback_all_barebone_tasks_inner(&store);
+            audit::record(
+                "barebone-tasks-batch-rollback",
+                "all",
+                failed == 0,
+                if failed > 0 {
+                    Some(format!("modified {modified}, failed {failed}"))
+                } else {
+                    None
+                },
+            );
+            if failed > 0 {
+                Err(format!("failed to rollback {failed} tasks"))
+            } else {
+                Ok(())
+            }
+        }
+
         "--elevated-drift-watch" => match id {
             "enable" => configure_drift_watch(true),
             "disable" => configure_drift_watch(false),
@@ -2607,6 +2647,8 @@ pub fn run() {
             scheduledtasks::list_barebone_tasks,
             scheduledtasks::set_barebone_task,
             scheduledtasks::rollback_barebone_task,
+            scheduledtasks::disable_all_barebone_tasks,
+            scheduledtasks::rollback_all_barebone_tasks,
             barebone::barebone_preflight,
             barebone::record_barebone_consent,
             netmaintenance::flush_dns_cache,

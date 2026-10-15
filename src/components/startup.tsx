@@ -2,7 +2,13 @@ import { ToolHeader, ToolSearch, ToolStatus, ToolDetails } from "./tool-section"
 import { useEffect, useState } from "react";
 import { invoke } from "@tauri-apps/api/core";
 import { format, Strings } from "../i18n";
-import { BareboneTaskEntry, ScheduledTaskEntry, StartupEntry, Toast } from "../types";
+import {
+  BareboneTaskEntry,
+  BatchTaskOutcome,
+  ScheduledTaskEntry,
+  StartupEntry,
+  Toast,
+} from "../types";
 import { Badge, Toggle } from "./ui";
 
 function StartupMark({ name, src }: { name: string; src?: string | null }) {
@@ -341,6 +347,34 @@ export function ScheduledTaskManager({
     }
   }
 
+  async function disableAllTelemetryTasks() {
+    setLoadError(null);
+    setBusyPath("all-batch");
+    try {
+      const outcome = await invoke<BatchTaskOutcome>("disable_all_barebone_tasks");
+      pushToast("success", `Disabled ${outcome.modified} telemetry tasks in one batch`);
+      await refresh();
+    } catch (e) {
+      pushToast("error", String(e));
+    } finally {
+      setBusyPath(null);
+    }
+  }
+
+  async function restoreAllTelemetryTasks() {
+    setLoadError(null);
+    setBusyPath("all-batch");
+    try {
+      const outcome = await invoke<BatchTaskOutcome>("rollback_all_barebone_tasks");
+      pushToast("success", `Restored ${outcome.modified} telemetry tasks`);
+      await refresh();
+    } catch (e) {
+      pushToast("error", String(e));
+    } finally {
+      setBusyPath(null);
+    }
+  }
+
   const enabledCount = tasks.filter((t) => t.enabled).length;
   const filtered = tasks.filter((task) =>
     `${task.name} ${task.command} ${task.path}`
@@ -441,7 +475,27 @@ export function ScheduledTaskManager({
             <ToolHeader
               title="Windows Telemetry &amp; Diagnostic Tasks"
               description="Allowlisted background tasks for CEIP, compatibility telemetry, and background diagnostics. Disabling them reduces background wake-ups."
-              actions={<Badge kind="caution">Tier 3</Badge>}
+              actions={
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    disabled={busyPath !== null}
+                    onClick={disableAllTelemetryTasks}
+                    className="rounded-lg bg-warn/15 px-2.5 py-1 text-xs font-semibold text-warn hover:bg-warn/25 transition-colors"
+                  >
+                    Disable All ({bareboneTasks.filter((t) => t.present && t.enabled).length})
+                  </button>
+                  <button
+                    type="button"
+                    disabled={busyPath !== null}
+                    onClick={restoreAllTelemetryTasks}
+                    className="rounded-lg bg-surface-2 px-2.5 py-1 text-xs font-medium text-ink-2 hover:bg-surface-3 transition-colors"
+                  >
+                    Restore All
+                  </button>
+                  <Badge kind="caution">Tier 3</Badge>
+                </div>
+              }
             />
           </div>
           {bareboneTasks
