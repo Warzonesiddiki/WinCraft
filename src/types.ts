@@ -284,6 +284,14 @@ export type BareboneTaskOutcome = {
   restorePoint: RestorePointOutcome;
 };
 
+/** Mirrors Rust `scheduledtasks::BareboneTaskEntry`. */
+export type BareboneTaskEntry = {
+  path: string;
+  name: string;
+  enabled: boolean;
+  present: boolean;
+};
+
 /** One read-only Barebone preflight finding (Rust `barebone::PreflightFinding`). */
 export type BarebonePreflightFinding = {
   code: string;

@@ -2,7 +2,7 @@ import { ToolHeader, ToolSearch, ToolStatus, ToolDetails } from "./tool-section"
 import { useEffect, useState } from "react";
 import { invoke } from "@tauri-apps/api/core";
 import { format, Strings } from "../i18n";
-import { ScheduledTaskEntry, StartupEntry, Toast } from "../types";
+import { BareboneTaskEntry, ScheduledTaskEntry, StartupEntry, Toast } from "../types";
 import { Badge, Toggle } from "./ui";
 
 function StartupMark({ name, src }: { name: string; src?: string | null }) {
@@ -259,6 +259,7 @@ export function ScheduledTaskManager({
   pushToast: (kind: Toast["kind"], message: string) => void;
 }) {
   const [tasks, setTasks] = useState<ScheduledTaskEntry[]>([]);
+  const [bareboneTasks, setBareboneTasks] = useState<BareboneTaskEntry[]>([]);
   const [busyPath, setBusyPath] = useState<string | null>(null);
   const [loaded, setLoaded] = useState(false);
   const [rescanning, setRescanning] = useState(false);
@@ -267,9 +268,13 @@ export function ScheduledTaskManager({
 
   async function refresh() {
     try {
-      const list = await invoke<ScheduledTaskEntry[]>("list_scheduled_tasks");
+      const [list, bbList] = await Promise.all([
+        invoke<ScheduledTaskEntry[]>("list_scheduled_tasks"),
+        invoke<BareboneTaskEntry[]>("list_barebone_tasks").catch(() => []),
+      ]);
       setLoadError(null);
       setTasks(list);
+      setBareboneTasks(bbList);
       setLoaded(true);
     } catch (error) {
       setLoadError(String(error));
@@ -307,6 +312,27 @@ export function ScheduledTaskManager({
         path: task.path,
         enabled: !task.enabled,
       });
+      await refresh();
+    } catch (e) {
+      pushToast("error", String(e));
+    } finally {
+      setBusyPath(null);
+    }
+  }
+
+  async function toggleBareboneTask(task: BareboneTaskEntry) {
+    setLoadError(null);
+    setBusyPath(task.path);
+    try {
+      if (task.enabled) {
+        await invoke("record_barebone_consent", { id: task.path, text: "Disable telemetry task" });
+        await invoke("set_barebone_task", { path: task.path, enabled: false });
+        pushToast("success", `Disabled ${task.name}`);
+      } else {
+        await invoke("record_barebone_consent", { id: task.path, text: "Restore telemetry task" });
+        await invoke("rollback_barebone_task", { path: task.path });
+        pushToast("success", `Restored ${task.name}`);
+      }
       await refresh();
     } catch (e) {
       pushToast("error", String(e));
@@ -408,6 +434,48 @@ export function ScheduledTaskManager({
           </div>
         </div>
       ))}
+
+      {loaded && bareboneTasks.filter((t) => t.present).length > 0 && (
+        <div className="tool-list-section mt-8">
+          <div className="tool-panel tool-list-header">
+            <ToolHeader
+              title="Windows Telemetry &amp; Diagnostic Tasks"
+              description="Allowlisted background tasks for CEIP, compatibility telemetry, and background diagnostics. Disabling them reduces background wake-ups."
+              actions={<Badge kind="caution">Tier 3</Badge>}
+            />
+          </div>
+          {bareboneTasks
+            .filter((t) => t.present)
+            .map((task, i) => (
+              <div
+                key={task.path}
+                style={{ animationDelay: `${i * 40}ms` }}
+                className="tool-startup-row animate-card"
+              >
+                <div className="flex items-center gap-4">
+                  <StartupMark name={task.name} />
+                  <div className="min-w-0 flex-1">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <h3 className="font-semibold text-ink">{task.name}</h3>
+                      <Badge kind="warn">Telemetry</Badge>
+                      <Badge kind="admin">{s.badges.admin}</Badge>
+                    </div>
+                    <ToolDetails label={s.healthPanel.showMore}>
+                      <code className="tool-command">{task.path}</code>
+                    </ToolDetails>
+                  </div>
+                  <Toggle
+                    label={task.name}
+                    checked={task.enabled}
+                    busy={busyPath === task.path}
+                    onClick={() => toggleBareboneTask(task)}
+                    s={s}
+                  />
+                </div>
+              </div>
+            ))}
+        </div>
+      )}
     </div>
   );
 }
