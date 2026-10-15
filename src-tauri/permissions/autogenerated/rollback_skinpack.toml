@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-rollback-skinpack"
+description = "Enables the rollback_skinpack command without any pre-configured scope."
+commands.allow = ["rollback_skinpack"]
+
+[[permission]]
+identifier = "deny-rollback-skinpack"
+description = "Denies the rollback_skinpack command without any pre-configured scope."
+commands.deny = ["rollback_skinpack"]

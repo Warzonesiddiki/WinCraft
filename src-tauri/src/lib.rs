@@ -80,6 +80,7 @@ mod scheduledtasks;
 mod securedefrag;
 mod services;
 mod settings_tweaks;
+mod skinpacks;
 mod startup;
 mod sysmon;
 mod sysrepair;
@@ -2650,6 +2651,9 @@ pub fn run() {
             scheduledtasks::disable_all_barebone_tasks,
             scheduledtasks::rollback_all_barebone_tasks,
             scheduledtasks::get_process_stats,
+            skinpacks::list_skinpacks,
+            skinpacks::apply_skinpack,
+            skinpacks::rollback_skinpack,
             barebone::barebone_preflight,
             barebone::record_barebone_consent,
             netmaintenance::flush_dns_cache,

@@ -306,6 +306,16 @@ export type ProcessStats = {
   target: number;
 };
 
+/** Mirrors Rust `skinpacks::SkinpackInfo`. */
+export type SkinpackInfo = {
+  id: string;
+  name: string;
+  description: string;
+  author: string;
+  active: boolean;
+  previewAccent: string;
+};
+
 /** One read-only Barebone preflight finding (Rust `barebone::PreflightFinding`). */
 export type BarebonePreflightFinding = {
   code: string;

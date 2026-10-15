@@ -140,6 +140,9 @@ const PricingPanel = lazy(() =>
 const GamingHudCard = lazy(() =>
   import("./components/pro").then((m) => ({ default: m.GamingHudCard })),
 );
+const SkinpacksPanel = lazy(() =>
+  import("./components/skinpacks").then((m) => ({ default: m.SkinpacksPanel })),
+);
 const ZeroTraceCard = lazy(() =>
   import("./components/pro").then((m) => ({ default: m.ZeroTraceCard })),
 );
@@ -984,7 +987,12 @@ function App() {
               locks, which is the kind of thing that screen is for. Above the
               tweak list, like every other screen's headline card — below
               forty-odd rows nobody scrolled far enough to find it. */}
-                  {filter === "ui" && !searching && <GamingHudCard s={s} pushToast={pushToast} />}
+                  {filter === "ui" && !searching && (
+                    <>
+                      <SkinpacksPanel pushToast={pushToast} />
+                      <GamingHudCard s={s} pushToast={pushToast} />
+                    </>
+                  )}
 
                   <ul className="flex flex-col gap-3">
                     {visibleTweaks.map((t, i) => (

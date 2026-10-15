@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-apply-skinpack"
+description = "Enables the apply_skinpack command without any pre-configured scope."
+commands.allow = ["apply_skinpack"]
+
+[[permission]]
+identifier = "deny-apply-skinpack"
+description = "Denies the apply_skinpack command without any pre-configured scope."
+commands.deny = ["apply_skinpack"]
