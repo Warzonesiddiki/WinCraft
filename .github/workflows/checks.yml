@@ -167,6 +167,12 @@ jobs:
       - name: Workflow steps name scripts that exist
         run: npm run check:workflows
 
+      - name: Privilege boundary checks
+        run: npm run check:no-new-privileges
+
+      - name: Data inventory audit
+        run: npm run check:data-inventory
+
       - name: Rust unit tests
         run: npm run check:rust
 
