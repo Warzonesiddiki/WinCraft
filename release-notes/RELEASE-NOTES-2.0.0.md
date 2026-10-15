@@ -14,3 +14,12 @@ WinCraft 2.0.0 is the major generation release of the non-destructive Windows pe
 - Frontend: `tsc --noEmit`, ESLint, Prettier, design tokens (128 baseline held), i18n key parity and quality audits, and 28 Vitest files / 369 tests all pass.
 - Backend & Site: `npm test --prefix backend` passes 194 unit tests; `npm run build --prefix site` verifies 19 prerendered routes, 36 font subsets, and 47 hydrated reveals.
 - Rust: `cargo test` passes 552 unit tests; `check:native-policy` executes 19 isolated native test suites.
+
+## Known gaps
+
+- **The binaries in this release are not code-signed.** Authenticode signing identifies the publisher; without it Windows SmartScreen may warn on first run. Unsigned binaries do not affect functionality or reversibility.
+- **Automatic updates are paused for this fork build.** Updater endpoints and minisign keys are configured for independent distribution.
+
+## Trust wording
+
+Authenticode establishes publisher identity and file integrity. Tauri signatures protect updater packages. Neither is Microsoft endorsement, a performance guarantee, or a promise that SmartScreen will never warn.

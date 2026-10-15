@@ -98,18 +98,40 @@ export function TweakRow({
               tweak.hive !== "—" && <Badge>{tweak.hive}</Badge>
             )}
             {tweak.requires_admin && <Badge kind="admin">{s.badges.admin}</Badge>}
-            {tweak.evidence === "measured" && <Badge kind="ok">Measured</Badge>}
-            {tweak.evidence === "modest" && <Badge kind="neutral">Modest</Badge>}
-            {tweak.effect && tweak.effect !== "immediate" && (
-              <Badge kind="muted">
-                {tweak.effect === "restart"
-                  ? "Restart"
-                  : tweak.effect === "reboot"
-                    ? "Reboot"
-                    : "Sign-out"}
-              </Badge>
+            {tweak.evidence === "measured" && (
+              <span title="Empirically measured impact with demonstrable benchmark shift">
+                <Badge kind="ok">Measured</Badge>
+              </span>
             )}
-            {tweak.consentRequired && <Badge kind="caution">Consent</Badge>}
+            {tweak.evidence === "modest" && (
+              <span title="Modest measured impact or secondary efficiency gain">
+                <Badge kind="neutral">Modest</Badge>
+              </span>
+            )}
+            {tweak.effect && tweak.effect !== "immediate" && (
+              <span
+                title={
+                  tweak.effect === "restart"
+                    ? "Requires restarting affected processes or File Explorer"
+                    : tweak.effect === "reboot"
+                      ? "Requires a full system restart to take effect"
+                      : "Requires signing out and back in to take effect"
+                }
+              >
+                <Badge kind="muted">
+                  {tweak.effect === "restart"
+                    ? "Restart"
+                    : tweak.effect === "reboot"
+                      ? "Reboot"
+                      : "Sign-out"}
+                </Badge>
+              </span>
+            )}
+            {tweak.consentRequired && (
+              <span title="Tier-3 setting: requires explicit user acknowledgement before applying">
+                <Badge kind="caution">Consent</Badge>
+              </span>
+            )}
             {(tweak.min_build || tweak.pro_edition || tweak.enterprise_edition) && (
               <Badge kind="muted">
                 {[

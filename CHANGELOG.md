@@ -1,5 +1,16 @@
 # Changelog
 
+## v2.0.0
+
+WinCraft 2.0.0 is the major generation release of the non-destructive Windows performance and privacy platform. The catalogue is expanded to 150 controls across Windows 11 and Windows 10, with SvcHost process consolidation, telemetry autologger session teardowns, 40 allowlisted background scheduled tasks, Tier-3 safety consent gates, and evidence/effect metadata.
+
+- **150 verified controls, 100% free.** Expanded from the previous catalogue: SvcHost process consolidation (`SvcHostSplitThresholdInKB`), NTFS 8.3 short name and last access timestamp disablement, 5 ETW Autologger session teardowns (`AutoLogger-Diagtrack-Listener`, `SQMLogger`, `AITEventLog`, `DiagLog`, `WiFiSession`), and background service startup management for `WerSvc`, `MapsBroker`, and `lfsvc`.
+- **40 allowlisted bloat scheduled tasks:** Expanded from CEIP uploaders to full Application Experience, Autochk, Disk Diagnostic, Maps, and Edge Update background task management in the startup manager.
+- **Evidence & effect calibration:** Every tweak displays empirical evidence (`Measured`, `Modest`, `Neutral`), taking effect indicator (`Immediate`, `Sign-out`, `Restart`, `Reboot`), and documented risk factors.
+- **Tier-3 consent modal & execution gate:** Explicit consent required before executing potentially irreversible or machine-wide settings; consent records persisted in `%APPDATA%\WinCraft\barebone_consent.json`.
+- **Pre-flight System Restore Point verification:** Integrates native `SRSetRestorePointW` before elevated operations with non-blocking graceful fallback.
+- **Full 6-locale translation parity:** 100% key parity across English, Italian, German, Spanish, French, and European Portuguese (1,769 keys per locale).
+
 ## v1.19.0
 
 WinCraft 1.19.0 is the first release built after the desktop app was made free and open source. The licence gate is gone from the shipped code, every one of the 81 controls is available to everyone, and the release gates that were supposed to prove it are now wired into CI so a regression is caught on the push that causes it rather than on release day.

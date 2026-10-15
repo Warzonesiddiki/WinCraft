@@ -22,9 +22,9 @@
   <a href="#zero-compromises"><img src="https://img.shields.io/badge/every_feature-free-2E7D32" alt="Every feature is free"></a>
 </p>
 
-**[Download for Windows](https://github.com/Warzonesiddiki/WinCraft/releases/latest/download/PCTweaker-Setup.exe)** · **[Microsoft Store](https://apps.microsoft.com/detail/9nh3c6dt1g87)** · [Chocolatey](https://community.chocolatey.org/packages/pc-tweaker) · [Website](https://wincraft.app/) · [Support](https://wincraft.app/support/) · [Release notes](CHANGELOG.md)
+**[Download for Windows](https://github.com/Warzonesiddiki/WinCraft/releases/latest/download/WinCraft_2.0.0_x64-setup.exe)** · **[Microsoft Store](https://apps.microsoft.com/detail/9nh3c6dt1g87)** · [Chocolatey](https://community.chocolatey.org/packages/pc-tweaker) · [Website](https://wincraft.app/) · [Support](https://wincraft.app/support/) · [Release notes](CHANGELOG.md)
 
-<p align="center"><a href="#zero-compromises">Zero compromises</a> · <a href="#find-your-task">Find your task</a> · <a href="#what-you-can-do">Features</a> · <a href="#what-changes-on-your-system">What changes</a> · <a href="#frequently-asked-questions">FAQ</a> · <a href="#whats-new-in-118">What's new</a> · <a href="#download-integrity-and-code-signing">Code signing</a> · <a href="#build-from-source">Build from source</a></p>
+<p align="center"><a href="#zero-compromises">Zero compromises</a> · <a href="#find-your-task">Find your task</a> · <a href="#what-you-can-do">Features</a> · <a href="#what-changes-on-your-system">What changes</a> · <a href="#frequently-asked-questions">FAQ</a> · <a href="#whats-new-in-20">What's new</a> · <a href="#download-integrity-and-code-signing">Code signing</a> · <a href="#build-from-source">Build from source</a></p>
 
 <p align="center"><img src="docs/screenshots/pc-tweaker-1.16-overview.png" alt="WinCraft 1.16 Overview in the default Graphite Ember theme, showing live CPU, memory and applied settings" width="85%"></p>
 
@@ -81,17 +81,13 @@ Package catalogs can lag behind a release. Check the release version before inst
 
 Closing the window keeps WinCraft running in the Windows notification area. Click its icon to reopen it, or right-click and choose **Exit WinCraft** to quit. To make closing the window quit instead, clear **Keep running in the background** in the icon's menu. Windows may place the icon in its hidden-icons panel.
 
-## What's new in 1.18
+## What's new in 2.0
 
-- **Before & After is a measured comparison.** Measure, apply your changes, measure again. Each timed test runs at least seven times and reports its median and spread; a difference is called only when the two series are clearly apart (exact rank test, p < 0.01), at least 5% apart and in the same direction. Otherwise it says there is no meaningful change.
-- **Change history is a timeline** by day and session, with the registry values before and after, filters, search, CSV/JSON export, PDF print, and undo for one change, a whole session or everything still in effect.
-- **Debloat now says how each app is really used** — when its data last changed, whether it starts with Windows, how much memory it holds — covering 25 curated bloatware apps (matching AtlasOS, ReviOS and Tiny11 debloat targets including Cortana, Maps, Quick Assist, Tips, Power Automate, 3D Viewer, and Paint 3D), with Minimal, Balanced, Aggressive and Barebone selections that only stage candidates in preview before removal. A selection can be saved as a file and loaded on another PC.
-- **Nine starter profiles:** Gaming, Streaming, Work, Study, Laptop, No interruptions, Barebone, Browser Only and Browser + MS Office, using only reversible per-user switches, with suggested selections shown for review before applying.
-- **Fifteen new controls since 1.17**, including the Windows AI layer: Click to Do, the Windows AI Components Host service, and the AI features in Microsoft Edge, Paint and Notepad — plus Fast Startup, Storage Sense, End task in the taskbar menu, the drag tray, Widgets, File Explorer's opening folder, the Start Recommended section, blocking automatic manufacturer apps, tips and suggestions, and Game Bar captures. The catalog is 150 controls.
-- **Every card states what it needs** — user or machine scope, administrator rights, Windows version and edition — and reports "Not available on this PC" when it does not apply. Every tweak has a "What this changes, exactly" panel listing each value as it is now and as it will be set.
-- **PC Health is a live dashboard:** processor load per core, memory, disk, network, graphics load, temperature, fan and video memory on NVIDIA cards, and "What's using resources" grouped by app, over 1 or 5 minutes.
-- **Scan runs 13 checks** and can be paused, resumed or ended early; a partial result names the checks that did not run instead of passing them.
-- **Turbo Boost shows measured numbers** — processor load smoothed over about three seconds, clock speeds, the power plan's minimum processor state and the processes using the most — plus a fixed 3-second workload to compare work done in each mode.
+- **150 verified controls across Windows 11 and 10.** Major catalog expansion including SvcHost process consolidation (`SvcHostSplitThresholdInKB`), NTFS 8.3 name and last access updates disablement, ETW Autologger session teardowns (`AutoLogger-Diagtrack-Listener`, `SQMLogger`, `AITEventLog`, `DiagLog`, `WiFiSession`), and background service startup management (`WerSvc`, `MapsBroker`, `lfsvc`).
+- **40 allowlisted telemetry scheduled tasks.** Startup Manager includes curated background telemetry scheduled tasks across CEIP, Application Experience, Disk Diagnostic, Autochk, and Edge Update with rollback snapshots.
+- **Tier-3 consent modal and execution gate.** Explicit acknowledgement dialog and persistent consent journal before applying high-impact or machine-wide settings.
+- **Evidence & effect tags.** Every control documents empirical evidence (`Measured`, `Modest`, `Neutral`) and taking-effect indicator (`Immediate`, `Sign-out`, `Restart`, `Reboot`).
+- **Complete 6-locale parity.** 1,769 keys synchronized with 100% parity across English, Italian, German, Spanish, French, and European Portuguese.
 
 See the [changelog](CHANGELOG.md) for every release.
 

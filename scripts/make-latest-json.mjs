@@ -104,7 +104,7 @@ function shippedApplication(msiPath) {
       for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
         const full = path.join(dir, entry.name);
         if (entry.isDirectory()) walk(full);
-        else if (entry.name.toLowerCase() === "pc tweaker.exe") found.push(full);
+        else if (entry.name.toLowerCase() === "wincraft.exe" || entry.name.toLowerCase() === "pc tweaker.exe") found.push(full);
       }
     };
     walk(staging);

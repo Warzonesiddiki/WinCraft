@@ -1148,12 +1148,10 @@ function App() {
                   const target = consentTweak;
                   setConsentTweak(null);
                   try {
-                    if (target.id.startsWith("barebone_")) {
-                      await invoke("record_barebone_consent", {
-                        id: target.id,
-                        text: "Acknowledged",
-                      });
-                    }
+                    await invoke("record_barebone_consent", {
+                      id: target.id,
+                      text: "Acknowledged",
+                    });
                   } catch {
                     // Non-fatal if backend has no consent table for this specific tweak
                   }

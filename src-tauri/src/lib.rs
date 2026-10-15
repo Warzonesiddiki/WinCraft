@@ -359,7 +359,7 @@ fn tweak_infos(store: &RollbackStore) -> Result<Vec<TweakInfo>, String> {
                 requires_admin: t.requires_admin,
                 requires_pro: t.requires_pro,
                 tier: tier.as_str().to_string(),
-                consent_required: tier.consent_required(),
+                consent_required: tier.consent_required() || MANUAL_ONLY_TWEAKS.contains(&t.id),
                 // Derived, not authored: every single-value tweak discloses
                 // itself the moment it exists, with no per-tweak work.
                 changes: vec![technical::TechnicalChange::Registry {
@@ -1111,6 +1111,15 @@ fn rollback_by_id_inner(store: &RollbackStore, id: &str) -> Result<(), String> {
     if let Some(tweak) = services::find(id) {
         return services::rollback_service(store, tweak);
     }
+    if barebone::is_barebone_task(id) {
+        return scheduledtasks::restore_barebone_task(store, id);
+    }
+    if id == "ecoqos_rules" || id == "monitor_refresh_profile" {
+        return Err(format!(
+            "Manage {} from its dedicated panel; no automatic rollback is supported",
+            id
+        ));
+    }
     match id {
         power::TWEAK_ID => power::rollback(store),
         turbo::TWEAK_ID => turbo::rollback(store),
@@ -1136,6 +1145,9 @@ fn rollback_by_id_inner(store: &RollbackStore, id: &str) -> Result<(), String> {
 
 #[cfg(windows)]
 fn requires_admin_for(id: &str) -> bool {
+    if barebone::is_barebone_task(id) {
+        return true;
+    }
     if id == download_limit::TWEAK_ID {
         return true;
     }

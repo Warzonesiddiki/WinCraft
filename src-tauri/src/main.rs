@@ -14,7 +14,7 @@ fn main() {
         // relaunches fell straight through to `run()` and started a second,
         // full GUI running as administrator instead of performing the action
         // headlessly and exiting. Anything added there has to be added here.
-        const ELEVATED_ACTIONS: [&str; 22] = [
+        const ELEVATED_ACTIONS: [&str; 24] = [
             "--elevated-download-limit",
             "--elevated-download-restore",
             "--elevated-session-apply",
@@ -34,6 +34,8 @@ fn main() {
             "--elevated-drift-watch",
             "--elevated-repair",
             "--elevated-task",
+            "--elevated-barebone-task",
+            "--elevated-barebone-task-rollback",
             "--elevated-dpc-trace",
             "--elevated-ramtrim",
             "--elevated-boot-times",
