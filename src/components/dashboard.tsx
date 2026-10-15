@@ -5,6 +5,7 @@ import type { Section, TweakInfo } from "../types";
 import { textFor } from "../lib";
 import { type PulseSample } from "./command";
 import { Badge } from "./ui";
+import { CommandDeckHero } from "./command-deck-hero";
 
 /* ==========================================================================
    Widget system: each widget is a self-contained card that can be rearranged.
@@ -57,6 +58,19 @@ function saveLayout(order: WidgetId[]) {
 
 function StatsWidget({ samples }: { s: Strings; samples: PulseSample[] }) {
   const latest = samples.length > 0 ? samples[samples.length - 1] : null;
+  const [procCount, setProcCount] = useState<number | null>(null);
+
+  useEffect(() => {
+    let alive = true;
+    void invoke<{ current: number; target: number }>("get_process_stats")
+      .then((res) => {
+        if (alive && res && typeof res.current === "number") setProcCount(res.current);
+      })
+      .catch(() => {});
+    return () => {
+      alive = false;
+    };
+  }, []);
 
   const readings = [
     {
@@ -84,12 +98,23 @@ function StatsWidget({ samples }: { s: Strings; samples: PulseSample[] }) {
             ? "var(--warning)"
             : "var(--success)",
     },
+    {
+      label: "PROCS",
+      value: procCount !== null ? `${procCount}` : "—",
+      pct: procCount !== null ? Math.min(100, (procCount / 220) * 100) : 0,
+      color:
+        procCount !== null && procCount <= 90
+          ? "var(--success)"
+          : procCount !== null && procCount <= 130
+            ? "var(--warning)"
+            : "var(--accent)",
+    },
   ];
 
   return (
     <div className="dashboard-widget" data-widget="stats">
-      <h3 className="widget-title">System Stats</h3>
-      <div className="grid grid-cols-2 gap-4">
+      <h3 className="widget-title">System Stats (Target: ~85)</h3>
+      <div className="grid grid-cols-3 gap-2">
         {readings.map((r) => (
           <div key={r.label} className="flex flex-col items-center">
             <div className="relative h-16 w-16">
@@ -453,6 +478,16 @@ export function Dashboard({
           Drag widgets to rearrange your dashboard. Your layout is saved automatically.
         </p>
       )}
+
+      {/* 1-Click AtlasOS & Custom-ISO Command Deck */}
+      <div className="mb-6">
+        <CommandDeckHero
+          tweaks={tweaks}
+          onRefresh={() => {
+            onNavigate("overview");
+          }}
+        />
+      </div>
 
       {/* Widget grid */}
       <div className="grid gap-4 md:grid-cols-2">
