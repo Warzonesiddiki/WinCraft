@@ -1,0 +1,71 @@
+# WinCraft COSMIC Desktop Environment - GlazeWM Configuration
+general:
+  inner_gaps: 8px
+  outer_gaps: 8px
+  focused_border:
+    enabled: true
+    width: 2px
+    active_color: "#48B9C7"    # COSMIC ext_blue accent
+    inactive_color: "#2E2E2E"  # COSMIC neutral_3
+  cursor_follows_focus: false
+  focus_follows_cursor: false
+
+workspaces:
+  - name: "1"
+    display_name: "1"
+  - name: "2"
+    display_name: "2"
+  - name: "3"
+    display_name: "3"
+  - name: "4"
+    display_name: "4"
+
+keybindings:
+  # Focus Navigation (Alt + Arrow Keys & Alt + H/J/K/L)
+  - command: "focus left"
+    bindings: ["alt+h", "alt+left"]
+  - command: "focus right"
+    bindings: ["alt+l", "alt+right"]
+  - command: "focus up"
+    bindings: ["alt+k", "alt+up"]
+  - command: "focus down"
+    bindings: ["alt+j", "alt+down"]
+
+  # Window Movement (Alt + Shift + Arrow Keys)
+  - command: "move left"
+    bindings: ["alt+shift+h", "alt+shift+left"]
+  - command: "move right"
+    bindings: ["alt+shift+l", "alt+shift+right"]
+  - command: "move up"
+    bindings: ["alt+shift+k", "alt+shift+up"]
+  - command: "move down"
+    bindings: ["alt+shift+j", "alt+shift+down"]
+
+  # Window Management
+  - command: "toggle-tiling-direction"
+    binding: "alt+v"
+  - command: "toggle-floating"
+    binding: "alt+g"
+  - command: "toggle-fullscreen"
+    binding: "alt+m"
+  - command: "close"
+    binding: "alt+q"
+
+  # Workspace Switching
+  - command: "focus workspace 1"
+    binding: "alt+1"
+  - command: "focus workspace 2"
+    binding: "alt+2"
+  - command: "focus workspace 3"
+    binding: "alt+3"
+  - command: "focus workspace 4"
+    binding: "alt+4"
+
+  - command: "move to workspace 1"
+    binding: "alt+shift+1"
+  - command: "move to workspace 2"
+    binding: "alt+shift+2"
+  - command: "move to workspace 3"
+    binding: "alt+shift+3"
+  - command: "move to workspace 4"
+    binding: "alt+shift+4"
