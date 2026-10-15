@@ -1911,6 +1911,21 @@ export const it: Strings = {
       description:
         "Blocca le app di terze parti del Microsoft Store dalla lettura di informazioni di diagnostica e telemetria.",
     },
+    svchost_split_threshold: {
+      name: "Raggruppa i processi host dei servizi",
+      description:
+        "Raggruppa i servizi di sistema in processi condivisi per ridurre il numero di processi inattivi e il consumo di memoria.",
+    },
+    disable_8dot3_names: {
+      name: "Disattiva i nomi brevi NTFS 8.3",
+      description:
+        "Interrompe la generazione dei nomi brevi DOS 8.3 sui volumi NTFS per velocizzare la ricerca nei file e nelle cartelle.",
+    },
+    disable_ntfs_last_access: {
+      name: "Disattiva i timestamp di ultimo accesso NTFS",
+      description:
+        "Elimina le scritture su disco superflue evitando di aggiornare la data di ultimo accesso alla lettura dei file.",
+    },
   },
   cleanup: {
     temp_cleanup: {

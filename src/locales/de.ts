@@ -1918,6 +1918,21 @@ export const de: Strings = {
       description:
         "Blockiert den Zugriff von Store-Apps von Drittanbietern auf Diagnoseinformationen und Systemtelemetrie.",
     },
+    svchost_split_threshold: {
+      name: "Diensthost-Prozesse zusammenfassen",
+      description:
+        "Fasst Hintergrunddienste in gemeinsamen Hostprozessen zusammen, um die Anzahl der Prozesse im Leerlauf und den Speicherbedarf zu senken.",
+    },
+    disable_8dot3_names: {
+      name: "Alte NTFS-8.3-Kurznamen deaktivieren",
+      description:
+        "Beendet die Erstellung alter DOS-8.3-Dateinamen auf NTFS-Laufwerken, um Verzeichniszugriffe und Dateioperationen zu beschleunigen.",
+    },
+    disable_ntfs_last_access: {
+      name: "NTFS-Zeitstempel für letzten Zugriff deaktivieren",
+      description:
+        "Verhindert zusätzliche Schreibvorgänge, indem der Zeitstempel für den letzten Zugriff beim Lesen von Dateien nicht aktualisiert wird.",
+    },
   },
   cleanup: {
     temp_cleanup: {

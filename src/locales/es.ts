@@ -1910,6 +1910,21 @@ export const es: Strings = {
       description:
         "Bloquea que aplicaciones de terceros de la Tienda lean información de diagnóstico y telemetría.",
     },
+    svchost_split_threshold: {
+      name: "Consolidar procesos host de servicios",
+      description:
+        "Agrupa los servicios en segundo plano en procesos compartidos para reducir el número de procesos inactivos y el uso de memoria.",
+    },
+    disable_8dot3_names: {
+      name: "Desactivar nombres cortos NTFS 8.3",
+      description:
+        "Detiene la generación de nombres cortos DOS 8.3 en unidades NTFS para acelerar las búsquedas de archivos y carpetas.",
+    },
+    disable_ntfs_last_access: {
+      name: "Desactivar marcas de último acceso en NTFS",
+      description:
+        "Elimina escrituras innecesarias en disco al dejar de registrar la fecha de último acceso al abrir o leer archivos.",
+    },
   },
   cleanup: {
     temp_cleanup: {

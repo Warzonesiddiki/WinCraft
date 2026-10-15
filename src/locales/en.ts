@@ -1884,6 +1884,21 @@ export const en: Strings = {
       description:
         "Blocks third-party Store applications from reading diagnostic information and system telemetry.",
     },
+    svchost_split_threshold: {
+      name: "Consolidate service host processes",
+      description:
+        "Groups non-critical background services into shared host processes to reduce idle process counts and memory overhead.",
+    },
+    disable_8dot3_names: {
+      name: "Disable legacy NTFS 8.3 short names",
+      description:
+        "Stops generating legacy 8.3 short file names on NTFS drives to speed up directory lookups and file operations.",
+    },
+    disable_ntfs_last_access: {
+      name: "Disable NTFS last access timestamps",
+      description:
+        "Eliminates disk write overhead by no longer recording access timestamps whenever files or folders are read.",
+    },
   },
   cleanup: {
     temp_cleanup: {

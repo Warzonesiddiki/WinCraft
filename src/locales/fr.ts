@@ -1914,6 +1914,21 @@ export const fr: Strings = {
       description:
         "Empêche les applications tierces du Store d'accéder aux informations de diagnostic et à la télémétrie.",
     },
+    svchost_split_threshold: {
+      name: "Consolider les processus hôtes de services",
+      description:
+        "Regroupe les services d'arrière-plan dans des processus partagés pour réduire le nombre de processus inactifs et l'utilisation de mémoire.",
+    },
+    disable_8dot3_names: {
+      name: "Désactiver les noms courts NTFS 8.3",
+      description:
+        "Arrête la génération des noms courts DOS 8.3 sur les volumes NTFS pour accélérer la recherche et la gestion des fichiers.",
+    },
+    disable_ntfs_last_access: {
+      name: "Désactiver l'horodatage du dernier accès NTFS",
+      description:
+        "Supprime les écritures disque superflues en évitant d'enregistrer la date du dernier accès lors de la lecture des fichiers.",
+    },
   },
   cleanup: {
     temp_cleanup: {

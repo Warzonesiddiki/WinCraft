@@ -1912,6 +1912,21 @@ export const pt: Strings = {
       description:
         "Bloqueia a leitura de informações de diagnóstico e telemetria do sistema por aplicações da Store.",
     },
+    svchost_split_threshold: {
+      name: "Consolidar processos anfitriões de serviços",
+      description:
+        "Agrupa serviços em segundo plano em processos partilhados para reduzir o número de processos inativos e a sobrecarga de memória.",
+    },
+    disable_8dot3_names: {
+      name: "Desativar nomes curtos NTFS 8.3",
+      description:
+        "Interrompe a criação de nomes curtos DOS 8.3 em unidades NTFS para acelerar a localização e operações de ficheiros.",
+    },
+    disable_ntfs_last_access: {
+      name: "Desativar carimbos de data do último acesso NTFS",
+      description:
+        "Elimina gravações desnecessárias no disco ao deixar de registar a data de último acesso ao abrir ou ler ficheiros.",
+    },
   },
   cleanup: {
     temp_cleanup: {
