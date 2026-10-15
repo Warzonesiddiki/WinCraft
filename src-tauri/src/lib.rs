@@ -180,6 +180,31 @@ pub struct TweakInfo {
     /// for Tier 3, which never appears in bulk/scan/reapply.
     #[serde(default)]
     consent_required: bool,
+    /// Evidence tier: `measured`, `modest` or `neutral`. Phase 0 plumbing:
+    /// uncalibrated until per-area follow-ups; nothing renders these yet.
+    #[serde(default = "default_evidence")]
+    evidence: String,
+    /// When the change takes effect: `immediate`, `sign_out`, `restart` or
+    /// `reboot`. Phase 0 plumbing: `immediate` until verified per tweak.
+    #[serde(default = "default_effect")]
+    effect: String,
+    /// Plain warning line when the tweak has a documented downside.
+    /// `None` means no known downside.
+    #[serde(default)]
+    risk: Option<String>,
+    /// Presentational sub-group. `None` until the catalogue is sub-grouped.
+    #[serde(default)]
+    group: Option<String>,
+}
+
+#[allow(dead_code)]
+fn default_evidence() -> String {
+    "neutral".to_string()
+}
+
+#[allow(dead_code)]
+fn default_effect() -> String {
+    "immediate".to_string()
 }
 
 #[allow(dead_code)]
@@ -187,7 +212,7 @@ fn default_tier() -> String {
     "reversible".to_string()
 }
 
-fn reg_value_type(v: &RegValue) -> &'static str {
+pub(crate) fn reg_value_type(v: &RegValue) -> &'static str {
     match v {
         RegValue::Dword(_) => "REG_DWORD",
         RegValue::Qword(_) => "REG_QWORD",
@@ -198,7 +223,7 @@ fn reg_value_type(v: &RegValue) -> &'static str {
     }
 }
 
-fn reg_value_display(v: &RegValue) -> String {
+pub(crate) fn reg_value_display(v: &RegValue) -> String {
     match v {
         RegValue::Dword(n) => format!("{n} (0x{n:X})"),
         RegValue::Qword(n) => format!("{n} (0x{n:X})"),
@@ -345,6 +370,10 @@ fn tweak_infos(store: &RollbackStore) -> Result<Vec<TweakInfo>, String> {
                 }],
                 unavailable: (t.id == TASKBAR_WIDGETS_ID && services::user_choice_protected())
                     .then_some("windows_protected"),
+                evidence: t.evidence.as_str().to_string(),
+                effect: t.effect.as_str().to_string(),
+                risk: t.risk.map(str::to_string),
+                group: t.group.map(str::to_string),
                 ..Default::default()
             }
         })
@@ -596,6 +625,10 @@ fn tweak_infos(store: &RollbackStore) -> Result<Vec<TweakInfo>, String> {
                     .map(|why| why.code()),
                 tier: tier.as_str().to_string(),
                 consent_required: tier.consent_required(),
+                evidence: t.evidence.as_str().to_string(),
+                effect: t.effect.as_str().to_string(),
+                risk: t.risk.map(str::to_string),
+                group: t.group.map(str::to_string),
             }
         });
     }
@@ -2713,10 +2746,7 @@ mod tests {
         ids.push("barebone_probe".to_string());
         let bulk = bulk_applicable(ids);
         assert!(!bulk.iter().any(|id| id == "barebone_probe"));
-        assert_eq!(
-            bulk_applicable(vec!["barebone_probe".to_string()]).len(),
-            0
-        );
+        assert_eq!(bulk_applicable(vec!["barebone_probe".to_string()]).len(), 0);
     }
 
     #[test]

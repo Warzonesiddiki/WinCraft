@@ -18,7 +18,7 @@ use crate::tweaks::{Category, Hive};
 pub struct Write {
     pub path: &'static str,
     pub name: &'static str,
-    pub value: u32,
+    pub value: RegValue,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -43,6 +43,12 @@ pub struct SettingsTweak {
     /// The first Windows build the setting exists on; 0 for any.
     pub min_build: u32,
     pub edition: Edition,
+    /// Phase 0 plumbing: see `RegistryTweak`. Uncalibrated until per-area
+    /// follow-ups; nothing renders these yet.
+    pub evidence: crate::tweaks::Evidence,
+    pub effect: crate::tweaks::Effect,
+    pub risk: Option<&'static str>,
+    pub group: Option<&'static str>,
 }
 
 impl SettingsTweak {
@@ -77,13 +83,17 @@ pub static TWEAKS: [SettingsTweak; 14] = [
         description: "Sets the Windows policy that removes Click to Do, the feature that takes a screenshot of your screen and analyzes it to suggest actions. Its entry points disappear for every account on this PC. Settings will show it as managed by your organization, which is how Windows labels policies. It has an effect only on PCs where Windows offers Click to Do.",
         category: Category::Privacy,
         hive: Hive::Hklm,
-        writes: &[Write { path: r"SOFTWARE\Policies\Microsoft\Windows\WindowsAI", name: "DisableClickToDo", value: 1 }],
+        writes: &[Write { path: r"SOFTWARE\Policies\Microsoft\Windows\WindowsAI", name: "DisableClickToDo", value: RegValue::Dword(1) }],
         requires_pro: false,
         // Microsoft's Policy CSP still lists this policy for Insider builds
         // only, so no Windows version is claimed; the policy is inert where
         // Click to Do does not exist.
         min_build: 0,
         edition: Edition::ProOrHigher,
+        evidence: crate::tweaks::Evidence::Neutral,
+        effect: crate::tweaks::Effect::Immediate,
+        risk: None,
+        group: None,
     },
     SettingsTweak {
         id: "disable_edge_ai",
@@ -96,16 +106,20 @@ pub static TWEAKS: [SettingsTweak; 14] = [
         category: Category::Privacy,
         hive: Hive::Hklm,
         writes: &[
-            Write { path: EDGE, name: "HubsSidebarEnabled", value: 0 },
-            Write { path: EDGE, name: "GenAILocalFoundationalModelSettings", value: 1 },
-            Write { path: EDGE, name: "EdgeHistoryAISearchEnabled", value: 0 },
-            Write { path: EDGE, name: "AIGenThemesEnabled", value: 0 },
-            Write { path: EDGE, name: "CopilotPageContext", value: 0 },
-            Write { path: EDGE, name: "ComposeInlineEnabled", value: 0 },
+            Write { path: EDGE, name: "HubsSidebarEnabled", value: RegValue::Dword(0) },
+            Write { path: EDGE, name: "GenAILocalFoundationalModelSettings", value: RegValue::Dword(1) },
+            Write { path: EDGE, name: "EdgeHistoryAISearchEnabled", value: RegValue::Dword(0) },
+            Write { path: EDGE, name: "AIGenThemesEnabled", value: RegValue::Dword(0) },
+            Write { path: EDGE, name: "CopilotPageContext", value: RegValue::Dword(0) },
+            Write { path: EDGE, name: "ComposeInlineEnabled", value: RegValue::Dword(0) },
         ],
         requires_pro: false,
         min_build: 0,
         edition: Edition::Any,
+        evidence: crate::tweaks::Evidence::Neutral,
+        effect: crate::tweaks::Effect::Immediate,
+        risk: None,
+        group: None,
     },
     SettingsTweak {
         id: "disable_paint_ai",
@@ -114,13 +128,17 @@ pub static TWEAKS: [SettingsTweak; 14] = [
         category: Category::Privacy,
         hive: Hive::Hklm,
         writes: &[
-            Write { path: PAINT, name: "DisableCocreator", value: 1 },
-            Write { path: PAINT, name: "DisableImageCreator", value: 1 },
-            Write { path: PAINT, name: "DisableGenerativeFill", value: 1 },
+            Write { path: PAINT, name: "DisableCocreator", value: RegValue::Dword(1) },
+            Write { path: PAINT, name: "DisableImageCreator", value: RegValue::Dword(1) },
+            Write { path: PAINT, name: "DisableGenerativeFill", value: RegValue::Dword(1) },
         ],
         requires_pro: false,
         min_build: BUILD_22H2,
         edition: Edition::ProOrHigher,
+        evidence: crate::tweaks::Evidence::Neutral,
+        effect: crate::tweaks::Effect::Immediate,
+        risk: None,
+        group: None,
     },
     SettingsTweak {
         id: "disable_notepad_ai",
@@ -128,10 +146,14 @@ pub static TWEAKS: [SettingsTweak; 14] = [
         description: "Sets the Notepad policy that turns off its Copilot writing tools (rewrite, summarize, write). Close and reopen Notepad to see the change.",
         category: Category::Privacy,
         hive: Hive::Hklm,
-        writes: &[Write { path: r"SOFTWARE\Policies\WindowsNotepad", name: "DisableAIFeatures", value: 1 }],
+        writes: &[Write { path: r"SOFTWARE\Policies\WindowsNotepad", name: "DisableAIFeatures", value: RegValue::Dword(1) }],
         requires_pro: false,
         min_build: BUILD_22H2,
         edition: Edition::Any,
+        evidence: crate::tweaks::Evidence::Neutral,
+        effect: crate::tweaks::Effect::Immediate,
+        risk: None,
+        group: None,
     },
     SettingsTweak {
         id: "disable_fast_startup",
@@ -139,10 +161,14 @@ pub static TWEAKS: [SettingsTweak; 14] = [
         description: "Makes Shut down a real shutdown instead of a partial hibernation. Windows starts a few seconds slower from cold, but drivers and updates load fresh every time, and dual-boot setups no longer find the Windows drive locked.",
         category: Category::Maintenance,
         hive: Hive::Hklm,
-        writes: &[Write { path: r"SYSTEM\CurrentControlSet\Control\Session Manager\Power", name: "HiberbootEnabled", value: 0 }],
+        writes: &[Write { path: r"SYSTEM\CurrentControlSet\Control\Session Manager\Power", name: "HiberbootEnabled", value: RegValue::Dword(0) }],
         requires_pro: false,
         min_build: 0,
         edition: Edition::Any,
+        evidence: crate::tweaks::Evidence::Neutral,
+        effect: crate::tweaks::Effect::Immediate,
+        risk: None,
+        group: None,
     },
     SettingsTweak {
         id: "disable_storage_sense",
@@ -150,10 +176,14 @@ pub static TWEAKS: [SettingsTweak; 14] = [
         description: "Stops Windows from deleting temporary files, emptying the Recycle Bin and moving OneDrive files online on its own schedule. You decide what gets cleaned and when.",
         category: Category::Maintenance,
         hive: Hive::Hkcu,
-        writes: &[Write { path: r"SOFTWARE\Microsoft\Windows\CurrentVersion\StorageSense\Parameters\StoragePolicy", name: "01", value: 0 }],
+        writes: &[Write { path: r"SOFTWARE\Microsoft\Windows\CurrentVersion\StorageSense\Parameters\StoragePolicy", name: "01", value: RegValue::Dword(0) }],
         requires_pro: false,
         min_build: 0,
         edition: Edition::Any,
+        evidence: crate::tweaks::Evidence::Neutral,
+        effect: crate::tweaks::Effect::Immediate,
+        risk: None,
+        group: None,
     },
     SettingsTweak {
         id: "taskbar_end_task",
@@ -161,10 +191,14 @@ pub static TWEAKS: [SettingsTweak; 14] = [
         description: "Adds End task to the right-click menu of apps on the taskbar, so a frozen app can be closed without opening Task Manager.",
         category: Category::Ui,
         hive: Hive::Hkcu,
-        writes: &[Write { path: r"SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced\TaskbarDeveloperSettings", name: "TaskbarEndTask", value: 1 }],
+        writes: &[Write { path: r"SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced\TaskbarDeveloperSettings", name: "TaskbarEndTask", value: RegValue::Dword(1) }],
         requires_pro: false,
         min_build: BUILD_23H2,
         edition: Edition::Any,
+        evidence: crate::tweaks::Evidence::Neutral,
+        effect: crate::tweaks::Effect::Immediate,
+        risk: None,
+        group: None,
     },
     SettingsTweak {
         id: "disable_drag_tray",
@@ -172,10 +206,14 @@ pub static TWEAKS: [SettingsTweak; 14] = [
         description: "Stops the sharing tray (called Drop tray on newer builds) from sliding down from the top of the screen every time you drag a file, so ordinary drag and drop works without it getting in the way. The value comes from Windows community documentation, not from Microsoft; recent Windows 11 updates also offer this switch in Settings.",
         category: Category::Ui,
         hive: Hive::Hkcu,
-        writes: &[Write { path: r"SOFTWARE\Microsoft\Windows\CurrentVersion\CDP", name: "DragTrayEnabled", value: 0 }],
+        writes: &[Write { path: r"SOFTWARE\Microsoft\Windows\CurrentVersion\CDP", name: "DragTrayEnabled", value: RegValue::Dword(0) }],
         requires_pro: false,
         min_build: BUILD_24H2,
         edition: Edition::Any,
+        evidence: crate::tweaks::Evidence::Neutral,
+        effect: crate::tweaks::Effect::Immediate,
+        risk: None,
+        group: None,
     },
     SettingsTweak {
         id: "explorer_open_this_pc",
@@ -183,10 +221,14 @@ pub static TWEAKS: [SettingsTweak; 14] = [
         description: "File Explorer opens on This PC, with your drives and folders, instead of Home and its recent files.",
         category: Category::Ui,
         hive: Hive::Hkcu,
-        writes: &[Write { path: ADVANCED, name: "LaunchTo", value: 1 }],
+        writes: &[Write { path: ADVANCED, name: "LaunchTo", value: RegValue::Dword(1) }],
         requires_pro: false,
         min_build: 0,
         edition: Edition::Any,
+        evidence: crate::tweaks::Evidence::Neutral,
+        effect: crate::tweaks::Effect::Immediate,
+        risk: None,
+        group: None,
     },
     SettingsTweak {
         id: "block_oem_device_apps",
@@ -194,10 +236,14 @@ pub static TWEAKS: [SettingsTweak; 14] = [
         description: "Stops Windows from downloading manufacturers' apps and custom icons for the devices you plug in, which is how some mouse, keyboard and motherboard utilities arrive without being asked for. Drivers still install as usual.",
         category: Category::Maintenance,
         hive: Hive::Hklm,
-        writes: &[Write { path: r"SOFTWARE\Microsoft\Windows\CurrentVersion\Device Metadata", name: "PreventDeviceMetadataFromNetwork", value: 1 }],
+        writes: &[Write { path: r"SOFTWARE\Microsoft\Windows\CurrentVersion\Device Metadata", name: "PreventDeviceMetadataFromNetwork", value: RegValue::Dword(1) }],
         requires_pro: false,
         min_build: 0,
         edition: Edition::Any,
+        evidence: crate::tweaks::Evidence::Neutral,
+        effect: crate::tweaks::Effect::Immediate,
+        risk: None,
+        group: None,
     },
     SettingsTweak {
         id: "disable_windows_suggestions",
@@ -206,20 +252,24 @@ pub static TWEAKS: [SettingsTweak; 14] = [
         category: Category::Privacy,
         hive: Hive::Hkcu,
         writes: &[
-            Write { path: CDM, name: "SubscribedContent-338389Enabled", value: 0 },
-            Write { path: CDM, name: "SubscribedContent-310093Enabled", value: 0 },
-            Write { path: CDM, name: "SubscribedContent-353694Enabled", value: 0 },
-            Write { path: CDM, name: "SubscribedContent-353696Enabled", value: 0 },
-            Write { path: CDM, name: "SoftLandingEnabled", value: 0 },
-            Write { path: r"SOFTWARE\Microsoft\Windows\CurrentVersion\UserProfileEngagement", name: "ScoobeSystemSettingEnabled", value: 0 },
-            Write { path: r"SOFTWARE\Microsoft\Windows\CurrentVersion\Notifications\Settings\Windows.SystemToast.Suggested", name: "Enabled", value: 0 },
-            Write { path: ADVANCED, name: "ShowSyncProviderNotifications", value: 0 },
-            Write { path: ADVANCED, name: "Start_IrisRecommendations", value: 0 },
-            Write { path: ADVANCED, name: "Start_AccountNotifications", value: 0 },
+            Write { path: CDM, name: "SubscribedContent-338389Enabled", value: RegValue::Dword(0) },
+            Write { path: CDM, name: "SubscribedContent-310093Enabled", value: RegValue::Dword(0) },
+            Write { path: CDM, name: "SubscribedContent-353694Enabled", value: RegValue::Dword(0) },
+            Write { path: CDM, name: "SubscribedContent-353696Enabled", value: RegValue::Dword(0) },
+            Write { path: CDM, name: "SoftLandingEnabled", value: RegValue::Dword(0) },
+            Write { path: r"SOFTWARE\Microsoft\Windows\CurrentVersion\UserProfileEngagement", name: "ScoobeSystemSettingEnabled", value: RegValue::Dword(0) },
+            Write { path: r"SOFTWARE\Microsoft\Windows\CurrentVersion\Notifications\Settings\Windows.SystemToast.Suggested", name: "Enabled", value: RegValue::Dword(0) },
+            Write { path: ADVANCED, name: "ShowSyncProviderNotifications", value: RegValue::Dword(0) },
+            Write { path: ADVANCED, name: "Start_IrisRecommendations", value: RegValue::Dword(0) },
+            Write { path: ADVANCED, name: "Start_AccountNotifications", value: RegValue::Dword(0) },
         ],
         requires_pro: false,
         min_build: 0,
         edition: Edition::Any,
+        evidence: crate::tweaks::Evidence::Neutral,
+        effect: crate::tweaks::Effect::Immediate,
+        risk: None,
+        group: None,
     },
     SettingsTweak {
         id: "disable_widgets",
@@ -227,10 +277,14 @@ pub static TWEAKS: [SettingsTweak; 14] = [
         description: "Sets the Windows policy that turns off the Widgets board itself, not just its taskbar button, so its news feed stops loading in the background. Settings will show it as managed by your organization, which is how Windows labels policies.",
         category: Category::Ui,
         hive: Hive::Hklm,
-        writes: &[Write { path: r"SOFTWARE\Policies\Microsoft\Dsh", name: "AllowNewsAndInterests", value: 0 }],
+        writes: &[Write { path: r"SOFTWARE\Policies\Microsoft\Dsh", name: "AllowNewsAndInterests", value: RegValue::Dword(0) }],
         requires_pro: false,
         min_build: BUILD_WIN11,
         edition: Edition::ProOrHigher,
+        evidence: crate::tweaks::Evidence::Neutral,
+        effect: crate::tweaks::Effect::Immediate,
+        risk: None,
+        group: None,
     },
     SettingsTweak {
         id: "hide_start_recommended",
@@ -238,10 +292,14 @@ pub static TWEAKS: [SettingsTweak; 14] = [
         description: "Sets the Windows policy that removes the Recommended section from Start, giving your pinned apps the space to themselves. Settings will show it as managed by your organization, which is how Windows labels policies.",
         category: Category::Ui,
         hive: Hive::Hklm,
-        writes: &[Write { path: r"SOFTWARE\Policies\Microsoft\Windows\Explorer", name: "HideRecommendedSection", value: 1 }],
+        writes: &[Write { path: r"SOFTWARE\Policies\Microsoft\Windows\Explorer", name: "HideRecommendedSection", value: RegValue::Dword(1) }],
         requires_pro: false,
         min_build: BUILD_22H2,
         edition: Edition::EnterpriseOrEducation,
+        evidence: crate::tweaks::Evidence::Neutral,
+        effect: crate::tweaks::Effect::Immediate,
+        risk: None,
+        group: None,
     },
     SettingsTweak {
         id: "disable_game_bar_captures",
@@ -250,12 +308,16 @@ pub static TWEAKS: [SettingsTweak; 14] = [
         category: Category::Gaming,
         hive: Hive::Hkcu,
         writes: &[
-            Write { path: r"SOFTWARE\Microsoft\Windows\CurrentVersion\GameDVR", name: "AppCaptureEnabled", value: 0 },
-            Write { path: r"SOFTWARE\Microsoft\Windows\CurrentVersion\GameDVR", name: "HistoricalCaptureEnabled", value: 0 },
+            Write { path: r"SOFTWARE\Microsoft\Windows\CurrentVersion\GameDVR", name: "AppCaptureEnabled", value: RegValue::Dword(0) },
+            Write { path: r"SOFTWARE\Microsoft\Windows\CurrentVersion\GameDVR", name: "HistoricalCaptureEnabled", value: RegValue::Dword(0) },
         ],
         requires_pro: false,
         min_build: 0,
         edition: Edition::Any,
+        evidence: crate::tweaks::Evidence::Neutral,
+        effect: crate::tweaks::Effect::Immediate,
+        risk: None,
+        group: None,
     },
 ];
 
@@ -370,8 +432,8 @@ pub fn in_effect(tweak: &SettingsTweak) -> Option<bool> {
     use crate::tweaks::windows_impl::read_value;
     let mut all = true;
     for w in tweak.writes {
-        match read_value(tweak.hive, w.path, w.name, &RegValue::Dword(0)) {
-            Ok(Some(RegValue::Dword(v))) => all &= v == w.value,
+        match read_value(tweak.hive, w.path, w.name, &w.value) {
+            Ok(Some(v)) => all &= v == w.value,
             Ok(_) => all = false,
             Err(_) => return None,
         }
@@ -393,8 +455,8 @@ pub(crate) fn apply_writes(store: &RollbackStore, tweak: &SettingsTweak) -> Resu
     let mut transaction = store.transaction()?;
     let mut entries = Vec::new();
     for w in tweak.writes {
-        let original = read_value(tweak.hive, w.path, w.name, &RegValue::Dword(0))
-            .map_err(|e| e.to_string())?;
+        let original =
+            read_value(tweak.hive, w.path, w.name, &w.value).map_err(|e| e.to_string())?;
         entries.push(SnapshotEntry::Registry(RegistrySnapshot {
             hive: tweak.hive_name().to_string(),
             path: w.path.to_string(),
@@ -404,7 +466,7 @@ pub(crate) fn apply_writes(store: &RollbackStore, tweak: &SettingsTweak) -> Resu
     }
     transaction.save_entry(tweak.id, SnapshotEntry::Composite { entries })?;
     for w in tweak.writes {
-        write_value(tweak.hive, w.path, w.name, &RegValue::Dword(w.value))?;
+        write_value(tweak.hive, w.path, w.name, &w.value)?;
     }
     Ok(())
 }
@@ -469,8 +531,8 @@ pub fn changes(tweak: &SettingsTweak) -> Vec<crate::technical::TechnicalChange> 
         .map(|w| crate::technical::TechnicalChange::Registry {
             path: format!("{}\\{}", tweak.hive_name(), w.path),
             value_name: w.name.to_string(),
-            value_type: "REG_DWORD",
-            sets_to: format!("{} (0x{:X})", w.value, w.value),
+            value_type: crate::reg_value_type(&w.value),
+            sets_to: crate::reg_value_display(&w.value),
         })
         .collect()
 }
@@ -665,7 +727,14 @@ mod tests {
                     "minBuild": t.min_build,
                     "edition": format!("{:?}", t.edition),
                     "writes": t.writes.iter().map(|w| serde_json::json!({
-                        "path": w.path, "name": w.name, "value": w.value,
+                        "path": w.path, "name": w.name,
+                        // Numeric while every write is a DWORD: verify-tweaks.ps1
+                        // casts this to uint32. The day a non-DWORD settings
+                        // write lands, that script needs a kind-aware comparison.
+                        "value": match &w.value {
+                            RegValue::Dword(n) => serde_json::json!(n),
+                            other => serde_json::json!(format!("{other:?}")),
+                        },
                     })).collect::<Vec<_>>(),
                     "expected": expected,
                 })

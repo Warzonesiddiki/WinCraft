@@ -61,6 +61,15 @@ export type TweakInfo = {
   tier?: string | null;
   /** True only for Tier 3 Barebone items needing separate consent. */
   consentRequired?: boolean | null;
+  /** Evidence tier from Rust: `measured` | `modest` | `neutral`. Phase 0
+   *  plumbing — uncalibrated until per-area follow-ups; nothing renders it yet. */
+  evidence?: string | null;
+  /** When the change takes effect: `immediate` | `sign_out` | `restart` | `reboot`. */
+  effect?: string | null;
+  /** Plain warning line when the tweak has a documented downside. */
+  risk?: string | null;
+  /** Presentational sub-group. */
+  group?: string | null;
 };
 
 /** One row of the dry run (`preview_tweak`): a change, what is there now and

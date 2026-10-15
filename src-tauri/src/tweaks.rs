@@ -16,6 +16,53 @@ pub enum Hive {
     Hklm,
 }
 
+/// Whether a tweak measurably helps. Calibrated per area in follow-ups;
+/// `Neutral` is the plumbing default, never a claim. Badges render these
+/// only after calibration (Phase 5 UI).
+// Allow(dead_code): Measured/Modest are constructed by the calibration
+// follow-ups, not yet.
+#[allow(dead_code)]
+#[derive(Serialize, Clone, Copy, Debug, PartialEq, Eq)]
+pub enum Evidence {
+    Measured,
+    Modest,
+    Neutral,
+}
+
+impl Evidence {
+    pub fn as_str(self) -> &'static str {
+        match self {
+            Evidence::Measured => "measured",
+            Evidence::Modest => "modest",
+            Evidence::Neutral => "neutral",
+        }
+    }
+}
+
+/// When the change takes effect. Absent today; roughly half of all policies
+/// need sign-out or better.
+// Allow(dead_code): non-Immediate variants are constructed by the calibration
+// follow-ups, not yet.
+#[allow(dead_code)]
+#[derive(Serialize, Clone, Copy, Debug, PartialEq, Eq)]
+pub enum Effect {
+    Immediate,
+    SignOut,
+    Restart,
+    Reboot,
+}
+
+impl Effect {
+    pub fn as_str(self) -> &'static str {
+        match self {
+            Effect::Immediate => "immediate",
+            Effect::SignOut => "sign_out",
+            Effect::Restart => "restart",
+            Effect::Reboot => "reboot",
+        }
+    }
+}
+
 /// The three registry operations every tweak is built from. Production code
 /// reaches the real registry through `windows_impl::WinRegistry`; unit tests
 /// install the in-memory backend in `tests/mock_registry.rs`, so the catalogue
@@ -44,6 +91,10 @@ pub trait RegistryBackend {
 /// A tweak backed by a single registry value (DWORD or string).
 /// `on_value` is written when applying; the previous value is snapshotted
 /// first so `rollback` can put it back exactly as it was.
+///
+/// `evidence`/`effect`/`risk`/`group` are Phase 0 plumbing: `Neutral`,
+/// `Immediate`, `None`, `None` until per-area calibration lands. Nothing
+/// renders them yet.
 pub struct RegistryTweak {
     pub id: &'static str,
     pub name: &'static str,
@@ -55,6 +106,15 @@ pub struct RegistryTweak {
     pub on_value: RegValue,
     pub requires_admin: bool,
     pub requires_pro: bool,
+    pub evidence: Evidence,
+    pub effect: Effect,
+    /// Plain warning line when the tweak has a documented downside, e.g.
+    /// "removes Program Compatibility Assistant; some apps mis-detect
+    /// hardware." `None` means no known downside.
+    pub risk: Option<&'static str>,
+    /// Presentational sub-group (`"telemetry"`, `"responsiveness"`, …).
+    /// `None` until the catalogue is sub-grouped (Phase 5 UI).
+    pub group: Option<&'static str>,
 }
 
 /// Every `name`/`description` here is English on purpose: the UI only falls
@@ -70,6 +130,7 @@ pub fn all_tweaks() -> Vec<RegistryTweak> {
             category: Category::Performance, hive: Hive::Hkcu,
             key_path: r"Software\Microsoft\Windows NT\CurrentVersion\Winlogon", value_name: "RestartApps",
             on_value: RegValue::Dword(0), requires_admin: false, requires_pro: false,
+            evidence: Evidence::Neutral, effect: Effect::Immediate, risk: None, group: None,
         },
         RegistryTweak {
             id: "enable_long_paths", name: "Enable long paths for compatible apps",
@@ -77,6 +138,7 @@ pub fn all_tweaks() -> Vec<RegistryTweak> {
             category: Category::Maintenance, hive: Hive::Hklm,
             key_path: r"SYSTEM\CurrentControlSet\Control\FileSystem", value_name: "LongPathsEnabled",
             on_value: RegValue::Dword(1), requires_admin: true, requires_pro: false,
+            evidence: Evidence::Neutral, effect: Effect::Immediate, risk: None, group: None,
         },
         RegistryTweak {
             id: "dark_mode",
@@ -89,6 +151,10 @@ pub fn all_tweaks() -> Vec<RegistryTweak> {
             on_value: RegValue::Dword(0),
             requires_admin: false,
             requires_pro: false,
+            evidence: Evidence::Neutral,
+            effect: Effect::Immediate,
+            risk: None,
+            group: None,
         },
         RegistryTweak {
             id: "show_hidden_files",
@@ -101,6 +167,10 @@ pub fn all_tweaks() -> Vec<RegistryTweak> {
             on_value: RegValue::Dword(1),
             requires_admin: false,
             requires_pro: false,
+            evidence: Evidence::Neutral,
+            effect: Effect::Immediate,
+            risk: None,
+            group: None,
         },
         RegistryTweak {
             id: "priority_separation",
@@ -113,6 +183,10 @@ pub fn all_tweaks() -> Vec<RegistryTweak> {
             on_value: RegValue::Dword(38),
             requires_admin: true,
             requires_pro: false,
+            evidence: Evidence::Neutral,
+            effect: Effect::Immediate,
+            risk: None,
+            group: None,
         },
         RegistryTweak {
             id: "disable_game_dvr",
@@ -125,6 +199,10 @@ pub fn all_tweaks() -> Vec<RegistryTweak> {
             on_value: RegValue::Dword(0),
             requires_admin: false,
             requires_pro: false,
+            evidence: Evidence::Neutral,
+            effect: Effect::Immediate,
+            risk: None,
+            group: None,
         },
         RegistryTweak {
             id: "disable_telemetry_tasks",
@@ -137,6 +215,10 @@ pub fn all_tweaks() -> Vec<RegistryTweak> {
             on_value: RegValue::Dword(0),
             requires_admin: true,
             requires_pro: false,
+            evidence: Evidence::Neutral,
+            effect: Effect::Immediate,
+            risk: None,
+            group: None,
         },
         RegistryTweak {
             id: "reset_advertising_id",
@@ -149,6 +231,10 @@ pub fn all_tweaks() -> Vec<RegistryTweak> {
             on_value: RegValue::Dword(0),
             requires_admin: false,
             requires_pro: false,
+            evidence: Evidence::Neutral,
+            effect: Effect::Immediate,
+            risk: None,
+            group: None,
         },
         RegistryTweak {
             id: "disable_location_tracking",
@@ -161,6 +247,10 @@ pub fn all_tweaks() -> Vec<RegistryTweak> {
             on_value: RegValue::Dword(1),
             requires_admin: true,
             requires_pro: false,
+            evidence: Evidence::Neutral,
+            effect: Effect::Immediate,
+            risk: None,
+            group: None,
         },
         RegistryTweak {
             id: "disable_bing_search",
@@ -173,6 +263,10 @@ pub fn all_tweaks() -> Vec<RegistryTweak> {
             on_value: RegValue::Dword(0),
             requires_admin: false,
             requires_pro: false,
+            evidence: Evidence::Neutral,
+            effect: Effect::Immediate,
+            risk: None,
+            group: None,
         },
         RegistryTweak {
             id: "hardware_gpu_scheduling",
@@ -185,6 +279,10 @@ pub fn all_tweaks() -> Vec<RegistryTweak> {
             on_value: RegValue::Dword(2),
             requires_admin: true,
             requires_pro: false,
+            evidence: Evidence::Neutral,
+            effect: Effect::Immediate,
+            risk: None,
+            group: None,
         },
         RegistryTweak {
             id: "network_throttling_index",
@@ -197,6 +295,10 @@ pub fn all_tweaks() -> Vec<RegistryTweak> {
             on_value: RegValue::Dword(0xffffffff),
             requires_admin: true,
             requires_pro: false,
+            evidence: Evidence::Neutral,
+            effect: Effect::Immediate,
+            risk: None,
+            group: None,
         },
         RegistryTweak {
             id: "system_responsiveness",
@@ -209,6 +311,10 @@ pub fn all_tweaks() -> Vec<RegistryTweak> {
             on_value: RegValue::Dword(0),
             requires_admin: true,
             requires_pro: false,
+            evidence: Evidence::Neutral,
+            effect: Effect::Immediate,
+            risk: None,
+            group: None,
         },
         RegistryTweak {
             id: "keep_kernel_in_ram",
@@ -221,6 +327,10 @@ pub fn all_tweaks() -> Vec<RegistryTweak> {
             on_value: RegValue::Dword(1),
             requires_admin: true,
             requires_pro: false,
+            evidence: Evidence::Neutral,
+            effect: Effect::Immediate,
+            risk: None,
+            group: None,
         },
         RegistryTweak {
             id: "auto_end_frozen_tasks",
@@ -233,6 +343,10 @@ pub fn all_tweaks() -> Vec<RegistryTweak> {
             on_value: RegValue::Str("1".to_string()),
             requires_admin: false,
             requires_pro: false,
+            evidence: Evidence::Neutral,
+            effect: Effect::Immediate,
+            risk: None,
+            group: None,
         },
         RegistryTweak {
             id: "instant_folder_loading",
@@ -245,6 +359,10 @@ pub fn all_tweaks() -> Vec<RegistryTweak> {
             on_value: RegValue::Str("NotSpecified".to_string()),
             requires_admin: false,
             requires_pro: false,
+            evidence: Evidence::Neutral,
+            effect: Effect::Immediate,
+            risk: None,
+            group: None,
         },
         RegistryTweak {
             id: "taskbar_align_left",
@@ -257,6 +375,10 @@ pub fn all_tweaks() -> Vec<RegistryTweak> {
             on_value: RegValue::Dword(0),
             requires_admin: false,
             requires_pro: false,
+            evidence: Evidence::Neutral,
+            effect: Effect::Immediate,
+            risk: None,
+            group: None,
         },
         RegistryTweak {
             id: "hide_taskbar_chat",
@@ -269,6 +391,10 @@ pub fn all_tweaks() -> Vec<RegistryTweak> {
             on_value: RegValue::Dword(0),
             requires_admin: false,
             requires_pro: false,
+            evidence: Evidence::Neutral,
+            effect: Effect::Immediate,
+            risk: None,
+            group: None,
         },
         RegistryTweak {
             id: "disable_start_suggestions",
@@ -281,6 +407,10 @@ pub fn all_tweaks() -> Vec<RegistryTweak> {
             on_value: RegValue::Dword(0),
             requires_admin: false,
             requires_pro: false,
+            evidence: Evidence::Neutral,
+            effect: Effect::Immediate,
+            risk: None,
+            group: None,
         },
         RegistryTweak {
             id: "hide_taskbar_search",
@@ -293,6 +423,10 @@ pub fn all_tweaks() -> Vec<RegistryTweak> {
             on_value: RegValue::Dword(0),
             requires_admin: false,
             requires_pro: false,
+            evidence: Evidence::Neutral,
+            effect: Effect::Immediate,
+            risk: None,
+            group: None,
         },
         RegistryTweak {
             id: "disable_fullscreen_optimizations_global",
@@ -305,6 +439,10 @@ pub fn all_tweaks() -> Vec<RegistryTweak> {
             on_value: RegValue::Dword(1),
             requires_admin: false,
             requires_pro: false,
+            evidence: Evidence::Neutral,
+            effect: Effect::Immediate,
+            risk: None,
+            group: None,
         },
         RegistryTweak {
             id: "disable_startup_delay",
@@ -317,6 +455,10 @@ pub fn all_tweaks() -> Vec<RegistryTweak> {
             on_value: RegValue::Dword(0),
             requires_admin: false,
             requires_pro: false,
+            evidence: Evidence::Neutral,
+            effect: Effect::Immediate,
+            risk: None,
+            group: None,
         },
         RegistryTweak {
             id: "menu_show_delay",
@@ -329,6 +471,10 @@ pub fn all_tweaks() -> Vec<RegistryTweak> {
             on_value: RegValue::Str(String::from("0")),
             requires_admin: false,
             requires_pro: false,
+            evidence: Evidence::Neutral,
+            effect: Effect::Immediate,
+            risk: None,
+            group: None,
         },
         RegistryTweak {
             id: "disable_power_throttling",
@@ -341,6 +487,10 @@ pub fn all_tweaks() -> Vec<RegistryTweak> {
             on_value: RegValue::Dword(1),
             requires_admin: true,
             requires_pro: false,
+            evidence: Evidence::Neutral,
+            effect: Effect::Immediate,
+            risk: None,
+            group: None,
         },
         RegistryTweak {
             id: "games_gpu_priority",
@@ -353,6 +503,10 @@ pub fn all_tweaks() -> Vec<RegistryTweak> {
             on_value: RegValue::Dword(8),
             requires_admin: true,
             requires_pro: false,
+            evidence: Evidence::Neutral,
+            effect: Effect::Immediate,
+            risk: None,
+            group: None,
         },
         RegistryTweak {
             id: "disable_tailored_experiences",
@@ -365,6 +519,10 @@ pub fn all_tweaks() -> Vec<RegistryTweak> {
             on_value: RegValue::Dword(0),
             requires_admin: false,
             requires_pro: false,
+            evidence: Evidence::Neutral,
+            effect: Effect::Immediate,
+            risk: None,
+            group: None,
         },
         RegistryTweak {
             id: "disable_app_launch_tracking",
@@ -377,6 +535,10 @@ pub fn all_tweaks() -> Vec<RegistryTweak> {
             on_value: RegValue::Dword(0),
             requires_admin: false,
             requires_pro: false,
+            evidence: Evidence::Neutral,
+            effect: Effect::Immediate,
+            risk: None,
+            group: None,
         },
         RegistryTweak {
             id: "disable_feedback_requests",
@@ -389,6 +551,10 @@ pub fn all_tweaks() -> Vec<RegistryTweak> {
             on_value: RegValue::Dword(0),
             requires_admin: false,
             requires_pro: false,
+            evidence: Evidence::Neutral,
+            effect: Effect::Immediate,
+            risk: None,
+            group: None,
         },
         RegistryTweak {
             id: "disable_cortana",
@@ -401,6 +567,10 @@ pub fn all_tweaks() -> Vec<RegistryTweak> {
             on_value: RegValue::Dword(0),
             requires_admin: true,
             requires_pro: false,
+            evidence: Evidence::Neutral,
+            effect: Effect::Immediate,
+            risk: None,
+            group: None,
         },
         RegistryTweak {
             id: "show_file_extensions",
@@ -413,6 +583,10 @@ pub fn all_tweaks() -> Vec<RegistryTweak> {
             on_value: RegValue::Dword(0),
             requires_admin: false,
             requires_pro: false,
+            evidence: Evidence::Neutral,
+            effect: Effect::Immediate,
+            risk: None,
+            group: None,
         },
         RegistryTweak {
             id: "hide_taskbar_widgets",
@@ -425,6 +599,10 @@ pub fn all_tweaks() -> Vec<RegistryTweak> {
             on_value: RegValue::Dword(0),
             requires_admin: false,
             requires_pro: false,
+            evidence: Evidence::Neutral,
+            effect: Effect::Immediate,
+            risk: None,
+            group: None,
         },
         RegistryTweak {
             id: "disable_transparency",
@@ -437,6 +615,10 @@ pub fn all_tweaks() -> Vec<RegistryTweak> {
             on_value: RegValue::Dword(0),
             requires_admin: false,
             requires_pro: false,
+            evidence: Evidence::Neutral,
+            effect: Effect::Immediate,
+            risk: None,
+            group: None,
         },
         RegistryTweak {
             id: "disable_window_animations",
@@ -451,6 +633,10 @@ pub fn all_tweaks() -> Vec<RegistryTweak> {
             on_value: RegValue::Str("0".to_string()),
             requires_admin: false,
             requires_pro: false,
+            evidence: Evidence::Neutral,
+            effect: Effect::Immediate,
+            risk: None,
+            group: None,
         },
         RegistryTweak {
             id: "disable_drag_full_windows",
@@ -463,6 +649,10 @@ pub fn all_tweaks() -> Vec<RegistryTweak> {
             on_value: RegValue::Str("0".to_string()),
             requires_admin: false,
             requires_pro: false,
+            evidence: Evidence::Neutral,
+            effect: Effect::Immediate,
+            risk: None,
+            group: None,
         },
         RegistryTweak {
             id: "mouse_hover_delay",
@@ -475,6 +665,10 @@ pub fn all_tweaks() -> Vec<RegistryTweak> {
             on_value: RegValue::Str("10".to_string()),
             requires_admin: false,
             requires_pro: false,
+            evidence: Evidence::Neutral,
+            effect: Effect::Immediate,
+            risk: None,
+            group: None,
         },
         RegistryTweak {
             id: "disable_background_apps",
@@ -487,6 +681,10 @@ pub fn all_tweaks() -> Vec<RegistryTweak> {
             on_value: RegValue::Dword(1),
             requires_admin: false,
             requires_pro: false,
+            evidence: Evidence::Neutral,
+            effect: Effect::Immediate,
+            risk: None,
+            group: None,
         },
         RegistryTweak {
             id: "disable_delivery_optimization",
@@ -499,6 +697,10 @@ pub fn all_tweaks() -> Vec<RegistryTweak> {
             on_value: RegValue::Dword(0),
             requires_admin: true,
             requires_pro: false,
+            evidence: Evidence::Neutral,
+            effect: Effect::Immediate,
+            risk: None,
+            group: None,
         },
         RegistryTweak {
             id: "disable_copilot",
@@ -511,6 +713,10 @@ pub fn all_tweaks() -> Vec<RegistryTweak> {
             on_value: RegValue::Dword(1),
             requires_admin: false,
             requires_pro: false,
+            evidence: Evidence::Neutral,
+            effect: Effect::Immediate,
+            risk: None,
+            group: None,
         },
         RegistryTweak {
             id: "disable_suggested_apps",
@@ -523,6 +729,10 @@ pub fn all_tweaks() -> Vec<RegistryTweak> {
             on_value: RegValue::Dword(0),
             requires_admin: false,
             requires_pro: false,
+            evidence: Evidence::Neutral,
+            effect: Effect::Immediate,
+            risk: None,
+            group: None,
         },
         RegistryTweak {
             id: "disable_mouse_acceleration",
@@ -535,6 +745,10 @@ pub fn all_tweaks() -> Vec<RegistryTweak> {
             on_value: RegValue::Str(String::from("0")),
             requires_admin: false,
             requires_pro: false,
+            evidence: Evidence::Neutral,
+            effect: Effect::Immediate,
+            risk: None,
+            group: None,
         },
         RegistryTweak {
             id: "disable_sticky_keys_prompt",
@@ -547,6 +761,10 @@ pub fn all_tweaks() -> Vec<RegistryTweak> {
             on_value: RegValue::Str(String::from("506")),
             requires_admin: false,
             requires_pro: false,
+            evidence: Evidence::Neutral,
+            effect: Effect::Immediate,
+            risk: None,
+            group: None,
         },
         RegistryTweak {
             id: "disable_recall",
@@ -559,6 +777,10 @@ pub fn all_tweaks() -> Vec<RegistryTweak> {
             on_value: RegValue::Dword(1),
             requires_admin: true,
             requires_pro: false,
+            evidence: Evidence::Neutral,
+            effect: Effect::Immediate,
+            risk: None,
+            group: None,
         },
         RegistryTweak {
             id: "global_timer_resolution",
@@ -571,6 +793,10 @@ pub fn all_tweaks() -> Vec<RegistryTweak> {
             on_value: RegValue::Dword(1),
             requires_admin: true,
             requires_pro: false,
+            evidence: Evidence::Neutral,
+            effect: Effect::Immediate,
+            risk: None,
+            group: None,
         },
         RegistryTweak {
             id: "disable_memory_integrity",
@@ -583,6 +809,10 @@ pub fn all_tweaks() -> Vec<RegistryTweak> {
             on_value: RegValue::Dword(0),
             requires_admin: true,
             requires_pro: false,
+            evidence: Evidence::Neutral,
+            effect: Effect::Immediate,
+            risk: None,
+            group: None,
         },
         RegistryTweak {
             id: "enable_regback",
@@ -595,6 +825,10 @@ pub fn all_tweaks() -> Vec<RegistryTweak> {
             on_value: RegValue::Dword(1),
             requires_admin: true,
             requires_pro: false,
+            evidence: Evidence::Neutral,
+            effect: Effect::Immediate,
+            risk: None,
+            group: None,
         },
         RegistryTweak {
             id: "explorer_anti_hang",
@@ -607,6 +841,10 @@ pub fn all_tweaks() -> Vec<RegistryTweak> {
             on_value: RegValue::Dword(1),
             requires_admin: false,
             requires_pro: false,
+            evidence: Evidence::Neutral,
+            effect: Effect::Immediate,
+            risk: None,
+            group: None,
         },
         RegistryTweak {
             id: "no_internet_open_with",
@@ -619,6 +857,10 @@ pub fn all_tweaks() -> Vec<RegistryTweak> {
             on_value: RegValue::Dword(1),
             requires_admin: false,
             requires_pro: false,
+            evidence: Evidence::Neutral,
+            effect: Effect::Immediate,
+            risk: None,
+            group: None,
         },
         RegistryTweak {
             id: "detailed_bsod",
@@ -631,6 +873,10 @@ pub fn all_tweaks() -> Vec<RegistryTweak> {
             on_value: RegValue::Dword(1),
             requires_admin: true,
             requires_pro: false,
+            evidence: Evidence::Neutral,
+            effect: Effect::Immediate,
+            risk: None,
+            group: None,
         },
         RegistryTweak {
             id: "disable_wpbt",
@@ -643,6 +889,10 @@ pub fn all_tweaks() -> Vec<RegistryTweak> {
             on_value: RegValue::Dword(1),
             requires_admin: true,
             requires_pro: false,
+            evidence: Evidence::Neutral,
+            effect: Effect::Immediate,
+            risk: None,
+            group: None,
         },
         RegistryTweak {
             id: "disable_ndu",
@@ -655,6 +905,10 @@ pub fn all_tweaks() -> Vec<RegistryTweak> {
             on_value: RegValue::Dword(4),
             requires_admin: true,
             requires_pro: false,
+            evidence: Evidence::Neutral,
+            effect: Effect::Immediate,
+            risk: None,
+            group: None,
         },
         RegistryTweak {
             id: "disable_search_highlights",
@@ -667,6 +921,10 @@ pub fn all_tweaks() -> Vec<RegistryTweak> {
             on_value: RegValue::Dword(0),
             requires_admin: false,
             requires_pro: false,
+            evidence: Evidence::Neutral,
+            effect: Effect::Immediate,
+            risk: None,
+            group: None,
         },
         RegistryTweak {
             id: "auto_complete_run",
@@ -679,6 +937,10 @@ pub fn all_tweaks() -> Vec<RegistryTweak> {
             on_value: RegValue::Str("yes".to_string()),
             requires_admin: false,
             requires_pro: false,
+            evidence: Evidence::Neutral,
+            effect: Effect::Immediate,
+            risk: None,
+            group: None,
         },
         RegistryTweak {
             id: "disable_aero_shake",
@@ -691,6 +953,10 @@ pub fn all_tweaks() -> Vec<RegistryTweak> {
             on_value: RegValue::Dword(1),
             requires_admin: false,
             requires_pro: false,
+            evidence: Evidence::Neutral,
+            effect: Effect::Immediate,
+            risk: None,
+            group: None,
         },
         RegistryTweak {
             id: "disable_remote_assistance",
@@ -703,6 +969,10 @@ pub fn all_tweaks() -> Vec<RegistryTweak> {
             on_value: RegValue::Dword(0),
             requires_admin: true,
             requires_pro: false,
+            evidence: Evidence::Neutral,
+            effect: Effect::Immediate,
+            risk: None,
+            group: None,
         },
         RegistryTweak {
             id: "disable_llmnr",
@@ -715,6 +985,10 @@ pub fn all_tweaks() -> Vec<RegistryTweak> {
             on_value: RegValue::Dword(0),
             requires_admin: true,
             requires_pro: false,
+            evidence: Evidence::Neutral,
+            effect: Effect::Immediate,
+            risk: None,
+            group: None,
         },
         RegistryTweak {
             id: "disable_wifi_sense",
@@ -727,6 +1001,10 @@ pub fn all_tweaks() -> Vec<RegistryTweak> {
             on_value: RegValue::Dword(0),
             requires_admin: true,
             requires_pro: false,
+            evidence: Evidence::Neutral,
+            effect: Effect::Immediate,
+            risk: None,
+            group: None,
         },
         RegistryTweak {
             id: "disable_cloud_search",
@@ -739,6 +1017,10 @@ pub fn all_tweaks() -> Vec<RegistryTweak> {
             on_value: RegValue::Dword(0),
             requires_admin: false,
             requires_pro: false,
+            evidence: Evidence::Neutral,
+            effect: Effect::Immediate,
+            risk: None,
+            group: None,
         },
         RegistryTweak {
             id: "disable_app_suggestions_start",
@@ -751,6 +1033,10 @@ pub fn all_tweaks() -> Vec<RegistryTweak> {
             on_value: RegValue::Dword(0),
             requires_admin: false,
             requires_pro: false,
+            evidence: Evidence::Neutral,
+            effect: Effect::Immediate,
+            risk: None,
+            group: None,
         },
         RegistryTweak {
             id: "disable_handwriting_sharing",
@@ -763,6 +1049,10 @@ pub fn all_tweaks() -> Vec<RegistryTweak> {
             on_value: RegValue::Dword(1),
             requires_admin: true,
             requires_pro: false,
+            evidence: Evidence::Neutral,
+            effect: Effect::Immediate,
+            risk: None,
+            group: None,
         },
         RegistryTweak {
             id: "disable_ceip",
@@ -775,6 +1065,10 @@ pub fn all_tweaks() -> Vec<RegistryTweak> {
             on_value: RegValue::Dword(0),
             requires_admin: true,
             requires_pro: false,
+            evidence: Evidence::Neutral,
+            effect: Effect::Immediate,
+            risk: None,
+            group: None,
         },
         RegistryTweak {
             id: "disable_lockscreen_camera",
@@ -787,6 +1081,10 @@ pub fn all_tweaks() -> Vec<RegistryTweak> {
             on_value: RegValue::Dword(1),
             requires_admin: true,
             requires_pro: false,
+            evidence: Evidence::Neutral,
+            effect: Effect::Immediate,
+            risk: None,
+            group: None,
         },
         RegistryTweak {
             id: "disable_cortana_consent",
@@ -799,6 +1097,10 @@ pub fn all_tweaks() -> Vec<RegistryTweak> {
             on_value: RegValue::Dword(0),
             requires_admin: false,
             requires_pro: false,
+            evidence: Evidence::Neutral,
+            effect: Effect::Immediate,
+            risk: None,
+            group: None,
         },
         RegistryTweak {
             id: "disable_wer_queuing",
@@ -811,6 +1113,10 @@ pub fn all_tweaks() -> Vec<RegistryTweak> {
             on_value: RegValue::Dword(1),
             requires_admin: true,
             requires_pro: false,
+            evidence: Evidence::Neutral,
+            effect: Effect::Immediate,
+            risk: None,
+            group: None,
         },
         RegistryTweak {
             id: "disable_experimentation",
@@ -823,6 +1129,10 @@ pub fn all_tweaks() -> Vec<RegistryTweak> {
             on_value: RegValue::Dword(0),
             requires_admin: true,
             requires_pro: false,
+            evidence: Evidence::Neutral,
+            effect: Effect::Immediate,
+            risk: None,
+            group: None,
         },
         RegistryTweak {
             id: "disable_app_inventory_collection",
@@ -835,6 +1145,10 @@ pub fn all_tweaks() -> Vec<RegistryTweak> {
             on_value: RegValue::Dword(1),
             requires_admin: true,
             requires_pro: false,
+            evidence: Evidence::Neutral,
+            effect: Effect::Immediate,
+            risk: None,
+            group: None,
         },
         RegistryTweak {
             id: "disable_problem_steps_recorder",
@@ -847,6 +1161,10 @@ pub fn all_tweaks() -> Vec<RegistryTweak> {
             on_value: RegValue::Dword(1),
             requires_admin: true,
             requires_pro: false,
+            evidence: Evidence::Neutral,
+            effect: Effect::Immediate,
+            risk: None,
+            group: None,
         },
         RegistryTweak {
             id: "disable_ait_telemetry",
@@ -859,6 +1177,10 @@ pub fn all_tweaks() -> Vec<RegistryTweak> {
             on_value: RegValue::Dword(0),
             requires_admin: true,
             requires_pro: false,
+            evidence: Evidence::Neutral,
+            effect: Effect::Immediate,
+            risk: None,
+            group: None,
         },
         RegistryTweak {
             id: "disable_smartscreen_app_install",
@@ -871,6 +1193,10 @@ pub fn all_tweaks() -> Vec<RegistryTweak> {
             on_value: RegValue::Dword(0),
             requires_admin: true,
             requires_pro: false,
+            evidence: Evidence::Neutral,
+            effect: Effect::Immediate,
+            risk: None,
+            group: None,
         },
         RegistryTweak {
             id: "disable_online_speech_privacy",
@@ -883,6 +1209,10 @@ pub fn all_tweaks() -> Vec<RegistryTweak> {
             on_value: RegValue::Dword(0),
             requires_admin: false,
             requires_pro: false,
+            evidence: Evidence::Neutral,
+            effect: Effect::Immediate,
+            risk: None,
+            group: None,
         },
         RegistryTweak {
             id: "disable_edge_shopping",
@@ -895,6 +1225,10 @@ pub fn all_tweaks() -> Vec<RegistryTweak> {
             on_value: RegValue::Dword(0),
             requires_admin: true,
             requires_pro: false,
+            evidence: Evidence::Neutral,
+            effect: Effect::Immediate,
+            risk: None,
+            group: None,
         },
         RegistryTweak {
             id: "disable_edge_metrics",
@@ -907,6 +1241,10 @@ pub fn all_tweaks() -> Vec<RegistryTweak> {
             on_value: RegValue::Dword(0),
             requires_admin: true,
             requires_pro: false,
+            evidence: Evidence::Neutral,
+            effect: Effect::Immediate,
+            risk: None,
+            group: None,
         },
         RegistryTweak {
             id: "disable_edge_startup_boost",
@@ -919,6 +1257,10 @@ pub fn all_tweaks() -> Vec<RegistryTweak> {
             on_value: RegValue::Dword(0),
             requires_admin: true,
             requires_pro: false,
+            evidence: Evidence::Neutral,
+            effect: Effect::Immediate,
+            risk: None,
+            group: None,
         },
         RegistryTweak {
             id: "disable_edge_background_mode",
@@ -931,6 +1273,10 @@ pub fn all_tweaks() -> Vec<RegistryTweak> {
             on_value: RegValue::Dword(0),
             requires_admin: true,
             requires_pro: false,
+            evidence: Evidence::Neutral,
+            effect: Effect::Immediate,
+            risk: None,
+            group: None,
         },
         RegistryTweak {
             id: "disable_bluetooth_le_discovery",
@@ -943,6 +1289,10 @@ pub fn all_tweaks() -> Vec<RegistryTweak> {
             on_value: RegValue::Dword(1),
             requires_admin: true,
             requires_pro: false,
+            evidence: Evidence::Neutral,
+            effect: Effect::Immediate,
+            risk: None,
+            group: None,
         },
         RegistryTweak {
             id: "disable_edge_wallet",
@@ -955,6 +1305,10 @@ pub fn all_tweaks() -> Vec<RegistryTweak> {
             on_value: RegValue::Dword(0),
             requires_admin: true,
             requires_pro: false,
+            evidence: Evidence::Neutral,
+            effect: Effect::Immediate,
+            risk: None,
+            group: None,
         },
         RegistryTweak {
             id: "disable_cortana_above_lock",
@@ -967,6 +1321,10 @@ pub fn all_tweaks() -> Vec<RegistryTweak> {
             on_value: RegValue::Dword(0),
             requires_admin: true,
             requires_pro: false,
+            evidence: Evidence::Neutral,
+            effect: Effect::Immediate,
+            risk: None,
+            group: None,
         },
         RegistryTweak {
             id: "disable_device_history",
@@ -979,6 +1337,10 @@ pub fn all_tweaks() -> Vec<RegistryTweak> {
             on_value: RegValue::Dword(0),
             requires_admin: false,
             requires_pro: false,
+            evidence: Evidence::Neutral,
+            effect: Effect::Immediate,
+            risk: None,
+            group: None,
         },
         RegistryTweak {
             id: "disable_search_history",
@@ -991,6 +1353,10 @@ pub fn all_tweaks() -> Vec<RegistryTweak> {
             on_value: RegValue::Dword(0),
             requires_admin: false,
             requires_pro: false,
+            evidence: Evidence::Neutral,
+            effect: Effect::Immediate,
+            risk: None,
+            group: None,
         },
         RegistryTweak {
             id: "disable_news_and_interests",
@@ -1003,6 +1369,10 @@ pub fn all_tweaks() -> Vec<RegistryTweak> {
             on_value: RegValue::Dword(2),
             requires_admin: false,
             requires_pro: false,
+            evidence: Evidence::Neutral,
+            effect: Effect::Immediate,
+            risk: None,
+            group: None,
         },
         RegistryTweak {
             id: "disable_auto_maintenance_wake",
@@ -1015,6 +1385,10 @@ pub fn all_tweaks() -> Vec<RegistryTweak> {
             on_value: RegValue::Dword(0),
             requires_admin: true,
             requires_pro: false,
+            evidence: Evidence::Neutral,
+            effect: Effect::Immediate,
+            risk: None,
+            group: None,
         },
         RegistryTweak {
             id: "disable_diagnostic_data_viewer",
@@ -1027,6 +1401,10 @@ pub fn all_tweaks() -> Vec<RegistryTweak> {
             on_value: RegValue::Dword(1),
             requires_admin: true,
             requires_pro: false,
+            evidence: Evidence::Neutral,
+            effect: Effect::Immediate,
+            risk: None,
+            group: None,
         },
         RegistryTweak {
             id: "disable_activity_feed",
@@ -1039,6 +1417,10 @@ pub fn all_tweaks() -> Vec<RegistryTweak> {
             on_value: RegValue::Dword(0),
             requires_admin: true,
             requires_pro: false,
+            evidence: Evidence::Neutral,
+            effect: Effect::Immediate,
+            risk: None,
+            group: None,
         },
         RegistryTweak {
             id: "disable_publish_user_activities",
@@ -1051,6 +1433,10 @@ pub fn all_tweaks() -> Vec<RegistryTweak> {
             on_value: RegValue::Dword(0),
             requires_admin: true,
             requires_pro: false,
+            evidence: Evidence::Neutral,
+            effect: Effect::Immediate,
+            risk: None,
+            group: None,
         },
         RegistryTweak {
             id: "disable_typing_insights",
@@ -1063,6 +1449,10 @@ pub fn all_tweaks() -> Vec<RegistryTweak> {
             on_value: RegValue::Dword(0),
             requires_admin: false,
             requires_pro: false,
+            evidence: Evidence::Neutral,
+            effect: Effect::Immediate,
+            risk: None,
+            group: None,
         },
         RegistryTweak {
             id: "disable_inking_typing_personalization",
@@ -1075,6 +1465,10 @@ pub fn all_tweaks() -> Vec<RegistryTweak> {
             on_value: RegValue::Dword(0),
             requires_admin: false,
             requires_pro: false,
+            evidence: Evidence::Neutral,
+            effect: Effect::Immediate,
+            risk: None,
+            group: None,
         },
         RegistryTweak {
             id: "disable_shared_experiences",
@@ -1087,6 +1481,10 @@ pub fn all_tweaks() -> Vec<RegistryTweak> {
             on_value: RegValue::Dword(0),
             requires_admin: true,
             requires_pro: false,
+            evidence: Evidence::Neutral,
+            effect: Effect::Immediate,
+            risk: None,
+            group: None,
         },
         RegistryTweak {
             id: "disable_remote_desktop",
@@ -1099,6 +1497,10 @@ pub fn all_tweaks() -> Vec<RegistryTweak> {
             on_value: RegValue::Dword(1),
             requires_admin: true,
             requires_pro: false,
+            evidence: Evidence::Neutral,
+            effect: Effect::Immediate,
+            risk: None,
+            group: None,
         },
         RegistryTweak {
             id: "disable_edge_collections",
@@ -1111,6 +1513,10 @@ pub fn all_tweaks() -> Vec<RegistryTweak> {
             on_value: RegValue::Dword(0),
             requires_admin: true,
             requires_pro: false,
+            evidence: Evidence::Neutral,
+            effect: Effect::Immediate,
+            risk: None,
+            group: None,
         },
         RegistryTweak {
             id: "disable_edge_quick_search",
@@ -1123,6 +1529,10 @@ pub fn all_tweaks() -> Vec<RegistryTweak> {
             on_value: RegValue::Dword(0),
             requires_admin: true,
             requires_pro: false,
+            evidence: Evidence::Neutral,
+            effect: Effect::Immediate,
+            risk: None,
+            group: None,
         },
         RegistryTweak {
             id: "disable_edge_personalization",
@@ -1135,6 +1545,10 @@ pub fn all_tweaks() -> Vec<RegistryTweak> {
             on_value: RegValue::Dword(0),
             requires_admin: true,
             requires_pro: false,
+            evidence: Evidence::Neutral,
+            effect: Effect::Immediate,
+            risk: None,
+            group: None,
         },
         RegistryTweak {
             id: "disable_lockscreen_spotlight",
@@ -1147,6 +1561,10 @@ pub fn all_tweaks() -> Vec<RegistryTweak> {
             on_value: RegValue::Dword(1),
             requires_admin: false,
             requires_pro: false,
+            evidence: Evidence::Neutral,
+            effect: Effect::Immediate,
+            risk: None,
+            group: None,
         },
         RegistryTweak {
             id: "disable_push_install_service",
@@ -1159,6 +1577,10 @@ pub fn all_tweaks() -> Vec<RegistryTweak> {
             on_value: RegValue::Dword(1),
             requires_admin: true,
             requires_pro: false,
+            evidence: Evidence::Neutral,
+            effect: Effect::Immediate,
+            risk: None,
+            group: None,
         },
         RegistryTweak {
             id: "disable_compatibility_assistant",
@@ -1171,6 +1593,10 @@ pub fn all_tweaks() -> Vec<RegistryTweak> {
             on_value: RegValue::Dword(1),
             requires_admin: true,
             requires_pro: false,
+            evidence: Evidence::Neutral,
+            effect: Effect::Immediate,
+            risk: None,
+            group: None,
         },
         RegistryTweak {
             id: "disable_cortana_cloud_search",
@@ -1183,6 +1609,10 @@ pub fn all_tweaks() -> Vec<RegistryTweak> {
             on_value: RegValue::Dword(0),
             requires_admin: true,
             requires_pro: false,
+            evidence: Evidence::Neutral,
+            effect: Effect::Immediate,
+            risk: None,
+            group: None,
         },
         RegistryTweak {
             id: "disable_find_my_device",
@@ -1195,6 +1625,10 @@ pub fn all_tweaks() -> Vec<RegistryTweak> {
             on_value: RegValue::Dword(0),
             requires_admin: true,
             requires_pro: false,
+            evidence: Evidence::Neutral,
+            effect: Effect::Immediate,
+            risk: None,
+            group: None,
         },
         RegistryTweak {
             id: "disable_sensors_data_collection",
@@ -1207,6 +1641,10 @@ pub fn all_tweaks() -> Vec<RegistryTweak> {
             on_value: RegValue::Dword(1),
             requires_admin: true,
             requires_pro: false,
+            evidence: Evidence::Neutral,
+            effect: Effect::Immediate,
+            risk: None,
+            group: None,
         },
         RegistryTweak {
             id: "disable_location_scripting",
@@ -1219,6 +1657,10 @@ pub fn all_tweaks() -> Vec<RegistryTweak> {
             on_value: RegValue::Dword(1),
             requires_admin: true,
             requires_pro: false,
+            evidence: Evidence::Neutral,
+            effect: Effect::Immediate,
+            risk: None,
+            group: None,
         },
         RegistryTweak {
             id: "disable_advertising_info",
@@ -1231,6 +1673,10 @@ pub fn all_tweaks() -> Vec<RegistryTweak> {
             on_value: RegValue::Dword(1),
             requires_admin: true,
             requires_pro: false,
+            evidence: Evidence::Neutral,
+            effect: Effect::Immediate,
+            risk: None,
+            group: None,
         },
         RegistryTweak {
             id: "disable_sync_settings",
@@ -1243,6 +1689,10 @@ pub fn all_tweaks() -> Vec<RegistryTweak> {
             on_value: RegValue::Dword(2),
             requires_admin: true,
             requires_pro: false,
+            evidence: Evidence::Neutral,
+            effect: Effect::Immediate,
+            risk: None,
+            group: None,
         },
         RegistryTweak {
             id: "disable_app_diagnostics_access",
@@ -1255,6 +1705,10 @@ pub fn all_tweaks() -> Vec<RegistryTweak> {
             on_value: RegValue::Dword(2),
             requires_admin: true,
             requires_pro: false,
+            evidence: Evidence::Neutral,
+            effect: Effect::Immediate,
+            risk: None,
+            group: None,
         },
     ]
 }
