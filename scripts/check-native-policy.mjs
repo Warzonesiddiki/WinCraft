@@ -34,17 +34,48 @@ const filters = [
   "tests::duplicate_batch_ids_execute_only_once_and_keep_input_order",
 ];
 
+// Build the test binary once, then execute isolated filters against the binary.
+// This preserves complete process isolation while avoiding 19 separate cargo invocations.
+const build = spawnSync(
+  "cargo",
+  ["test", "--manifest-path", "src-tauri/Cargo.toml", "--lib", "--no-run", "--message-format=json"],
+  {
+    cwd: fileURLToPath(new URL("..", import.meta.url)),
+    stdio: ["inherit", "pipe", "inherit"],
+    encoding: "utf8",
+  },
+);
+if (build.error) throw build.error;
+if (build.status !== 0) process.exit(build.status ?? 1);
+
+let executable = null;
+for (const line of build.stdout.split("\n")) {
+  if (!line.trim()) continue;
+  try {
+    const msg = JSON.parse(line);
+    if (msg.reason === "compiler-artifact" && msg.target?.name === "tauri_app_lib" && msg.executable) {
+      executable = msg.executable;
+    }
+  } catch {}
+}
+
 for (const filter of filters) {
   console.log(`\nChecking isolated native policy: ${filter}`);
-  const result = spawnSync(
-    "cargo",
-    ["test", "--manifest-path", "src-tauri/Cargo.toml", "--lib", filter],
-    {
-      cwd: fileURLToPath(new URL("..", import.meta.url)),
-      stdio: ["inherit", "pipe", "inherit"],
-      encoding: "utf8",
-    },
-  );
+  const result = executable
+    ? spawnSync(executable, [filter], {
+        cwd: fileURLToPath(new URL("..", import.meta.url)),
+        stdio: ["inherit", "pipe", "inherit"],
+        encoding: "utf8",
+      })
+    : spawnSync(
+        "cargo",
+        ["test", "--manifest-path", "src-tauri/Cargo.toml", "--lib", filter],
+        {
+          cwd: fileURLToPath(new URL("..", import.meta.url)),
+          stdio: ["inherit", "pipe", "inherit"],
+          encoding: "utf8",
+        },
+      );
   if (result.error) throw result.error;
   process.stdout.write(result.stdout);
   if (result.status !== 0) process.exit(result.status ?? 1);
