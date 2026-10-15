@@ -281,7 +281,7 @@ export const PRACTICAL_GUIDES = {
       },
       {
         heading: "Free features and signed installers",
-        body: "The current release includes all 142 controls in the catalogue, plus editable starter profiles, with no account required and no paid tier. Official Windows installers are digitally signed. Signing identifies the publisher and protects file integrity; it does not guarantee that SmartScreen or antivirus warnings will never appear.",
+        body: "The current release includes all 150 controls in the catalogue, plus editable starter profiles, with no account required and no paid tier. Official Windows installers are digitally signed. Signing identifies the publisher and protects file integrity; it does not guarantee that SmartScreen or antivirus warnings will never appear.",
       },
       {
         heading: "Inspect the implementation",

@@ -1927,6 +1927,46 @@ export const pt: Strings = {
       description:
         "Elimina gravações desnecessárias no disco ao deixar de registar a data de último acesso ao abrir ou ler ficheiros.",
     },
+    disable_autologger_diagtrack: {
+      name: "Desativar sessão de autologger DiagTrack",
+      description:
+        "Interrompe o registo circular contínuo em disco para a sessão ETW de telemetria e diagnóstico do DiagTrack.",
+    },
+    disable_autologger_sqm: {
+      name: "Desativar sessão de autologger SQM",
+      description:
+        "Interrompe o registo em disco em segundo plano para o serviço de telemetria Software Quality Metrics (SQM).",
+    },
+    disable_autologger_ait: {
+      name: "Desativar sessão de autologger de eventos AIT",
+      description:
+        "Interrompe o registo de eventos ETW para o serviço Application Inventory and Telemetry (AIT).",
+    },
+    disable_autologger_diaglog: {
+      name: "Desativar sessão de autologger de diagnóstico",
+      description:
+        "Interrompe o registo circular em disco para as sessões de diagnóstico e rastreio de erros do Windows.",
+    },
+    disable_autologger_wifisession: {
+      name: "Desativar sessão de autologger de diagnóstico Wi-Fi",
+      description:
+        "Interrompe o registo contínuo de telemetria de diagnóstico para os estados de ligação Wi-Fi.",
+    },
+    disable_wersvc_service: {
+      name: "Iniciar o Relatório de Erros do Windows apenas quando necessário",
+      description:
+        "Para o serviço de Relatório de Erros do Windows (WerSvc) e define-o como Manual para reduzir a atividade em segundo plano.",
+    },
+    disable_mapsbroker_service: {
+      name: "Desativar o serviço Gestor de Mapas Descarregados",
+      description:
+        "Para e desativa o serviço Gestor de Mapas Descarregados (MapsBroker), impedindo verificações de rede em segundo plano.",
+    },
+    disable_lfsvc_service: {
+      name: "Iniciar o serviço de geolocalização apenas quando necessário",
+      description:
+        "Para o serviço de geolocalização do Windows (lfsvc) e define-o como Manual, evitando a consulta contínua da localização.",
+    },
   },
   cleanup: {
     temp_cleanup: {

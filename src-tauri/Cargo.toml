@@ -1,6 +1,6 @@
 [package]
 name = "tauri-app"
-version = "1.19.0"
+version = "2.0.0"
 description = "WinCraft — Craft your perfect Windows experience"
 authors = ["Aurelio Avila"]
 license-file = "../LICENSE"

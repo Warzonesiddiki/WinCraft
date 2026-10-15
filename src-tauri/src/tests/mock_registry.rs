@@ -326,7 +326,7 @@ const REGISTRY_COMPOSITES: [&str; 5] = [
 
 /// Tweaks driven through a seam of their own, with their round-trip tests
 /// next to it rather than here.
-const COVERED_IN_MODULE: [&str; 13] = [
+const COVERED_IN_MODULE: [&str; 16] = [
     crate::power::TWEAK_ID,                           // power::tests (power plans)
     crate::turbo::TWEAK_ID,                           // turbo::tests (registry plus power plans)
     crate::gaming::TURBO_BOOST_ID,                    // gaming::tests (power plans)
@@ -335,6 +335,9 @@ const COVERED_IN_MODULE: [&str; 13] = [
     crate::services::AI_FABRIC_ID,                    // services::tests (service control manager)
     crate::services::DMWAP_PUSH_ID,                   // services::tests (service control manager)
     crate::services::DIAGTRACK_ID,                    // services::tests (service control manager)
+    crate::services::WERSVC_ID,                       // services::tests (service control manager)
+    crate::services::MAPSBROKER_ID,                   // services::tests (service control manager)
+    crate::services::LFSVC_ID,                        // services::tests (service control manager)
     crate::everyday::DISABLE_FILTER_KEYS_SHORTCUT_ID, // everyday::tests (SystemParametersInfo)
     crate::contextmenu::TWEAK_ID,                     // contextmenu::tests (registry keys)
     crate::dns::TWEAK_ID,                             // dns::tests (DNS client settings)

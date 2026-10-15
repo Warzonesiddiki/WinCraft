@@ -1929,6 +1929,46 @@ export const fr: Strings = {
       description:
         "Supprime les écritures disque superflues en évitant d'enregistrer la date du dernier accès lors de la lecture des fichiers.",
     },
+    disable_autologger_diagtrack: {
+      name: "Désactiver la session d'autologger DiagTrack",
+      description:
+        "Arrête l'écriture circulaire continue sur disque de la session ETW de télémétrie de DiagTrack.",
+    },
+    disable_autologger_sqm: {
+      name: "Désactiver la session d'autologger SQM",
+      description:
+        "Arrête l'enregistrement sur disque en arrière-plan pour le journal de télémétrie Software Quality Metrics (SQM).",
+    },
+    disable_autologger_ait: {
+      name: "Désactiver la session d'autologger d'événements AIT",
+      description:
+        "Arrête la journalisation des événements ETW pour le service Application Inventory and Telemetry (AIT).",
+    },
+    disable_autologger_diaglog: {
+      name: "Désactiver la session d'autologger de diagnostic",
+      description:
+        "Arrête l'écriture circulaire sur disque pour les sessions de diagnostic et de suivi d'erreurs Windows.",
+    },
+    disable_autologger_wifisession: {
+      name: "Désactiver la session d'autologger de diagnostic Wi-Fi",
+      description:
+        "Arrête la journalisation continue de la télémétrie de diagnostic pour les états de connexion Wi-Fi.",
+    },
+    disable_wersvc_service: {
+      name: "Démarrer le rapport d'erreurs Windows uniquement sur demande",
+      description:
+        "Arrête le service Rapport d'erreurs Windows (WerSvc) et le configure sur Manuel pour réduire les activités en arrière-plan.",
+    },
+    disable_mapsbroker_service: {
+      name: "Désactiver le service Gestionnaire de cartes téléchargées",
+      description:
+        "Arrête et désactive le service Gestionnaire de cartes téléchargées (MapsBroker) pour empêcher les vérifications réseau en arrière-plan.",
+    },
+    disable_lfsvc_service: {
+      name: "Démarrer le service de géolocalisation uniquement sur demande",
+      description:
+        "Arrête le service de géolocalisation Windows (lfsvc) et le configure sur Manuel, évitant la recherche constante de localisation.",
+    },
   },
   cleanup: {
     temp_cleanup: {

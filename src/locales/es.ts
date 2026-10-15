@@ -1925,6 +1925,46 @@ export const es: Strings = {
       description:
         "Elimina escrituras innecesarias en disco al dejar de registrar la fecha de último acceso al abrir o leer archivos.",
     },
+    disable_autologger_diagtrack: {
+      name: "Desactivar sesión de autologger DiagTrack",
+      description:
+        "Detiene el registro circular continuo en disco de la sesión ETW de telemetría de DiagTrack.",
+    },
+    disable_autologger_sqm: {
+      name: "Desactivar sesión de autologger SQM",
+      description:
+        "Detiene el registro en disco en segundo plano para el registrador de telemetría Software Quality Metrics (SQM).",
+    },
+    disable_autologger_ait: {
+      name: "Desactivar sesión de autologger de eventos AIT",
+      description:
+        "Detiene el registro de eventos ETW en segundo plano del servicio Application Inventory and Telemetry (AIT).",
+    },
+    disable_autologger_diaglog: {
+      name: "Desactivar sesión de autologger de diagnóstico",
+      description:
+        "Detiene la escritura circular en disco para las sesiones de seguimiento de errores y diagnóstico de Windows.",
+    },
+    disable_autologger_wifisession: {
+      name: "Desactivar sesión de autologger de diagnóstico Wi-Fi",
+      description:
+        "Detiene el registro continuo de telemetría de diagnóstico para los estados de conexión Wi-Fi.",
+    },
+    disable_wersvc_service: {
+      name: "Iniciar Informe de errores de Windows solo cuando sea necesario",
+      description:
+        "Detiene el servicio Informe de errores de Windows (WerSvc) y lo configura en Manual, reduciendo el trabajo en segundo plano.",
+    },
+    disable_mapsbroker_service: {
+      name: "Desactivar servicio de Administrador de mapas descargados",
+      description:
+        "Detiene y deshabilita el servicio Administrador de mapas descargados (MapsBroker), evitando comprobaciones de red en segundo plano.",
+    },
+    disable_lfsvc_service: {
+      name: "Iniciar el servicio de geolocalización solo cuando sea necesario",
+      description:
+        "Detiene el servicio de ubicación de Windows (lfsvc) y lo configura en Manual, evitando el sondeo continuo de ubicación.",
+    },
   },
   cleanup: {
     temp_cleanup: {

@@ -1899,6 +1899,45 @@ export const en: Strings = {
       description:
         "Eliminates disk write overhead by no longer recording access timestamps whenever files or folders are read.",
     },
+    disable_autologger_diagtrack: {
+      name: "Disable DiagTrack autologger session",
+      description:
+        "Stops continuous circular disk logging for the Connected User Experiences and Telemetry ETW session.",
+    },
+    disable_autologger_sqm: {
+      name: "Disable SQM autologger session",
+      description:
+        "Stops background disk logging for the Software Quality Metrics (SQM) telemetry logger.",
+    },
+    disable_autologger_ait: {
+      name: "Disable AIT event autologger session",
+      description:
+        "Stops background ETW event logging for the Application Inventory and Telemetry (AIT) service.",
+    },
+    disable_autologger_diaglog: {
+      name: "Disable Diagnostic autologger session",
+      description: "Stops circular disk logging for Windows diagnostic and fault-tracing sessions.",
+    },
+    disable_autologger_wifisession: {
+      name: "Disable Wi-Fi diagnostic autologger session",
+      description:
+        "Stops continuous diagnostic telemetry logging of Wi-Fi connection states and hotspot transitions.",
+    },
+    disable_wersvc_service: {
+      name: "Start Windows Error Reporting only when needed",
+      description:
+        "Stops the Windows Error Reporting Service (WerSvc) and sets it to Manual, reducing background crash monitoring overhead.",
+    },
+    disable_mapsbroker_service: {
+      name: "Disable the Downloaded Maps Manager service",
+      description:
+        "Stops and disables the Downloaded Maps Manager service (MapsBroker), preventing background network checks and disk reads for map packages.",
+    },
+    disable_lfsvc_service: {
+      name: "Start the Geolocation service only when needed",
+      description:
+        "Stops the Windows Geolocation Service (lfsvc) and sets it to Manual, preventing continuous background sensor polling.",
+    },
   },
   cleanup: {
     temp_cleanup: {

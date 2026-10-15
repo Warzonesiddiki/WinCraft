@@ -1933,6 +1933,46 @@ export const de: Strings = {
       description:
         "Verhindert zusätzliche Schreibvorgänge, indem der Zeitstempel für den letzten Zugriff beim Lesen von Dateien nicht aktualisiert wird.",
     },
+    disable_autologger_diagtrack: {
+      name: "DiagTrack-Autologger-Sitzung deaktivieren",
+      description:
+        "Beendet die fortlaufende zirkuläre Protokollierung auf Datenträgern für die ETW-Sitzung von DiagTrack.",
+    },
+    disable_autologger_sqm: {
+      name: "SQM-Autologger-Sitzung deaktivieren",
+      description:
+        "Beendet die Hintergrundprotokollierung auf Datenträgern für den Software Quality Metrics (SQM)-Telemetrieprotokollierer.",
+    },
+    disable_autologger_ait: {
+      name: "AIT-Ereignis-Autologger-Sitzung deaktivieren",
+      description:
+        "Beendet die Hintergrund-ETW-Ereignisprotokollierung für den Dienst Application Inventory and Telemetry (AIT).",
+    },
+    disable_autologger_diaglog: {
+      name: "Diagnose-Autologger-Sitzung deaktivieren",
+      description:
+        "Beendet die zirkuläre Datenträgerprotokollierung für Windows-Diagnose- und Fehlerverfolgungssitzungen.",
+    },
+    disable_autologger_wifisession: {
+      name: "WLAN-Diagnose-Autologger-Sitzung deaktivieren",
+      description:
+        "Beendet die kontinuierliche Diagnosetelemetrie-Protokollierung von WLAN-Verbindungszuständen.",
+    },
+    disable_wersvc_service: {
+      name: "Windows-Fehlerberichterstattung nur bei Bedarf starten",
+      description:
+        "Hält den Dienst Windows-Fehlerberichterstattung (WerSvc) an und setzt ihn auf Manuell, um Hintergrundaktivität zu verringern.",
+    },
+    disable_mapsbroker_service: {
+      name: "Dienst für heruntergeladene Karten deaktivieren",
+      description:
+        "Hält den Downloaded Maps Manager-Dienst (MapsBroker) an und deaktiviert ihn, um Hintergrundprüfungen zu verhindern.",
+    },
+    disable_lfsvc_service: {
+      name: "Geolokalisierungsdienst nur bei Bedarf starten",
+      description:
+        "Hält den Windows-Standortdienst (lfsvc) an und setzt ihn auf Manuell, um ständige Standortabfragen im Hintergrund zu stoppen.",
+    },
   },
   cleanup: {
     temp_cleanup: {

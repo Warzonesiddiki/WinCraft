@@ -8,6 +8,12 @@ pub const DMWAP_PUSH_ID: &str = "disable_dmwappush_service";
 pub(crate) const DMWAP_PUSH_SERVICE: &str = "dmwappushservice";
 pub const DIAGTRACK_ID: &str = "disable_diagtrack_service";
 pub(crate) const DIAGTRACK_SERVICE: &str = "DiagTrack";
+pub const WERSVC_ID: &str = "disable_wersvc_service";
+pub(crate) const WERSVC_SERVICE: &str = "WerSvc";
+pub const MAPSBROKER_ID: &str = "disable_mapsbroker_service";
+pub(crate) const MAPSBROKER_SERVICE: &str = "MapsBroker";
+pub const LFSVC_ID: &str = "disable_lfsvc_service";
+pub(crate) const LFSVC_SERVICE: &str = "lfsvc";
 
 /// A tweak that stops one service and sets its start type, restoring both
 /// its start type and whether it was running.
@@ -19,7 +25,7 @@ pub struct ServiceTweak {
     pub manual: bool,
 }
 
-pub const SERVICE_TWEAKS: [ServiceTweak; 4] = [
+pub const SERVICE_TWEAKS: [ServiceTweak; 7] = [
     ServiceTweak {
         id: WINDOWS_SEARCH_ID,
         service: SERVICE_NAME,
@@ -48,6 +54,27 @@ pub const SERVICE_TWEAKS: [ServiceTweak; 4] = [
         id: DIAGTRACK_ID,
         service: DIAGTRACK_SERVICE,
         manual: false,
+    },
+    // Manual: stops Windows Error Reporting from continuously running
+    // in the background while still permitting on-demand crash reporting.
+    ServiceTweak {
+        id: WERSVC_ID,
+        service: WERSVC_SERVICE,
+        manual: true,
+    },
+    // Disabled: Downloaded Maps Manager runs background checks for offline
+    // maps that desktop users rarely use.
+    ServiceTweak {
+        id: MAPSBROKER_ID,
+        service: MAPSBROKER_SERVICE,
+        manual: false,
+    },
+    // Manual: Windows Geolocation service does not need to poll
+    // continuously in the background.
+    ServiceTweak {
+        id: LFSVC_ID,
+        service: LFSVC_SERVICE,
+        manual: true,
     },
 ];
 
@@ -100,6 +127,36 @@ pub fn diagtrack_info() -> ServiceInfo {
         id: DIAGTRACK_ID,
         name: "Disable the telemetry service (Connected User Experiences)",
         description: "Stops and disables the Connected User Experiences and Telemetry service (DiagTrack), which uploads usage and diagnostic data to Microsoft. Windows Update and error reporting keep working; feedback and tailored experiences stop. Only present on PCs that have it.",
+        requires_admin: true,
+        requires_pro: false,
+    }
+}
+
+pub fn wersvc_info() -> ServiceInfo {
+    ServiceInfo {
+        id: WERSVC_ID,
+        name: "Start Windows Error Reporting only when needed",
+        description: "Stops the Windows Error Reporting Service (WerSvc) and sets it to Manual, reducing background crash monitoring overhead while keeping on-demand crash reporting available.",
+        requires_admin: true,
+        requires_pro: false,
+    }
+}
+
+pub fn mapsbroker_info() -> ServiceInfo {
+    ServiceInfo {
+        id: MAPSBROKER_ID,
+        name: "Disable the Downloaded Maps Manager service",
+        description: "Stops and disables the Downloaded Maps Manager service (MapsBroker), preventing background network checks and disk reads for map packages.",
+        requires_admin: true,
+        requires_pro: false,
+    }
+}
+
+pub fn lfsvc_info() -> ServiceInfo {
+    ServiceInfo {
+        id: LFSVC_ID,
+        name: "Start the Geolocation service only when needed",
+        description: "Stops the Windows Geolocation Service (lfsvc) and sets it to Manual, preventing continuous background sensor polling while allowing location queries on demand.",
         requires_admin: true,
         requires_pro: false,
     }

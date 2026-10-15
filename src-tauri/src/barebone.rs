@@ -58,18 +58,43 @@ pub const BAREBONE_TASKS: &[&str] = &[
     "\\Microsoft\\Windows\\Customer Experience Improvement Program\\Consolidator",
     "\\Microsoft\\Windows\\Customer Experience Improvement Program\\UsbCeip",
     "\\Microsoft\\Windows\\Customer Experience Improvement Program\\KernelCeipTask",
+    "\\Microsoft\\Windows\\Customer Experience Improvement Program\\BthSQM",
+    "\\Microsoft\\Windows\\Customer Experience Improvement Program\\HypervisorFlightingTask",
     "\\Microsoft\\Windows\\Application Experience\\Microsoft Compatibility Appraiser",
     "\\Microsoft\\Windows\\Application Experience\\ProgramDataUpdater",
     "\\Microsoft\\Windows\\Application Experience\\StartupAppTask",
+    "\\Microsoft\\Windows\\Application Experience\\AitAgent",
+    "\\Microsoft\\Windows\\Application Experience\\MareBackup",
+    "\\Microsoft\\Windows\\Application Experience\\PcaWallpaperAppDetect",
     "\\Microsoft\\Windows\\Autochk\\Proxy",
     "\\Microsoft\\Windows\\DiskDiagnostic\\Microsoft-Windows-DiskDiagnosticDataCollector",
+    "\\Microsoft\\Windows\\DiskDiagnostic\\Microsoft-Windows-DiskDiagnosticResolver",
     "\\Microsoft\\Windows\\DiskFootprint\\Diagnostics",
+    "\\Microsoft\\Windows\\DiskFootprint\\StorageSense",
     "\\Microsoft\\Windows\\Maps\\MapsUpdateTask",
     "\\Microsoft\\Windows\\Maps\\MapsToastTask",
     "\\Microsoft\\Windows\\Feedback\\Siuf\\DmClient",
     "\\Microsoft\\Windows\\Feedback\\Siuf\\DmClientOnScenarioDownload",
     "\\Microsoft\\EdgeUpdate\\EdgeUpdateTaskMachineCore",
     "\\Microsoft\\EdgeUpdate\\EdgeUpdateTaskMachineUA",
+    "\\Microsoft\\Windows\\Diagnosis\\Scheduled",
+    "\\Microsoft\\Windows\\Maintenance\\WinSAT",
+    "\\Microsoft\\Windows\\PI\\Sqm-Tasks",
+    "\\Microsoft\\Windows\\Power Efficiency Diagnostics\\AnalyzeSystem",
+    "\\Microsoft\\Windows\\Windows Error Reporting\\QueueReporting",
+    "\\Microsoft\\Windows\\CloudExperienceHost\\CreateObjectTask",
+    "\\Microsoft\\Windows\\Shell\\FamilySafetyMonitor",
+    "\\Microsoft\\Windows\\Shell\\FamilySafetyRefreshTask",
+    "\\Microsoft\\Windows\\Windows Media Player\\UpdateLibrary",
+    "\\Microsoft\\Windows\\Windows Media Player\\WMPNSSCert",
+    "\\Microsoft\\Windows\\Device Information\\Device",
+    "\\Microsoft\\Windows\\Device Information\\Device User",
+    "\\Microsoft\\Windows\\FileHistory\\File History (maintenance mode)",
+    "\\Microsoft\\Windows\\LanguageComponentsInstaller\\Installation",
+    "\\Microsoft\\Windows\\LanguageComponentsInstaller\\Uninstallation",
+    "\\Microsoft\\Windows\\License Manager\\TempSignedLicenseExchange",
+    "\\Microsoft\\Windows\\NetTrace\\GatherNetworkInfo",
+    "\\Microsoft\\Windows\\Speech\\SpeechModelDownloadTask",
 ];
 
 /// Whether a scheduler path is on the Barebone allowlist. Exact match only.
@@ -346,7 +371,7 @@ mod tests {
     #[test]
     fn barebone_task_allowlist_is_empty_in_b0() {
         // Allowlisted telemetry/diagnostics tasks. Exact paths, no wildcards.
-        assert_eq!(crate::barebone::BAREBONE_TASKS.len(), 15);
+        assert_eq!(crate::barebone::BAREBONE_TASKS.len(), 40);
         for path in crate::barebone::BAREBONE_TASKS {
             assert!(path.starts_with('\\'), "{path}");
             assert!(!path.contains('\0'));

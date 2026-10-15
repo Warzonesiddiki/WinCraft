@@ -1926,6 +1926,46 @@ export const it: Strings = {
       description:
         "Elimina le scritture su disco superflue evitando di aggiornare la data di ultimo accesso alla lettura dei file.",
     },
+    disable_autologger_diagtrack: {
+      name: "Disattiva sessione autologger DiagTrack",
+      description:
+        "Interrompe la registrazione circolare continua su disco per la sessione ETW di telemetria e diagnostica.",
+    },
+    disable_autologger_sqm: {
+      name: "Disattiva sessione autologger SQM",
+      description:
+        "Interrompe la registrazione su disco in background per il logger di telemetria Software Quality Metrics (SQM).",
+    },
+    disable_autologger_ait: {
+      name: "Disattiva sessione autologger eventi AIT",
+      description:
+        "Interrompe la registrazione degli eventi ETW in background per il servizio Application Inventory and Telemetry (AIT).",
+    },
+    disable_autologger_diaglog: {
+      name: "Disattiva sessione autologger diagnostica",
+      description:
+        "Interrompe la scrittura circolare su disco per le sessioni di diagnostica e tracciamento errori di Windows.",
+    },
+    disable_autologger_wifisession: {
+      name: "Disattiva sessione autologger diagnostica Wi-Fi",
+      description:
+        "Interrompe la registrazione continua della telemetria diagnostica per gli stati della connessione Wi-Fi.",
+    },
+    disable_wersvc_service: {
+      name: "Avvia segnalazione errori Windows solo su richiesta",
+      description:
+        "Arresta il servizio Segnalazione errori Windows (WerSvc) e lo imposta su Manuale, riducendo l'attività in background.",
+    },
+    disable_mapsbroker_service: {
+      name: "Disattiva il servizio Gestione mappe scaricate",
+      description:
+        "Arresta e disabilita il servizio Gestione mappe scaricate (MapsBroker), impedendo controlli di rete e letture disco in background.",
+    },
+    disable_lfsvc_service: {
+      name: "Avvia il servizio di geolocalizzazione solo su richiesta",
+      description:
+        "Arresta il servizio di geolocalizzazione di Windows (lfsvc) e lo imposta su Manuale, evitando il polling continuo della posizione.",
+    },
   },
   cleanup: {
     temp_cleanup: {

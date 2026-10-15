@@ -24,6 +24,24 @@
       "id": "disable_diagtrack_service",
       "service": "DiagTrack",
       "startTypeWhenApplied": "DISABLED"
+    },
+    {
+      "expected": "applies where the service is installed; otherwise not_present",
+      "id": "disable_wersvc_service",
+      "service": "WerSvc",
+      "startTypeWhenApplied": "DEMAND_START"
+    },
+    {
+      "expected": "applies where the service is installed; otherwise not_present",
+      "id": "disable_mapsbroker_service",
+      "service": "MapsBroker",
+      "startTypeWhenApplied": "DISABLED"
+    },
+    {
+      "expected": "applies where the service is installed; otherwise not_present",
+      "id": "disable_lfsvc_service",
+      "service": "lfsvc",
+      "startTypeWhenApplied": "DEMAND_START"
     }
   ],
   "settings": [

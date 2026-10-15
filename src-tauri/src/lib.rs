@@ -650,7 +650,13 @@ fn tweak_infos(store: &RollbackStore) -> Result<Vec<TweakInfo>, String> {
         ..Default::default()
     });
 
-    for info in [services::dmwappush_info(), services::diagtrack_info()] {
+    for info in [
+        services::dmwappush_info(),
+        services::diagtrack_info(),
+        services::wersvc_info(),
+        services::mapsbroker_info(),
+        services::lfsvc_info(),
+    ] {
         let tier = barebone::tier_for_tweak(info.id);
         let applied = applied_ids.contains(info.id);
         list.push(TweakInfo {
@@ -2671,6 +2677,9 @@ mod tests {
                 services::WINDOWS_SEARCH_ID,
                 services::DMWAP_PUSH_ID,
                 services::DIAGTRACK_ID,
+                services::WERSVC_ID,
+                services::MAPSBROKER_ID,
+                services::LFSVC_ID,
                 netlatency::TWEAK_ID,
                 netshaper::TWEAK_ID,
                 everyday::DISABLE_FILTER_KEYS_SHORTCUT_ID,
@@ -2869,6 +2878,9 @@ mod tests {
             services::windows_search_info().requires_pro,
             services::dmwappush_info().requires_pro,
             services::diagtrack_info().requires_pro,
+            services::wersvc_info().requires_pro,
+            services::mapsbroker_info().requires_pro,
+            services::lfsvc_info().requires_pro,
             services::ai_fabric_info().requires_pro,
             false, // Filter Keys shortcut
             false, // background app EcoQoS
@@ -2884,12 +2896,12 @@ mod tests {
             + power_tuning::TWEAKS.iter().filter(|t| t.pro).count()
             + settings.iter().filter(|t| t.requires_pro).count();
 
-        assert_eq!(total, 142, "the catalogue no longer has 142 tweaks");
+        assert_eq!(total, 150, "the catalogue no longer has 150 tweaks");
         assert_eq!(
             pro, 0,
             "a control is Pro again: nothing in this build is gated"
         );
-        assert_eq!(total - pro, 142, "every control is free");
+        assert_eq!(total - pro, 150, "every control is free");
 
         // The composite list must stay in step with what list_tweaks builds,
         // otherwise the totals above would quietly stop covering everything.
