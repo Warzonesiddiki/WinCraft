@@ -604,19 +604,45 @@ fn reconcile(system: &impl PackageSystem, journal: &Journal) -> Result<Vec<Deblo
             .iter_mut()
             .filter(|r| r.status == RemovalStatus::Pending)
         {
-            record.status = if packages
-                .iter()
-                .any(|p| p.full_name == record.package_full_name)
-            {
-                RemovalStatus::Unknown
-            } else {
-                RemovalStatus::Removed
-            };
+            if packages.iter().any(|p| p.full_name == record.package_full_name) {
+            record.status = RemovalStatus::Unknown;
+        } else {
+            record.status = RemovalStatus::Removed;
+        }
             record.error = Some("Operation was interrupted; current package state was checked without retrying removal".into());
         }
         journal.save(&records)?;
     }
     Ok(records)
+}
+
+#[must_use]
+fn reconcile_prevention_status(packages: &[&DebloatApp], full_name: &str) -> RemovalStatus {
+    if packages.iter().any(|p| p.package_full_name.as_deref() == Some(full_name)) {
+        RemovalStatus::Unknown
+    } else {
+        RemovalStatus::Removed
+    }
+}
+
+fn reconcile_prevention_edit(
+    records: &mut Vec<DebloatRecord>,
+    packages: &[&DebloatApp],
+    journal: &Journal,
+) -> Result<(), String> {
+    let mut changed = false;
+    for record in records.iter_mut().filter(|r| r.status == RemovalStatus::Pending) {
+        let next = reconcile_prevention_status(packages, &record.package_full_name);
+        if next != record.status {
+            record.status = next;
+            record.error = Some("Operation was interrupted; current package state was checked without retrying removal".into());
+            changed = true;
+        }
+    }
+    if changed {
+        journal.save(records)?;
+    }
+    Ok(())
 }
 
 fn remove_inner(
@@ -626,6 +652,7 @@ fn remove_inner(
 ) -> Result<DebloatRecord, String> {
     let _lock = journal.lock()?;
     let mut records = journal.load()?;
+
     if records
         .iter()
         .any(|r| r.status == RemovalStatus::Pending && r.package_full_name == full_name)
@@ -666,24 +693,29 @@ fn remove_inner(
     })();
     let operation = preflight.and_then(|()| system.remove(full_name));
     let observed = system.scan();
-    match observed {
-        Ok(ref current) if !current.iter().any(|p| p.full_name == full_name) => {
-            record.status = RemovalStatus::Removed
-        }
-        Ok(_) if operation.is_err() => record.status = RemovalStatus::Failed,
-        _ => record.status = RemovalStatus::Unknown,
-    }
+    let remove_outcome = match observed {
+        Ok(ref current) if !current.iter().any(|p| p.full_name == full_name) => RemovalStatus::Removed,
+        Ok(_) if operation.is_err() => RemovalStatus::Failed,
+        _ => RemovalStatus::Unknown,
+    };
+    let is_unknown = matches!(remove_outcome, RemovalStatus::Unknown);
+    record.status = remove_outcome;
     record.error = operation.err().or_else(|| observed.err()).or_else(|| {
-        if record.status == RemovalStatus::Unknown {
+        if is_unknown {
             Some("Could not verify removal outcome".into())
         } else {
             None
         }
     });
-    *records.last_mut().expect("pending record just appended") = record.clone();
+    if let Some(last) = records.last_mut() {
+        *last = record.clone();
+    } else {
+        records.push(record.clone());
+    }
     journal.save(&records)?;
     Ok(record)
 }
+
 
 #[tauri::command(async)]
 pub fn list_debloat_apps() -> Result<Vec<DebloatApp>, String> {

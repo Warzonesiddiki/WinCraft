@@ -291,8 +291,14 @@ fn originating_watcher_may_be_alive(owner: &str, processes: &[ProcessObservation
         return true;
     }
     let parts: Vec<_> = owner.split('-').collect();
-    let pid = parts[1].parse::<u32>().unwrap();
-    let started_at = parts[2].parse::<u64>().unwrap();
+    let pid: u32 = match parts.get(1).and_then(|s| s.parse().ok()) {
+        Some(v) => v,
+        None => return true,
+    };
+    let started_at: u64 = match parts.get(2).and_then(|s| s.parse().ok()) {
+        Some(v) => v,
+        None => return true,
+    };
     processes.iter().any(|p| {
         p.pid == pid && (started_at == 0 || p.started_at == 0 || p.started_at == started_at)
     })

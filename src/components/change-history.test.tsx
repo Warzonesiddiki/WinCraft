@@ -352,7 +352,7 @@ describe("Change history", () => {
     setDialog("save", "/tmp/wincraft-history.csv");
     bridge.reply("save_history_export", null);
     await act(async () => {
-      fireEvent.click(screen.getByRole("button", { name: "CSV" }));
+      fireEvent.click(screen.getByRole("button", { name: /CSV/i }));
     });
 
     const args = bridge.argsOf("save_history_export") as { path: string; contents: string };
@@ -367,7 +367,7 @@ describe("Change history", () => {
 
     setDialog("save", null);
     await act(async () => {
-      fireEvent.click(screen.getByRole("button", { name: "JSON" }));
+      fireEvent.click(screen.getByRole("button", { name: /JSON/i }));
     });
 
     expect(bridge.callsTo("save_history_export")).toHaveLength(0);

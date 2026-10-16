@@ -279,3 +279,36 @@
     break-inside: avoid;
   }
 }
+
+@media (prefers-reduced-motion: reduce) {
+  .history-row,
+  .history-filter-item,
+  .history-values-toggle,
+  .history-entry,
+  .workspace-button {
+    transition: none;
+    animation: none;
+  }
+}
+
+@media (forced-colors: active) {
+  :is(button, input, select):focus-visible {
+    outline: 2px solid Highlight;
+    outline-offset: 2px;
+  }
+  .history-dialog,
+  .history-filter-bar,
+  .history-list,
+  .history-row,
+  .history-session {
+    border: 1px solid ButtonBorder;
+  }
+  .workspace-button {
+    border: 1px solid ButtonBorder;
+    background: ButtonFace;
+    color: ButtonText;
+  }
+  .workspace-button-delete {
+    border-color: Highlight;
+  }
+}

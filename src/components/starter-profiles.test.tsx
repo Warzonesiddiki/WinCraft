@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { axe } from "jest-axe";
+import { isCurrentCatalogTweak, MANUAL_ONLY_TWEAK_IDS } from "../catalog";
 import { STRINGS } from "../i18n-tables";
 import type { TweakInfo } from "../types";
 import { STARTER_COPY } from "./starter-copy";
@@ -102,6 +103,26 @@ describe("StarterProfiles", () => {
     expect(screen.getByRole("button", { name: new RegExp(c.gaming) })).toBeDisabled();
     expect(screen.getByRole("button", { name: c.applying })).toBeDisabled();
     expect(screen.getByRole("button", { name: c.applying })).toHaveAttribute("aria-busy", "true");
+  });
+
+  it("never names a retired or manual-only control in a preset", () => {
+    // A preset that lists a control the backend refuses to apply makes Apply
+    // fail for the whole selection. `disable_copilot` was exactly that: retired,
+    // restore-only, and still preselected in Browser Only, so choosing that
+    // profile and pressing Apply could not succeed. The Rust round-trip test
+    // catches it too, but only after applying every id in every preset.
+    const ids = [...new Set(STARTER_PRESETS.flatMap((p) => p.tweaks.map((t) => t.id)))];
+    expect(ids.filter((id) => !isCurrentCatalogTweak(id))).toEqual([]);
+    expect(ids.filter((id) => MANUAL_ONLY_TWEAK_IDS.has(id))).toEqual([]);
+  });
+
+  it("keeps Browser Only the size the README and the pack document state", () => {
+    // The count is quoted in README.md and docs/BROWSER-ONLY-PACK.md. Pinning it
+    // here means a control added to (or dropped from) the set has to be stated
+    // in both documents in the same change, instead of quietly becoming false.
+    const browserOnly = STARTER_PRESETS.find((p) => p.id === "browser_only")!;
+    expect(browserOnly.tweaks).toHaveLength(30);
+    expect(browserOnly.tweaks.filter((t) => t.selected)).toHaveLength(25);
   });
 
   it("has no accessibility violations, with a complete catalog and a partial one", async () => {

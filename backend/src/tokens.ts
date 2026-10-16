@@ -36,6 +36,9 @@ async function consumeActionToken(
   purpose: string,
   database: Pick<Pool, "query"> = getPool(),
 ): Promise<number | null> {
+  if (typeof rawToken !== "string" || rawToken.length === 0) {
+    return null;
+  }
   const result = await database.query(
     `UPDATE action_tokens
        SET used_at = now()
@@ -63,4 +66,4 @@ async function confirmsVerifiedAddress(rawToken: string): Promise<boolean> {
   return result.rows.length > 0;
 }
 
-export { createActionToken, consumeActionToken, confirmsVerifiedAddress };
+export { createActionToken, consumeActionToken, confirmsVerifiedAddress, hashToken };

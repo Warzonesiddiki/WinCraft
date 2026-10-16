@@ -19,9 +19,12 @@ void getVersion()
   .then((v) => {
     cachedAppVersion = v;
   })
-  .catch(() => {
+  .catch((err) => {
     // Without a version the backend rejects the report; reporting simply
     // stays silent, which is the correct failure mode for telemetry.
+    if (typeof window !== "undefined" && "__TAURI_INTERNALS__" in window) {
+      console.warn("[lib] getVersion failed", err);
+    }
   });
 
 export function errorReportsEnabled(): boolean {
@@ -43,8 +46,9 @@ export function reportError(message: string) {
       appVersion: cachedAppVersion,
       message: message.slice(0, 500),
     }),
-  }).catch(() => {
+  }).catch((err) => {
     // Fire-and-forget by design: a failed report must never surface an error.
+    console.warn("[lib] reportError network request failed", err);
   });
 }
 
@@ -237,8 +241,9 @@ export async function readAvatar(email: string): Promise<string | null> {
   try {
     const stored = await invoke<string | null>("read_avatar", { email });
     if (stored && stored.startsWith("data:image/")) return stored;
-  } catch {
+  } catch (err) {
     // An unreadable file degrades to "no photo", which shows the initial.
+    console.warn("[lib] read_avatar failed", err);
   }
   return null;
 }
@@ -270,8 +275,9 @@ export async function adoptLegacyAvatar(email: string): Promise<void> {
   if (!email) return;
   try {
     await invoke("adopt_legacy_avatar", { email });
-  } catch {
+  } catch (err) {
     // Nothing to adopt, or the folder is unreadable. Not worth a toast.
+    console.warn("[lib] adopt_legacy_avatar failed", err);
   }
 
   let legacy: string | null;
@@ -293,8 +299,9 @@ export async function adoptLegacyAvatar(email: string): Promise<void> {
   }
   try {
     localStorage.removeItem(AVATAR_KEY);
-  } catch {
+  } catch (err) {
     // Blocked; discardLegacyAvatar gets another chance at sign-out.
+    console.warn("[lib] removeItem AVATAR_KEY failed", err);
   }
 }
 
@@ -303,13 +310,15 @@ export async function adoptLegacyAvatar(email: string): Promise<void> {
 export async function discardLegacyAvatar(): Promise<void> {
   try {
     await invoke("discard_legacy_avatar");
-  } catch {
+  } catch (err) {
     // Already gone, or unreachable; the localStorage half still matters.
+    console.warn("[lib] discard_legacy_avatar failed", err);
   }
   try {
     localStorage.removeItem(AVATAR_KEY);
-  } catch {
+  } catch (err) {
     // Storage blocked; nothing readable there either.
+    console.warn("[lib] discardLegacyAvatar removeItem failed", err);
   }
 }
 
@@ -458,11 +467,13 @@ export function readCachedDriverAudit(): {
       at,
       hardware: typeof parsed.hardware === "string" ? parsed.hardware : null,
     };
-  } catch {
+  } catch (err) {
+    console.warn("[lib] readCachedDriverAudit failed to parse cache", err);
     try {
       localStorage.removeItem(DRIVER_AUDIT_KEY);
-    } catch {
+    } catch (removeErr) {
       /* Storage can be blocked. */
+      console.warn("[lib] removeItem DRIVER_AUDIT_KEY failed", removeErr);
     }
     return null;
   }
@@ -485,8 +496,9 @@ export function writeCachedDriverAudit(
         at: at.toISOString(),
       }),
     );
-  } catch {
+  } catch (err) {
     // Over quota or blocked storage: the current session still works.
+    console.warn("[lib] writeCachedDriverAudit failed", err);
   }
 }
 
@@ -498,8 +510,9 @@ export function writeCachedDriverAudit(
 export function clearCachedDriverAudit(): void {
   try {
     localStorage.removeItem(DRIVER_AUDIT_KEY);
-  } catch {
+  } catch (err) {
     /* Storage can be blocked. */
+    console.warn("[lib] clearCachedDriverAudit removeItem failed", err);
   }
 }
 

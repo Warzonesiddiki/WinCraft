@@ -306,14 +306,15 @@ export type ProcessStats = {
   target: number;
 };
 
-/** Mirrors Rust `skinpacks::SkinpackInfo`. */
-export type SkinpackInfo = {
+/**
+ * Mirrors Rust `skinpacks::SkinpackStatus`. The name, description and scope
+ * text are deliberately not sent from Rust: they are user-facing copy and live
+ * in the translation tables with every other user-facing string.
+ */
+export type SkinpackStatus = {
   id: string;
-  name: string;
-  description: string;
-  author: string;
   active: boolean;
-  previewAccent: string;
+  valueCount: number;
 };
 
 /** One read-only Barebone preflight finding (Rust `barebone::PreflightFinding`). */

@@ -48,8 +48,9 @@ export function usePulseSamples(): PulseSample[] {
             return next.length > MAX_SAMPLES ? next.slice(next.length - MAX_SAMPLES) : next;
           });
         })
-        .catch(() => {
+        .catch((err) => {
           // A missed sample just leaves a shorter trace.
+          console.warn("[Command] system_stats sample failed", err);
         })
         .finally(() => {
           busy = false;
@@ -430,9 +431,16 @@ export function SessionProfiles({
       </ul>
 
       {preview && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[var(--overlay)] p-6">
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="command-profile-title"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-[var(--overlay)] p-6"
+        >
           <div className="border-line-2 bg-surface-2 w-full max-w-md rounded-[14px] border p-6">
-            <h3 className="type-section">{s.command.profileGame}</h3>
+            <h3 id="command-profile-title" className="type-section">
+              {s.command.profileGame}
+            </h3>
             <p className="type-caption mt-1">{s.command.profileGameDesc}</p>
 
             <ul className="mt-4 flex flex-col gap-2">
@@ -455,12 +463,14 @@ export function SessionProfiles({
 
             <div className="mt-5 flex justify-end gap-2.5">
               <button
+                type="button"
                 onClick={() => setPreview(false)}
                 className="text-ink-3 hover:text-ink rounded-[8px] px-3 py-2 text-[12.5px] font-semibold transition-colors duration-150"
               >
                 {s.cleanupConfirm.cancel}
               </button>
               <button
+                type="button"
                 onClick={() => {
                   setPreview(false);
                   void onToggleGame();

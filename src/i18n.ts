@@ -1078,6 +1078,19 @@ export interface Strings {
     aboveNormal: string;
     high: string;
   };
+  skinpacks: {
+    title: string;
+    description: string;
+    packName: string;
+    packBody: string;
+    /** What the transformation is not: no desktop environment is installed. */
+    scope: string;
+    apply: string;
+    restore: string;
+    active: string;
+    applying: string;
+    valuesSummary: string; // uses {count}
+  };
   tweaks: Record<string, TweakText>;
   cleanup: Record<string, TweakText>;
   coffee: {

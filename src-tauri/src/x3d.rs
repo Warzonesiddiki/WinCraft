@@ -192,7 +192,7 @@ pub(crate) mod win {
         // Strictly larger, not merely largest: two identical dies have a
         // "largest" too, and steering to an arbitrary one of them would be
         // motion without effect.
-        let largest = ccds.iter().max_by_key(|c| c.l3_bytes).unwrap().l3_bytes;
+        let largest = ccds.iter().map(|c| c.l3_bytes).max().unwrap_or(0);
         let winners: Vec<usize> = ccds
             .iter()
             .filter(|c| c.l3_bytes == largest)

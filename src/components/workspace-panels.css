@@ -59,7 +59,8 @@
   gap: 8px;
   flex-shrink: 0;
   /* Same size and type as the tool actions (tool-surfaces.css). */
-  min-height: 40px;
+  min-height: 44px;
+  min-width: 44px;
   border: 1px solid transparent;
   border-radius: 8px;
   padding: 9px 15px;

@@ -41,8 +41,9 @@ function Row({
           setCopied(false);
         }, 1400);
       })
-      .catch(() => {
+      .catch((err) => {
         // Clipboard denied: the value is on screen and selectable anyway.
+        console.warn("[Technical] clipboard writeText failed", err);
       });
   }
 

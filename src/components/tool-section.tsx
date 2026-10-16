@@ -5,11 +5,13 @@ import "./tool-surfaces.css";
 /** Presentational structure shared by desktop tools; no native effects. */
 export function ToolHeader({
   title,
+  titleId,
   description,
   actions,
   icon,
 }: {
   title: ReactNode;
+  titleId?: string;
   description?: ReactNode;
   actions?: ReactNode;
   icon?: ReactNode;
@@ -22,7 +24,7 @@ export function ToolHeader({
         </span>
       )}
       <div className="tool-header-copy">
-        <h2>{title}</h2>
+        <h2 id={titleId}>{title}</h2>
         {description && <p>{description}</p>}
       </div>
       {actions && <div className="tool-header-actions">{actions}</div>}

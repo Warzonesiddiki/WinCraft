@@ -121,6 +121,8 @@ mod imp {
             Ok(())
         } else if status.status == SERVICE_DISABLED {
             Err("System Restore is disabled on this system.".to_string())
+        } else if status.status == 5 {
+            Err("Access denied: creating a System Restore point requires administrator privileges.".to_string())
         } else {
             Err(format!(
                 "Windows refused to create a restore point (status {}).",

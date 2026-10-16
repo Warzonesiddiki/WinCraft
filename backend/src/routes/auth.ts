@@ -22,6 +22,9 @@ import {
 
 const router = express.Router();
 
+/** Pre-computed bcrypt hash used to neutralize timing side-channels on login attempts for nonexistent emails. */
+const DUMMY_PASSWORD_HASH = "$2a$10$DIM5IT.xVGrm9SUCzqAQ0eaxrxoEMQ33WZrckJag5/Uuspr/GOLJG";
+
 // Slows down credential-stuffing / brute-force attempts against these
 // endpoints specifically, without throttling the rest of the API.
 //
@@ -42,6 +45,16 @@ router.use(authLimiter);
 
 // Stricter per-endpoint limiters for the most sensitive operations.
 // These stack on top of authLimiter — a request must pass both.
+
+/** Login attempts: 10 per minute per IP (prevents brute-force credential stuffing). */
+const loginLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  limit: 10,
+  standardHeaders: true,
+  legacyHeaders: false,
+  keyGenerator: (req) => `login:${req.ip}`,
+  message: { error: "Too many login attempts. Try again later." },
+});
 
 /** Mass account creation: 5 new accounts per hour per IP. */
 const registerLimiter = rateLimit({
@@ -214,7 +227,7 @@ router.post("/register", registerLimiter, limitAuthWork("register", async (req: 
   }
 }));
 
-router.post("/login", limitAuthWork("login", async (req: Request, res: Response) => {
+router.post("/login", loginLimiter, limitAuthWork("login", async (req: Request, res: Response) => {
   const { email, password } = req.body || {};
   if (!isValidEmail(email) || typeof password !== "string") {
     return res.status(400).json({ error: "invalid email or password" });
@@ -227,6 +240,7 @@ router.post("/login", limitAuthWork("login", async (req: Request, res: Response)
       [email.toLowerCase()],
     );
     if (result.rowCount === 0) {
+      await verifyPassword(password, DUMMY_PASSWORD_HASH);
       return res.status(401).json({ error: "invalid email or password" });
     }
     const user = result.rows[0];
@@ -249,6 +263,25 @@ router.post("/logout-all", requireAuth, async (req: Request, res: Response) => {
   } catch (err) {
     console.error("logout-all failed:", err);
     res.status(500).json({ error: "logout failed" });
+  }
+});
+
+router.post("/refresh", requireAuth, async (req: Request, res: Response) => {
+  if (!isConfigured) return res.status(503).json({ error: "database not configured (DATABASE_URL missing)" });
+
+  try {
+    const result = await getPool().query(
+      "SELECT token_version FROM users WHERE id = $1",
+      [req.userId],
+    );
+    if (result.rowCount === 0) {
+      return res.status(401).json({ error: "invalid or expired token" });
+    }
+    const token = signToken(req.userId as number, result.rows[0].token_version);
+    res.json({ token });
+  } catch (err) {
+    console.error("refresh failed:", err);
+    res.status(500).json({ error: "refresh failed" });
   }
 });
 

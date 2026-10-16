@@ -435,7 +435,9 @@ fn restore_record(path: &Path, record: &Recovery) -> Result<bool, String> {
         .and_then(|p| p.creation().map(|creation| (creation, p.class())));
     let decision = restore_decision(record, now);
     if decision == Decision::PutBack {
-        let process = process.expect("a live process was observed");
+        let Some(process) = process else {
+            return Err("cannot restore priority: process handle missing".to_string());
+        };
         process.set_class(record.original)?;
         if process.class() != record.original {
             return Err("the restored priority did not stick".to_string());

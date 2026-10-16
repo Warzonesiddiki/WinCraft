@@ -358,14 +358,17 @@ export function GamingHudCard({
           try {
             const isCompact = await invoke<boolean>("hud_is_compact");
             if (alive) setCompact(isCompact);
-          } catch {
+          } catch (err) {
             // The overlay is still known to be open even if its size could
             // not be read; falling back to the normal layout is the safe
             // guess, and the size button lets the user correct it.
+            console.warn("[Pro] hud_is_compact failed", err);
           }
         }
       })
-      .catch(() => {});
+      .catch((err) => {
+        console.warn("[Pro] hud_is_open failed", err);
+      });
 
     void invoke<{ running: boolean; elevated: boolean }>("fps_status")
       .then((st) => {
@@ -373,9 +376,10 @@ export function GamingHudCard({
         setMeasuring(st.running);
         setElevated(st.elevated);
       })
-      .catch(() => {
+      .catch((err) => {
         // Leaving both false hides the control and shows the requirement,
         // which is the safe reading of "we could not find out".
+        console.warn("[Pro] fps_status check failed", err);
       });
     return () => {
       alive = false;
@@ -614,8 +618,9 @@ export function DriverBoosterCard({
     for (const url of batch) {
       try {
         await openUrl(url);
-      } catch {
+      } catch (err) {
         // One page failing to open must not abandon the rest of the batch.
+        console.warn(`[Pro] Failed to open URL: ${url}`, err);
       }
     }
     if (selectedPages.length > batch.length) {

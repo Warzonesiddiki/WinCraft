@@ -1,4 +1,4 @@
-import { createPrivateKey, sign } from "crypto";
+import { createPrivateKey, createPublicKey, sign, verify } from "crypto";
 
 /**
  * Signs the desktop app's local Pro entitlement check.
@@ -21,7 +21,7 @@ import { createPrivateKey, sign } from "crypto";
  * implicates the other.
  */
 
-const PRIVATE_KEY_B64 = process.env.LICENSE_SIGNING_PRIVATE_KEY;
+const PRIVATE_KEY_B64 = process.env.LICENSE_SIGNING_PRIVATE_KEY?.trim();
 
 export const isConfigured = Boolean(PRIVATE_KEY_B64);
 
@@ -82,4 +82,36 @@ export function signLicense(payload: LicensePayload): SignedLicense {
   // algorithm the way RSA/ECDSA do, it hashes internally.
   const signature = sign(null, bytes, key);
   return { payloadJson, signature: signature.toString("base64") };
+}
+
+/**
+ * Verifies a SignedLicense against an Ed25519 public key (SPKI DER base64).
+ */
+export function verifyLicense(
+  license: SignedLicense,
+  publicKeyB64: string,
+): { valid: boolean; payload?: LicensePayload; error?: string } {
+  try {
+    if (!license || typeof license.payloadJson !== "string" || typeof license.signature !== "string") {
+      return { valid: false, error: "invalid license object" };
+    }
+    const pubKey = createPublicKey({
+      key: Buffer.from(publicKeyB64.trim(), "base64"),
+      format: "der",
+      type: "spki",
+    });
+    const bytes = Buffer.from(license.payloadJson, "utf8");
+    const sig = Buffer.from(license.signature, "base64");
+    const valid = verify(null, bytes, pubKey, sig);
+    if (!valid) {
+      return { valid: false, error: "invalid signature" };
+    }
+    const payload = JSON.parse(license.payloadJson) as LicensePayload;
+    if (typeof payload.expiresAt === "number" && payload.expiresAt < Math.floor(Date.now() / 1000)) {
+      return { valid: false, payload, error: "license expired" };
+    }
+    return { valid: true, payload };
+  } catch {
+    return { valid: false, error: "verification failed" };
+  }
 }

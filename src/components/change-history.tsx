@@ -319,21 +319,31 @@ export function ChangeHistory({
           <div className="history-header-actions no-print">
             <span className="history-export-label">{c.export}</span>
             <button
+              type="button"
               className="workspace-button workspace-button-secondary"
+              aria-label={`${c.export} CSV`}
               onClick={() => void exportAs("csv")}
             >
               CSV
             </button>
             <button
+              type="button"
               className="workspace-button workspace-button-secondary"
+              aria-label={`${c.export} JSON`}
               onClick={() => void exportAs("json")}
             >
               JSON
             </button>
-            <button className="workspace-button workspace-button-secondary" onClick={printHistory}>
+            <button
+              type="button"
+              className="workspace-button workspace-button-secondary"
+              aria-label={`${c.export} PDF`}
+              onClick={printHistory}
+            >
               {c.exportPdf}
             </button>
             <button
+              type="button"
               onClick={() => setConfirm({ title: c.clearTitle, ids: [], clear: true })}
               disabled={clearing}
               className="workspace-button workspace-button-secondary workspace-button-delete"
@@ -347,7 +357,11 @@ export function ChangeHistory({
       {loadError && (
         <div className="workspace-panel-error" role="alert">
           <p>{loadError}</p>
-          <button onClick={load} className="workspace-button workspace-button-secondary">
+          <button
+            type="button"
+            onClick={load}
+            className="workspace-button workspace-button-secondary"
+          >
             {s.scheduledTasks.refresh}
           </button>
         </div>
@@ -377,6 +391,7 @@ export function ChangeHistory({
           {inEffect.length > 0 && (
             <div className="history-compare-actions no-print">
               <button
+                type="button"
                 className="workspace-button workspace-button-secondary"
                 aria-expanded={compareOpen}
                 onClick={() => setCompareOpen((v) => !v)}
@@ -384,6 +399,7 @@ export function ChangeHistory({
                 {compareOpen ? c.compareHide : format(c.compareShow, { count: inEffect.length })}
               </button>
               <button
+                type="button"
                 className="workspace-button workspace-button-secondary"
                 disabled={busy}
                 onClick={() =>
@@ -458,6 +474,7 @@ export function ChangeHistory({
           </select>
           {filtered && (
             <button
+              type="button"
               className="workspace-button workspace-button-secondary"
               onClick={() => {
                 setFilters(NO_FILTERS);
@@ -519,6 +536,7 @@ export function ChangeHistory({
                     </span>
                     {undoable.length > 0 && (
                       <button
+                        type="button"
                         className="workspace-button workspace-button-secondary no-print"
                         disabled={busy}
                         onClick={() => setConfirm({ title: c.undoTitleSession, ids: undoable })}
@@ -683,6 +701,7 @@ function HistoryRow({
           {item.detail && <p className="workspace-ledger-detail">{item.detail}</p>}
           {showsValues && (
             <button
+              type="button"
               className="history-values-toggle no-print"
               aria-expanded={open}
               onClick={onToggle}
@@ -700,6 +719,7 @@ function HistoryRow({
         </div>
         {inEffect && (
           <button
+            type="button"
             onClick={onUndo}
             disabled={busy}
             aria-label={`${c.undoOne} · ${name}`}

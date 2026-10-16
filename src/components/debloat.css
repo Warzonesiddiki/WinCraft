@@ -764,8 +764,40 @@
   }
   .debloat-row,
   .debloat-actionbar,
-  .debloat-progress-bar span {
+  .debloat-progress-bar span,
+  .debloat-tabs button,
+  .debloat-group-toggle svg,
+  .debloat-actionbar-button,
+  .debloat-lose {
     transition: none;
+  }
+}
+
+@media (forced-colors: active) {
+  :is(button, input, select):focus-visible {
+    outline: 2px solid Highlight;
+    outline-offset: 2px;
+  }
+  .debloat-dialog,
+  .debloat-actionbar,
+  .debloat-row,
+  .debloat-group,
+  .debloat-tabs,
+  .debloat-search-input {
+    border: 1px solid ButtonBorder;
+  }
+  .debloat-tabs button[aria-current="page"] {
+    border-bottom: 2px solid Highlight;
+    color: Highlight;
+  }
+  .debloat-lose {
+    border: 1px solid ButtonBorder;
+    appearance: auto;
+  }
+  .debloat-actionbar-button-primary {
+    background: Highlight;
+    color: HighlightText;
+    border: 1px solid Highlight;
   }
 }
 

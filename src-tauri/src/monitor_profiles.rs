@@ -429,6 +429,7 @@ mod native {
         String::from_utf16_lossy(&s[..s.iter().position(|c| *c == 0).unwrap_or(s.len())])
     }
     fn devmode() -> DEVMODEW {
+        // SAFETY: DEVMODEW is a plain data struct safely zero-initialized with dmSize set.
         unsafe {
             let mut d: DEVMODEW = std::mem::zeroed();
             d.dmSize = std::mem::size_of::<DEVMODEW>() as u16;
@@ -436,6 +437,7 @@ mod native {
         }
     }
     fn mode(d: &DEVMODEW) -> Mode {
+        // SAFETY: Accessing union fields in DEVMODEW populated by EnumDisplaySettings.
         unsafe {
             Mode {
                 width: d.dmPelsWidth,
@@ -450,11 +452,13 @@ mod native {
         }
     }
     fn adapters() -> Result<Vec<(String, String, String)>, String> {
+        // SAFETY: GetSystemMetrics has no side effects and accepts standard SM_* metric flags.
         if unsafe { GetSystemMetrics(SM_REMOTESESSION) } != 0 {
             return Err("Refresh profiles are unavailable over Remote Desktop".into());
         }
         let mut out = vec![];
         for i in 0..64 {
+            // SAFETY: DISPLAY_DEVICEW is zeroed with `cb` initialized to its struct size per Win32 API contract.
             unsafe {
                 let mut a: DISPLAY_DEVICEW = std::mem::zeroed();
                 a.cb = std::mem::size_of::<DISPLAY_DEVICEW>() as u32;
@@ -506,6 +510,7 @@ mod native {
     }
     fn raw_current(device: &str) -> Result<DEVMODEW, String> {
         let mut d = devmode();
+        // SAFETY: wide(device) provides a null-terminated UTF-16 string; d is initialized with dmSize.
         if unsafe { EnumDisplaySettingsW(wide(device).as_ptr(), ENUM_CURRENT_SETTINGS, &mut d) }
             == 0
         {
@@ -526,6 +531,7 @@ mod native {
         let mut frequencies = vec![];
         for i in 0..4096 {
             let mut d = devmode();
+            // SAFETY: wide(device) provides a null-terminated UTF-16 string; d is initialized with dmSize.
             if unsafe { EnumDisplaySettingsW(wide(device).as_ptr(), i, &mut d) } == 0 {
                 break;
             }
@@ -576,6 +582,7 @@ mod native {
         d.dmDisplayFrequency = wanted.hz;
         d.dmFields = DM_DISPLAYFREQUENCY;
         let name = wide(&device);
+        // SAFETY: ChangeDisplaySettingsExW with CDS_TEST checks if the settings are dynamically valid without applying them.
         if unsafe {
             ChangeDisplaySettingsExW(
                 name.as_ptr(),
@@ -588,6 +595,7 @@ mod native {
         {
             return Err("Windows rejected this display mode".into());
         }
+        // SAFETY: Applying validated display mode dynamically without reboot (flags = 0).
         let result = unsafe {
             ChangeDisplaySettingsExW(name.as_ptr(), &d, std::ptr::null_mut(), 0, std::ptr::null())
         };

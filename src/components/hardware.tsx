@@ -843,7 +843,11 @@ function DriverRow({ entry, s }: { entry: DriverEntry; s: Strings }) {
       </Badge>
       {entry.vendor_url && (
         <button
-          onClick={() => void openUrl(entry.vendor_url as string).catch(() => {})}
+          onClick={() =>
+            void openUrl(entry.vendor_url as string).catch((err) => {
+              console.warn("[Hardware] open vendor url failed", err);
+            })
+          }
           className="tool-secondary-action shrink-0"
         >
           {s.hardware.vendorSite}
@@ -992,7 +996,9 @@ export function DriversPanel({
       .then((v) => {
         if (alive) setRebootNeeded(v);
       })
-      .catch(() => {});
+      .catch((err) => {
+        console.warn("[Hardware] reboot_pending check failed", err);
+      });
     return () => {
       alive = false;
     };
@@ -1016,9 +1022,10 @@ export function DriversPanel({
         setCheckedAt(null);
         setHardwareChanged(true);
       })
-      .catch(() => {
+      .catch((err) => {
         // No profile, no comparison: the age limit and the browser facts still
         // apply, and a failed read must not throw away a usable scan.
+        console.warn("[Hardware] system_profile read failed", err);
       });
     return () => {
       alive = false;
@@ -1050,12 +1057,24 @@ export function DriversPanel({
     progress && progress.total > 0 ? Math.round((progress.done / progress.total) * 100) : 0;
 
   return (
-    <div className="tool-panel tool-drivers-panel" aria-busy={busy}>
+    <section
+      role="region"
+      aria-labelledby="hardware-drivers-title"
+      className="tool-panel tool-drivers-panel"
+      aria-busy={busy}
+    >
       <ToolHeader
+        titleId="hardware-drivers-title"
         title={s.hardware.driversTitle}
         description={s.hardware.driversSubtitle}
         actions={
-          <button onClick={run} disabled={busy} aria-busy={busy} className="tool-primary-action">
+          <button
+            type="button"
+            onClick={run}
+            disabled={busy}
+            aria-busy={busy}
+            className="tool-primary-action"
+          >
             <svg
               aria-hidden="true"
               viewBox="0 0 20 20"
@@ -1389,7 +1408,7 @@ export function DriversPanel({
           </ToolDetails>
         </>
       )}
-    </div>
+    </section>
   );
 }
 

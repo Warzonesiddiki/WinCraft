@@ -54,6 +54,20 @@ describe("Toggle", () => {
     expect(button).toHaveTextContent(s.toggle.on);
   });
 
+  it("supports role='switch' with aria-checked", () => {
+    const { container, rerender } = render(
+      <Toggle role="switch" checked={false} busy={false} onClick={click} s={s} />,
+    );
+    const button = container.querySelector<HTMLButtonElement>("button");
+    if (!button) throw new Error("toggle did not render");
+    expect(button).toHaveAttribute("role", "switch");
+    expect(button).toHaveAttribute("aria-checked", "false");
+    expect(button).not.toHaveAttribute("aria-pressed");
+
+    rerender(<Toggle role="switch" checked busy={false} onClick={click} s={s} />);
+    expect(button).toHaveAttribute("aria-checked", "true");
+  });
+
   it("calls back once per click and stays quiet while a write is in flight", () => {
     const onClick = vi.fn();
     const { container, rerender } = render(
@@ -75,6 +89,16 @@ describe("Toggle", () => {
   it("uses the shared applying caption when no busy label is given", () => {
     const { container } = render(<Toggle checked busy onClick={click} s={s} />);
     expect(container.textContent).toBe(s.profiles.applying);
+  });
+
+  it("meets touch target size recommendations for compact controls", () => {
+    const { container } = render(
+      <Toggle checked={false} busy={false} onClick={click} s={s} label="Target test" />,
+    );
+    const button = container.querySelector<HTMLButtonElement>("button");
+    if (!button) throw new Error("toggle did not render");
+    expect(button.className).toContain("tweak-toggle");
+    expect(button.className).toContain("min-h-[36px]");
   });
 
   it("has no detectable accessibility violations in either state", async () => {

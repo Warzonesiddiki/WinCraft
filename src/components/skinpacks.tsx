@@ -1,145 +1,116 @@
 import { useEffect, useState } from "react";
 import { invoke } from "@tauri-apps/api/core";
-import { SkinpackInfo, Toast } from "../types";
+import { SkinpackStatus, Toast } from "../types";
+import { format, type Strings } from "../i18n";
+import { friendlyError } from "../lib";
 import { Badge } from "./ui";
-import { ToolHeader } from "./tool-section";
+import { ToolHeader, ToolStatus } from "./tool-section";
 
+/**
+ * The one desktop look this build ships.
+ *
+ * It is a shell re-theme, not a desktop environment, and the panel says so in
+ * its own words in all six languages rather than implying COSMIC, GNOME or
+ * macOS is being installed. The scope paragraph is not decoration: it is the
+ * claim, and the Rust side cannot do more than it states. Every value it writes
+ * is recorded first, so the change appears in Change history with the values
+ * before and after and is undone from here in one click.
+ */
 export function SkinpacksPanel({
+  s,
   pushToast,
 }: {
+  s: Strings;
   pushToast: (kind: Toast["kind"], message: string) => void;
 }) {
-  const [skinpacks, setSkinpacks] = useState<SkinpackInfo[]>([]);
-  const [activeId, setActiveId] = useState<string | null>(null);
+  const c = s.skinpacks;
+  const [packs, setPacks] = useState<SkinpackStatus[]>([]);
   const [busy, setBusy] = useState(false);
+  // Held as the raw error and localised at render time, so the read effect
+  // depends on nothing that changes with the language.
+  const [readError, setReadError] = useState<unknown>(null);
 
   useEffect(() => {
     let alive = true;
-    void invoke<SkinpackInfo[]>("list_skinpacks")
-      .then((packs) => {
-        if (alive && Array.isArray(packs)) {
-          setSkinpacks(packs);
-          const active = packs.find((p) => p.active);
-          if (active) setActiveId(active.id);
-        }
+    void invoke<SkinpackStatus[]>("list_skinpacks")
+      .then((next) => {
+        if (alive && Array.isArray(next)) setPacks(next);
       })
-      .catch(() => {});
+      .catch((e: unknown) => {
+        if (alive) setReadError(e);
+      });
     return () => {
       alive = false;
     };
   }, []);
 
-  async function handleApply(id: string, name: string) {
+  async function apply(id: string) {
+    if (busy) return;
     setBusy(true);
     try {
-      await invoke("apply_skinpack", { id });
-      setActiveId(id);
-      pushToast("success", `Applied ${name} overlay. Windows Taskbar suppressed safely.`);
+      const next = await invoke<SkinpackStatus>("apply_skinpack", { id });
+      setPacks((current) => current.map((p) => (p.id === next.id ? next : p)));
     } catch (e) {
-      pushToast("error", String(e));
+      pushToast("error", friendlyError(e, s));
     } finally {
       setBusy(false);
     }
   }
 
-  async function handleRestore() {
+  async function restore() {
+    if (busy) return;
     setBusy(true);
     try {
       await invoke("rollback_skinpack");
-      setActiveId(null);
-      pushToast("success", "Restored standard Windows 11 shell and taskbar.");
+      setPacks(await invoke<SkinpackStatus[]>("list_skinpacks"));
     } catch (e) {
-      pushToast("error", String(e));
+      pushToast("error", friendlyError(e, s));
     } finally {
       setBusy(false);
     }
   }
 
+  const pack = packs[0];
   return (
-    <div className="tool-list-section mb-6">
-      <div className="tool-panel tool-list-header mb-4">
-        <ToolHeader
-          title="Desktop Environment Skinpacks"
-          description="100% non-destructive user-space transformation engine. Replicates Linux COSMIC DE, macOS Sequoia, GNOME 47, and KDE Plasma 6 without patching system DLLs or modifying explorer.exe. Revert anytime in under 500ms."
-          actions={
-            <div className="flex items-center gap-2">
-              {activeId && (
-                <button
-                  type="button"
-                  disabled={busy}
-                  onClick={handleRestore}
-                  className="rounded-lg bg-surface-2 px-3 py-1.5 text-xs font-semibold text-accent hover:bg-surface-3 transition-colors border border-accent/25"
-                >
-                  Restore Windows Shell
-                </button>
-              )}
-              <Badge kind="ok">Zero DLL Patching</Badge>
-            </div>
-          }
-        />
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-        {(skinpacks || []).map((pack) => {
-          const isActive = activeId === pack.id;
-          return (
-            <div
-              key={pack.id}
-              className={`tool-panel relative flex flex-col justify-between p-4 rounded-xl border transition-all ${
-                isActive
-                  ? "border-accent bg-surface-2 ring-1 ring-accent/30"
-                  : "border-border bg-surface-1 hover:border-line"
-              }`}
-            >
-              <div>
-                <div className="flex items-center justify-between gap-2 mb-2">
-                  <div className="flex items-center gap-2">
-                    <span
-                      className="w-2.5 h-2.5 rounded-full inline-block"
-                      style={{ backgroundColor: pack.previewAccent }}
-                      aria-hidden="true"
-                    />
-                    <h3 className="text-sm font-semibold text-ink-1">{pack.name}</h3>
-                  </div>
-                  {isActive ? (
-                    <Badge kind="ok">Active</Badge>
-                  ) : (
-                    <span className="text-[10px] text-ink-3 uppercase tracking-wider">
-                      {pack.author.split("/")[0].trim()}
-                    </span>
-                  )}
-                </div>
-                <p className="text-xs text-ink-2 leading-relaxed mb-4">{pack.description}</p>
-              </div>
-
-              <div className="pt-2 border-t border-border/50 flex items-center justify-between">
-                <span className="text-[11px] font-mono text-ink-3">
-                  {pack.id === "cosmic" ? "System76 / Rust" : "User-space overlay"}
-                </span>
-                {isActive ? (
-                  <button
-                    type="button"
-                    disabled={busy}
-                    onClick={handleRestore}
-                    className="text-xs font-medium text-warn hover:underline"
-                  >
-                    Revert
-                  </button>
-                ) : (
-                  <button
-                    type="button"
-                    disabled={busy}
-                    onClick={() => handleApply(pack.id, pack.name)}
-                    className="rounded-md bg-surface-3 px-3 py-1 text-xs font-medium text-ink-1 hover:bg-surface-4 transition-colors"
-                  >
-                    Apply Theme
-                  </button>
-                )}
-              </div>
-            </div>
-          );
-        })}
-      </div>
-    </div>
+    <section className="tool-panel mb-4" role="region" aria-labelledby="skinpacks-title">
+      <ToolHeader titleId="skinpacks-title" title={c.title} description={c.description} />
+      {readError !== null && <ToolStatus tone="error">{friendlyError(readError, s)}</ToolStatus>}
+      {pack && (
+        <div className="flex flex-col gap-3">
+          <div className="flex flex-wrap items-center gap-2">
+            <h3 className="text-sm font-semibold text-ink">{c.packName}</h3>
+            {pack.active && <Badge kind="ok">{c.active}</Badge>}
+            <span className="text-[11px] text-ink-3">
+              {format(c.valuesSummary, { count: pack.valueCount })}
+            </span>
+          </div>
+          <p className="max-w-[62ch] text-xs leading-relaxed text-ink-2">{c.packBody}</p>
+          <p className="max-w-[62ch] text-xs leading-relaxed text-ink-3">{c.scope}</p>
+          <div className="flex flex-wrap items-center gap-2 pt-1">
+            {pack.active ? (
+              <button
+                type="button"
+                disabled={busy}
+                aria-busy={busy}
+                onClick={() => void restore()}
+                className="rounded-lg border border-accent/25 bg-surface-2 px-3 py-1.5 text-xs font-semibold text-accent transition-colors hover:bg-surface-3 disabled:opacity-50"
+              >
+                {busy ? c.applying : c.restore}
+              </button>
+            ) : (
+              <button
+                type="button"
+                disabled={busy}
+                aria-busy={busy}
+                onClick={() => void apply(pack.id)}
+                className="rounded-lg bg-accent px-3 py-1.5 text-xs font-semibold text-surface-base transition-colors hover:bg-accent/90 disabled:opacity-50"
+              >
+                {busy ? c.applying : c.apply}
+              </button>
+            )}
+          </div>
+        </div>
+      )}
+    </section>
   );
 }

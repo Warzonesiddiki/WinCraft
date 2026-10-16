@@ -108,7 +108,8 @@ export function recordDuration(step: string, ms: number) {
     const history = loadHistory();
     history[step] = [...(history[step] ?? []), Math.round(ms)].slice(-HISTORY_RUNS);
     localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
-  } catch {
+  } catch (err) {
     // Storage full or blocked: the estimate falls back to the rate alone.
+    console.warn("[repair-eta] recordDuration failed", err);
   }
 }

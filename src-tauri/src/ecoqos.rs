@@ -386,6 +386,7 @@ mod native {
                 ControlMask: 0,
                 StateMask: 0,
             };
+            // SAFETY: self.0.raw() is a valid open process handle; state points to valid stack memory matching ProcessPowerThrottling size.
             if unsafe {
                 GetProcessInformation(
                     self.0.raw(),
@@ -413,6 +414,7 @@ mod native {
                 ControlMask: masks.control,
                 StateMask: masks.state,
             };
+            // SAFETY: self.0.raw() is a valid open process handle; state points to valid stack memory matching ProcessPowerThrottling size.
             if unsafe {
                 SetProcessInformation(
                     self.0.raw(),
@@ -535,7 +537,9 @@ fn restore_record(
     let decision = restore_decision(record, actual.as_ref().map(|(_, id, masks)| (id, *masks)));
     match decision {
         RestoreDecision::Restore => {
-            let (process, _, _) = actual.unwrap();
+            let Some((process, _, _)) = actual else {
+                return Ok(false);
+            };
             process.set_masks(record.original)?;
             if process.masks()? != record.original {
                 return Err("EcoQoS restoration did not reproduce the saved masks".to_string());

@@ -9,7 +9,8 @@ WinCraft 2.0.0 is the major generation release of the non-destructive Windows pe
 - **Evidence & effect calibration:** Every tweak displays empirical evidence (`Measured`, `Modest`, `Neutral`), taking effect indicator (`Immediate`, `Sign-out`, `Restart`, `Reboot`), and documented risk factors.
 - **Tier-3 consent modal & execution gate:** Explicit consent required before executing potentially irreversible or machine-wide settings; consent records persisted in `%APPDATA%\WinCraft\barebone_consent.json`.
 - **Pre-flight System Restore Point verification:** Integrates native `SRSetRestorePointW` before elevated operations with non-blocking graceful fallback.
-- **Full 6-locale translation parity:** 100% key parity across English, Italian, German, Spanish, French, and European Portuguese (1,769 keys per locale).
+- **Desktop look (Interface):** The shell-replication panel was replaced by one real transformation, `COSMIC Dark` — nine per-user `HKCU` values (dark surfaces, transparency off, accent on title bars and the taskbar, flat window borders, no minimise animation, taskbar at the left), journalled under one rollback id before any write and restored in one click. It re-themes Windows and says so in all six languages; it does not install a desktop environment, and the five previously advertised packs that did not exist are gone.
+- **Full 6-locale translation parity:** 100% key parity across English, Italian, German, Spanish, French, and European Portuguese (1,780 keys per locale).
 
 ## v1.19.0
 

@@ -92,13 +92,19 @@ export function TitleBar({
         .then((v) => {
           if (alive) setMaximized(v);
         })
-        .catch(() => {});
+        .catch((err) => {
+          console.warn("[Titlebar] isMaximized failed", err);
+        });
     };
     sync();
     const unlisten = w.onResized(sync);
     return () => {
       alive = false;
-      unlisten.then((fn) => fn()).catch(() => {});
+      unlisten
+        .then((fn) => fn())
+        .catch((err) => {
+          console.warn("[Titlebar] unlisten onResized failed", err);
+        });
     };
   }, []);
 

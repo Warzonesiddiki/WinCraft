@@ -127,10 +127,10 @@ REACTIONS = {
 # offers nothing). The save/share variants stay because those are the actions
 # ranking weighs most, but they too now say WHAT you get by opening the link.
 CTA = [
-    "WinCraft fixes everything you just saw in one click, and it's free to try. Link in bio.",
+    "WinCraft fixes everything you just saw in one click, and it's 100% free. Link in bio.",
     "You could change all of this by hand, or let WinCraft do it in one click. Free, link in bio.",
     "Every tweak you just saw is one click in WinCraft, and one click to undo. Link in bio.",
-    "WinCraft shows you exactly what it changes before it touches anything. Free to try, link in bio.",
+    "WinCraft shows you exactly what it changes before it touches anything. Free to download, link in bio.",
     "Save this before you forget, then let WinCraft do it for you in one click. Link in bio.",
     "Send this to whoever's PC is a mess right now, the one-click fix is in the bio.",
     # Added 2026-08-19: the one CTA that points explicitly at verifiability

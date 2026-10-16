@@ -86,18 +86,57 @@ export const STARTER_PRESETS = [
     ],
   },
   {
-    // Tuned for users who only use a web browser: strips background apps,
-    // Start search suggestions, and taskbar widgets to free maximum RAM.
+    // A browser-first set. What a browser-only user gains most from removing is
+    // Windows' own background work and the web lookups and feeds that run beside
+    // the browser: background apps, Start/Explorer web search, suggestion and
+    // widget feeds, lock-screen promotions, and data-collection surfaces they
+    // never use. The compositor and shell effects are reduced so more of the
+    // machine is left for the browser, and search stays local.
+    //
+    // Every control is per-user, reversible and non-elevated; nothing here
+    // changes security, networking or power, and no RAM or speed gain is
+    // claimed. Layout and appearance choices are listed but never preselected.
     id: "browser_only",
     icon: "disable_background_apps",
     tweaks: [
+      // Background work competing with the browser for RAM and CPU.
       { id: "disable_background_apps", selected: true },
+      { id: "disable_restart_apps", selected: true },
+      { id: "disable_startup_delay", selected: true },
+      // Compositor and shell effects.
+      { id: "disable_window_animations", selected: true },
+      { id: "disable_transparency", selected: true },
+      // Shell responsiveness.
+      { id: "menu_show_delay", selected: true },
+      { id: "mouse_hover_delay", selected: true },
+      { id: "instant_folder_loading", selected: true },
+      // Search stays local: no web roundtrips, no suggestion feeds.
+      { id: "disable_bing_search", selected: true },
+      { id: "disable_cloud_search", selected: true },
+      { id: "disable_search_highlights", selected: true },
+      { id: "disable_search_history", selected: true },
       { id: "disable_start_suggestions", selected: true },
       { id: "disable_suggested_apps", selected: true },
+      { id: "disable_app_suggestions_start", selected: true },
+      // Prompts and promotions that interrupt a browsing session.
       { id: "disable_feedback_requests", selected: true },
-      { id: "disable_bing_search", selected: true },
+      { id: "disable_tailored_experiences", selected: true },
+      { id: "disable_lockscreen_spotlight", selected: true },
+      { id: "disable_sticky_keys_prompt", selected: true },
+      { id: "disable_aero_shake", selected: true },
+      // Collection surfaces this user does not feed.
+      { id: "disable_typing_insights", selected: true },
+      { id: "disable_online_speech_privacy", selected: true },
+      { id: "disable_device_history", selected: true },
+      // File extensions stay visible in the downloads folder.
+      { id: "show_file_extensions", selected: true },
+      // Taskbar and appearance: shown for review, never preselected.
       { id: "hide_taskbar_widgets", selected: true },
-      { id: "disable_restart_apps", selected: true },
+      { id: "hide_taskbar_search", selected: false },
+      { id: "hide_taskbar_chat", selected: false },
+      { id: "taskbar_align_left", selected: false },
+      { id: "disable_drag_full_windows", selected: false },
+      { id: "dark_mode", selected: false },
     ],
   },
   {

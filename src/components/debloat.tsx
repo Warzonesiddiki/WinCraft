@@ -201,7 +201,9 @@ export function DebloatPanel({
     const timer = window.setTimeout(() => {
       loadedRef.current = true;
       void scan();
-      void loadHistory().catch(() => {});
+      void loadHistory().catch((err) => {
+        console.warn("[Debloat] loadHistory failed", err);
+      });
     }, 0);
     // The parent keeps this panel mounted during navigation so an operation can finish.
     return () => window.clearTimeout(timer);
@@ -254,7 +256,9 @@ export function DebloatPanel({
           i === index ? { ...step, state: result.status, error: result.error } : step,
         ),
       );
-      await loadHistory().catch(() => {});
+      await loadHistory().catch((err) => {
+        console.warn("[Debloat] refresh loadHistory failed", err);
+      });
     }
     setSelection(new Set());
     await scan();
@@ -972,7 +976,11 @@ export function DebloatPanel({
               <button
                 type="button"
                 className="tool-secondary-action"
-                onClick={() => void loadHistory().catch(() => {})}
+                onClick={() =>
+                  void loadHistory().catch((err) => {
+                    console.warn("[Debloat] reload loadHistory failed", err);
+                  })
+                }
                 disabled={running}
               >
                 {c.reloadHistory}

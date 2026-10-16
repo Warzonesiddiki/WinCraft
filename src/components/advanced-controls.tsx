@@ -67,6 +67,10 @@ function EcoCard({ lang, onChanged }: { lang: Lang; onChanged: () => Promise<voi
     try {
       await task();
       await refresh();
+      // These rules change system state, so the shell re-reads its applied
+      // state on every successful change, not only on the blocked-global
+      // restore below.
+      await onChanged();
     } catch (e) {
       setError(friendlyError(e, stringsFor(lang)));
     } finally {
@@ -74,8 +78,14 @@ function EcoCard({ lang, onChanged }: { lang: Lang; onChanged: () => Promise<voi
     }
   }
   return (
-    <section className="tool-panel advanced-card" aria-busy={busy}>
+    <section
+      className="tool-panel advanced-card"
+      role="region"
+      aria-labelledby="eco-control-title"
+      aria-busy={busy}
+    >
       <ToolHeader
+        titleId="eco-control-title"
         title={c.ecoTitle}
         description={c.ecoDescription}
         actions={
@@ -221,8 +231,14 @@ function PriorityRulesCard({ lang }: { lang: Lang }) {
     }
   }
   return (
-    <section className="tool-panel advanced-card" aria-busy={busy}>
+    <section
+      className="tool-panel advanced-card"
+      role="region"
+      aria-labelledby="priority-rules-title"
+      aria-busy={busy}
+    >
       <ToolHeader
+        titleId="priority-rules-title"
         title={p.title}
         description={p.subtitle}
         actions={
@@ -255,7 +271,7 @@ function PriorityRulesCard({ lang }: { lang: Lang }) {
             })
           }
         >
-          {c.ecoAdd}
+          {c.priorityAdd}
         </button>
       </div>
       {state?.rules.length ? (
@@ -347,8 +363,17 @@ function DownloadCard({ lang }: { lang: Lang }) {
   }
   const valid = Number.isInteger(value) && value >= 1 && value <= 1_000_000;
   return (
-    <section className="tool-panel advanced-card" aria-busy={busy}>
-      <ToolHeader title={c.doTitle} description={c.doDescription} />
+    <section
+      className="tool-panel advanced-card"
+      role="region"
+      aria-labelledby="download-control-title"
+      aria-busy={busy}
+    >
+      <ToolHeader
+        titleId="download-control-title"
+        title={c.doTitle}
+        description={c.doDescription}
+      />
       {state && !state.supported && <ToolStatus tone="error">{c.doUnsupported}</ToolStatus>}
       {state?.conflict && <ToolStatus tone="error">{state.conflict}</ToolStatus>}
       <div className="advanced-facts">
@@ -478,8 +503,14 @@ function MonitorCard({ lang }: { lang: Lang }) {
     ? Math.max(0, Math.ceil((state.deadline_ms - now) / 1000))
     : 0;
   return (
-    <section className="tool-panel advanced-card" aria-busy={busy}>
+    <section
+      className="tool-panel advanced-card"
+      role="region"
+      aria-labelledby="monitor-control-title"
+      aria-busy={busy}
+    >
       <ToolHeader
+        titleId="monitor-control-title"
         title={c.monitorTitle}
         description={c.monitorDescription}
         actions={

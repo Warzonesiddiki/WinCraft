@@ -1,4 +1,13 @@
+param(
+  [string]$ReleaseTag = $env:RELEASE_TAG,
+  [string]$Format = $(if ($env:INSTALLER_FORMAT) { $env:INSTALLER_FORMAT } else { $env:FORMAT })
+)
+
 $ErrorActionPreference = 'Stop'
+
+if ($ReleaseTag) { $env:RELEASE_TAG = $ReleaseTag }
+if ($Format) { $env:INSTALLER_FORMAT = $Format }
+
 if ($env:GITHUB_ACTIONS -ne 'true' -or -not $env:RUNNER_TEMP) {
   throw 'Installer execution is restricted to the disposable CI runner.'
 }

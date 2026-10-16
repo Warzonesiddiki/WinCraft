@@ -177,9 +177,10 @@ export function UpdateDriftCard({
       .then((v) => {
         if (alive) setReport(v);
       })
-      .catch(() => {
+      .catch((err) => {
         // Not being able to read the patch level is not something to put in
         // front of the user: the watchdog simply has nothing to say.
+        console.warn("[Intelligence] check_update_drift failed", err);
       });
     return () => {
       alive = false;
@@ -326,9 +327,10 @@ export function CrashReportsCard({
       .then((v) => {
         if (alive) setReports(v);
       })
-      .catch(() => {
+      .catch((err) => {
         // No reports is the normal case and the same outcome as a failed
         // read: either way there is nothing to show.
+        console.warn("[Intelligence] list_crash_reports failed", err);
       });
     return () => {
       alive = false;

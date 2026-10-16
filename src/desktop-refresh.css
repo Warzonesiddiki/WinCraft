@@ -532,4 +532,7 @@
   .workspace-view {
     animation: none;
   }
+  .tweak-toggle {
+    transition: none;
+  }
 }

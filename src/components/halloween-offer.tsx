@@ -176,8 +176,8 @@ export function HalloweenStrip({
             setClosed(true);
             try {
               localStorage.setItem(storageKey, "1");
-            } catch {
-              /* ignore */
+            } catch (err) {
+              console.warn("[HalloweenOffer] save dismissed state failed", err);
             }
           }}
         >

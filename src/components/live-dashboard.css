@@ -702,3 +702,27 @@
 .live-spark[data-axis="true"] {
   margin-top: 16px;
 }
+
+@media (forced-colors: active) {
+  .live-card,
+  .live-core,
+  .live-meter,
+  .live-bar::before,
+  .live-notes li,
+  .live-zoom {
+    border: 1px solid ButtonBorder;
+  }
+  .live-line {
+    stroke: CanvasText;
+  }
+  .live-ring-used {
+    stroke: Highlight;
+  }
+  .live-ring-track {
+    stroke: ButtonBorder;
+  }
+  .live-zoom button[aria-pressed="true"] {
+    background: Highlight;
+    color: HighlightText;
+  }
+}

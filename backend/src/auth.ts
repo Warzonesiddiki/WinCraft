@@ -38,8 +38,21 @@ function signToken(userId: number, tokenVersion: number): string {
  * ("log out everywhere", password reset) still revokes both. */
 function renewedToken(payload: jwt.JwtPayload, nowSeconds = Date.now() / 1000): string | null {
   if (typeof payload.iat !== "number" || typeof payload.tv !== "number") return null;
+  if (typeof payload.sub !== "number" || !Number.isInteger(payload.sub) || payload.sub <= 0) return null;
+  if (typeof payload.exp === "number" && nowSeconds >= payload.exp) return null;
   if (nowSeconds - payload.iat < RENEW_AFTER_SECONDS) return null;
   return signToken(payload.sub as unknown as number, payload.tv);
+}
+
+/** Verifies and decodes a session token against JWT_SECRET. Returns payload or null. */
+function verifyToken(token: string): jwt.JwtPayload | null {
+  if (!JWT_SECRET) return null;
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET);
+    return typeof decoded === "object" && decoded !== null ? decoded : null;
+  } catch {
+    return null;
+  }
 }
 
 /** Express middleware: requires a valid, non-revoked `Authorization: Bearer <token>` header. */
@@ -64,6 +77,16 @@ async function requireAuth(req: Request, res: Response, next: NextFunction): Pro
     if (typeof decoded === "string") throw new Error("unexpected string payload");
     payload = decoded;
   } catch {
+    res.status(401).json({ error: "invalid or expired token" });
+    return;
+  }
+
+  if (
+    typeof payload.sub !== "number" ||
+    !Number.isInteger(payload.sub) ||
+    payload.sub <= 0 ||
+    typeof payload.tv !== "number"
+  ) {
     res.status(401).json({ error: "invalid or expired token" });
     return;
   }
@@ -109,9 +132,11 @@ function isValidEmail(email: unknown): email is string {
 
 function isValidPassword(password: unknown): password is string {
   // bcrypt silently ignores bytes beyond 72, including part of a Unicode character.
+  // Enforce minimum 8 characters of non-whitespace entropy and maximum 72 UTF-8 bytes.
   return (
     typeof password === "string" &&
     password.length >= 8 &&
+    password.trim().length >= 8 &&
     Buffer.byteLength(password, "utf8") <= 72
   );
 }
@@ -120,6 +145,7 @@ export {
   hashPassword,
   verifyPassword,
   signToken,
+  verifyToken,
   requireAuth,
   isValidEmail,
   isValidPassword,

@@ -246,9 +246,10 @@ function Hud() {
       applied = key;
       void getCurrentWindow()
         .setSize(new LogicalSize(w, h))
-        .catch(() => {
+        .catch((err) => {
           // The panel is still readable at whatever size the window already
           // is; a failed resize is not worth interrupting a game for.
+          console.warn("[Overlay] setSize failed", err);
         });
     };
 
@@ -264,8 +265,9 @@ function Hud() {
       .then((v) => {
         if (alive) setCompact(v);
       })
-      .catch(() => {
+      .catch((err) => {
         // Normal size is the safe answer: it fits whatever the window is.
+        console.warn("[Overlay] hud_is_compact failed", err);
       });
     const stop = listen<boolean>("hud-compact", (e) => {
       if (alive) setCompact(e.payload);
@@ -284,9 +286,10 @@ function Hud() {
       try {
         const s = await invoke<HudSnapshot>("hud_snapshot");
         if (alive) setSnap(s);
-      } catch {
+      } catch (err) {
         // A failed sample is not worth surfacing on an overlay drawn over a
         // game: the panel simply keeps the last reading until the next tick.
+        console.warn("[Overlay] hud_snapshot failed", err);
       }
       if (alive) timer = window.setTimeout(() => void tick(), POLL_MS);
     };

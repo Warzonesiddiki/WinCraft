@@ -6,7 +6,7 @@ Video file: `wincraft-youtube.mp4` (1920x1080, 1:26, 27.6 MB)
 
 ## Title (pick one)
 
-- WinCraft — 36 real Windows tweaks, all undoable in one click
+- WinCraft — 150 real Windows tweaks, all undoable in one click
 - I built a Windows tweaker where every change can be undone
 
 ## Description
@@ -32,9 +32,9 @@ In this video:
   as Have I Been Pwned)
 - Maintenance: drive health, SSD-safe optimize (TRIM on SSD, defrag on HDD),
   duplicate and large file finders, temp and Windows Update cache cleanup
-- 5 languages and 10 color themes
+- 6 languages and 10 color themes
 
-DOWNLOAD (free tier included)
+DOWNLOAD (100% free, all controls included)
 winget install Warzonesiddiki.WinCraft
 https://sourceforge.net/projects/pc-tweaker/
 https://github.com/Warzonesiddiki/WinCraft
@@ -46,7 +46,7 @@ Chapters
 0:20 Performance and gaming
 0:44 Privacy and password breach check
 0:57 Windows UI and maintenance
-1:11 Rollback, pricing and download
+1:11 Rollback and download
 
 Music: "Inspired" by Kevin MacLeod (incompetech.com)
 Licensed under Creative Commons: By Attribution 4.0

@@ -55,13 +55,19 @@ const writeLimiter = rateLimit({
   legacyHeaders: false,
 });
 
+/** Strips null bytes and control characters that corrupt text or database logs. */
+function sanitizeReviewInput(s: string): string {
+  return s.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, "");
+}
+
 /** Escapes text before it goes into the notification email's HTML body. */
 function escapeHtml(s: string): string {
   return s
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;");
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
 }
 
 /** Moderation uses the same verified proxy policy as rate limiting. */
@@ -127,9 +133,9 @@ router.post("/", writeLimiter, asyncRoute(async (req: Request, res: Response) =>
     return;
   }
 
-  const name = typeof req.body?.name === "string" ? req.body.name.trim().slice(0, MAX_NAME) : "";
-  const email = typeof req.body?.email === "string" ? req.body.email.trim() : "";
-  const body = typeof req.body?.body === "string" ? req.body.body.trim() : "";
+  const name = typeof req.body?.name === "string" ? sanitizeReviewInput(req.body.name).trim().slice(0, MAX_NAME) : "";
+  const email = typeof req.body?.email === "string" ? sanitizeReviewInput(req.body.email).trim() : "";
+  const body = typeof req.body?.body === "string" ? sanitizeReviewInput(req.body.body).trim() : "";
   const rating = Number(req.body?.rating);
 
   if (!Number.isInteger(rating) || rating < 1 || rating > 5) {

@@ -378,6 +378,13 @@ const REVIEWED_AS_CORRECT = new Set([
   "fr:systemRepair.underMinute",
   "es:systemRepair.underMinute",
   "pt:systemRepair.underMinute",
+  // The desktop look is named "COSMIC Dark" in every language. A product name
+  // is not translated; the surrounding sentence that describes it is.
+  "it:skinpacks.packName",
+  "fr:skinpacks.packName",
+  "es:skinpacks.packName",
+  "de:skinpacks.packName",
+  "pt:skinpacks.packName",
 ]);
 
 const unexplained = untranslated.filter((r) => !REVIEWED_AS_CORRECT.has(`${r.locale}:${r.key}`));

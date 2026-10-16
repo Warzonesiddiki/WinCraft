@@ -123,8 +123,9 @@ export function SystemMonitor({ s }: { s: Strings }) {
     try {
       const value = await invoke<SystemStats>("system_stats");
       if (alive.current) setStats(value);
-    } catch {
+    } catch (err) {
       /* A missed sample leaves the previous value visible. */
+      console.warn("[Monitor] system_stats sample failed", err);
     }
   }, 2500);
 
@@ -229,6 +230,7 @@ export function useScheduledRamClean(autoMinutes: number): AutoCleanState | null
     if (autoMinutes === 0) return;
     const periodMs = autoMinutes * 60_000;
     const id = window.setInterval(() => {
+      if (document.hidden) return;
       const due = dueRef.current;
       if (due === null || Date.now() < due) return;
       // Re-arm before the run, not after: a slow pass must not push the next
@@ -334,16 +336,23 @@ export function RamCleaner({
   const chooseInterval = onChangeAuto;
 
   return (
-    <div className="tool-panel tool-card tool-ram-cleaner signal border-line bg-surface-1 relative mb-6 overflow-hidden rounded-2xl border p-5">
+    <div
+      role="region"
+      aria-labelledby="ram-cleaner-title"
+      className="tool-panel tool-card tool-ram-cleaner signal border-line bg-surface-1 relative mb-6 overflow-hidden rounded-2xl border p-5"
+    >
       <div className="tool-card-head flex flex-wrap items-center gap-4">
         <span className="tool-card-icon bg-accent-soft text-accent grid h-11 w-11 shrink-0 place-items-center rounded-xl">
           <ChipIcon className="h-5 w-5" />
         </span>
         <div className="tool-card-copy min-w-0 flex-1">
-          <h2 className="text-ink font-semibold">{s.ram.title}</h2>
+          <h2 id="ram-cleaner-title" className="text-ink font-semibold">
+            {s.ram.title}
+          </h2>
           <p className="text-ink-3 mt-0.5 text-sm">{s.ram.subtitle}</p>
         </div>
         <button
+          type="button"
           onClick={() => void cleanNow()}
           disabled={busy}
           aria-busy={busy}

@@ -158,7 +158,8 @@
   justify-content: center;
   align-items: center;
   gap: 7px;
-  min-height: 40px;
+  min-height: 44px;
+  min-width: 44px;
   padding: 9px 15px;
   border: 1px solid transparent;
   border-radius: 8px;
@@ -1457,4 +1458,48 @@
   margin-top: 6px;
   overflow-wrap: anywhere;
   font-family: var(--font-data);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tool-primary-action,
+  .tool-secondary-action,
+  .tool-danger-action,
+  .advanced-toolbar > button,
+  .tool-metric-card,
+  .tool-card {
+    transition: none;
+    transform: none !important;
+    animation: none;
+  }
+}
+
+@media (forced-colors: active) {
+  .tool-panel,
+  .tool-card,
+  .tool-windows-update,
+  .tool-info-alert,
+  .tool-detail-drawer,
+  .tool-metric-card,
+  .tool-list-row {
+    border: 1px solid ButtonBorder;
+  }
+  .tool-primary-action {
+    background: Highlight;
+    color: HighlightText;
+    border: 1px solid Highlight;
+  }
+  .tool-secondary-action,
+  .tool-danger-action {
+    border: 1px solid ButtonBorder;
+    background: ButtonFace;
+    color: ButtonText;
+  }
+  .tool-panel :is(button, input, select, summary):focus-visible,
+  .tool-list-section :is(button, input, summary):focus-visible,
+  .tool-primary-action:focus-visible,
+  .tool-secondary-action:focus-visible,
+  .tool-danger-action:focus-visible {
+    outline: 2px solid Highlight;
+    outline-offset: 2px;
+  }
 }

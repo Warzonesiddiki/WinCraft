@@ -153,9 +153,10 @@ export function StartupManager({
   );
 
   return (
-    <div className="tool-list-section">
+    <section role="region" aria-labelledby="startup-manager-title" className="tool-list-section">
       <div className="tool-panel tool-list-header">
         <ToolHeader
+          titleId="startup-manager-title"
           title={s.startupManager.title}
           description={s.startupManager.description}
           actions={
@@ -169,6 +170,7 @@ export function StartupManager({
                 </Badge>
               )}
               <button
+                type="button"
                 onClick={() => void rescan()}
                 disabled={rescanning}
                 className="border-line-2 text-ink-2 hover:border-accent/40 hover:text-ink flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-semibold transition-colors disabled:cursor-wait"
@@ -244,7 +246,7 @@ export function StartupManager({
           </div>
         </div>
       ))}
-    </div>
+    </section>
   );
 }
 
@@ -383,9 +385,14 @@ export function ScheduledTaskManager({
   );
 
   return (
-    <div className="tool-list-section mt-5">
+    <section
+      role="region"
+      aria-labelledby="scheduled-tasks-title"
+      className="tool-list-section mt-5"
+    >
       <div className="tool-panel tool-list-header">
         <ToolHeader
+          titleId="scheduled-tasks-title"
           title={s.scheduledTasks.title}
           description={s.scheduledTasks.description}
           actions={
@@ -399,6 +406,7 @@ export function ScheduledTaskManager({
                 </Badge>
               )}
               <button
+                type="button"
                 onClick={() => void rescan()}
                 disabled={rescanning}
                 className="border-line-2 text-ink-2 hover:border-accent/40 hover:text-ink flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-semibold transition-colors disabled:cursor-wait"
@@ -470,9 +478,14 @@ export function ScheduledTaskManager({
       ))}
 
       {loaded && bareboneTasks.filter((t) => t.present).length > 0 && (
-        <div className="tool-list-section mt-8">
+        <section
+          role="region"
+          aria-labelledby="telemetry-tasks-title"
+          className="tool-list-section mt-8"
+        >
           <div className="tool-panel tool-list-header">
             <ToolHeader
+              titleId="telemetry-tasks-title"
               title="Windows Telemetry &amp; Diagnostic Tasks"
               description="Allowlisted background tasks for CEIP, compatibility telemetry, and background diagnostics. Disabling them reduces background wake-ups."
               actions={
@@ -528,8 +541,8 @@ export function ScheduledTaskManager({
                 </div>
               </div>
             ))}
-        </div>
+        </section>
       )}
-    </div>
+    </section>
   );
 }

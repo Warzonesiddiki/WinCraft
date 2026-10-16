@@ -68,12 +68,14 @@ jobs:
       - name: Rename to stable filenames
         run: |
           mkdir -p out
+          cp "$(ls dl/*_x64-setup.exe)" out/WinCraft-Setup.exe
           cp "$(ls dl/*_x64-setup.exe)" out/PCTweaker-Setup.exe
+          cp "$(ls dl/*_x64_en-US.msi)" out/WinCraft-Setup.msi
           cp "$(ls dl/*_x64_en-US.msi)" out/PCTweaker-Setup.msi
 
       - name: Verify final aliases before upload
         shell: pwsh
-        run: ./scripts/verify-authenticode.ps1 -Path @('out/PCTweaker-Setup.exe', 'out/PCTweaker-Setup.msi')
+        run: ./scripts/verify-authenticode.ps1 -Path @('out/WinCraft-Setup.exe', 'out/PCTweaker-Setup.exe', 'out/WinCraft-Setup.msi', 'out/PCTweaker-Setup.msi')
 
       - name: Upload stable aliases to the release
         env:
@@ -81,5 +83,6 @@ jobs:
           TAG: ${{ steps.tag.outputs.tag }}
         run: |
           gh release upload "$TAG" \
-            out/PCTweaker-Setup.exe out/PCTweaker-Setup.msi \
+            out/WinCraft-Setup.exe out/PCTweaker-Setup.exe \
+            out/WinCraft-Setup.msi out/PCTweaker-Setup.msi \
             --repo "${{ github.repository }}" --clobber

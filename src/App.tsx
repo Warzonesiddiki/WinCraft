@@ -275,12 +275,15 @@ function App() {
         if (typeof flags.processGuardHold === "boolean") {
           await invoke("set_process_guard_hold", { hold: flags.processGuardHold });
         }
-      } catch {
+      } catch (err) {
         // Offline or unreachable: keep the last known state.
+        console.warn("[App] readHold flags fetch failed", err);
       }
     }
     void readHold();
-    const id = window.setInterval(() => void readHold(), 60 * 60_000);
+    const id = window.setInterval(() => {
+      if (!document.hidden) void readHold();
+    }, 60 * 60_000);
     return () => window.clearInterval(id);
   }, []);
 
@@ -989,7 +992,7 @@ function App() {
               forty-odd rows nobody scrolled far enough to find it. */}
                   {filter === "ui" && !searching && (
                     <>
-                      <SkinpacksPanel pushToast={pushToast} />
+                      <SkinpacksPanel s={s} pushToast={pushToast} />
                       <GamingHudCard s={s} pushToast={pushToast} />
                     </>
                   )}
@@ -1115,19 +1118,28 @@ function App() {
       </Suspense>
 
       {confirmRestore && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-scrim/60 p-6 backdrop-blur-sm">
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="confirm-restore-title"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-scrim/60 p-6 backdrop-blur-sm"
+        >
           <div className="animate-card w-full max-w-sm rounded-2xl border border-line bg-slate-900 p-6 shadow-2xl">
-            <h3 className="text-lg font-bold text-ink">{s.restore.title}</h3>
+            <h3 id="confirm-restore-title" className="text-lg font-bold text-ink">
+              {s.restore.title}
+            </h3>
             <p className="mt-2 text-sm leading-relaxed text-ink-3">
               {format(s.restore.body, { count: restorableCount })}
             </p>
             <button
+              type="button"
               onClick={restoreAll}
               className="mt-5 w-full rounded-xl bg-amber-500 py-2.5 text-sm font-semibold text-amber-950 transition-colors hover:bg-amber-400"
             >
               {s.restore.confirm}
             </button>
             <button
+              type="button"
               onClick={() => setConfirmRestore(false)}
               className="mt-2 w-full rounded-xl py-2 text-sm font-medium text-ink-3 hover:text-ink-2"
             >
@@ -1138,9 +1150,14 @@ function App() {
       )}
 
       {consentTweak && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-scrim/60 p-6 backdrop-blur-sm">
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="consent-tweak-title"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-scrim/60 p-6 backdrop-blur-sm"
+        >
           <div className="animate-card w-full max-w-md rounded-2xl border border-line bg-surface-1 p-6 shadow-2xl">
-            <h3 className="text-lg font-bold text-ink">
+            <h3 id="consent-tweak-title" className="text-lg font-bold text-ink">
               {textFor(s.tweaks, consentTweak.id, consentTweak.name, consentTweak.description).name}
             </h3>
             <p className="mt-2 text-sm leading-relaxed text-ink-3">
@@ -1152,6 +1169,7 @@ function App() {
             )}
             <div className="mt-5 flex gap-2">
               <button
+                type="button"
                 onClick={async () => {
                   const target = consentTweak;
                   setConsentTweak(null);
@@ -1160,8 +1178,9 @@ function App() {
                       id: target.id,
                       text: "Acknowledged",
                     });
-                  } catch {
+                  } catch (err) {
                     // Non-fatal if backend has no consent table for this specific tweak
+                    console.warn("[App] record_barebone_consent failed", err);
                   }
                   await performToggle(target);
                 }}
@@ -1170,6 +1189,7 @@ function App() {
                 Acknowledge &amp; Apply
               </button>
               <button
+                type="button"
                 onClick={() => setConsentTweak(null)}
                 className="w-full rounded-xl py-2.5 text-sm font-medium text-ink-3 hover:text-ink-2"
               >

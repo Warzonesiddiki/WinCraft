@@ -3,6 +3,22 @@ export const CONFIGURABLE_TWEAK_IDS = new Set([
   "ecoqos_rules",
   "limit_do_background_download",
   "monitor_refresh_profile",
+  // Part B: Registry controls for browser-only users (HKCU only; each reversible)
+  "ads_in_settings",
+  "no_post_login_upsell",
+  "no_welcome_tips",
+  "explorer_home_this_pc",
+  "quick_access_no_cloud",
+  "hide_gallery_explorer",
+  "snap_assist_off",
+  "alt_tab_no_browser_tabs",
+  "taskbar_button_combining",
+  "no_toasts_fullscreen_video",
+  "no_window_snap_drag",
+  "menu_show_delay_minimal",
+  "keyboard_delay_zero",
+  "keyboard_speed_fast",
+  "ui_classic_context_menu",
 ]);
 
 // Kept in the list only so existing snapshots can still be restored.

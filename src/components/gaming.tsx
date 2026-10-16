@@ -44,7 +44,9 @@ export function GameSessionsPanel({ s }: { s: Strings }) {
     // first load that never succeeded leaves the row hidden.
     invoke<CoreSteeringStatus>("core_steering_status")
       .then(setSteering)
-      .catch(() => {});
+      .catch((err) => {
+        console.warn("[Gaming] core_steering_status failed", err);
+      });
   }
 
   async function refresh() {

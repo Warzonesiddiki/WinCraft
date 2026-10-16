@@ -189,8 +189,9 @@ export function ScanPanel({
     setLastScan(stamp);
     try {
       localStorage.setItem(LAST_SCAN_KEY, JSON.stringify(stamp));
-    } catch {
+    } catch (err) {
       /* Storage is optional. */
+      console.warn("[Scan] save last scan failed", err);
     }
   }
 
@@ -856,10 +857,16 @@ export function ScanPanel({
           ))}
         </ul>
         <div className="scan-dialog-actions">
-          <button className="scan-secondary" onClick={() => setReviewIds(null)} autoFocus>
+          <button
+            type="button"
+            className="scan-secondary"
+            onClick={() => setReviewIds(null)}
+            autoFocus
+          >
             {c.cancel}
           </button>
           <button
+            type="button"
             className="scan-primary"
             disabled={!reviewFixes.length}
             onClick={() => void apply()}

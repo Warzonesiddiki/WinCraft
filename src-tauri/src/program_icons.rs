@@ -37,6 +37,7 @@ pub(crate) fn extract(raw: &str) -> Option<String> {
         .encode_utf16()
         .chain(Some(0))
         .collect();
+    // SAFETY: `wide` is null-terminated UTF-16; FFI handles are checked against null and released via DeleteObject/DeleteDC/DestroyIcon.
     unsafe {
         let mut icon = std::ptr::null_mut();
         if ExtractIconExW(wide.as_ptr(), index, &mut icon, std::ptr::null_mut(), 1) == 0

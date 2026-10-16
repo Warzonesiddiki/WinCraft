@@ -76,6 +76,7 @@ export function Toggle({
   label,
   busyLabel,
   disabled = false,
+  role,
 }: {
   label?: string;
   busyLabel?: string;
@@ -84,14 +85,19 @@ export function Toggle({
   busy: boolean;
   onClick: () => void;
   s: Strings;
+  role?: "switch" | "button";
 }) {
   const [feedback, setFeedback] = useState(false);
   const feedbackTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   useEffect(() => () => clearTimeout(feedbackTimer.current), []);
   const presenting = useBusyPresentation(busy) || feedback;
+  const isSwitch = role === "switch";
   return (
     <button
       type="button"
+      role={isSwitch ? "switch" : undefined}
+      aria-checked={isSwitch ? checked : undefined}
+      aria-pressed={isSwitch ? undefined : checked}
       disabled={presenting || disabled}
       onClick={() => {
         // A click is visible even when the parent operation settles within one render.
@@ -99,10 +105,9 @@ export function Toggle({
         feedbackTimer.current = setTimeout(() => setFeedback(false), 550);
         onClick();
       }}
-      aria-pressed={checked}
       aria-busy={presenting}
       aria-label={label}
-      className="tweak-toggle group flex shrink-0 items-center gap-2 rounded-md disabled:cursor-wait"
+      className="tweak-toggle group flex shrink-0 items-center gap-2 rounded-md disabled:cursor-wait min-h-[36px] min-w-[48px]"
     >
       <span
         className={`max-w-24 text-right text-xs font-medium tabular-nums transition-colors ${
@@ -288,10 +293,16 @@ export function UpdateBanner({
     };
     check();
     const unlisten = listen("app-reopened", () => check(true));
-    void unlisten.catch(() => {});
+    void unlisten.catch((err) => {
+      console.warn("[UI] listen app-reopened failed", err);
+    });
     return () => {
       alive = false;
-      void unlisten.then((stop) => stop()).catch(() => {});
+      void unlisten
+        .then((stop) => stop())
+        .catch((err) => {
+          console.warn("[UI] unlisten app-reopened failed", err);
+        });
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

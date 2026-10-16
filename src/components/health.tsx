@@ -441,7 +441,7 @@ export function HealthPanel({
     // call resolves — and never before a minimum dwell, so the ceremony
     // reads as measurement rather than a flicker.
     const ticker = window.setInterval(() => {
-      setStageIndex((i) => Math.min(i + 1, 3));
+      if (!document.hidden) setStageIndex((i) => Math.min(i + 1, 3));
     }, 420);
     const begun = performance.now();
     const MIN_DWELL_MS = 1900;

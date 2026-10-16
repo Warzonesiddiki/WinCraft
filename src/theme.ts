@@ -55,8 +55,9 @@ export function detectInitialTheme(): ThemeName {
       localStorage.removeItem("wincraft-theme");
       return "graphite_ember";
     }
-  } catch {
+  } catch (err) {
     // Storage blocked: the default still applies, it just will not persist.
+    console.warn("[Theme] detectInitialTheme storage access failed", err);
   }
   const stored = localStorage.getItem("wincraft-theme");
   // Coral Sunset was folded into the new default, which it closely resembled.

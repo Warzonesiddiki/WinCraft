@@ -19,8 +19,9 @@ export function shouldShowOnboarding(): boolean {
 export function completeOnboarding() {
   try {
     localStorage.setItem(ONBOARDING_KEY, "true");
-  } catch {
+  } catch (err) {
     // Storage blocked: onboarding will show again next launch. Acceptable.
+    console.warn("[Onboarding] save onboarding state failed", err);
   }
 }
 
@@ -97,8 +98,9 @@ export function OnboardingFlow({
     try {
       await invoke("apply_tweak", { id: tweak.id });
       setAppliedIds((prev) => new Set(prev).add(tweak.id));
-    } catch {
-      // Tweak failed: silently skip, don't block onboarding
+    } catch (err) {
+      // Tweak failed: log warning, don't block onboarding
+      console.warn(`[Onboarding] apply_tweak failed for ${tweak.id}`, err);
     } finally {
       setApplying(null);
     }

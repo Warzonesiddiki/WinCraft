@@ -6,6 +6,7 @@ import { textFor } from "../lib";
 import { type PulseSample } from "./command";
 import { Badge } from "./ui";
 import { CommandDeckHero } from "./command-deck-hero";
+import { BoltIcon, FolderIcon, MagnifierIcon, TrashIcon, UndoIcon } from "./icons";
 
 /* ==========================================================================
    Widget system: each widget is a self-contained card that can be rearranged.
@@ -49,8 +50,9 @@ function readLayout(): WidgetId[] {
 function saveLayout(order: WidgetId[]) {
   try {
     localStorage.setItem(LAYOUT_KEY, JSON.stringify(order));
-  } catch {
+  } catch (err) {
     // Storage blocked: layout resets on next launch. Acceptable.
+    console.warn("[Dashboard] save layout failed", err);
   }
 }
 
@@ -66,7 +68,9 @@ function StatsWidget({ samples }: { s: Strings; samples: PulseSample[] }) {
       .then((res) => {
         if (alive && res && typeof res.current === "number") setProcCount(res.current);
       })
-      .catch(() => {});
+      .catch((err) => {
+        console.warn("[Dashboard] get_process_stats failed", err);
+      });
     return () => {
       alive = false;
     };
@@ -166,10 +170,22 @@ function QuickActionsWidget({
   onRestoreAll: () => void;
 }) {
   const actions = [
-    { label: "Run Scan", icon: "🔍", onClick: onScan },
-    { label: "Restore All", icon: "↩️", onClick: onRestoreAll },
-    { label: "Profiles", icon: "📁", onClick: () => onNavigate("profiles") },
-    { label: "Debloat", icon: "🧹", onClick: () => onNavigate("debloat") },
+    { label: "Run Scan", icon: <MagnifierIcon className="w-4 h-4 text-accent" />, onClick: onScan },
+    {
+      label: "Restore All",
+      icon: <UndoIcon className="w-4 h-4 text-accent" />,
+      onClick: onRestoreAll,
+    },
+    {
+      label: "Profiles",
+      icon: <FolderIcon className="w-4 h-4 text-accent" />,
+      onClick: () => onNavigate("profiles"),
+    },
+    {
+      label: "Debloat",
+      icon: <TrashIcon className="w-4 h-4 text-accent" />,
+      onClick: () => onNavigate("debloat"),
+    },
   ];
 
   return (
@@ -179,10 +195,12 @@ function QuickActionsWidget({
         {actions.map((a) => (
           <button
             key={a.label}
+            type="button"
+            aria-label={a.label}
             onClick={a.onClick}
             className="flex items-center gap-2.5 rounded-xl border border-line bg-surface-2 p-3 text-left transition-all hover:border-accent/30 hover:bg-surface-hover"
           >
-            <span className="text-lg" aria-hidden="true">
+            <span className="flex items-center justify-center shrink-0" aria-hidden="true">
               {a.icon}
             </span>
             <span className="text-[12px] font-semibold text-ink">{a.label}</span>
@@ -248,7 +266,7 @@ function NextStepWidget({
           title: "Run your first scan",
           description: "Find settings that could improve your PC's performance and privacy.",
           action: "Open Scan",
-          icon: "🔍",
+          icon: <MagnifierIcon className="w-6 h-6 text-accent" />,
           onClick: () => onNavigate("scan"),
         }
       : appliedCount < 5
@@ -256,14 +274,14 @@ function NextStepWidget({
             title: "Explore more tweaks",
             description: `You have ${appliedCount} of ${total} tweaks applied. Discover more in Performance and Privacy.`,
             action: "Browse Performance",
-            icon: "⚡",
+            icon: <BoltIcon className="w-6 h-6 text-accent" />,
             onClick: () => onNavigate("performance"),
           }
         : {
             title: "Save your setup as a profile",
             description: "Lock in your configuration so you can restore it anytime or share it.",
             action: "Open Profiles",
-            icon: "📁",
+            icon: <FolderIcon className="w-6 h-6 text-accent" />,
             onClick: () => onNavigate("profiles"),
           };
 
@@ -271,17 +289,19 @@ function NextStepWidget({
     <div className="dashboard-widget" data-widget="next-step">
       <h3 className="widget-title">Suggested Next</h3>
       <div className="mt-2 flex items-start gap-3 rounded-xl border border-line bg-surface-2 p-4">
-        <span className="text-2xl" aria-hidden="true">
+        <span className="flex items-center justify-center shrink-0" aria-hidden="true">
           {suggestion.icon}
         </span>
         <div className="min-w-0 flex-1">
           <p className="text-[13px] font-semibold text-ink">{suggestion.title}</p>
           <p className="mt-1 text-[11px] leading-relaxed text-ink-3">{suggestion.description}</p>
           <button
+            type="button"
+            aria-label={`${suggestion.action}: ${suggestion.title}`}
             onClick={suggestion.onClick}
             className="mt-3 rounded-lg bg-accent px-3 py-1.5 text-[11px] font-semibold text-on-accent transition-opacity hover:opacity-90"
           >
-            {suggestion.action} →
+            {suggestion.action} <span aria-hidden="true">→</span>
           </button>
         </div>
       </div>
@@ -462,6 +482,8 @@ export function Dashboard({
           </h1>
         </div>
         <button
+          type="button"
+          aria-pressed={customizing}
           onClick={() => setCustomizing((v) => !v)}
           className={`rounded-lg border px-3 py-1.5 text-[11px] font-semibold transition-colors ${
             customizing
@@ -518,9 +540,35 @@ export function Dashboard({
             }`}
           >
             {customizing && (
-              <div className="mb-1 flex items-center gap-1 px-1 text-[9px] font-semibold uppercase tracking-wider text-ink-3">
-                <span>⠿</span>
-                <span>{WIDGET_DEFS.find((w) => w.id === id)?.label}</span>
+              <div className="mb-1 flex items-center justify-between px-1 text-[9px] font-semibold uppercase tracking-wider text-ink-3">
+                <span className="flex items-center gap-1">
+                  <span aria-hidden="true">⠿</span>
+                  <span>{WIDGET_DEFS.find((w) => w.id === id)?.label}</span>
+                </span>
+                <div className="flex items-center gap-1">
+                  <button
+                    type="button"
+                    aria-label={`Move ${WIDGET_DEFS.find((w) => w.id === id)?.label} up`}
+                    onClick={() => {
+                      const idx = layout.indexOf(id);
+                      if (idx > 0) reorder(id, layout[idx - 1]);
+                    }}
+                    className="flex h-6 w-6 min-h-[24px] min-w-[24px] items-center justify-center rounded border border-line text-[11px] hover:border-accent hover:text-accent"
+                  >
+                    ↑
+                  </button>
+                  <button
+                    type="button"
+                    aria-label={`Move ${WIDGET_DEFS.find((w) => w.id === id)?.label} down`}
+                    onClick={() => {
+                      const idx = layout.indexOf(id);
+                      if (idx < layout.length - 1) reorder(id, layout[idx + 1]);
+                    }}
+                    className="flex h-6 w-6 min-h-[24px] min-w-[24px] items-center justify-center rounded border border-line text-[11px] hover:border-accent hover:text-accent"
+                  >
+                    ↓
+                  </button>
+                </div>
               </div>
             )}
             {widgetMap[id]}

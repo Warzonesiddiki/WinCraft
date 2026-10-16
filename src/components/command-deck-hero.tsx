@@ -92,7 +92,7 @@ export function CommandDeckHero({
             </span>
             <Badge kind="ok">AtlasOS Target: ~85 Processes</Badge>
           </div>
-          <h3 className="text-lg font-bold text-ink-1">
+          <h3 className="text-lg font-bold text-ink">
             {isOptimized
               ? "Extreme Optimization Active"
               : "Extreme Debloat & Process Consolidation"}

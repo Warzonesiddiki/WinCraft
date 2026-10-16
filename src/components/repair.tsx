@@ -192,7 +192,9 @@ async function startRepair(job: RepairJob, onError: (message: string) => void) {
     stepFinishAt: null,
     jobFinishAt: null,
   });
-  const timer = window.setInterval(tick, 1000);
+  const timer = window.setInterval(() => {
+    if (!document.hidden) tick();
+  }, 1000);
   try {
     const outcome = await invoke<RepairOutcome>("run_system_repair", { job });
     // The last step has no successor event to close it, so it is timed here.
@@ -513,8 +515,14 @@ export function SystemRepairCard({
   const weighted = steps.every((step) => typical[step] !== undefined);
 
   return (
-    <section className="tool-panel tool-system-repair-card" aria-busy={running !== null}>
+    <section
+      className="tool-panel tool-system-repair-card"
+      role="region"
+      aria-labelledby="system-repair-title"
+      aria-busy={running !== null}
+    >
       <ToolHeader
+        titleId="system-repair-title"
         icon={<HeartPulseIcon className="h-5 w-5" />}
         title={
           <>

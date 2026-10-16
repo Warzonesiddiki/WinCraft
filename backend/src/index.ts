@@ -104,13 +104,14 @@ app.use(cors({ origin: allowedOrigins, exposedHeaders: ["X-Session-Token"] }));
 
 // Stripe needs the raw, unparsed body to verify the webhook signature, so
 // this route is registered before the global express.json() middleware.
-app.post("/api/stripe-webhook", express.raw({ type: "application/json" }), webhookHandler);
+app.post(
+  "/api/stripe-webhook",
+  express.raw({ type: "application/json", limit: "1mb" }),
+  webhookHandler,
+);
 
-app.use(express.json());
-// The password-reset page is a plain HTML form posting back to this server:
-// helmet's CSP is `script-src 'self'`, so an inline script to serialize it
-// into JSON would never run. Without this the form body arrives empty.
-app.use(express.urlencoded({ extended: false }));
+app.use(express.json({ limit: "100kb" }));
+app.use(express.urlencoded({ extended: false, limit: "100kb" }));
 
 // Liveness only: "this process is up and answering". Whether the database
 // is wired is real operational detail, and /ready below already proves it by
@@ -348,9 +349,30 @@ app.use((_req: Request, res: Response) => {
   res.status(404).json({ error: "Not found" });
 });
 
-app.use((err: Error, _req: Request, res: Response, _next: express.NextFunction) => {
-  console.error("unhandled error:", err);
-  res.status(500).json({ error: "internal server error" });
+app.use((err: any, _req: Request, res: Response, _next: express.NextFunction) => {
+  if (res.headersSent) {
+    return;
+  }
+  const status =
+    typeof err?.status === "number" && err.status >= 400 && err.status < 600
+      ? err.status
+      : typeof err?.statusCode === "number" && err.statusCode >= 400 && err.statusCode < 600
+        ? err.statusCode
+        : 500;
+
+  if (status >= 500) {
+    console.error("unhandled server error:", err);
+    res.status(500).json({ error: "internal server error" });
+    return;
+  }
+
+  const message =
+    status === 413
+      ? "payload too large"
+      : status === 400
+        ? "bad request"
+        : "client error";
+  res.status(status).json({ error: message });
 });
 
 /**
@@ -441,6 +463,15 @@ initSchema()
       console.log(
         `wincraft-backend listening on :${port} (database ${isConfigured ? "configured" : "NOT configured"}, email ${mailIsConfigured ? "configured" : "NOT configured"})`,
       );
+      if (!process.env.JWT_SECRET) {
+        console.warn(
+          "WARNING: JWT_SECRET is not configured. User authentication and token signing will fail.",
+        );
+      } else if (process.env.NODE_ENV === "production" && process.env.JWT_SECRET.length < 32) {
+        console.warn(
+          "WARNING: JWT_SECRET should be at least 32 characters in production.",
+        );
+      }
       if (!mailIsConfigured) {
         // Worth shouting about: without a provider, nobody can verify an
         // address or recover a forgotten password, and the only symptom is

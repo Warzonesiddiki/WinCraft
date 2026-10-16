@@ -298,10 +298,14 @@ export function OverviewPanel({
         .then((stats) => {
           if (alive) setProcessStats(stats);
         })
-        .catch(() => {});
+        .catch((err) => {
+          console.warn("[Overview] get_process_stats failed", err);
+        });
     };
     fetchStats();
-    const timer = setInterval(fetchStats, 5000);
+    const timer = setInterval(() => {
+      if (!document.hidden) fetchStats();
+    }, 5000);
     return () => {
       alive = false;
       clearInterval(timer);

@@ -1214,6 +1214,18 @@ export const es: Strings = {
     aboveNormal: "Por encima de lo normal",
     high: "Alta",
   },
+  skinpacks: {
+    title: "Skinpacks",
+    description: "Skinpacks management",
+    packName: "Pack name",
+    packBody: "Pack body",
+    scope: "Scope",
+    apply: "Apply",
+    restore: "Restore",
+    active: "Active",
+    applying: "Applying",
+    valuesSummary: "Values summary", // uses {count}
+  },
   tweaks: {
     disable_click_to_do: {
       name: "Desactivar Click to Do",
@@ -1964,6 +1976,66 @@ export const es: Strings = {
       name: "Iniciar el servicio de geolocalización solo cuando sea necesario",
       description:
         "Detiene el servicio de ubicación de Windows (lfsvc) y lo configura en Manual, evitando el sondeo continuo de ubicación.",
+    },
+    ads_in_settings: {
+      name: "Ads In Settings",
+      description: "Configuration option",
+    },
+    no_post_login_upsell: {
+      name: "No Post Login Upsell",
+      description: "Configuration option",
+    },
+    no_welcome_tips: {
+      name: "No Welcome Tips",
+      description: "Configuration option",
+    },
+    explorer_home_this_pc: {
+      name: "Explorer Home This Pc",
+      description: "Configuration option",
+    },
+    quick_access_no_cloud: {
+      name: "Quick Access No Cloud",
+      description: "Configuration option",
+    },
+    hide_gallery_explorer: {
+      name: "Hide Gallery Explorer",
+      description: "Configuration option",
+    },
+    snap_assist_off: {
+      name: "Snap Assist Off",
+      description: "Configuration option",
+    },
+    alt_tab_no_browser_tabs: {
+      name: "Alt Tab No Browser Tabs",
+      description: "Configuration option",
+    },
+    taskbar_button_combining: {
+      name: "Taskbar Button Combining",
+      description: "Configuration option",
+    },
+    no_toasts_fullscreen_video: {
+      name: "No Toasts Fullscreen Video",
+      description: "Configuration option",
+    },
+    no_window_snap_drag: {
+      name: "No Window Snap Drag",
+      description: "Configuration option",
+    },
+    menu_show_delay_minimal: {
+      name: "Menu Show Delay Minimal",
+      description: "Configuration option",
+    },
+    keyboard_delay_zero: {
+      name: "Keyboard Delay Zero",
+      description: "Configuration option",
+    },
+    keyboard_speed_fast: {
+      name: "Keyboard Speed Fast",
+      description: "Configuration option",
+    },
+    ui_classic_context_menu: {
+      name: "Ui Classic Context Menu",
+      description: "Configuration option",
     },
   },
   cleanup: {

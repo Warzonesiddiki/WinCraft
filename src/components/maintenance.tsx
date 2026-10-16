@@ -515,9 +515,16 @@ export function UninstallerPromoCard({ s }: { s: Strings }) {
       </li>
 
       {asking && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[var(--overlay)] p-6 backdrop-blur-sm">
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="uninstaller-promo-title"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-[var(--overlay)] p-6 backdrop-blur-sm"
+        >
           <div className="animate-card w-full max-w-md rounded-2xl border border-line-2 bg-surface-2 p-6 shadow-2xl">
-            <h3 className="text-lg font-bold text-ink">{s.uninstallerPromo.confirmTitle}</h3>
+            <h3 id="uninstaller-promo-title" className="text-lg font-bold text-ink">
+              {s.uninstallerPromo.confirmTitle}
+            </h3>
             <p className="mt-2 text-sm leading-relaxed text-ink-3">
               {s.uninstallerPromo.confirmBody}
             </p>
@@ -526,18 +533,24 @@ export function UninstallerPromoCard({ s }: { s: Strings }) {
             </p>
 
             <button
+              type="button"
               onClick={() => choose(UNINSTALLER_DOWNLOAD_URL)}
               className="tool-primary-action mt-5 w-full"
             >
               {s.uninstallerPromo.confirmDownload}
             </button>
             <button
+              type="button"
               onClick={() => choose(UNINSTALLER_PAGE_URL)}
               className="tool-secondary-action mt-2 w-full"
             >
               {s.uninstallerPromo.confirmOpenPage}
             </button>
-            <button onClick={() => setAsking(false)} className="tool-secondary-action mt-2 w-full">
+            <button
+              type="button"
+              onClick={() => setAsking(false)}
+              className="tool-secondary-action mt-2 w-full"
+            >
               {s.uninstallerPromo.cancel}
             </button>
           </div>
@@ -1141,9 +1154,16 @@ export function CleanupConfirmModal({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[var(--overlay)] p-6 backdrop-blur-sm">
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="cleanup-confirm-title"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-[var(--overlay)] p-6 backdrop-blur-sm"
+    >
       <div className="animate-card w-full max-w-md rounded-2xl border border-line-2 bg-surface-2 p-6 shadow-2xl">
-        <h3 className="text-lg font-bold text-ink">{s.cleanupConfirm.title}</h3>
+        <h3 id="cleanup-confirm-title" className="text-lg font-bold text-ink">
+          {s.cleanupConfirm.title}
+        </h3>
         <p className="mt-2 text-sm text-ink-3">
           {format(s.cleanupConfirm.body, { name: displayName })}
         </p>
@@ -1194,13 +1214,14 @@ export function CleanupConfirmModal({
         )}
 
         <button
+          type="button"
           onClick={confirm}
           disabled={nothingToClean || (listable && selected.length === 0)}
           className="tool-primary-action mt-5 w-full"
         >
           {listable && !allSelected ? s.cleanupConfirm.confirmSelected : s.cleanupConfirm.confirm}
         </button>
-        <button onClick={onCancel} className="tool-secondary-action mt-2 w-full">
+        <button type="button" onClick={onCancel} className="tool-secondary-action mt-2 w-full">
           {s.cleanupConfirm.cancel}
         </button>
       </div>

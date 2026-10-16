@@ -24,7 +24,7 @@ if (connectionString === "pgmem") {
   pool = new MemPool();
 } else if (connectionString) {
   pool = new Pool(databaseOptions());
-  pool.on("error", () => console.error("Idle database connection failed"));
+  pool.on("error", (err) => console.error("Idle database connection failed:", err));
 }
 
 /** All statements in a transaction must use this one checked-out client. */

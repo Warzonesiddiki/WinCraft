@@ -21,9 +21,10 @@ export function useVisibilityInterval(callback: () => void | Promise<unknown>, i
         .then(() => {
           if (active && !stopped) return callbackRef.current();
         })
-        .catch(() => {
+        .catch((err) => {
           // Consumers own their error display; a rejected read must not stop
           // future polling or create an unhandled promise rejection.
+          console.warn("[useVisibilityInterval] tick failed", err);
         })
         .finally(() => {
           busy = false;

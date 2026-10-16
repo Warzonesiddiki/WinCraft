@@ -40,13 +40,15 @@ router.get(
     }
 
     const entitlement = await productEntitlement(req.userId as number, product, product === "uninstaller");
+    const expiryMs = entitlement.expiresAt ? new Date(entitlement.expiresAt).getTime() : NaN;
+    const expiresAt = Number.isFinite(expiryMs) ? Math.floor(expiryMs / 1000) : null;
     const license = signLicense({
       userId: String(req.userId),
       isPro: entitlement.active,
       plan: entitlement.plan,
       product,
       issuedAt: Math.floor(Date.now() / 1000),
-      expiresAt: entitlement.expiresAt ? Math.floor(new Date(entitlement.expiresAt).getTime() / 1000) : null,
+      expiresAt,
     });
 
     res.json(license);

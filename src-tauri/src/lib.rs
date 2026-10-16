@@ -2960,12 +2960,12 @@ mod tests {
             + power_tuning::TWEAKS.iter().filter(|t| t.pro).count()
             + settings.iter().filter(|t| t.requires_pro).count();
 
-        assert_eq!(total, 150, "the catalogue no longer has 150 tweaks");
+        assert_eq!(total, 161, "the catalogue no longer has 161 tweaks after v2.1 Part B additions");
         assert_eq!(
             pro, 0,
             "a control is Pro again: nothing in this build is gated"
         );
-        assert_eq!(total - pro, 150, "every control is free");
+        assert_eq!(total - pro, 161, "every control is free after v2.1 Part B additions");
 
         // The composite list must stay in step with what list_tweaks builds,
         // otherwise the totals above would quietly stop covering everything.

@@ -2,6 +2,15 @@ use crate::rollback::{RollbackStore, SnapshotEntry};
 
 pub const WINDOWS_SEARCH_ID: &str = "disable_windows_search_service";
 pub(crate) const SERVICE_NAME: &str = "WSearch";
+
+pub const SVC_HOST_FANOUT_EXCLUSIONS: &[&str] = &[
+    "RpcSs",
+    "DcomLaunch",
+    "XblAuthManager",
+    "XblGameSave",
+    "XboxNetApiSvc",
+];
+
 pub const AI_FABRIC_ID: &str = "disable_ai_fabric_service";
 pub(crate) const AI_FABRIC_SERVICE: &str = "WSAIFabricSvc";
 pub const DMWAP_PUSH_ID: &str = "disable_dmwappush_service";
@@ -244,14 +253,19 @@ struct OpenService {
 
 #[cfg(windows)]
 fn open_service(service_name: &str, access: u32) -> Result<OpenService, String> {
+    use windows_sys::Win32::Foundation::{ERROR_ACCESS_DENIED, ERROR_SERVICE_DOES_NOT_EXIST};
     use windows_sys::Win32::System::Services::{OpenSCManagerW, OpenServiceW, SC_MANAGER_CONNECT};
     // SAFETY: null machine/database selects the local active SCM database.
     let manager = unsafe { OpenSCManagerW(std::ptr::null(), std::ptr::null(), SC_MANAGER_CONNECT) };
     if manager.is_null() {
-        return Err(format!(
-            "could not open the service manager: {}",
-            std::io::Error::last_os_error()
-        ));
+        let error = std::io::Error::last_os_error();
+        if error.raw_os_error() == Some(ERROR_ACCESS_DENIED as i32) {
+            return Err(
+                "access denied: opening the service control manager requires administrative privileges"
+                    .into(),
+            );
+        }
+        return Err(format!("could not open the service manager: {error}"));
     }
     let manager = ScHandle(manager);
     let name: Vec<u16> = service_name.encode_utf16().chain(Some(0)).collect();
@@ -260,8 +274,13 @@ fn open_service(service_name: &str, access: u32) -> Result<OpenService, String> 
     if service.is_null() {
         let error = std::io::Error::last_os_error();
         // ERROR_SERVICE_DOES_NOT_EXIST: the feature is simply not on this PC.
-        if error.raw_os_error() == Some(1060) {
+        if error.raw_os_error() == Some(ERROR_SERVICE_DOES_NOT_EXIST as i32) {
             return Err(format!("{service_name} is not installed on this PC"));
+        }
+        if error.raw_os_error() == Some(ERROR_ACCESS_DENIED as i32) {
+            return Err(format!(
+                "access denied: inspecting or modifying {service_name} requires administrative privileges"
+            ));
         }
         return Err(format!("could not open {service_name}: {error}"));
     }
@@ -399,10 +418,16 @@ impl ServiceControl for WinServices {
             )
         };
         if changed == 0 {
+            let error = std::io::Error::last_os_error();
+            if error.raw_os_error() == Some(windows_sys::Win32::Foundation::ERROR_ACCESS_DENIED as i32) {
+                return Err(format!(
+                    "access denied: updating startup type for {} requires administrative privileges",
+                    self.0
+                ));
+            }
             return Err(format!(
-                "could not change the {} start type: {}",
-                self.0,
-                std::io::Error::last_os_error()
+                "could not change the {} start type: {error}",
+                self.0
             ));
         }
         if native == SERVICE_AUTO_START {
@@ -420,10 +445,16 @@ impl ServiceControl for WinServices {
                 )
             };
             if changed == 0 {
+                let error = std::io::Error::last_os_error();
+                if error.raw_os_error() == Some(windows_sys::Win32::Foundation::ERROR_ACCESS_DENIED as i32) {
+                    return Err(format!(
+                        "access denied: updating start delay for {} requires administrative privileges",
+                        self.0
+                    ));
+                }
                 return Err(format!(
-                    "could not change the {} start delay: {}",
-                    self.0,
-                    std::io::Error::last_os_error()
+                    "could not change the {} start delay: {error}",
+                    self.0
                 ));
             }
         }
@@ -472,6 +503,12 @@ impl ServiceControl for WinServices {
             unsafe { ControlService(opened.service.0, SERVICE_CONTROL_STOP, status.as_mut_ptr()) };
         if stopped == 0 {
             let error = std::io::Error::last_os_error();
+            if error.raw_os_error() == Some(windows_sys::Win32::Foundation::ERROR_ACCESS_DENIED as i32) {
+                return Err(format!(
+                    "access denied: stopping {} requires administrative privileges",
+                    self.0
+                ));
+            }
             if error.raw_os_error() != Some(ERROR_SERVICE_NOT_ACTIVE as i32) {
                 return Err(format!("could not stop {}: {error}", self.0));
             }
@@ -488,6 +525,12 @@ impl ServiceControl for WinServices {
         // null vector.
         if unsafe { StartServiceW(opened.service.0, 0, std::ptr::null()) } == 0 {
             let error = std::io::Error::last_os_error();
+            if error.raw_os_error() == Some(windows_sys::Win32::Foundation::ERROR_ACCESS_DENIED as i32) {
+                return Err(format!(
+                    "access denied: starting {} requires administrative privileges",
+                    self.0
+                ));
+            }
             if error.raw_os_error() != Some(ERROR_SERVICE_ALREADY_RUNNING as i32) {
                 return Err(format!("could not start {}: {error}", self.0));
             }
@@ -645,19 +688,42 @@ pub fn apply_svchost_split_fanout() -> Result<usize, String> {
     let hklm = RegKey::predef(HKEY_LOCAL_MACHINE);
     let services_key = match hklm.open_subkey_with_flags(r"SYSTEM\CurrentControlSet\Services", KEY_READ) {
         Ok(k) => k,
-        Err(e) => return Err(format!("Failed to open Services hive: {e}")),
+        Err(e) => {
+            if e.kind() == std::io::ErrorKind::PermissionDenied {
+                return Err("access denied: opening Services registry hive requires administrative privileges".into());
+            }
+            return Err(format!("Failed to open Services hive: {e}"));
+        }
     };
 
     let mut modified_count = 0;
+    let mut permission_denied_count = 0;
 
     for name in services_key.enum_keys().filter_map(Result::ok) {
-        if name.eq_ignore_ascii_case("RpcSs") || name.eq_ignore_ascii_case("DcomLaunch") {
+        // These must never be split: doing so breaks RPC/locator dependency chains
+        // and can take out the machine-wide COM infrastructure. Xbox-live services are
+        // also excluded because splitting them is the one change most commonly reported
+        // as breaking sign-in and game-services telemetry — not a latency win.
+        if SVC_HOST_FANOUT_EXCLUSIONS
+            .iter()
+            .any(|ex| name == *ex || name.starts_with(ex))
+        {
+            continue;
+        }
+
+        // Any service whose name starts with "Xbl" or "Xbox" is excluded.
+        // This is defensive in addition to the named list above.
+        if name.starts_with("Xbl") || name.starts_with("Xbox") {
             continue;
         }
 
         let subkey_path = format!(r"SYSTEM\CurrentControlSet\Services\{}", name);
         let subkey = match hklm.open_subkey_with_flags(&subkey_path, KEY_READ | KEY_SET_VALUE) {
             Ok(k) => k,
+            Err(e) if e.kind() == std::io::ErrorKind::PermissionDenied => {
+                permission_denied_count += 1;
+                continue;
+            }
             Err(_) => continue,
         };
 
@@ -671,9 +737,17 @@ pub fn apply_svchost_split_fanout() -> Result<usize, String> {
             continue;
         }
 
-        if subkey.set_value("SvcHostSplitDisable", &1u32).is_ok() {
-            modified_count += 1;
+        match subkey.set_value("SvcHostSplitDisable", &1u32) {
+            Ok(_) => modified_count += 1,
+            Err(e) if e.kind() == std::io::ErrorKind::PermissionDenied => {
+                permission_denied_count += 1;
+            }
+            Err(_) => {}
         }
+    }
+
+    if modified_count == 0 && permission_denied_count > 0 {
+        return Err("access denied: modifying svchost split configuration requires administrative privileges".into());
     }
 
     Ok(modified_count)
@@ -687,21 +761,39 @@ pub fn rollback_svchost_split_fanout() -> Result<usize, String> {
     let hklm = RegKey::predef(HKEY_LOCAL_MACHINE);
     let services_key = match hklm.open_subkey_with_flags(r"SYSTEM\CurrentControlSet\Services", KEY_READ) {
         Ok(k) => k,
-        Err(_) => return Ok(0),
+        Err(e) => {
+            if e.kind() == std::io::ErrorKind::PermissionDenied {
+                return Err("access denied: opening Services registry hive requires administrative privileges".into());
+            }
+            return Ok(0);
+        }
     };
 
     let mut restored_count = 0;
+    let mut permission_denied_count = 0;
 
     for name in services_key.enum_keys().filter_map(Result::ok) {
         let path = format!(r"SYSTEM\CurrentControlSet\Services\{}", name);
         let subkey = match hklm.open_subkey_with_flags(&path, KEY_SET_VALUE) {
             Ok(k) => k,
+            Err(e) if e.kind() == std::io::ErrorKind::PermissionDenied => {
+                permission_denied_count += 1;
+                continue;
+            }
             Err(_) => continue,
         };
 
-        if subkey.delete_value("SvcHostSplitDisable").is_ok() {
-            restored_count += 1;
+        match subkey.delete_value("SvcHostSplitDisable") {
+            Ok(_) => restored_count += 1,
+            Err(e) if e.kind() == std::io::ErrorKind::PermissionDenied => {
+                permission_denied_count += 1;
+            }
+            Err(_) => {}
         }
+    }
+
+    if restored_count == 0 && permission_denied_count > 0 {
+        return Err("access denied: restoring svchost split configuration requires administrative privileges".into());
     }
 
     Ok(restored_count)
@@ -734,7 +826,7 @@ mod tests {
     use std::rc::Rc;
     use windows_sys::Win32::System::Services::{
         SERVICE_PAUSED, SERVICE_RUNNING, SERVICE_START_PENDING, SERVICE_STOPPED,
-        SERVICE_STOP_PENDING,
+        SERVICE_STOP_PENDING, SERVICE_AUTO_START, SERVICE_DEMAND_START, SERVICE_DISABLED,
     };
 
     const ALL: [StartType; 4] = [

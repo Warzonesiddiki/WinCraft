@@ -25,7 +25,7 @@ same folder (`01-scan.png` … `05-maintenance.png`), plus `app_icon_1024.png`
 >
 > The one thing that's different from the usual "PC cleaner" apps: every
 > single tweak snapshots the original value before it touches anything, so
-> it can be reverted with one click — or all 36 at once with "Restore all".
+> it can be reverted with one click — or all 150 at once with "Restore all".
 > Admin-required tweaks batch behind a single UAC prompt instead of asking
 > once per toggle.
 >
@@ -37,7 +37,7 @@ same folder (`01-scan.png` … `05-maintenance.png`), plus `app_icon_1024.png`
 >   never leaves your machine in full)
 > - Real disk tools: SSD-safe TRIM/defrag, drive health (S.M.A.R.T.), large
 >   file finder, duplicate file finder
-> - Free tier covers the basics; Pro (€9.99/mo or €59/yr) unlocks the rest
+> - 100% free and open-source: all 150 controls included, zero paywalls or subscriptions
 >
 > Built solo, Tauri (Rust) + React. Also on winget:
 > `winget install Warzonesiddiki.WinCraft`
@@ -51,7 +51,7 @@ same folder (`01-scan.png` … `05-maintenance.png`), plus `app_icon_1024.png`
 > rule I held myself to: every tweak snapshots the previous value first,
 > full stop — that's the whole premise of the app.
 >
-> It's a small Windows app (~2MB installer), free tier included, no account
+> It's a small Windows app (~2MB installer), 100% free with all controls included, no account
 > required to try it. Would love feedback, especially on which tweaks you'd
 > want to see next — I'm actively building this.
 
@@ -91,8 +91,7 @@ For each, when AlternativeTo asks "why is this an alternative", use:
 
 **Platform:** Windows
 
-**License:** Proprietary (Freemium — free tier + paid Pro tier,
-€9.99/mo or €59/yr)
+**License:** MIT (100% free and open-source, no paid tiers or subscriptions)
 
 **Official website:** https://github.com/Warzonesiddiki/WinCraft
 

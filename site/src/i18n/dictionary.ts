@@ -341,14 +341,14 @@ export const engDictionary: Dictionary = {
         tag: "GAMING",
         title: "Make sessions easier to manage",
         body: "Use Game Sessions to apply a gaming preset when a supported game starts and restore its supported settings afterward. Review hardware scheduling and input options individually.",
-        pro: true,
+        pro: false,
         span: "std",
       },
       {
         tag: "PRIVACY",
         title: "Choose what Windows shares",
         body: "Review supported advertising, tracking and diagnostic settings. Availability varies by Windows edition. Check password exposure using a hash-prefix lookup; your full password is not sent.",
-        pro: true,
+        pro: false,
         span: "std",
       },
       {

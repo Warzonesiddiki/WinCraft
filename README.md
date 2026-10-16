@@ -87,7 +87,8 @@ Closing the window keeps WinCraft running in the Windows notification area. Clic
 - **40 allowlisted telemetry scheduled tasks.** Startup Manager includes curated background telemetry scheduled tasks across CEIP, Application Experience, Disk Diagnostic, Autochk, and Edge Update with rollback snapshots.
 - **Tier-3 consent modal and execution gate.** Explicit acknowledgement dialog and persistent consent journal before applying high-impact or machine-wide settings.
 - **Evidence & effect tags.** Every control documents empirical evidence (`Measured`, `Modest`, `Neutral`) and taking-effect indicator (`Immediate`, `Sign-out`, `Restart`, `Reboot`).
-- **Complete 6-locale parity.** 1,769 keys synchronized with 100% parity across English, Italian, German, Spanish, French, and European Portuguese.
+- **One re-theme of the Windows shell, described as what it is.** Interface → Desktop look applies a named look (`COSMIC Dark`): dark surfaces, an accent colour on title bars and the taskbar, flat window borders and no minimise animation — nine per-user values, each recorded before it is written and reversible in one click. It re-themes Windows; it does not install the COSMIC desktop environment, GNOME, KDE or macOS, and it patches no system file.
+- **Complete 6-locale parity.** 1,780 keys synchronized with 100% parity across English, Italian, German, Spanish, French, and European Portuguese.
 
 See the [changelog](CHANGELOG.md) for every release.
 
@@ -130,7 +131,7 @@ Read the effect and trade-offs before applying a setting. A disabled tweak is no
 
 **Nine starter profiles ship with every install: Gaming, Streaming, Work, Study, Laptop, No interruptions, Barebone, Browser Only and Browser + MS Office.** Open Profiles, choose one, and review or customize the selection before anything is applied. Suggested selections are shown for review; nothing is applied until you confirm; a control this PC's Windows does not support is shown but never applied. Each profile uses reversible, per-user switches only, and adds its settings without undoing your other tweaks. Results depend on your hardware and workload; no FPS gain is promised.
 
-- **Browser Only:** Strips background apps, search suggestions, and taskbar widgets so maximum RAM and CPU are reserved for browser tabs and web applications.
+- **Browser Only:** A browser-first set of 30 reversible per-user controls: background apps stopped, search web lookups and suggestion feeds off, widget and lock-screen promotions silenced, unused data-collection surfaces off, and shell effects and menus made lighter so more of the machine is left for browser tabs. Layout choices are listed but never preselected.
 - **Browser + MS Office:** Workstation setup with immediate folder loading, visible file extensions, snappy menus, and silenced telemetry surveys for seamless document editing and email workflows.
 - **Barebone:** Changes supported background-app, recommendation, suggestion, feedback and appearance preferences. Settings can be restored, but workload-dependent performance gains are not guaranteed. Disabling background apps may affect notifications and synchronization; forced app termination is not selected by default.
 

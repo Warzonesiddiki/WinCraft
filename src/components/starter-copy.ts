@@ -17,7 +17,7 @@ const en = {
   bareboneBody:
     "Changes background-app, suggestion and appearance preferences; performance depends on your workload.",
   browser_onlyBody:
-    "Fewer Windows suggestions and optional background-app changes for browser-focused use.",
+    "A browser-first selection: background apps and web search lookups off, suggestion and widget feeds silenced, shell effects and menus made lighter, and unused data-collection surfaces off.",
   officeBody:
     "Workstation productivity: fast folder loading, visible file extensions, immediate menus, and zero telemetry prompts.",
   laptopNote:
@@ -29,7 +29,7 @@ const en = {
   bareboneNote:
     "Turns off supported background-app preferences, animations, transparency, Bing search, suggestions and Game DVR. Background notifications or synchronization may be affected. Settings can be restored; this is not a replacement Windows installation.",
   browser_onlyNote:
-    "Changes supported background-app, Start suggestion, Bing search and widget preferences. Notifications or synchronization may be affected; no RAM or speed gain is guaranteed.",
+    "Changes supported per-user preferences only, each reversible from its category or Change history. Background notifications or synchronization may be affected, and no RAM, speed or battery gain is guaranteed.",
   officeNote:
     "Optimizes desktop and file navigation responsiveness while silencing feedback surveys and recommendations, leaving your office documents, email, and spreadsheets running smoothly.",
   gamingBody: "Consistent Windows pointer movement and control over Game DVR recording.",
@@ -76,7 +76,7 @@ export const STARTER_COPY: Record<Lang, Copy> = {
     bareboneBody:
       "Modifica le preferenze per app in background, suggerimenti e aspetto; le prestazioni dipendono dal carico di lavoro.",
     browser_onlyBody:
-      "Meno suggerimenti di Windows e modifiche facoltative alle app in background per chi usa soprattutto il browser.",
+      "Selezione pensata per il browser: app in background e ricerche web disattivate, suggerimenti e widget silenziati, effetti e menu più leggeri, raccolta dati inutilizzata disattivata.",
     officeBody:
       "Produttività da ufficio: cartelle immediate, estensioni visibili, menu reattivi e zero avvisi di telemetria.",
     laptopNote:
@@ -88,7 +88,7 @@ export const STARTER_COPY: Record<Lang, Copy> = {
     bareboneNote:
       "Disattiva le preferenze supportate per app in background, animazioni, trasparenza, ricerca Bing, suggerimenti e Game DVR. Notifiche o sincronizzazione possono risentirne. Le impostazioni si possono ripristinare; non è una nuova installazione di Windows.",
     browser_onlyNote:
-      "Modifica le preferenze supportate per app in background, suggerimenti di Start, ricerca Bing e widget. Notifiche o sincronizzazione possono risentirne; non sono garantiti vantaggi di RAM o velocità.",
+      "Modifica solo preferenze supportate per utente, tutte ripristinabili dalla categoria o dalla Cronologia. Notifiche o sincronizzazione possono risentirne; non sono garantiti vantaggi di RAM, velocità o batteria.",
     officeNote:
       "Velocizza l'esplorazione dei file e i menu di sistema eliminando sondaggi e suggerimenti per lavorare al meglio su documenti, email e fogli di calcolo.",
     gamingBody: "Movimento del puntatore coerente e controllo della registrazione Game DVR.",
@@ -134,7 +134,7 @@ export const STARTER_COPY: Record<Lang, Copy> = {
     bareboneBody:
       "Modifie les préférences des applications en arrière-plan, suggestions et apparence ; les performances dépendent de votre activité.",
     browser_onlyBody:
-      "Moins de suggestions Windows et des changements facultatifs des applications en arrière-plan pour un usage centré sur le navigateur.",
+      "Sélection pensée pour le navigateur : applications en arrière-plan et recherches web désactivées, suggestions et widgets réduits au silence, effets et menus allégés, collecte de données inutilisée désactivée.",
     officeBody:
       "Productivité bureautique : dossiers rapides, extensions visibles, menus immédiats et zéro notification de télémétrie.",
     laptopNote:
@@ -146,7 +146,7 @@ export const STARTER_COPY: Record<Lang, Copy> = {
     bareboneNote:
       "Désactive les préférences prises en charge pour les applications en arrière-plan, animations, transparence, recherche Bing, suggestions et Game DVR. Les notifications ou la synchronisation peuvent être affectées. Les réglages sont restaurables ; cela ne remplace pas Windows.",
     browser_onlyNote:
-      "Modifie les préférences prises en charge des applications en arrière-plan, suggestions de Démarrer, recherche Bing et widgets. Les notifications ou la synchronisation peuvent être affectées ; aucun gain de mémoire ou de vitesse n’est garanti.",
+      "Ne modifie que des préférences par utilisateur prises en charge, toutes réversibles depuis leur catégorie ou l’historique. Les notifications ou la synchronisation peuvent être affectées ; aucun gain de mémoire, de vitesse ou d’autonomie n’est garanti.",
     officeNote:
       "Accélère la navigation dans les fichiers et les menus tout en supprimant les sondages pour un travail fluide sur vos documents, e-mails et feuilles de calcul.",
     gamingBody: "Un pointeur Windows constant et le contrôle de l’enregistrement Game DVR.",
@@ -192,7 +192,7 @@ export const STARTER_COPY: Record<Lang, Copy> = {
     bareboneBody:
       "Cambia las preferencias de aplicaciones en segundo plano, sugerencias y apariencia; el rendimiento depende de tu actividad.",
     browser_onlyBody:
-      "Menos sugerencias de Windows y cambios opcionales en aplicaciones en segundo plano para quienes usan principalmente el navegador.",
+      "Selección pensada para el navegador: aplicaciones en segundo plano y búsquedas web desactivadas, sugerencias y widgets silenciados, efectos y menús más ligeros, y recopilación de datos sin uso desactivada.",
     officeBody:
       "Productividad de oficina: carpetas rápidas, extensiones visibles, menús inmediatos y cero avisos de telemetría.",
     laptopNote:
@@ -204,7 +204,7 @@ export const STARTER_COPY: Record<Lang, Copy> = {
     bareboneNote:
       "Desactiva las preferencias compatibles de aplicaciones en segundo plano, animaciones, transparencia, búsqueda de Bing, sugerencias y Game DVR. Puede afectar a las notificaciones o la sincronización. Los ajustes se pueden restaurar; no sustituye la instalación de Windows.",
     browser_onlyNote:
-      "Cambia las preferencias compatibles de aplicaciones en segundo plano, sugerencias de Inicio, búsqueda de Bing y widgets. Puede afectar a las notificaciones o la sincronización; no se garantiza un ahorro de RAM ni mayor velocidad.",
+      "Solo cambia preferencias por usuario compatibles, todas reversibles desde su categoría o el Historial. Puede afectar a las notificaciones o la sincronización; no se garantiza ahorro de RAM, velocidad ni batería.",
     officeNote:
       "Acelera la navegación de archivos y menús eliminando encuestas para trabajar con fluidez en documentos, correos y hojas de cálculo.",
     gamingBody: "Movimiento constante del puntero y control de la grabación Game DVR.",
@@ -249,7 +249,7 @@ export const STARTER_COPY: Record<Lang, Copy> = {
     bareboneBody:
       "Ändert Einstellungen für Hintergrund-Apps, Vorschläge und Darstellung; die Leistung hängt von der Nutzung ab.",
     browser_onlyBody:
-      "Weniger Windows-Vorschläge und optionale Änderungen an Hintergrund-Apps für die überwiegende Browsernutzung.",
+      "Browser-orientierte Auswahl: Hintergrund-Apps und Websuchen aus, Vorschlags- und Widget-Feeds stumm, Effekte und Menüs leichter, ungenutzte Datenerfassung aus.",
     officeBody:
       "Büro-Produktivität: Schnelles Laden von Ordnern, sichtbare Dateiendungen, direkte Menüs und keine Telemetrie-Hinweise.",
     laptopNote:
@@ -261,7 +261,7 @@ export const STARTER_COPY: Record<Lang, Copy> = {
     bareboneNote:
       "Deaktiviert unterstützte Einstellungen für Hintergrund-Apps, Animationen, Transparenz, Bing-Suche, Vorschläge und Game DVR. Benachrichtigungen oder Synchronisierung können beeinträchtigt werden. Einstellungen lassen sich wiederherstellen; Windows wird nicht ersetzt.",
     browser_onlyNote:
-      "Ändert unterstützte Einstellungen für Hintergrund-Apps, Start-Vorschläge, Bing-Suche und Widgets. Benachrichtigungen oder Synchronisierung können beeinträchtigt werden; RAM- oder Geschwindigkeitsvorteile sind nicht garantiert.",
+      "Ändert nur unterstützte Einstellungen pro Benutzer, alle über ihre Kategorie oder den Verlauf wiederherstellbar. Benachrichtigungen oder Synchronisierung können beeinträchtigt werden; RAM-, Geschwindigkeits- oder Akkuvorteile sind nicht garantiert.",
     officeNote:
       "Beschleunigt Dateinavigation und Menüs bei stummgeschalteten Umfragen für reibungsloses Arbeiten an Dokumenten, E-Mails und Tabellen.",
     gamingBody: "Gleichmäßige Windows-Zeigerbewegung und Kontrolle über Game-DVR-Aufnahmen.",
@@ -309,7 +309,7 @@ export const STARTER_COPY: Record<Lang, Copy> = {
     bareboneBody:
       "Altera as preferências de aplicações em segundo plano, sugestões e aspeto; o desempenho depende da utilização.",
     browser_onlyBody:
-      "Menos sugestões do Windows e alterações opcionais de aplicações em segundo plano para utilização centrada no navegador.",
+      "Seleção pensada para o navegador: aplicações em segundo plano e pesquisas web desativadas, sugestões e widgets silenciados, efeitos e menus mais leves, recolha de dados não usada desativada.",
     officeBody:
       "Produtividade de escritório: pastas rápidas, extensões visíveis, menus imediatos e zero notificações de telemetria.",
     gamingNote:
@@ -327,7 +327,7 @@ export const STARTER_COPY: Record<Lang, Copy> = {
     bareboneNote:
       "Desativa as preferências suportadas de aplicações em segundo plano, animações, transparência, pesquisa Bing, sugestões e Game DVR. Pode afetar notificações ou sincronização. As definições podem ser repostas; não substitui a instalação do Windows.",
     browser_onlyNote:
-      "Altera as preferências suportadas de aplicações em segundo plano, sugestões do Iniciar, pesquisa Bing e widgets. Pode afetar notificações ou sincronização; não se garante poupança de RAM nem maior velocidade.",
+      "Altera apenas preferências suportadas por utilizador, todas reversíveis na respetiva categoria ou no Histórico. Pode afetar notificações ou sincronização; não se garante poupança de RAM, velocidade ou bateria.",
     officeNote:
       "Acelera a navegação de ficheiros e menus eliminando inquéritos para um trabalho fluido em documentos, correio e folhas de cálculo.",
     apply: "Aplicar seleção",

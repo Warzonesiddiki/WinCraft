@@ -3,7 +3,6 @@ import { realpathSync } from "node:fs";
 import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
 
-// @ts-expect-error process is a nodejs global
 const host = process.env.TAURI_DEV_HOST;
 
 // https://vite.dev/config/
@@ -20,10 +19,35 @@ export default defineConfig(async () => ({
     // was imported eagerly: a per-chunk stylesheet would load later in the
     // document and could win a specificity tie it used to lose.
     cssCodeSplit: false,
+    chunkSizeWarningLimit: 600,
     rollupOptions: {
       input: {
         main: "index.html",
         overlay: "overlay.html",
+      },
+      output: {
+        codeSplitting: {
+          groups: [
+            {
+              name: "vendor-react",
+              test(id) {
+                return /node_modules[\\/](react|react-dom|scheduler)[\\/]/.test(id);
+              },
+            },
+            {
+              name: "vendor-tauri",
+              test(id) {
+                return /node_modules[\\/]@tauri-apps[\\/]/.test(id);
+              },
+            },
+            {
+              name: "vendor-icons",
+              test(id) {
+                return /node_modules[\\/]lucide-react[\\/]/.test(id);
+              },
+            },
+          ],
+        },
       },
     },
   },

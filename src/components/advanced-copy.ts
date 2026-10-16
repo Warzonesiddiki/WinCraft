@@ -5,6 +5,8 @@ const en = {
   ecoDescription:
     "Choose non-critical apps for lower energy priority while WinCraft is open. Rules pause when an app becomes interactive; this is not a CPU percentage cap.",
   ecoAdd: "Choose executable",
+  choose: "Choose executable",
+  priorityAdd: "Choose application",
   ecoEmpty: "No app rules yet.",
   ecoOn: "Rules enabled",
   ecoOff: "Rules paused",
@@ -57,6 +59,8 @@ export const ADVANCED_COPY: Record<Lang, AdvancedCopy> = {
     ecoDescription:
       "Scegli app non critiche a priorità energetica ridotta mentre WinCraft è aperto. Le regole si sospendono quando l'app è interattiva; non sono un limite percentuale della CPU.",
     ecoAdd: "Scegli eseguibile",
+    choose: "Choose executable",
+    priorityAdd: "Scegli applicazione",
     ecoEmpty: "Nessuna regola per le app.",
     ecoOn: "Regole attive",
     ecoOff: "Regole in pausa",
@@ -105,6 +109,8 @@ export const ADVANCED_COPY: Record<Lang, AdvancedCopy> = {
     ecoDescription:
       "Choisissez des applications non critiques à priorité énergétique réduite tant que WinCraft est ouvert. Les règles se suspendent lorsque l'application devient interactive ; ce n'est pas un plafond CPU.",
     ecoAdd: "Choisir un exécutable",
+    choose: "Choose executable",
+    priorityAdd: "Choisir une application",
     ecoEmpty: "Aucune règle d'application.",
     ecoOn: "Règles actives",
     ecoOff: "Règles en pause",
@@ -154,6 +160,8 @@ export const ADVANCED_COPY: Record<Lang, AdvancedCopy> = {
     ecoDescription:
       "Elige apps no críticas con menor prioridad energética mientras WinCraft está abierto. Las reglas se pausan cuando la app pasa a ser interactiva; no son un límite porcentual de CPU.",
     ecoAdd: "Elegir ejecutable",
+    choose: "Choose executable",
+    priorityAdd: "Elegir aplicación",
     ecoEmpty: "Aún no hay reglas de apps.",
     ecoOn: "Reglas activas",
     ecoOff: "Reglas pausadas",
@@ -202,6 +210,8 @@ export const ADVANCED_COPY: Record<Lang, AdvancedCopy> = {
     ecoDescription:
       "Wählen Sie unkritische Apps für eine niedrigere Energiepriorität, solange WinCraft geöffnet ist. Bei interaktiver Nutzung pausieren die Regeln; sie sind keine CPU-Prozentgrenze.",
     ecoAdd: "Programmdatei wählen",
+    choose: "Choose executable",
+    priorityAdd: "Anwendung wählen",
     ecoEmpty: "Noch keine App-Regeln.",
     ecoOn: "Regeln aktiv",
     ecoOff: "Regeln pausiert",
@@ -251,6 +261,8 @@ export const ADVANCED_COPY: Record<Lang, AdvancedCopy> = {
     ecoDescription:
       "Escolha apps não críticas com menor prioridade energética enquanto o WinCraft está aberto. As regras pausam quando a app fica interativa; não são um limite percentual da CPU.",
     ecoAdd: "Escolher executável",
+    choose: "Choose executable",
+    priorityAdd: "Escolher aplicação",
     ecoEmpty: "Ainda não há regras de apps.",
     ecoOn: "Regras ativas",
     ecoOff: "Regras em pausa",
