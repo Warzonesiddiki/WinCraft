@@ -395,6 +395,92 @@
           "value": 0
         }
       ]
+    },
+    {
+      "edition": "ProOrHigher",
+      "expected": {
+        "win10-22h2-pro": "applies",
+        "win11-education-24h2": "applies",
+        "win11-home-24h2": "windows_edition",
+        "win11-pro-24h2": "applies"
+      },
+      "hive": "HKLM",
+      "id": "prevent_auto_restart_while_logged_on",
+      "minBuild": 0,
+      "writes": [
+        {
+          "name": "NoAutoRebootWithLoggedOnUsers",
+          "path": "SOFTWARE\\Policies\\Microsoft\\Windows\\WindowsUpdate\\AU",
+          "value": 1
+        }
+      ]
+    },
+    {
+      "edition": "ProOrHigher",
+      "expected": {
+        "win10-22h2-pro": "applies",
+        "win11-education-24h2": "applies",
+        "win11-home-24h2": "windows_edition",
+        "win11-pro-24h2": "applies"
+      },
+      "hive": "HKLM",
+      "id": "defer_quality_updates_7_days",
+      "minBuild": 14393,
+      "writes": [
+        {
+          "name": "DeferQualityUpdates",
+          "path": "SOFTWARE\\Policies\\Microsoft\\Windows\\WindowsUpdate",
+          "value": 1
+        },
+        {
+          "name": "DeferQualityUpdatesPeriodInDays",
+          "path": "SOFTWARE\\Policies\\Microsoft\\Windows\\WindowsUpdate",
+          "value": 7
+        }
+      ]
+    },
+    {
+      "edition": "ProOrHigher",
+      "expected": {
+        "win10-22h2-pro": "applies",
+        "win11-education-24h2": "applies",
+        "win11-home-24h2": "windows_edition",
+        "win11-pro-24h2": "applies"
+      },
+      "hive": "HKLM",
+      "id": "defer_feature_updates_30_days",
+      "minBuild": 14393,
+      "writes": [
+        {
+          "name": "DeferFeatureUpdates",
+          "path": "SOFTWARE\\Policies\\Microsoft\\Windows\\WindowsUpdate",
+          "value": 1
+        },
+        {
+          "name": "DeferFeatureUpdatesPeriodInDays",
+          "path": "SOFTWARE\\Policies\\Microsoft\\Windows\\WindowsUpdate",
+          "value": 30
+        }
+      ]
+    },
+    {
+      "edition": "ProOrHigher",
+      "expected": {
+        "win10-22h2-pro": "applies",
+        "win11-education-24h2": "applies",
+        "win11-home-24h2": "windows_edition",
+        "win11-pro-24h2": "applies"
+      },
+      "hive": "HKLM",
+      "id": "exclude_windows_update_drivers",
+      "minBuild": 14393,
+      "writes": [
+        {
+          "name": "ExcludeWUDriversInQualityUpdate",
+          "path": "SOFTWARE\\Policies\\Microsoft\\Windows\\WindowsUpdate",
+          "value": 1
+        }
+      ]
     }
   ],
   "targets": [

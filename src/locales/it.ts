@@ -1439,9 +1439,29 @@ export const it: Strings = {
         "Impedisce alle app dello Store di girare, aggiornarsi e interrogare la rete mentre non le stai usando. Sono CPU, RAM e batteria reali spese per app che non hai aperto.",
     },
     disable_delivery_optimization: {
-      name: "Smetti di condividere gli aggiornamenti Windows",
+      name: "Disattiva la condivisione peer-to-peer degli aggiornamenti Windows",
       description:
-        "Per impostazione predefinita Windows carica i file di aggiornamento scaricati verso altri PC usando la tua connessione. Questo limita Delivery Optimization al tuo solo computer, così quell'upload non ti mangia banda mentre giochi.",
+        "Imposta Delivery Optimization in modalità solo HTTP, impedendo a questo PC di scaricare contenuti degli aggiornamenti da altri PC o di caricarveli. Windows Update continua a scaricare da Microsoft; questo non disattiva il servizio Delivery Optimization né Windows Update.",
+    },
+    prevent_auto_restart_while_logged_on: {
+      name: "Evita i riavvii programmati di Windows Update durante l'accesso",
+      description:
+        "Impedisce a Windows Update di riavviare automaticamente il PC per un aggiornamento programmato mentre qualcuno ha effettuato l'accesso. Gli aggiornamenti possono comunque essere scaricati e installati; non blocca un riavvio avviato da te. Un aggiornamento di sicurezza che richiede un riavvio non è pienamente attivo finché non riavvii il PC: mantenere la sessione aperta può quindi ritardare la protezione. Lascia Windows Update attivo e riavvia appena possibile.",
+    },
+    defer_quality_updates_7_days: {
+      name: "Ritarda gli aggiornamenti di qualità di 7 giorni",
+      description:
+        "Rinvia di 7 giorni dal rilascio gli aggiornamenti di qualità di Windows, inclusi gli aggiornamenti di sicurezza mensili. Windows Update resta attivo: è un breve rinvio, non una pausa né un blocco. Le correzioni di sicurezza restano non applicate durante l'attesa; installa subito gli aggiornamenti urgenti e riavvia quando richiesto da Windows. Ripristinando questa impostazione si rimuove il rinvio.",
+    },
+    defer_feature_updates_30_days: {
+      name: "Ritarda gli aggiornamenti delle funzionalità di 30 giorni",
+      description:
+        "Rinvia di 30 giorni dal rilascio la disponibilità degli aggiornamenti delle funzionalità di Windows. Gli aggiornamenti mensili di qualità e sicurezza continuano secondo la normale pianificazione. Non blocca una versione specifica e non estende il supporto della versione di Windows attuale; ripristinando l'impostazione si rimuove il rinvio.",
+    },
+    exclude_windows_update_drivers: {
+      name: "Escludi gli aggiornamenti dei driver da Windows Update",
+      description:
+        "Chiede a Windows Update di escludere gli aggiornamenti autonomi dei driver dal normale ciclo degli aggiornamenti di qualità. Windows Update e gli aggiornamenti di qualità e sicurezza restano attivi. I driver inclusi negli aggiornamenti di sicurezza o critici, e quelli installati dinamicamente durante gli aggiornamenti delle funzionalità, possono comunque arrivare. Gli strumenti dei produttori e le installazioni manuali non sono bloccati. Dovrai gestire autonomamente i driver; mentre questa impostazione è attiva, il catalogo driver di Windows Update può mostrare meno offerte o nessuna. Ripristina l'impostazione per consentire di nuovo gli aggiornamenti dei driver da Windows Update.",
     },
     disable_copilot: {
       name: "Criterio Copilot legacy (solo ripristino)",

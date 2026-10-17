@@ -1173,15 +1173,6 @@ function App() {
                 onClick={async () => {
                   const target = consentTweak;
                   setConsentTweak(null);
-                  try {
-                    await invoke("record_barebone_consent", {
-                      id: target.id,
-                      text: "Acknowledged",
-                    });
-                  } catch (err) {
-                    // Non-fatal if backend has no consent table for this specific tweak
-                    console.warn("[App] record_barebone_consent failed", err);
-                  }
                   await performToggle(target);
                 }}
                 className="w-full rounded-xl bg-accent py-2.5 text-sm font-semibold text-surface-1 transition-colors hover:bg-accent/90"

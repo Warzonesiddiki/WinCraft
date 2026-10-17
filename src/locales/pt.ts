@@ -1440,9 +1440,29 @@ export const pt: Strings = {
         "Impede que as aplicações da Store corram, se atualizem e consultem a rede enquanto não as está a usar. Isso é CPU, RAM e bateria gastos a sério em aplicações que não abriu.",
     },
     disable_delivery_optimization: {
-      name: "Deixar de partilhar atualizações do Windows com desconhecidos",
+      name: "Desativar a partilha ponto a ponto das atualizações do Windows",
       description:
-        "Por predefinição, o Windows envia ficheiros de atualização já transferidos para outros PCs através da sua ligação. Isto limita a Otimização da Entrega à sua própria máquina, o que impede esse envio de consumir largura de banda a meio de um jogo.",
+        "Configura a Otimização da Entrega no modo apenas HTTP, impedindo este PC de transferir conteúdo de atualizações de outros PCs ou de o enviar para eles. O Windows Update continua a transferir conteúdo da Microsoft; isto não desativa o serviço de Otimização da Entrega nem o Windows Update.",
+    },
+    prevent_auto_restart_while_logged_on: {
+      name: "Impedir reinícios agendados do Windows Update com uma sessão iniciada",
+      description:
+        "Impede o Windows Update de reiniciar automaticamente o PC por causa de uma atualização agendada enquanto alguém tiver sessão iniciada. As atualizações podem continuar a ser transferidas e instaladas; isto não impede um reinício iniciado por si. Uma atualização de segurança que exige reinício só fica plenamente ativa depois de reiniciar, por isso manter a sessão aberta pode atrasar a proteção. Mantenha o Windows Update ativo e reinicie o PC assim que possível.",
+    },
+    defer_quality_updates_7_days: {
+      name: "Adiar atualizações de qualidade por 7 dias",
+      description:
+        "Adia por 7 dias após a publicação as atualizações de qualidade do Windows, incluindo as correções de segurança mensais. O Windows Update continua ativo: é um adiamento curto, não uma pausa nem um bloqueio. As correções de segurança não são aplicadas durante a espera; instale prontamente as atualizações urgentes e reinicie quando o Windows o solicitar. Restaurar esta definição remove o adiamento.",
+    },
+    defer_feature_updates_30_days: {
+      name: "Adiar atualizações de funcionalidades por 30 dias",
+      description:
+        "Adia por 30 dias após a publicação a oferta de atualizações de funcionalidades do Windows. As atualizações mensais de qualidade e segurança continuam no calendário normal. Não fixa uma versão nem prolonga o suporte da versão atual do Windows; restaurar esta definição remove o adiamento.",
+    },
+    exclude_windows_update_drivers: {
+      name: "Excluir controladores autónomos do Windows Update",
+      description:
+        "Indica ao Windows Update para excluir atualizações autónomas de controladores do ciclo normal de atualizações de qualidade. O Windows Update e as atualizações de qualidade e segurança continuam ativos. Os controladores incluídos em atualizações de segurança ou críticas, e os instalados dinamicamente durante atualizações de funcionalidades, podem continuar a chegar. As ferramentas dos fabricantes e as instalações manuais não são bloqueadas. Terá de gerir os controladores autónomos por sua conta; enquanto esta definição estiver ativa, o catálogo de controladores do Windows Update poderá apresentar menos ofertas ou nenhumas. Restaurar esta definição permite novamente as ofertas de controladores do Windows Update.",
     },
     disable_copilot: {
       name: "Política antiga do Copilot (apenas restauro)",

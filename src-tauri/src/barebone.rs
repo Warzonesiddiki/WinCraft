@@ -54,6 +54,8 @@ pub fn tier_for_debloat(_catalog_id: &str) -> ReversibilityTier {
 /// Both entries are Customer Experience Improvement Program uploaders (Phase
 /// B3). Verified present-or-absent per machine at preflight; absent tasks are
 /// reported, never created.
+pub const BAREBONE_BATCH_CONSENT_ID: &str = "barebone_tasks_batch";
+
 pub const BAREBONE_TASKS: &[&str] = &[
     "\\Microsoft\\Windows\\Customer Experience Improvement Program\\Consolidator",
     "\\Microsoft\\Windows\\Customer Experience Improvement Program\\UsbCeip",
@@ -100,6 +102,10 @@ pub const BAREBONE_TASKS: &[&str] = &[
 /// Whether a scheduler path is on the Barebone allowlist. Exact match only.
 pub fn is_barebone_task(path: &str) -> bool {
     BAREBONE_TASKS.contains(&path)
+}
+
+pub fn is_valid_barebone_consent_id(id: &str) -> bool {
+    id == BAREBONE_BATCH_CONSENT_ID || is_barebone_task(id)
 }
 
 /// One preflight finding. All checks are read-only.
@@ -262,6 +268,9 @@ pub fn record_barebone_consent(
     id: String,
     text: String,
 ) -> Result<(), String> {
+    if !is_valid_barebone_consent_id(&id) {
+        return Err("consent can only be recorded for an allowlisted Barebone task or its batch".into());
+    }
     record_consent(&crate::store_for_dir(&app)?, &id, &text)
 }
 
@@ -403,6 +412,14 @@ mod tests {
             );
             assert!(!finding.message.is_empty(), "{}", finding.code);
         }
+    }
+
+    #[test]
+    fn consent_ids_are_limited_to_exact_tasks_or_the_batch_action() {
+        assert!(is_valid_barebone_consent_id(BAREBONE_BATCH_CONSENT_ID));
+        assert!(is_valid_barebone_consent_id(BAREBONE_TASKS[0]));
+        assert!(!is_valid_barebone_consent_id("barebone_other"));
+        assert!(!is_valid_barebone_consent_id("\\\\Microsoft\\\\Windows\\\\SomethingElse"));
     }
 
     #[test]

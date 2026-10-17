@@ -118,6 +118,87 @@ describe("TweakRow", () => {
     expect(screen.getByText(s.badges.admin)).toBeInTheDocument();
   });
 
+  it("shows the Windows Update restart and security caveat before the switch is used", () => {
+    const text = s.tweaks.prevent_auto_restart_while_logged_on;
+    renderRow({
+      id: "prevent_auto_restart_while_logged_on",
+      name: text.name,
+      description: text.description,
+      category: "maintenance",
+      requires_admin: true,
+      pro_edition: true,
+    });
+
+    expect(screen.getByRole("heading", { name: text.name })).toBeInTheDocument();
+    expect(screen.getByText(text.description)).toBeInTheDocument();
+    expect(screen.getByText(s.badges.admin)).toBeInTheDocument();
+    expect(screen.getByText(s.requirements.proEdition)).toBeInTheDocument();
+    fireEvent.click(switchFor(text.name));
+    expect(onToggle).toHaveBeenCalledWith(
+      expect.objectContaining({ id: "prevent_auto_restart_while_logged_on" }),
+    );
+  });
+
+  it("shows bounded Windows Update deferrals and their security caveats", () => {
+    const controls = [
+      {
+        id: "defer_quality_updates_7_days",
+        text: s.tweaks.defer_quality_updates_7_days,
+        caveat: "Security fixes remain unapplied",
+      },
+      {
+        id: "defer_feature_updates_30_days",
+        text: s.tweaks.defer_feature_updates_30_days,
+        caveat: "Monthly quality and security updates continue",
+      },
+    ];
+
+    for (const { id, text, caveat } of controls) {
+      cleanup();
+      renderRow({
+        id,
+        name: text.name,
+        description: text.description,
+        category: "maintenance",
+        requires_admin: true,
+        pro_edition: true,
+      });
+
+      expect(screen.getByRole("heading", { name: text.name })).toBeInTheDocument();
+      expect(screen.getByText(text.description)).toBeInTheDocument();
+      expect(text.description).toContain(caveat);
+      expect(screen.getByText(s.badges.admin)).toBeInTheDocument();
+      expect(screen.getByText(s.requirements.proEdition)).toBeInTheDocument();
+      fireEvent.click(switchFor(text.name));
+      expect(onToggle).toHaveBeenCalledWith(expect.objectContaining({ id }));
+      onToggle.mockClear();
+    }
+  });
+
+  it("explains the limits of excluding driver updates from Windows Update", () => {
+    const text = s.tweaks.exclude_windows_update_drivers;
+    renderRow({
+      id: "exclude_windows_update_drivers",
+      name: text.name,
+      description: text.description,
+      category: "maintenance",
+      requires_admin: true,
+      pro_edition: true,
+    });
+
+    expect(screen.getByRole("heading", { name: text.name })).toBeInTheDocument();
+    expect(screen.getByText(text.description)).toBeInTheDocument();
+    expect(text.description).toContain("security or critical updates");
+    expect(text.description).toContain("dynamically during feature updates");
+    expect(text.description).toContain("manage standalone drivers yourself");
+    expect(screen.getByText(s.badges.admin)).toBeInTheDocument();
+    expect(screen.getByText(s.requirements.proEdition)).toBeInTheDocument();
+    fireEvent.click(switchFor(text.name));
+    expect(onToggle).toHaveBeenCalledWith(
+      expect.objectContaining({ id: "exclude_windows_update_drivers" }),
+    );
+  });
+
   it("explains why a control cannot be applied on this PC", () => {
     const reasons: [TweakInfo["unavailable"], string][] = [
       ["windows_version", format(s.requirements.unavailableVersion, { version: buildName(22000) })],

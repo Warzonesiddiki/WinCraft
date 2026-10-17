@@ -1,6 +1,7 @@
 import { ToolHeader, ToolSearch, ToolStatus, ToolDetails } from "./tool-section";
 import { useEffect, useState } from "react";
 import { invoke } from "@tauri-apps/api/core";
+import { ask } from "@tauri-apps/plugin-dialog";
 import { format, Strings } from "../i18n";
 import {
   BareboneTaskEntry,
@@ -10,6 +11,31 @@ import {
   Toast,
 } from "../types";
 import { Badge, Toggle } from "./ui";
+
+function batchTaskFailureDetails(outcome: BatchTaskOutcome): string {
+  const failedTasks = outcome.failedTasks.filter(
+    (path) => !outcome.unavailableTasks.includes(path),
+  );
+  const names = failedTasks
+    .slice(0, 3)
+    .map((path) => path.split("\\").filter(Boolean).pop() ?? path);
+  const remaining = failedTasks.length - names.length;
+  const affected = names.length
+    ? ` Affected: ${names.join(", ")}${remaining > 0 ? `, and ${remaining} more` : ""}.`
+    : "";
+  const retry = outcome.executionError
+    ? ` Elevated retry: ${outcome.executionError.slice(0, 180)}${outcome.executionError.length > 180 ? "…" : ""}.`
+    : "";
+  const unavailable = outcome.unavailableTasks;
+  const unavailableNames = unavailable
+    .slice(0, 3)
+    .map((path) => path.split("\\").filter(Boolean).pop() ?? path);
+  const unavailableRemaining = unavailable.length - unavailableNames.length;
+  const unverified = unavailable.length
+    ? ` Could not verify ${unavailableNames.join(", ")}${unavailableRemaining > 0 ? `, and ${unavailableRemaining} more` : ""}; those tasks may be absent or unreadable.`
+    : "";
+  return `${affected}${retry}${unverified}`;
+}
 
 function StartupMark({ name, src }: { name: string; src?: string | null }) {
   const [failedSource, setFailedSource] = useState<string>();
@@ -333,11 +359,18 @@ export function ScheduledTaskManager({
     setBusyPath(task.path);
     try {
       if (task.enabled) {
-        await invoke("record_barebone_consent", { id: task.path, text: "Disable telemetry task" });
+        const approved = await ask(
+          `Disable ${task.name}? This Windows task may support diagnostics, compatibility checks, maintenance, or related features. WinCraft saves its previous enabled state for rollback.`,
+          { title: "Review Windows task change", kind: "warning" },
+        );
+        if (!approved) return;
+        await invoke("record_barebone_consent", {
+          id: task.path,
+          text: "I reviewed the warning and consent to disable this allowlisted Windows task.",
+        });
         await invoke("set_barebone_task", { path: task.path, enabled: false });
         pushToast("success", `Disabled ${task.name}`);
       } else {
-        await invoke("record_barebone_consent", { id: task.path, text: "Restore telemetry task" });
         await invoke("rollback_barebone_task", { path: task.path });
         pushToast("success", `Restored ${task.name}`);
       }
@@ -349,12 +382,33 @@ export function ScheduledTaskManager({
     }
   }
 
-  async function disableAllTelemetryTasks() {
+  async function disableAllBackgroundTasks() {
     setLoadError(null);
     setBusyPath("all-batch");
     try {
+      const taskCount = bareboneTasks.filter((task) => task.present).length;
+      const unavailableCount = bareboneTasks.filter((task) => !task.present).length;
+      const availabilityNote = unavailableCount
+        ? ` ${unavailableCount} allowlisted entries are absent or could not be read; those will not be changed and will be reported.`
+        : "";
+      const approved = await ask(
+        `This can disable up to ${taskCount} allowlisted Windows tasks, including compatibility diagnostics, maintenance, and update-related tasks. Existing enabled states are saved for rollback. Review the listed tasks before continuing.${availabilityNote}`,
+        { title: "Review batch task changes", kind: "warning" },
+      );
+      if (!approved) return;
+      await invoke("record_barebone_consent", {
+        id: "barebone_tasks_batch",
+        text: "I reviewed the batch warning and consent to disable the allowlisted Windows task set.",
+      });
       const outcome = await invoke<BatchTaskOutcome>("disable_all_barebone_tasks");
-      pushToast("success", `Disabled ${outcome.modified} telemetry tasks in one batch`);
+      if (outcome.failed > 0 || outcome.executionError || outcome.unavailableTasks.length > 0) {
+        pushToast(
+          "error",
+          `Disabled ${outcome.modified} tasks; ${outcome.failed} failed.${batchTaskFailureDetails(outcome)}`,
+        );
+      } else {
+        pushToast("success", `Disabled ${outcome.modified} Windows tasks in one batch`);
+      }
       await refresh();
     } catch (e) {
       pushToast("error", String(e));
@@ -363,12 +417,19 @@ export function ScheduledTaskManager({
     }
   }
 
-  async function restoreAllTelemetryTasks() {
+  async function restoreAllBackgroundTasks() {
     setLoadError(null);
     setBusyPath("all-batch");
     try {
       const outcome = await invoke<BatchTaskOutcome>("rollback_all_barebone_tasks");
-      pushToast("success", `Restored ${outcome.modified} telemetry tasks`);
+      if (outcome.failed > 0 || outcome.executionError || outcome.unavailableTasks.length > 0) {
+        pushToast(
+          "error",
+          `Restored ${outcome.modified} tasks; ${outcome.failed} failed.${batchTaskFailureDetails(outcome)}`,
+        );
+      } else {
+        pushToast("success", `Restored ${outcome.modified} Windows tasks`);
+      }
       await refresh();
     } catch (e) {
       pushToast("error", String(e));
@@ -480,20 +541,20 @@ export function ScheduledTaskManager({
       {loaded && bareboneTasks.filter((t) => t.present).length > 0 && (
         <section
           role="region"
-          aria-labelledby="telemetry-tasks-title"
+          aria-labelledby="background-tasks-title"
           className="tool-list-section mt-8"
         >
           <div className="tool-panel tool-list-header">
             <ToolHeader
-              titleId="telemetry-tasks-title"
-              title="Windows Telemetry &amp; Diagnostic Tasks"
-              description="Allowlisted background tasks for CEIP, compatibility telemetry, and background diagnostics. Disabling them reduces background wake-ups."
+              titleId="background-tasks-title"
+              title="Windows Background Tasks"
+              description="Allowlisted Windows tasks for customer experience, compatibility, diagnostics, maps, maintenance, and update components. Disabling a task can affect the feature it supports; review each one before opting in."
               actions={
                 <div className="flex items-center gap-2">
                   <button
                     type="button"
                     disabled={busyPath !== null}
-                    onClick={disableAllTelemetryTasks}
+                    onClick={disableAllBackgroundTasks}
                     className="rounded-lg bg-warn/15 px-2.5 py-1 text-xs font-semibold text-warn hover:bg-warn/25 transition-colors"
                   >
                     Disable All ({bareboneTasks.filter((t) => t.present && t.enabled).length})
@@ -501,7 +562,7 @@ export function ScheduledTaskManager({
                   <button
                     type="button"
                     disabled={busyPath !== null}
-                    onClick={restoreAllTelemetryTasks}
+                    onClick={restoreAllBackgroundTasks}
                     className="rounded-lg bg-surface-2 px-2.5 py-1 text-xs font-medium text-ink-2 hover:bg-surface-3 transition-colors"
                   >
                     Restore All
@@ -524,7 +585,7 @@ export function ScheduledTaskManager({
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-center gap-2">
                       <h3 className="font-semibold text-ink">{task.name}</h3>
-                      <Badge kind="warn">Telemetry</Badge>
+                      <Badge kind="warn">Allowlisted</Badge>
                       <Badge kind="admin">{s.badges.admin}</Badge>
                     </div>
                     <ToolDetails label={s.healthPanel.showMore}>

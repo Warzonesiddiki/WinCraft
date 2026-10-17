@@ -1,8 +1,8 @@
-# VM verification of the 1.18 controls
+# VM verification of the settings-based controls
 
-Checks, on clean virtual machines, that each of the 15 controls added in 1.18
-writes exactly what it declares where it is supported, leaves the PC untouched
-where it is not, and restores the exact original values.
+Checks, on clean virtual machines, that all 18 settings-based controls in the
+current catalogue write exactly what they declare where supported, leave the PC
+untouched where unavailable, and restore the exact original values.
 
 `verify-tweaks.ps1` is read-only: WinCraft applies and restores, the script
 only compares the registry and the service configuration with
@@ -21,15 +21,16 @@ only compares the registry and the service configuration with
 
 Expected verdict per control and VM: the `expected` field of each entry in
 `tweak-matrix.json`, or `.\verify-tweaks.ps1 -Phase Plan` on the VM itself.
-In short: Home refuses Click to Do, Paint AI and Widgets; only Education
-accepts the Start Recommended policy; Windows 10 refuses Paint AI, Notepad
-AI, End task, the drag tray, Widgets and Start Recommended; the AI
-Components Host control is offered only where `WSAIFabricSvc` exists.
+In short: Home refuses Click to Do, Paint AI, Widgets and all four Pro-or-higher
+Windows Update policies; only Education accepts the Start Recommended policy;
+Windows 10 refuses Paint AI, Notepad AI, End task, the drag tray, Widgets and
+Start Recommended; the AI Components Host control is offered only where
+`WSAIFabricSvc` exists.
 
 ## Manual procedure (each VM, about 15 minutes)
 
 1. Take a VM checkpoint. Install the WinCraft build under test. There is no
-   licence to sign in with and no locked control: all 15 controls apply.
+   licence to sign in with and no paid controls; Windows edition/build gates still apply.
 2. In a normal, non-elevated PowerShell as the same user:
    `.\verify-tweaks.ps1 -Phase Baseline`
 3. In WinCraft, search each control by name and apply it. Unsupported ones
@@ -64,6 +65,10 @@ exit code is the number of failed checks, so a run can gate a release.
 | disable_widgets | | | | |
 | hide_start_recommended | | | | |
 | disable_game_bar_captures | | | | |
+| prevent_auto_restart_while_logged_on | | | | |
+| defer_quality_updates_7_days | | | | |
+| defer_feature_updates_30_days | | | | |
+| exclude_windows_update_drivers | | | | |
 | disable_ai_fabric_service | | | | |
 
 Beyond the registry: on A and C, also check by eye that the taskbar and

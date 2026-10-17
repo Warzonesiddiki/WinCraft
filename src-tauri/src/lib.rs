@@ -34,6 +34,7 @@ mod tray;
 mod cpubench;
 mod cpuclock;
 pub mod crash;
+#[cfg(test)]
 mod deprovision;
 mod diskhealth;
 mod diskinfo;
@@ -2256,20 +2257,29 @@ pub fn run_elevated_headless(action: &str, id: &str) -> ! {
         }
 
         "--elevated-barebone-batch-disable" => {
-            let store = rollback::RollbackStore::new(dirs_app_data_dir());
-            let (modified, failed) = scheduledtasks::disable_all_barebone_tasks_inner(&store);
+            let dir = dirs_app_data_dir();
+            barebone::assert_consented(&dir, barebone::BAREBONE_BATCH_CONSENT_ID)?;
+            let store = rollback::RollbackStore::new(dir);
+            let (modified, failed_tasks) = scheduledtasks::disable_all_barebone_tasks_inner(&store);
+            let failed = failed_tasks.len();
             audit::record(
                 "barebone-tasks-batch-disable",
                 "all",
                 failed == 0,
                 if failed > 0 {
-                    Some(format!("modified {modified}, failed {failed}"))
+                    Some(format!(
+                        "modified {modified}; failed paths: {}",
+                        failed_tasks.join(", ")
+                    ))
                 } else {
                     None
                 },
             );
             if failed > 0 {
-                Err(format!("failed to disable {failed} tasks"))
+                Err(format!(
+                    "failed to disable {failed} tasks: {}",
+                    failed_tasks.join(", ")
+                ))
             } else {
                 Ok(())
             }
@@ -2277,19 +2287,26 @@ pub fn run_elevated_headless(action: &str, id: &str) -> ! {
 
         "--elevated-barebone-batch-rollback" => {
             let store = rollback::RollbackStore::new(dirs_app_data_dir());
-            let (modified, failed) = scheduledtasks::rollback_all_barebone_tasks_inner(&store);
+            let (modified, failed_tasks) = scheduledtasks::rollback_all_barebone_tasks_inner(&store);
+            let failed = failed_tasks.len();
             audit::record(
                 "barebone-tasks-batch-rollback",
                 "all",
                 failed == 0,
                 if failed > 0 {
-                    Some(format!("modified {modified}, failed {failed}"))
+                    Some(format!(
+                        "modified {modified}; failed paths: {}",
+                        failed_tasks.join(", ")
+                    ))
                 } else {
                     None
                 },
             );
             if failed > 0 {
-                Err(format!("failed to rollback {failed} tasks"))
+                Err(format!(
+                    "failed to restore {failed} tasks: {}",
+                    failed_tasks.join(", ")
+                ))
             } else {
                 Ok(())
             }
@@ -2660,7 +2677,6 @@ pub fn run() {
             skinpacks::apply_skinpack,
             skinpacks::rollback_skinpack,
             recovery_script::export_recovery_script,
-            deprovision::deprovision_package,
             barebone::barebone_preflight,
             barebone::record_barebone_consent,
             netmaintenance::flush_dns_cache,
@@ -2917,7 +2933,7 @@ mod tests {
     /// there is no path by which a control can come out of this build gated.
     /// This test pins the size of the catalogue so a refactor notices drift.
     #[test]
-    fn the_catalogue_is_159_active_tweaks_all_free_in_output() {
+    fn the_catalogue_is_163_active_tweaks_all_free_in_output() {
         let registry: Vec<_> = tweaks::all_tweaks()
             .into_iter()
             .filter(|t| !tweaks::is_retired_tweak(t.id))
@@ -2962,12 +2978,12 @@ mod tests {
             + power_tuning::TWEAKS.iter().filter(|t| t.pro).count()
             + settings.iter().filter(|t| t.requires_pro).count();
 
-        assert_eq!(total, 159, "the active catalogue count changed after retiring legacy keyboard controls");
+        assert_eq!(total, 163, "the active catalogue count changed after retiring legacy keyboard controls");
         assert_eq!(
             pro, 0,
             "a control is Pro again: nothing in this build is gated"
         );
-        assert_eq!(total - pro, 159, "every active control is free after retiring legacy keyboard controls");
+        assert_eq!(total - pro, 163, "every active control is free after retiring legacy keyboard controls");
 
         // The composite list must stay in step with what list_tweaks builds,
         // otherwise the totals above would quietly stop covering everything.

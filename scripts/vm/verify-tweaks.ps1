@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS
-  Verifies the 1.18 controls on a test machine: apply -> verify -> revert.
+  Verifies the settings-based controls on a test machine: apply -> verify -> revert.
 
 .DESCRIPTION
   Read-only. It never writes the registry or touches a service: WinCraft

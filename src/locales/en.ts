@@ -1416,9 +1416,29 @@ export const en: Strings = {
         "Stops Store apps from running, refreshing and polling the network while you are not using them. This is real CPU, RAM and battery spent on apps you did not open.",
     },
     disable_delivery_optimization: {
-      name: "Stop sharing Windows updates with strangers",
+      name: "Disable peer-to-peer Windows Update sharing",
       description:
-        "Windows uploads downloaded update files to other PCs over your connection by default. This limits Delivery Optimization to your own machine, which stops that upload eating bandwidth mid-game.",
+        "Sets Delivery Optimization to HTTP-only mode, stopping this PC from downloading update content from or uploading it to other PCs. Windows Update still downloads from Microsoft; this does not turn off the Delivery Optimization service or Windows Update.",
+    },
+    prevent_auto_restart_while_logged_on: {
+      name: "Prevent scheduled Windows Update restarts while signed in",
+      description:
+        "Stops Windows Update from automatically restarting the PC for a scheduled update while someone is signed in. Updates can still download and install; this does not block a restart you request yourself. A security update that needs a restart is not fully active until the PC restarts, so staying signed in can delay protection. Keep Windows Update enabled and restart promptly.",
+    },
+    defer_quality_updates_7_days: {
+      name: "Delay quality updates by 7 days",
+      description:
+        "Defers Windows quality updates, including monthly security fixes, for 7 days after release. Windows Update stays enabled; this is a short delay, not a pause or a block. Security fixes remain unapplied during the delay, so install urgent updates promptly and restart when Windows asks. Restoring this setting removes the deferral.",
+    },
+    defer_feature_updates_30_days: {
+      name: "Delay feature updates by 30 days",
+      description:
+        "Defers offers of Windows feature updates by 30 days after release. Monthly quality and security updates continue on their normal schedule. This is not a version pin and does not extend support for your current Windows release; restoring this setting removes the deferral.",
+    },
+    exclude_windows_update_drivers: {
+      name: "Exclude standalone driver updates from Windows Update",
+      description:
+        "Tells Windows Update to leave standalone driver-classified updates out of its normal quality-update cycle. Windows Update and security/quality updates remain enabled. Drivers bundled into security or critical updates, and drivers installed dynamically during feature updates, can still arrive. Vendor tools and manual installs are unaffected. You must manage standalone drivers yourself; while this is active, Windows Update's driver catalogue may show fewer or no offers. Restoring this setting allows Windows Update to offer drivers again.",
     },
     disable_copilot: {
       name: "Legacy Copilot policy (restore only)",

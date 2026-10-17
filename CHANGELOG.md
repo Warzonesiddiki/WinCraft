@@ -2,15 +2,18 @@
 
 ## v2.0.0
 
-WinCraft 2.0.0 is the major generation release of the non-destructive Windows performance and privacy platform. The catalogue is expanded to 150 controls across Windows 11 and Windows 10, with SvcHost process consolidation, telemetry autologger session teardowns, 40 allowlisted background scheduled tasks, Tier-3 safety consent gates, and evidence/effect metadata.
+WinCraft 2.0.0 is the major generation release of the non-destructive Windows performance and privacy platform. The catalogue is expanded to 163 controls across Windows 11 and Windows 10, with SvcHost process consolidation, telemetry autologger session teardowns, reversible Windows Update restart protection, bounded deferrals and a standalone driver-offer policy, 40 allowlisted background scheduled tasks, Tier-3 safety consent gates, and evidence/effect metadata.
 
-- **150 verified controls, 100% free.** Expanded from the previous catalogue: SvcHost process consolidation (`SvcHostSplitThresholdInKB`), NTFS 8.3 short name and last access timestamp disablement, 5 ETW Autologger session teardowns (`AutoLogger-Diagtrack-Listener`, `SQMLogger`, `AITEventLog`, `DiagLog`, `WiFiSession`), and background service startup management for `WerSvc`, `MapsBroker`, and `lfsvc`.
+- **163 controls, 100% free.** Expanded from the previous catalogue: SvcHost process consolidation (`SvcHostSplitThresholdInKB`), NTFS 8.3 short name and last access timestamp disablement, 5 ETW Autologger session teardowns (`AutoLogger-Diagtrack-Listener`, `SQMLogger`, `AITEventLog`, `DiagLog`, `WiFiSession`), background service startup management for `WerSvc`, `MapsBroker`, and `lfsvc`, and scheduled-update restart protection while signed in.
+- **Scheduled Windows Update restarts are opt-in to defer:** A reversible Pro-or-higher policy prevents automatic scheduled restarts while a user is signed in. Downloads and installation continue; security updates that need a restart remain pending, so the app tells users to restart promptly.
+- **Bounded Windows Update deferrals:** Reversible Pro-or-higher policies delay quality updates by 7 days and feature updates by 30 days. The quality delay also delays security fixes; monthly quality/security updates continue during feature deferral. These are not a pause, update disablement or version pin.
+- **Windows Update driver-offer preference:** A reversible Pro-or-higher policy can exclude standalone driver-classified offers from the normal quality-update cycle. Drivers bundled into security/critical updates or installed during feature updates may still arrive; users must manage standalone drivers themselves. This is not a performance tweak.
 - **40 allowlisted bloat scheduled tasks:** Expanded from CEIP uploaders to full Application Experience, Autochk, Disk Diagnostic, Maps, and Edge Update background task management in the startup manager.
 - **Evidence & effect calibration:** Every tweak displays empirical evidence (`Measured`, `Modest`, `Neutral`), taking effect indicator (`Immediate`, `Sign-out`, `Restart`, `Reboot`), and documented risk factors.
 - **Tier-3 consent modal & execution gate:** Explicit consent required before executing potentially irreversible or machine-wide settings; consent records persisted in `%APPDATA%\WinCraft\barebone_consent.json`.
 - **Pre-flight System Restore Point verification:** Integrates native `SRSetRestorePointW` before elevated operations with non-blocking graceful fallback.
 - **Desktop look (Interface):** The shell-replication panel was replaced by one real transformation, `COSMIC Dark` — nine per-user `HKCU` values (dark surfaces, transparency off, accent on title bars and the taskbar, flat window borders, no minimise animation, taskbar at the left), journalled under one rollback id before any write and restored in one click. It re-themes Windows and says so in all six languages; it does not install a desktop environment, and the five previously advertised packs that did not exist are gone.
-- **Full 6-locale translation parity:** 100% key parity across English, Italian, German, Spanish, French, and European Portuguese (1,780 keys per locale).
+- **Full 6-locale translation parity:** 100% key parity across English, Italian, German, Spanish, French, and European Portuguese (1,812 keys per locale).
 
 ## v1.19.0
 
@@ -1541,6 +1544,13 @@ links keep working until they are pointed here.
 - **Fixed**: Stripe checkout failing on Managed Payments accounts — pinned
   the API version and added a required product tax code.
 - **Live**: Stripe payments went live (real card charges, real payouts).
+- **Released**: v0.1.1, backend deployed to Railway with Postgres.
+
+## Earlier
+
+See `git log` for the full history predating this changelog (initial app
+scaffold, rollback engine, tweak categories, i18n, themes, Pro tier).
+ Stripe payments went live (real card charges, real payouts).
 - **Released**: v0.1.1, backend deployed to Railway with Postgres.
 
 ## Earlier
