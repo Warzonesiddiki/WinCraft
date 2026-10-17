@@ -56,6 +56,7 @@ export type TweakInfo = {
     | "windows_edition_enterprise"
     | "not_present"
     | "windows_protected"
+    | "retired"
     | null;
   /** Reversibility tier from Rust. Core catalogue is `reversible`. */
   tier?: string | null;

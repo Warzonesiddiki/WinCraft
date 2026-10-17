@@ -1203,6 +1203,8 @@ export const de: Strings = {
     unavailableEnterpriseEdition:
       "Auf diesem PC nicht verfügbar: erfordert Windows Enterprise oder Education.",
     notPresent: "Dieser PC hat diese Funktion nicht, es gibt also nichts abzuschalten.",
+    retired:
+      "Eingestellt: Diese ältere Einstellung kann nicht erneut angewendet werden. Der zuvor gespeicherte Zustand lässt sich weiterhin wiederherstellen.",
     windowsProtected:
       "Auf diesem PC schützt Windows diese Einstellung und lässt keine Änderungen durch andere Apps zu. Schalte Widgets unter Einstellungen > Personalisierung > Taskleiste aus.",
   },
@@ -1225,16 +1227,19 @@ export const de: Strings = {
     high: "Hoch",
   },
   skinpacks: {
-    title: "Skinpacks",
-    description: "Skinpacks management",
-    packName: "Pack name",
-    packBody: "Pack body",
-    scope: "Scope",
-    apply: "Apply",
-    restore: "Restore",
-    active: "Active",
-    applying: "Applying",
-    valuesSummary: "Values summary", // uses {count}
+    title: "Windows-Erscheinungsbild",
+    description: "Wendet ein umkehrbares Erscheinungsbild nur für diesen Windows-Benutzer an.",
+    packName: "Dunkles Erscheinungsbild im COSMIC-Stil",
+    packBody:
+      "Aktiviert den Dunkelmodus, setzt einen türkisfarbenen Akzent, verringert Transparenz, flacht Fensterränder ab und richtet die Taskleiste links aus. Alle neun Registrierungswerte werden vor der Änderung gesichert.",
+    scope:
+      "Geändert wird nur das Erscheinungsbild der Windows-Shell. COSMIC wird nicht installiert und die Windows-Desktopumgebung wird nicht ersetzt.",
+    apply: "Erscheinungsbild anwenden",
+    restore: "Vorheriges Erscheinungsbild wiederherstellen",
+    active: "Erscheinungsbild aktiv",
+    applying: "Wird angewendet…",
+    valuesSummary:
+      "Dieses Erscheinungsbild nutzt {count} Registrierungswerte; beim Anwenden werden die ursprünglichen Werte zur Wiederherstellung gesichert.", // uses {count}
   },
   tweaks: {
     disable_click_to_do: {
@@ -1280,7 +1285,7 @@ export const de: Strings = {
     explorer_open_this_pc: {
       name: "Datei-Explorer bei „Dieser PC“ öffnen",
       description:
-        "Der Datei-Explorer öffnet sich bei „Dieser PC“ mit deinen Laufwerken und Ordnern statt bei „Start“ mit den zuletzt verwendeten Dateien.",
+        "Der Datei-Explorer öffnet sich unter „Dieser PC“ mit Laufwerken und Ordnern statt unter „Start“. Geändert wird nur die Startseite; der Eintrag „Start“ bleibt im Navigationsbereich verfügbar.",
     },
     block_oem_device_apps: {
       name: "Hersteller-Apps nicht mehr selbst installieren lassen",
@@ -1451,6 +1456,16 @@ export const de: Strings = {
       name: "Alte Copilot-Richtlinie (nur Wiederherstellung)",
       description:
         "Diese eingestellte Richtlinie steuert die aktuelle Copilot-App nicht. Hier kannst du den gespeicherten Registrierungswert wiederherstellen. Verwalte die separate Copilot-App in Debloat; das Entfernen verhindert keine spätere Neuinstallation.",
+    },
+    keyboard_delay_zero: {
+      name: "Alter KeyboardDelay-Wert (nur Wiederherstellung)",
+      description:
+        "Frühere Versionen schrieben KeyboardDelay in den Mauseinstellungen statt in den Tastatureinstellungen. Dieser Eintrag stellt nur die frühere Sicherung wieder her. Für die Tastenwiederholung nutze „Eingabeverzögerung reduzieren (Tastatur)“.",
+    },
+    keyboard_speed_fast: {
+      name: "Alter KeyboardSpeed-Wert (nur Wiederherstellung)",
+      description:
+        "Frühere Versionen schrieben KeyboardSpeed in den Mauseinstellungen statt in den Tastatureinstellungen. Dieser Eintrag stellt nur die frühere Sicherung wieder her. Für die Tastenwiederholung nutze „Eingabeverzögerung reduzieren (Tastatur)“.",
     },
     disable_suggested_apps: {
       name: "Verhindern, dass Windows selbst Apps installiert",
@@ -1986,64 +2001,49 @@ export const de: Strings = {
         "Hält den Windows-Standortdienst (lfsvc) an und setzt ihn auf Manuell, um ständige Standortabfragen im Hintergrund zu stoppen.",
     },
     ads_in_settings: {
-      name: "Ads In Settings",
-      description: "Configuration option",
-    },
-    no_post_login_upsell: {
-      name: "No Post Login Upsell",
-      description: "Configuration option",
-    },
-    no_welcome_tips: {
-      name: "No Welcome Tips",
-      description: "Configuration option",
-    },
-    explorer_home_this_pc: {
-      name: "Explorer Home This Pc",
-      description: "Configuration option",
+      name: "Werbeinhalte in den Einstellungen ausblenden",
+      description:
+        "Setzt den benutzerspezifischen Wert SubscribedContent-338393Enabled auf 0. Andere Windows-Vorschlagsbereiche bleiben unverändert.",
     },
     quick_access_no_cloud: {
-      name: "Quick Access No Cloud",
-      description: "Configuration option",
+      name: "Cloud-Dateien im Schnellzugriff ausblenden",
+      description:
+        "Setzt ShowCloudFilesInQuickAccess auf 0. Einträge unter Zuletzt verwendet und Häufig verwenden eigene Einstellungen und bleiben unverändert.",
     },
     hide_gallery_explorer: {
-      name: "Hide Gallery Explorer",
-      description: "Configuration option",
+      name: "Galerie im Datei-Explorer ausblenden",
+      description:
+        "Setzt den benutzerspezifischen Wert HideGallery auf 1. Blendet den Galerieeintrag im Navigationsbereich aus; Fotos werden weder gelöscht noch verschoben.",
     },
     snap_assist_off: {
-      name: "Snap Assist Off",
-      description: "Configuration option",
+      name: "Snap-Assist-Vorschläge begrenzen",
+      description:
+        "Deaktiviert die Einstellung für Snap-Assist-Vorschläge. Die separate Einstellung für das Snap-Layouts-Flyout bleibt unverändert; daher können manche Einrastvorschläge weiterhin erscheinen.",
     },
     alt_tab_no_browser_tabs: {
-      name: "Alt Tab No Browser Tabs",
-      description: "Configuration option",
+      name: "In Alt+Tab Fenster statt Edge-Tabs anzeigen",
+      description:
+        "Verhindert, dass Microsoft-Edge-Tabs als eigene Alt+Tab-Einträge erscheinen. Die Tabs bleiben geöffnet; nur der Windows-Task-Switcher ändert sich.",
     },
     taskbar_button_combining: {
-      name: "Taskbar Button Combining",
-      description: "Configuration option",
+      name: "Taskleistenschaltflächen gruppieren",
+      description:
+        "Setzt TaskbarGlomLevel auf 0 und gruppiert Fenster derselben App unter einer Taskleistenschaltfläche. Einzelne Fenster sind dadurch weniger gut sichtbar.",
     },
     no_toasts_fullscreen_video: {
-      name: "No Toasts Fullscreen Video",
-      description: "Configuration option",
+      name: "Benachrichtigungsbanner deaktivieren",
+      description:
+        "Setzt NOC_GLOBAL_SETTING_TOASTS_ENABLED auf 0. Benachrichtigungen können auch außerhalb von Vollbildvideos unterdrückt werden.",
     },
     no_window_snap_drag: {
-      name: "No Window Snap Drag",
-      description: "Configuration option",
-    },
-    menu_show_delay_minimal: {
-      name: "Menu Show Delay Minimal",
-      description: "Configuration option",
-    },
-    keyboard_delay_zero: {
-      name: "Keyboard Delay Zero",
-      description: "Configuration option",
-    },
-    keyboard_speed_fast: {
-      name: "Keyboard Speed Fast",
-      description: "Configuration option",
+      name: "Andocken beim Ziehen von Fenstern deaktivieren",
+      description:
+        "Setzt WindowArrangementActive auf 0 und deaktiviert Andocklayouts, die durch Ziehen eines Fensters ausgelöst werden. Andere Fenster-Tastenkürzel können weiterhin funktionieren.",
     },
     ui_classic_context_menu: {
-      name: "Ui Classic Context Menu",
-      description: "Configuration option",
+      name: "Klassisches Rechtsklickmenü anzeigen",
+      description:
+        "Erstellt eine benutzerspezifische Explorer-Überschreibung für das klassische Kontextmenü statt des kompakten Windows-11-Menüs. Ein Neustart des Explorers oder eine Abmeldung kann nötig sein.",
     },
   },
   cleanup: {

@@ -32,6 +32,11 @@ const filters = [
   "diagnostics::network_verify::tests",
   "engine::dynamic_session::tests",
   "tests::duplicate_batch_ids_execute_only_once_and_keep_input_order",
+  "tests::the_catalogue_is_159_active_tweaks_all_free_in_output",
+  "profiles::tests::retired_ids_from_an_old_profile_are_reported_not_reapplied",
+  "recommend::scan_scope_tests::retired_controls_never_enter_scan_recommendations",
+  "tweaks::retired_tweaks_are_restore_only",
+  "tweaks::catalogue_tests::keyboard_repeat_settings_have_one_current_composite_owner",
 ];
 
 // Build the test binary once, then execute isolated filters against the binary.
@@ -53,7 +58,11 @@ for (const line of build.stdout.split("\n")) {
   if (!line.trim()) continue;
   try {
     const msg = JSON.parse(line);
-    if (msg.reason === "compiler-artifact" && msg.target?.name === "tauri_app_lib" && msg.executable) {
+    if (
+      msg.reason === "compiler-artifact" &&
+      msg.target?.name === "tauri_app_lib" &&
+      msg.executable
+    ) {
       executable = msg.executable;
     }
   } catch {}
@@ -67,15 +76,11 @@ for (const filter of filters) {
         stdio: ["inherit", "pipe", "inherit"],
         encoding: "utf8",
       })
-    : spawnSync(
-        "cargo",
-        ["test", "--manifest-path", "src-tauri/Cargo.toml", "--lib", filter],
-        {
-          cwd: fileURLToPath(new URL("..", import.meta.url)),
-          stdio: ["inherit", "pipe", "inherit"],
-          encoding: "utf8",
-        },
-      );
+    : spawnSync("cargo", ["test", "--manifest-path", "src-tauri/Cargo.toml", "--lib", filter], {
+        cwd: fileURLToPath(new URL("..", import.meta.url)),
+        stdio: ["inherit", "pipe", "inherit"],
+        encoding: "utf8",
+      });
   if (result.error) throw result.error;
   process.stdout.write(result.stdout);
   if (result.status !== 0) process.exit(result.status ?? 1);

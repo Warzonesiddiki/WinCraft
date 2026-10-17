@@ -102,7 +102,7 @@ assert.ok(
   "Metadata must not promise a restore point",
 );
 for (const [value, label] of [
-  [150, "CONTROLS IN THIS RELEASE"],
+  [159, "CONTROLS IN THIS RELEASE"],
   [1, "PLACE TO REVIEW &amp; RESTORE"],
 ]) {
   assert.match(

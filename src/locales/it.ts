@@ -1194,6 +1194,8 @@ export const it: Strings = {
     unavailableEnterpriseEdition:
       "Non disponibile su questo PC: richiede Windows Enterprise o Education.",
     notPresent: "Questo PC non ha questa funzione, quindi non c'è nulla da disattivare.",
+    retired:
+      "Ritirato: questo controllo legacy non può più essere applicato. Lo stato salvato in precedenza può ancora essere ripristinato.",
     windowsProtected:
       "Su questo PC Windows protegge questa opzione e non accetta modifiche da altre app. Disattiva Widget in Impostazioni > Personalizzazione > Barra delle applicazioni.",
   },
@@ -1216,16 +1218,19 @@ export const it: Strings = {
     high: "Alta",
   },
   skinpacks: {
-    title: "Skinpacks",
-    description: "Skinpacks management",
-    packName: "Pack name",
-    packBody: "Pack body",
-    scope: "Scope",
-    apply: "Apply",
-    restore: "Restore",
-    active: "Active",
-    applying: "Applying",
-    valuesSummary: "Values summary", // uses {count}
+    title: "Aspetto di Windows",
+    description: "Applica un tema reversibile alla shell di Windows per questo utente.",
+    packName: "Aspetto scuro ispirato a COSMIC",
+    packBody:
+      "Imposta la modalità scura, un accento turchese, riduce la trasparenza, rende piatti i bordi delle finestre e allinea la barra delle applicazioni a sinistra. Salva tutti e nove i valori del Registro prima di modificarli.",
+    scope:
+      "Cambia solo l’aspetto della shell di Windows. Non installa COSMIC né sostituisce l’ambiente desktop di Windows.",
+    apply: "Applica aspetto",
+    restore: "Ripristina aspetto precedente",
+    active: "Aspetto attivo",
+    applying: "Applicazione…",
+    valuesSummary:
+      "Questo aspetto usa {count} valori del Registro; applicandolo si salvano gli originali per il ripristino.", // uses {count}
   },
   tweaks: {
     disable_click_to_do: {
@@ -1271,7 +1276,7 @@ export const it: Strings = {
     explorer_open_this_pc: {
       name: "Apri Esplora file su Questo PC",
       description:
-        "Esplora file si apre su Questo PC, con unità e cartelle, invece che su Home con i file recenti.",
+        "Imposta Esplora file in modo che si apra su Questo PC, con unità e cartelle, anziché su Home. Cambia solo la pagina iniziale; la voce Home resta nel riquadro di navigazione.",
     },
     block_oem_device_apps: {
       name: "Impedisci alle app dei produttori di installarsi da sole",
@@ -1442,6 +1447,16 @@ export const it: Strings = {
       name: "Criterio Copilot legacy (solo ripristino)",
       description:
         "Questo criterio ritirato non controlla l’app Copilot attuale. Qui puoi ripristinare il valore del registro salvato. Gestisci l’app Copilot separata in Debloat; la rimozione non impedisce installazioni future.",
+    },
+    keyboard_delay_zero: {
+      name: "Valore KeyboardDelay legacy (solo ripristino)",
+      description:
+        "Le versioni precedenti scrivevano KeyboardDelay nel ramo del mouse invece che in quello della tastiera. Questa voce serve solo a ripristinare quel salvataggio; per la ripetizione dei tasti usa «Riduci ritardo di input (tastiera)».",
+    },
+    keyboard_speed_fast: {
+      name: "Valore KeyboardSpeed legacy (solo ripristino)",
+      description:
+        "Le versioni precedenti scrivevano KeyboardSpeed nel ramo del mouse invece che in quello della tastiera. Questa voce serve solo a ripristinare quel salvataggio; per la ripetizione dei tasti usa «Riduci ritardo di input (tastiera)».",
     },
     disable_suggested_apps: {
       name: "Impedisci a Windows di installare app da solo",
@@ -1979,64 +1994,49 @@ export const it: Strings = {
         "Arresta il servizio di geolocalizzazione di Windows (lfsvc) e lo imposta su Manuale, evitando il polling continuo della posizione.",
     },
     ads_in_settings: {
-      name: "Ads In Settings",
-      description: "Configuration option",
-    },
-    no_post_login_upsell: {
-      name: "No Post Login Upsell",
-      description: "Configuration option",
-    },
-    no_welcome_tips: {
-      name: "No Welcome Tips",
-      description: "Configuration option",
-    },
-    explorer_home_this_pc: {
-      name: "Explorer Home This Pc",
-      description: "Configuration option",
+      name: "Nascondi i contenuti promozionali in Impostazioni",
+      description:
+        "Imposta a 0 il valore per utente SubscribedContent-338393Enabled. Non modifica le altre superfici di suggerimenti di Windows.",
     },
     quick_access_no_cloud: {
-      name: "Quick Access No Cloud",
-      description: "Configuration option",
+      name: "Nascondi i file cloud in Accesso rapido",
+      description:
+        "Imposta ShowCloudFilesInQuickAccess a 0. Gli elementi Recenti e Frequenti usano impostazioni separate e non vengono modificati.",
     },
     hide_gallery_explorer: {
-      name: "Hide Gallery Explorer",
-      description: "Configuration option",
+      name: "Nascondi Galleria in Esplora file",
+      description:
+        "Imposta a 1 il valore per utente HideGallery. Nasconde la voce Galleria nel riquadro di navigazione; non elimina né sposta le foto.",
     },
     snap_assist_off: {
-      name: "Snap Assist Off",
-      description: "Configuration option",
+      name: "Limita i suggerimenti di Snap Assist",
+      description:
+        "Disattiva l’impostazione dei suggerimenti di Snap Assist. Non modifica l’impostazione separata del riquadro Snap Layouts, quindi alcuni suggerimenti relativi allo snap potrebbero rimanere.",
     },
     alt_tab_no_browser_tabs: {
-      name: "Alt Tab No Browser Tabs",
-      description: "Configuration option",
+      name: "Mostra le finestre, non le schede Edge, in Alt+Tab",
+      description:
+        "Impedisce alle schede di Microsoft Edge di apparire come voci separate in Alt+Tab. Le schede restano aperte; cambia solo il selettore finestre.",
     },
     taskbar_button_combining: {
-      name: "Taskbar Button Combining",
-      description: "Configuration option",
+      name: "Raggruppa i pulsanti della barra delle applicazioni",
+      description:
+        "Imposta TaskbarGlomLevel a 0, raggruppando le finestre della stessa app sotto un solo pulsante. Le singole finestre possono essere meno visibili.",
     },
     no_toasts_fullscreen_video: {
-      name: "No Toasts Fullscreen Video",
-      description: "Configuration option",
+      name: "Disattiva le notifiche popup",
+      description:
+        "Imposta NOC_GLOBAL_SETTING_TOASTS_ENABLED a 0. Le notifiche popup potrebbero essere disattivate anche fuori dai video a schermo intero.",
     },
     no_window_snap_drag: {
-      name: "No Window Snap Drag",
-      description: "Configuration option",
-    },
-    menu_show_delay_minimal: {
-      name: "Menu Show Delay Minimal",
-      description: "Configuration option",
-    },
-    keyboard_delay_zero: {
-      name: "Keyboard Delay Zero",
-      description: "Configuration option",
-    },
-    keyboard_speed_fast: {
-      name: "Keyboard Speed Fast",
-      description: "Configuration option",
+      name: "Disattiva l’aggancio quando si trascinano le finestre",
+      description:
+        "Imposta WindowArrangementActive a 0 per disattivare gli agganci avviati trascinando una finestra. Altre scorciatoie per gestire le finestre possono restare attive.",
     },
     ui_classic_context_menu: {
-      name: "Ui Classic Context Menu",
-      description: "Configuration option",
+      name: "Mostra il menu classico del clic destro",
+      description:
+        "Crea un override di Esplora file per utente per usare il menu contestuale classico al posto di quello compatto di Windows 11. Potrebbe essere necessario riavviare Esplora file o disconnettersi.",
     },
   },
   cleanup: {

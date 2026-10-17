@@ -48,13 +48,35 @@ const files = [
   ...(fs.existsSync(new URL(`../${releaseNotes}`, import.meta.url)) ? [releaseNotes] : []),
 ];
 
+// Store listings keep releaseNotes as a versioned changelog. A historical
+// release can truthfully name the catalog size at that time; scan its live
+// description/features, and scan releaseNotes only when they identify the
+// package version currently being prepared.
+function publicStoreCopy(file) {
+  const listing = JSON.parse(read(file));
+  const currentNotes =
+    typeof listing.releaseNotes === "string" &&
+    listing.releaseNotes.startsWith(`WinCraft ${version}`)
+      ? [listing.releaseNotes]
+      : [];
+  return [
+    listing.shortDescription,
+    listing.description,
+    ...(listing.features ?? []),
+    ...(listing.screenshots ?? []).map((s) => s.caption),
+    ...currentNotes,
+  ]
+    .filter((part) => typeof part === "string")
+    .join("\n");
+}
+
 // A number right before a catalog noun, in the six languages the texts use.
 const NOUN = String.raw`(?:Windows[ -])?(?:Free |Pro )?(?:controls?|tweaks?|settings|controlli|impostazioni|réglages|contrôles|ajustes|controles|controlos|Einstellungen)`;
 const claim = new RegExp(String.raw`\b(\d{2,3})\s+${NOUN}`, "gi");
 const NEW = /^\s*(new|nuovi|nouveaux|nuevos|neue|novos)\b/i;
 const problems = [];
 for (const file of files) {
-  const text = read(file);
+  const text = file.startsWith("scripts/store/listing/") ? publicStoreCopy(file) : read(file);
   for (const m of text.matchAll(claim)) {
     const n = Number(m[1]);
     if (n === total) continue;

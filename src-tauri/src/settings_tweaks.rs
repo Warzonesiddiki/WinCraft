@@ -218,7 +218,7 @@ pub static TWEAKS: [SettingsTweak; 14] = [
     SettingsTweak {
         id: "explorer_open_this_pc",
         name: "Open File Explorer to This PC",
-        description: "File Explorer opens on This PC, with your drives and folders, instead of Home and its recent files.",
+        description: "File Explorer opens on This PC, with your drives and folders, instead of opening on Home. This changes the starting page only; the Home entry remains in the navigation pane.",
         category: Category::Ui,
         hive: Hive::Hkcu,
         writes: &[Write { path: ADVANCED, name: "LaunchTo", value: RegValue::Dword(1) }],

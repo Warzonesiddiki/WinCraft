@@ -1195,6 +1195,8 @@ export const pt: Strings = {
     enterpriseEdition: "Enterprise ou Education",
     unavailableEnterpriseEdition: "Indisponível neste PC: requer Windows Enterprise ou Education.",
     notPresent: "Este PC não tem esta funcionalidade, por isso não há nada para desativar.",
+    retired:
+      "Retirado: este controlo antigo já não pode ser aplicado. O estado guardado anteriormente ainda pode ser restaurado.",
     windowsProtected:
       "Neste PC, o Windows protege esta opção e recusa alterações de outras aplicações. Desative os Widgets em Definições > Personalização > Barra de tarefas.",
   },
@@ -1217,16 +1219,19 @@ export const pt: Strings = {
     high: "Alta",
   },
   skinpacks: {
-    title: "Skinpacks",
-    description: "Skinpacks management",
-    packName: "Pack name",
-    packBody: "Pack body",
-    scope: "Scope",
-    apply: "Apply",
-    restore: "Restore",
-    active: "Active",
-    applying: "Applying",
-    valuesSummary: "Values summary", // uses {count}
+    title: "Aspeto do Windows",
+    description: "Aplica um aspeto reversível à shell do Windows deste utilizador.",
+    packName: "Aspeto escuro inspirado no COSMIC",
+    packBody:
+      "Ativa o modo escuro, aplica um destaque turquesa, reduz a transparência, aplana os rebordos das janelas e alinha a barra de tarefas à esquerda. Os nove valores do Registo são guardados antes de serem alterados.",
+    scope:
+      "Só altera o aspeto da shell do Windows. Não instala o COSMIC nem substitui o ambiente de trabalho do Windows.",
+    apply: "Aplicar aspeto",
+    restore: "Restaurar aspeto anterior",
+    active: "Aspeto ativo",
+    applying: "A aplicar…",
+    valuesSummary:
+      "Este aspeto utiliza {count} valores do Registo; ao aplicá-lo, os valores originais são guardados para permitir o restauro.", // uses {count}
   },
   tweaks: {
     disable_click_to_do: {
@@ -1272,7 +1277,7 @@ export const pt: Strings = {
     explorer_open_this_pc: {
       name: "Abrir o Explorador de Ficheiros em Este PC",
       description:
-        "O Explorador de Ficheiros abre em Este PC, com as suas unidades e pastas, em vez do Início e dos ficheiros recentes.",
+        "Configura o Explorador de Ficheiros para abrir em Este PC, com as unidades e pastas, em vez de abrir em Início. Só altera a página inicial; a entrada Início continua disponível no painel de navegação.",
     },
     block_oem_device_apps: {
       name: "Impedir que aplicações dos fabricantes se instalem sozinhas",
@@ -1443,6 +1448,16 @@ export const pt: Strings = {
       name: "Política antiga do Copilot (apenas restauro)",
       description:
         "Esta política descontinuada não controla a aplicação Copilot atual. Aqui pode restaurar o valor do registo guardado. A aplicação Copilot separada gere-se no Debloat; a remoção não impede reinstalações futuras.",
+    },
+    keyboard_delay_zero: {
+      name: "Valor KeyboardDelay antigo (apenas restauro)",
+      description:
+        "As versões anteriores escreviam KeyboardDelay na chave de definições do rato, e não na do teclado. Esta entrada serve apenas para restaurar essa cópia de segurança; para a repetição do teclado, utilize «Reduzir o atraso de entrada (teclado)».",
+    },
+    keyboard_speed_fast: {
+      name: "Valor KeyboardSpeed antigo (apenas restauro)",
+      description:
+        "As versões anteriores escreviam KeyboardSpeed na chave de definições do rato, e não na do teclado. Esta entrada serve apenas para restaurar essa cópia de segurança; para a repetição do teclado, utilize «Reduzir o atraso de entrada (teclado)».",
     },
     disable_suggested_apps: {
       name: "Impedir o Windows de instalar aplicações sozinho",
@@ -1980,64 +1995,49 @@ export const pt: Strings = {
         "Para o serviço de geolocalização do Windows (lfsvc) e define-o como Manual, evitando a consulta contínua da localização.",
     },
     ads_in_settings: {
-      name: "Ads In Settings",
-      description: "Configuration option",
-    },
-    no_post_login_upsell: {
-      name: "No Post Login Upsell",
-      description: "Configuration option",
-    },
-    no_welcome_tips: {
-      name: "No Welcome Tips",
-      description: "Configuration option",
-    },
-    explorer_home_this_pc: {
-      name: "Explorer Home This Pc",
-      description: "Configuration option",
+      name: "Ocultar conteúdo promocional nas Definições",
+      description:
+        "Define como 0 o valor por utilizador SubscribedContent-338393Enabled. Não altera as outras áreas de sugestões do Windows.",
     },
     quick_access_no_cloud: {
-      name: "Quick Access No Cloud",
-      description: "Configuration option",
+      name: "Ocultar ficheiros da nuvem no Acesso rápido",
+      description:
+        "Define ShowCloudFilesInQuickAccess como 0. Os itens Recentes e Frequentes usam definições separadas e não são alterados.",
     },
     hide_gallery_explorer: {
-      name: "Hide Gallery Explorer",
-      description: "Configuration option",
+      name: "Ocultar Galeria no Explorador de Ficheiros",
+      description:
+        "Define como 1 o valor por utilizador HideGallery. Oculta a entrada Galeria no painel de navegação; não elimina nem move fotografias.",
     },
     snap_assist_off: {
-      name: "Snap Assist Off",
-      description: "Configuration option",
+      name: "Limitar sugestões do Snap Assist",
+      description:
+        "Desativa a definição de sugestões do Snap Assist. Não altera a definição separada do painel Snap Layouts, pelo que algumas sugestões de encaixe podem continuar a aparecer.",
     },
     alt_tab_no_browser_tabs: {
-      name: "Alt Tab No Browser Tabs",
-      description: "Configuration option",
+      name: "Mostrar janelas, não separadores do Edge, no Alt+Tab",
+      description:
+        "Impede que os separadores do Microsoft Edge apareçam como entradas separadas no Alt+Tab. Os separadores continuam abertos; só muda o seletor de janelas.",
     },
     taskbar_button_combining: {
-      name: "Taskbar Button Combining",
-      description: "Configuration option",
+      name: "Agrupar botões da barra de tarefas",
+      description:
+        "Define TaskbarGlomLevel como 0 e agrupa as janelas da mesma aplicação num único botão. As janelas individuais poderão ficar menos visíveis.",
     },
     no_toasts_fullscreen_video: {
-      name: "No Toasts Fullscreen Video",
-      description: "Configuration option",
+      name: "Desativar notificações pop-up",
+      description:
+        "Define NOC_GLOBAL_SETTING_TOASTS_ENABLED como 0. As notificações poderão também ser ocultadas fora da reprodução em ecrã inteiro.",
     },
     no_window_snap_drag: {
-      name: "No Window Snap Drag",
-      description: "Configuration option",
-    },
-    menu_show_delay_minimal: {
-      name: "Menu Show Delay Minimal",
-      description: "Configuration option",
-    },
-    keyboard_delay_zero: {
-      name: "Keyboard Delay Zero",
-      description: "Configuration option",
-    },
-    keyboard_speed_fast: {
-      name: "Keyboard Speed Fast",
-      description: "Configuration option",
+      name: "Desativar o encaixe ao arrastar janelas",
+      description:
+        "Define WindowArrangementActive como 0 para desativar os esquemas de encaixe acionados ao arrastar uma janela. Outros atalhos de gestão de janelas poderão continuar a funcionar.",
     },
     ui_classic_context_menu: {
-      name: "Ui Classic Context Menu",
-      description: "Configuration option",
+      name: "Mostrar o menu clássico do botão direito",
+      description:
+        "Cria uma substituição do Explorador por utilizador para mostrar o menu de contexto clássico em vez do menu compacto do Windows 11. Poderá ser necessário reiniciar o Explorador ou terminar sessão.",
     },
   },
   cleanup: {

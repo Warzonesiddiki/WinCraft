@@ -1196,6 +1196,8 @@ export const fr: Strings = {
     unavailableEnterpriseEdition:
       "Indisponible sur ce PC : nécessite Windows Entreprise ou Éducation.",
     notPresent: "Ce PC ne dispose pas de cette fonction, il n'y a donc rien à désactiver.",
+    retired:
+      "Retiré : cet ancien réglage ne peut plus être appliqué. Son état précédemment enregistré peut toujours être restauré.",
     windowsProtected:
       "Sur ce PC, Windows protège ce réglage et refuse les modifications venant d'autres applications. Désactivez Widgets dans Paramètres > Personnalisation > Barre des tâches.",
   },
@@ -1218,16 +1220,19 @@ export const fr: Strings = {
     high: "Haute",
   },
   skinpacks: {
-    title: "Skinpacks",
-    description: "Skinpacks management",
-    packName: "Pack name",
-    packBody: "Pack body",
-    scope: "Scope",
-    apply: "Apply",
-    restore: "Restore",
-    active: "Active",
-    applying: "Applying",
-    valuesSummary: "Values summary", // uses {count}
+    title: "Apparence de Windows",
+    description: "Applique une apparence réversible à la session Windows de cet utilisateur.",
+    packName: "Apparence sombre inspirée de COSMIC",
+    packBody:
+      "Active le mode sombre, applique une touche turquoise, réduit la transparence, aplatit les bordures des fenêtres et aligne la barre des tâches à gauche. Les neuf valeurs du Registre sont enregistrées avant toute modification.",
+    scope:
+      "Seule l’apparence de l’interface Windows change. COSMIC n’est pas installé et l’environnement de bureau Windows n’est pas remplacé.",
+    apply: "Appliquer l’apparence",
+    restore: "Restaurer l’apparence précédente",
+    active: "Apparence active",
+    applying: "Application…",
+    valuesSummary:
+      "Cette apparence utilise {count} valeurs du Registre ; leur état d’origine est sauvegardé lors de l’application pour permettre la restauration.", // uses {count}
   },
   tweaks: {
     disable_click_to_do: {
@@ -1273,7 +1278,7 @@ export const fr: Strings = {
     explorer_open_this_pc: {
       name: "Ouvrir l'Explorateur de fichiers sur Ce PC",
       description:
-        "L'Explorateur de fichiers s'ouvre sur Ce PC, avec vos lecteurs et dossiers, au lieu de l'Accueil et de ses fichiers récents.",
+        "Configure l’ouverture de l’Explorateur de fichiers sur Ce PC, avec les lecteurs et dossiers, plutôt que sur Accueil. Seule la page de démarrage change ; l’entrée Accueil reste dans le volet de navigation.",
     },
     block_oem_device_apps: {
       name: "Empêcher les applications des fabricants de s'installer seules",
@@ -1444,6 +1449,16 @@ export const fr: Strings = {
       name: "Ancienne stratégie Copilot (restauration uniquement)",
       description:
         "Cette stratégie abandonnée ne contrôle pas l’application Copilot actuelle. Vous pouvez restaurer ici la valeur du registre sauvegardée. Gérez l’application Copilot distincte dans Debloat ; sa suppression n’empêche pas une réinstallation future.",
+    },
+    keyboard_delay_zero: {
+      name: "Ancienne valeur KeyboardDelay (restauration uniquement)",
+      description:
+        "Les versions précédentes écrivaient KeyboardDelay dans la clé des paramètres de la souris, et non dans celle du clavier. Cette entrée sert uniquement à restaurer l'ancienne sauvegarde ; pour la répétition du clavier, utilisez « Réduire le délai d'entrée (clavier) ».",
+    },
+    keyboard_speed_fast: {
+      name: "Ancienne valeur KeyboardSpeed (restauration uniquement)",
+      description:
+        "Les versions précédentes écrivaient KeyboardSpeed dans la clé des paramètres de la souris, et non dans celle du clavier. Cette entrée sert uniquement à restaurer l'ancienne sauvegarde ; pour la répétition du clavier, utilisez « Réduire le délai d'entrée (clavier) ».",
     },
     disable_suggested_apps: {
       name: "Empêcher Windows d'installer des applications tout seul",
@@ -1982,64 +1997,49 @@ export const fr: Strings = {
         "Arrête le service de géolocalisation Windows (lfsvc) et le configure sur Manuel, évitant la recherche constante de localisation.",
     },
     ads_in_settings: {
-      name: "Ads In Settings",
-      description: "Configuration option",
-    },
-    no_post_login_upsell: {
-      name: "No Post Login Upsell",
-      description: "Configuration option",
-    },
-    no_welcome_tips: {
-      name: "No Welcome Tips",
-      description: "Configuration option",
-    },
-    explorer_home_this_pc: {
-      name: "Explorer Home This Pc",
-      description: "Configuration option",
+      name: "Masquer les contenus promotionnels dans Paramètres",
+      description:
+        "Définit à 0 la valeur utilisateur SubscribedContent-338393Enabled. Les autres surfaces de suggestions Windows ne sont pas modifiées.",
     },
     quick_access_no_cloud: {
-      name: "Quick Access No Cloud",
-      description: "Configuration option",
+      name: "Masquer les fichiers cloud dans Accès rapide",
+      description:
+        "Définit ShowCloudFilesInQuickAccess à 0. Les éléments Récents et Fréquents ont des paramètres distincts et ne sont pas modifiés.",
     },
     hide_gallery_explorer: {
-      name: "Hide Gallery Explorer",
-      description: "Configuration option",
+      name: "Masquer Galerie dans l’Explorateur de fichiers",
+      description:
+        "Définit la valeur utilisateur HideGallery à 1. Masque l’entrée Galerie du volet de navigation ; les photos ne sont ni supprimées ni déplacées.",
     },
     snap_assist_off: {
-      name: "Snap Assist Off",
-      description: "Configuration option",
+      name: "Limiter les suggestions Snap Assist",
+      description:
+        "Désactive le réglage des suggestions Snap Assist. Il ne modifie pas le réglage distinct du volet Snap Layouts ; certaines suggestions liées à l’ancrage peuvent donc rester visibles.",
     },
     alt_tab_no_browser_tabs: {
-      name: "Alt Tab No Browser Tabs",
-      description: "Configuration option",
+      name: "Afficher les fenêtres, pas les onglets Edge, avec Alt+Tab",
+      description:
+        "Empêche les onglets Microsoft Edge d’apparaître comme entrées Alt+Tab distinctes. Les onglets restent ouverts ; seul le sélecteur de fenêtres change.",
     },
     taskbar_button_combining: {
-      name: "Taskbar Button Combining",
-      description: "Configuration option",
+      name: "Regrouper les boutons de la barre des tâches",
+      description:
+        "Définit TaskbarGlomLevel à 0 et regroupe les fenêtres d’une même application sous un seul bouton. Les fenêtres individuelles sont moins visibles.",
     },
     no_toasts_fullscreen_video: {
-      name: "No Toasts Fullscreen Video",
-      description: "Configuration option",
+      name: "Désactiver les bannières de notification",
+      description:
+        "Définit NOC_GLOBAL_SETTING_TOASTS_ENABLED à 0. Les notifications peuvent aussi être masquées hors lecture vidéo en plein écran.",
     },
     no_window_snap_drag: {
-      name: "No Window Snap Drag",
-      description: "Configuration option",
-    },
-    menu_show_delay_minimal: {
-      name: "Menu Show Delay Minimal",
-      description: "Configuration option",
-    },
-    keyboard_delay_zero: {
-      name: "Keyboard Delay Zero",
-      description: "Configuration option",
-    },
-    keyboard_speed_fast: {
-      name: "Keyboard Speed Fast",
-      description: "Configuration option",
+      name: "Désactiver l’ancrage lors du déplacement des fenêtres",
+      description:
+        "Définit WindowArrangementActive à 0 pour désactiver l’ancrage déclenché en faisant glisser une fenêtre. D’autres raccourcis de gestion des fenêtres peuvent rester actifs.",
     },
     ui_classic_context_menu: {
-      name: "Ui Classic Context Menu",
-      description: "Configuration option",
+      name: "Afficher le menu contextuel classique",
+      description:
+        "Crée un remplacement Explorer réservé à l’utilisateur pour afficher le menu contextuel classique plutôt que celui, compact, de Windows 11. Il peut être nécessaire de redémarrer Explorer ou de fermer la session.",
     },
   },
   cleanup: {

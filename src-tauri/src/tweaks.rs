@@ -1073,8 +1073,8 @@ pub fn all_tweaks() -> Vec<RegistryTweak> {
         // === Part B: Registry controls for browser-only users (from BROWSER-ONLY-PACK.md) ===
         RegistryTweak {
             id: "ads_in_settings",
-            name: "Ads in Settings stopped",
-            description: "Stops Microsoft service advertising in Settings. SubscribedContent-338393Enabled=0, SubscribedContent-353694/353696Enabled=0",
+            name: "Hide promotional content in Settings",
+            description: "Turns off the Settings promotional-content value SubscribedContent-338393Enabled. Other Windows suggestion surfaces are not changed by this control.",
             category: Category::Privacy,
             hive: Hive::Hkcu,
             key_path: r"SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager",
@@ -1089,8 +1089,8 @@ pub fn all_tweaks() -> Vec<RegistryTweak> {
         },
         RegistryTweak {
             id: "quick_access_no_cloud",
-            name: "Quick Access: no cloud files",
-            description: "Hides cloud and Office entries from Quick Access in File Explorer",
+            name: "Hide cloud files in Quick Access",
+            description: "Sets ShowCloudFilesInQuickAccess to 0. Recent and Frequent items are separate settings and remain unchanged.",
             category: Category::Ui,
             hive: Hive::Hkcu,
             key_path: r"Software\Microsoft\Windows\CurrentVersion\Explorer",
@@ -1105,8 +1105,8 @@ pub fn all_tweaks() -> Vec<RegistryTweak> {
         },
         RegistryTweak {
             id: "hide_gallery_explorer",
-            name: "Hide Gallery in Explorer",
-            description: "Hides the Windows 11 Gallery node from Explorer",
+            name: "Hide Gallery in File Explorer",
+            description: "Sets the per-user HideGallery value to 1. Hides the Gallery navigation entry; it does not delete or move photos.",
             category: Category::Ui,
             hive: Hive::Hkcu,
             key_path: r"Software\Microsoft\Windows\CurrentVersion\Explorer",
@@ -1121,8 +1121,8 @@ pub fn all_tweaks() -> Vec<RegistryTweak> {
         },
         RegistryTweak {
             id: "snap_assist_off",
-            name: "Snap Assist suggestions off",
-            description: "Disables Snap Assist flyout panels when snapping windows side-by-side",
+            name: "Limit Snap Assist suggestions",
+            description: "Turns off the Snap Assist suggestions setting. It does not change the separate Snap Layouts flyout setting, so some snap-related prompts may remain.",
             category: Category::Ui,
             hive: Hive::Hkcu,
             key_path: r"Software\Microsoft\Windows\CurrentVersion\Explorer",
@@ -1137,8 +1137,8 @@ pub fn all_tweaks() -> Vec<RegistryTweak> {
         },
         RegistryTweak {
             id: "alt_tab_no_browser_tabs",
-            name: "Alt+Tab: windows only (not browser tabs)",
-            description: "Prevents Alt+Tab from restoring browser tabs as separate entries, reducing re-renders",
+            name: "Show windows, not Edge tabs, in Alt+Tab",
+            description: "Keeps Microsoft Edge tabs from appearing as separate Alt+Tab entries. The tabs remain open; this changes only the Windows task switcher.",
             category: Category::Ui,
             hive: Hive::Hkcu,
             key_path: r"Software\Microsoft\Windows\CurrentVersion\Explorer",
@@ -1153,8 +1153,8 @@ pub fn all_tweaks() -> Vec<RegistryTweak> {
         },
         RegistryTweak {
             id: "taskbar_button_combining",
-            name: "Taskbar button combining",
-            description: "Combines taskbar buttons to save room for browser windows",
+            name: "Combine taskbar buttons",
+            description: "Groups windows from the same app under one taskbar button. Individual windows may be less visible.",
             category: Category::Ui,
             hive: Hive::Hkcu,
             key_path: r"Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced",
@@ -1169,8 +1169,8 @@ pub fn all_tweaks() -> Vec<RegistryTweak> {
         },
         RegistryTweak {
             id: "no_toasts_fullscreen_video",
-            name: "No notification toasts during fullscreen video",
-            description: "Prevents Windows from showing notification toasts over fullscreen video playback",
+            name: "Turn off notification toasts",
+            description: "Turns off Windows notification toasts with NOC_GLOBAL_SETTING_TOASTS_ENABLED. Toasts may be suppressed outside full-screen video too.",
             category: Category::Ui,
             hive: Hive::Hkcu,
             key_path: r"Software\Microsoft\Windows\CurrentVersion\CloudPolicy\Toasts",
@@ -1185,8 +1185,8 @@ pub fn all_tweaks() -> Vec<RegistryTweak> {
         },
         RegistryTweak {
             id: "no_window_snap_drag",
-            name: "No window snap on drag",
-            description: "Prevents accidental window snap while dragging a browser window",
+            name: "Turn off snap while dragging windows",
+            description: "Sets WindowArrangementActive to 0 to disable snap arrangements triggered by dragging a window. Other window-management shortcuts may still work.",
             category: Category::Ui,
             hive: Hive::Hkcu,
             key_path: r"Software\Microsoft\Windows\CurrentVersion\Explorer",
@@ -1199,10 +1199,14 @@ pub fn all_tweaks() -> Vec<RegistryTweak> {
             risk: None,
             group: Some("explorer"),
         },
+        // Retired: older builds wrote these values to the wrong Mouse key.
+        // Keep the definitions so their snapshots can be restored; the
+        // current keyboard-repeat control lives in Gaming, and
+        // `require_active_policy` prevents new applications.
         RegistryTweak {
             id: "keyboard_delay_zero",
-            name: "Keyboard delay set to zero",
-            description: "Sets Windows KeyboardDelay registry value to 0 for snappier typing",
+            name: "Legacy KeyboardDelay value (restore only)",
+            description: "Restore-only legacy entry. Older builds wrote KeyboardDelay under Control Panel\\Mouse, not Control Panel\\Keyboard. Use the combined keyboard repeat control in Gaming for new changes.",
             category: Category::Ui,
             hive: Hive::Hkcu,
             key_path: r"Control Panel\Mouse",
@@ -1217,8 +1221,8 @@ pub fn all_tweaks() -> Vec<RegistryTweak> {
         },
         RegistryTweak {
             id: "keyboard_speed_fast",
-            name: "Keyboard speed set to fast",
-            description: "Sets Windows KeyboardSpeed registry value to 31 for faster keyboard repetition",
+            name: "Legacy KeyboardSpeed value (restore only)",
+            description: "Restore-only legacy entry. Older builds wrote KeyboardSpeed under Control Panel\\Mouse, not Control Panel\\Keyboard. Use the combined keyboard repeat control in Gaming for new changes.",
             category: Category::Ui,
             hive: Hive::Hkcu,
             key_path: r"Control Panel\Mouse",
@@ -1233,8 +1237,8 @@ pub fn all_tweaks() -> Vec<RegistryTweak> {
         },
         RegistryTweak {
             id: "ui_classic_context_menu",
-            name: "Classic right-click context menu",
-            description: "Shows classic Win32 context menu instead of modern Windows 11 menu",
+            name: "Show the classic right-click menu",
+            description: "Creates a per-user Explorer override for the classic context menu instead of the compact Windows 11 menu. Restart Explorer or sign out may be needed.",
             category: Category::Ui,
             hive: Hive::Hkcu,
             key_path: r"Software\Classes\CLSID\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\InprocServer32",
@@ -2022,19 +2026,41 @@ pub fn find_tweak(id: &str) -> Option<RegistryTweak> {
     all_tweaks().into_iter().find(|t| t.id == id)
 }
 
-// Retain the ID for old snapshots and profile imports, but never report a
-// successful application of a policy that cannot control the current app.
+/// IDs retained for rollback snapshots. They are excluded from active
+/// catalogues, profiles, Scan and new applications, but listed when an
+/// existing snapshot needs a restore control.
+pub const RETIRED_TWEAK_IDS: [&str; 3] = [
+    "disable_copilot",
+    "keyboard_delay_zero",
+    "keyboard_speed_fast",
+];
+
+pub fn is_retired_tweak(id: &str) -> bool {
+    RETIRED_TWEAK_IDS.contains(&id)
+}
+
+// Retired definitions remain available to restore old snapshots, but no
+// current apply path may create a new one.
 fn require_active_policy(id: &str) -> Result<(), String> {
-    if id == "disable_copilot" {
-        return Err("The legacy Copilot policy is retired. Manage the current Copilot app in Debloat; existing policy snapshots can still be restored.".into());
+    match id {
+        "disable_copilot" => Err(
+            "The legacy Copilot policy is retired. Manage the current Copilot app in Debloat; existing policy snapshots can still be restored."
+                .into(),
+        ),
+        "keyboard_delay_zero" | "keyboard_speed_fast" => Err(
+            "The legacy keyboard values are retired. Use reduce_keyboard_delay for keyboard repeat; existing snapshots can still be restored."
+                .into(),
+        ),
+        _ => Ok(()),
     }
-    Ok(())
 }
 
 #[test]
-fn legacy_copilot_is_restore_only() {
-    assert!(require_active_policy("disable_copilot").is_err());
-    assert!(find_tweak("disable_copilot").is_some());
+fn retired_tweaks_are_restore_only() {
+    for id in RETIRED_TWEAK_IDS {
+        assert!(require_active_policy(id).is_err(), "{id} must not be applied again");
+        assert!(find_tweak(id).is_some(), "{id} must remain available for rollback");
+    }
     assert!(require_active_policy("disable_suggested_apps").is_ok());
 }
 
@@ -2390,5 +2416,31 @@ pub mod windows_impl {
             }
             res
         }
+    }
+}
+
+#[cfg(test)]
+mod catalogue_tests {
+    use super::{all_tweaks, find_tweak, is_retired_tweak, require_active_policy};
+
+    #[test]
+    fn keyboard_repeat_settings_have_one_current_composite_owner() {
+        assert_eq!(crate::gaming::KEYBOARD_PATH, r"Control Panel\Keyboard");
+        assert_eq!(
+            crate::gaming::KEYBOARD_TARGET,
+            [("KeyboardDelay", "0"), ("KeyboardSpeed", "31")]
+        );
+        for legacy in ["keyboard_delay_zero", "keyboard_speed_fast"] {
+            assert!(is_retired_tweak(legacy));
+            assert!(require_active_policy(legacy).is_err());
+            let old = find_tweak(legacy).expect("old snapshots still need a rollback handler");
+            assert_eq!(old.key_path, r"Control Panel\Mouse");
+        }
+        let legacy_keyboard_values: Vec<_> = all_tweaks()
+            .into_iter()
+            .filter(|t| matches!(t.value_name, "KeyboardDelay" | "KeyboardSpeed"))
+            .collect();
+        assert_eq!(legacy_keyboard_values.len(), 2);
+        assert!(legacy_keyboard_values.iter().all(|t| is_retired_tweak(t.id)));
     }
 }

@@ -1058,6 +1058,8 @@ export interface Strings {
     enterpriseEdition: string;
     unavailableEnterpriseEdition: string;
     notPresent: string;
+    /** Retired controls cannot be applied, but an existing snapshot can be restored. */
+    retired: string;
     /** Windows refuses other apps' changes to this switch (User Choice Protection). */
     windowsProtected: string;
   };

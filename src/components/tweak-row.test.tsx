@@ -124,6 +124,7 @@ describe("TweakRow", () => {
       ["windows_edition", s.requirements.unavailableEdition],
       ["windows_edition_enterprise", s.requirements.unavailableEnterpriseEdition],
       ["windows_protected", s.requirements.windowsProtected],
+      ["retired", s.requirements.retired],
       ["not_present", s.requirements.notPresent],
     ];
     for (const [unavailable, text] of reasons) {
@@ -142,7 +143,7 @@ describe("TweakRow", () => {
   });
 
   it("leaves an applied control switchable, whatever the PC reports", () => {
-    renderRow({ unavailable: "not_present", applied: true });
+    renderRow({ unavailable: "retired", applied: true });
     expect(switchFor("Made up control")).toBeEnabled();
     expect(switchFor("Made up control")).toHaveAttribute("aria-pressed", "true");
   });
