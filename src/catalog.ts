@@ -1,28 +1,20 @@
-// These catalogue entries have their own configuration and recovery controls.
+// These catalogue entries have dedicated configuration and recovery controls.
+// Ordinary registry switches stay in Restore all, Change History and Scan.
 export const CONFIGURABLE_TWEAK_IDS = new Set([
   "ecoqos_rules",
   "limit_do_background_download",
   "monitor_refresh_profile",
-  // Part B: Registry controls for browser-only users (HKCU only; each reversible)
-  "ads_in_settings",
-  "no_post_login_upsell",
-  "no_welcome_tips",
-  "explorer_home_this_pc",
-  "quick_access_no_cloud",
-  "hide_gallery_explorer",
-  "snap_assist_off",
-  "alt_tab_no_browser_tabs",
-  "taskbar_button_combining",
-  "no_toasts_fullscreen_video",
-  "no_window_snap_drag",
-  "menu_show_delay_minimal",
-  "keyboard_delay_zero",
-  "keyboard_speed_fast",
-  "ui_classic_context_menu",
 ]);
 
-// Kept in the list only so existing snapshots can still be restored.
-export const isCurrentCatalogTweak = (id: string) => id !== "disable_copilot";
+// Mirror the native retired-ID policy. The Rust list returns these only when
+// a rollback snapshot exists; they are not part of active or public counts.
+export const RETIRED_TWEAK_IDS = new Set([
+  "disable_copilot",
+  "keyboard_delay_zero",
+  "keyboard_speed_fast",
+]);
+
+export const isCurrentCatalogTweak = (id: string) => !RETIRED_TWEAK_IDS.has(id);
 
 // Applied only from their own switch, never in a batch, a profile or an
 // update re-apply. Mirrors MANUAL_ONLY_TWEAKS in src-tauri/src/lib.rs, which

@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   CONFIGURABLE_TWEAK_IDS,
   MANUAL_ONLY_TWEAK_IDS,
+  RETIRED_TWEAK_IDS,
   buildName,
   isCurrentCatalogTweak,
 } from "./catalog";
@@ -18,14 +19,14 @@ describe("buildName", () => {
 });
 
 describe("isCurrentCatalogTweak", () => {
-  it("keeps the retired entry restorable but out of the catalogue", () => {
+  it("keeps retired entries restorable but out of the current catalogue", () => {
     expect(isCurrentCatalogTweak("disable_game_dvr")).toBe(true);
-    expect(isCurrentCatalogTweak("disable_copilot")).toBe(false);
+    for (const id of RETIRED_TWEAK_IDS) expect(isCurrentCatalogTweak(id)).toBe(false);
   });
 });
 
 describe("the ids the app special-cases", () => {
-  const special = [...CONFIGURABLE_TWEAK_IDS, ...MANUAL_ONLY_TWEAK_IDS];
+  const special = [...CONFIGURABLE_TWEAK_IDS, ...MANUAL_ONLY_TWEAK_IDS, ...RETIRED_TWEAK_IDS];
 
   it("each have a translated name in every locale", () => {
     // A renamed or added id with no translation would show the English the

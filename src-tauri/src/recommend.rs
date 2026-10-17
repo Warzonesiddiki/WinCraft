@@ -481,6 +481,17 @@ mod scan_scope_tests {
         }
     }
 
+    #[test]
+    fn retired_controls_never_enter_scan_recommendations() {
+        let scan_ids = scan_relevant_ids();
+        for id in crate::tweaks::RETIRED_TWEAK_IDS {
+            assert!(
+                !scan_ids.iter().any(|candidate| candidate.as_str() == id),
+                "retired control {id} must stay out of Scan",
+            );
+        }
+    }
+
     /// Every allowlisted id must actually exist, or the Scan would silently
     /// look for a tweak that was renamed or removed.
     #[test]

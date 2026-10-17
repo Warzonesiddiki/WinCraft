@@ -166,7 +166,9 @@ export function TweakRow({
                     ? s.requirements.unavailableEnterpriseEdition
                     : tweak.unavailable === "windows_protected"
                       ? s.requirements.windowsProtected
-                      : s.requirements.notPresent}
+                      : tweak.unavailable === "retired"
+                        ? s.requirements.retired
+                        : s.requirements.notPresent}
             </p>
           )}
           {open && <TechnicalDetails changes={tweak.changes} s={s} previewId={tweak.id} />}

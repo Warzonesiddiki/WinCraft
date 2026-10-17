@@ -349,7 +349,7 @@ fn tweak_infos(store: &RollbackStore) -> Result<Vec<TweakInfo>, String> {
 
     let mut list: Vec<TweakInfo> = tweaks::all_tweaks()
         .into_iter()
-        .filter(|t| t.id != "disable_copilot" || applied_ids.contains(t.id))
+        .filter(|t| !tweaks::is_retired_tweak(t.id) || applied_ids.contains(t.id))
         .map(|t| {
             let tier = barebone::tier_for_tweak(t.id);
             TweakInfo {
@@ -371,8 +371,13 @@ fn tweak_infos(store: &RollbackStore) -> Result<Vec<TweakInfo>, String> {
                     value_type: reg_value_type(&t.on_value),
                     sets_to: reg_value_display(&t.on_value),
                 }],
-                unavailable: (t.id == TASKBAR_WIDGETS_ID && services::user_choice_protected())
-                    .then_some("windows_protected"),
+                unavailable: if tweaks::is_retired_tweak(t.id) {
+                    Some("retired")
+                } else if t.id == TASKBAR_WIDGETS_ID && services::user_choice_protected() {
+                    Some("windows_protected")
+                } else {
+                    None
+                },
                 evidence: t.evidence.as_str().to_string(),
                 effect: t.effect.as_str().to_string(),
                 risk: t.risk.map(str::to_string),
@@ -1904,9 +1909,10 @@ pub fn run_scheduled_temp_cleanup_headless() -> ! {
 /// The scheduled half of the update watchdog.
 ///
 /// Runs the same comparison `check_update_drift` does, with no window and no
-/// Tauri app, and exits. If anything the user applied is no longer in effect
-/// it says so with a toast; if nothing moved it says nothing at all, which is
-/// the behaviour that keeps the notification worth reading.
+/// Tauri app, and exits. If an active tweak is no longer in effect it says so
+/// with a toast; retired restore-only entries are omitted. If nothing moved,
+/// it says nothing at all, which is the behaviour that keeps the notification
+/// worth reading.
 ///
 /// Exit code 0 either way. This is a watchdog, not a test: a Windows update
 /// undoing tweaks is the expected case it exists to report, not a failure of
@@ -1931,7 +1937,7 @@ pub fn run_drift_check_headless() -> ! {
 
     let states: Vec<updatewatch::TweakState> = tweaks::all_tweaks()
         .iter()
-        .filter(|t| !MANUAL_ONLY_TWEAKS.contains(&t.id))
+        .filter(|t| !MANUAL_ONLY_TWEAKS.contains(&t.id) && !tweaks::is_retired_tweak(t.id))
         .map(|t| {
             let recorded_applied = applied_ids.contains(t.id);
             let live_matches = if recorded_applied {
@@ -2385,14 +2391,10 @@ fn list_audit_log(app: tauri::AppHandle) -> Result<Vec<audit::AuditEntry>, Strin
     Ok(audit::list_in(&dir, 1000))
 }
 
-/// Crash reports recorded on this machine, newest first.
+/// Whether Windows has undone an active tweak since the last look.
 ///
-/// Read from the same folder both processes write to, so a crash in the
-/// elevated helper shows up here even though that process never had a window.
-/// Whether Windows has undone any applied tweak since the last look.
-///
-/// Reads two independent things — the patch level, and the live value of
-/// every registry tweak the rollback store says is applied — and records the
+/// Reads the patch level and live values for active registry tweaks recorded
+/// in the rollback store; retired restore-only entries are omitted. Records the
 /// patch level for next time. Never changes anything: re-applying is a
 /// button, because a watchdog that silently re-applied would make system
 /// changes at the moment the user least expects them.
@@ -2407,14 +2409,14 @@ fn check_update_drift(app: tauri::AppHandle) -> Result<updatewatch::DriftReport,
         .ok_or_else(|| "could not read the Windows patch level".to_string())?;
     let previous = updatewatch::read_state(&dir).last_seen;
 
-    // Only the registry tweaks: those are the ones whose live state can be
-    // read back and compared without touching anything. The composite tweaks
-    // (power plans, services, network) each answer "am I on" their own way,
-    // and guessing a shared shape for them would report drift that is not
-    // there.
+    // Only active registry tweaks: those are the ones whose live state can be
+    // read back and compared without touching anything. Retired entries are
+    // restore-only, and the composite tweaks (power plans, services, network)
+    // each answer "am I on" their own way; guessing a shared shape would
+    // report drift that is not there.
     let states: Vec<updatewatch::TweakState> = tweaks::all_tweaks()
         .into_iter()
-        .filter(|t| !MANUAL_ONLY_TWEAKS.contains(&t.id))
+        .filter(|t| !MANUAL_ONLY_TWEAKS.contains(&t.id) && !tweaks::is_retired_tweak(t.id))
         .map(|t| {
             let recorded_applied = applied_ids.contains(t.id);
             let live_matches = if recorded_applied {
@@ -2717,12 +2719,12 @@ mod tests {
         assert_eq!(task_xml_text(&utf16), text);
     }
 
-    /// Every id the UI can show, gathered from the same places `list_tweaks`
-    /// gathers them.
+    /// Every active catalogue id, excluding snapshot-only retired entries,
+    /// gathered from the same sources as `list_tweaks`.
     pub(crate) fn all_visible_ids() -> Vec<String> {
         let mut ids: Vec<String> = tweaks::all_tweaks()
             .iter()
-            .filter(|t| t.id != "disable_copilot")
+            .filter(|t| !tweaks::is_retired_tweak(t.id))
             .map(|t| t.id.to_string())
             .collect();
         ids.extend(
@@ -2915,10 +2917,10 @@ mod tests {
     /// there is no path by which a control can come out of this build gated.
     /// This test pins the size of the catalogue so a refactor notices drift.
     #[test]
-    fn the_catalogue_is_eighty_one_tweaks_all_free_in_output() {
+    fn the_catalogue_is_159_active_tweaks_all_free_in_output() {
         let registry: Vec<_> = tweaks::all_tweaks()
             .into_iter()
-            .filter(|t| t.id != "disable_copilot")
+            .filter(|t| !tweaks::is_retired_tweak(t.id))
             .collect();
         let registry_pro = registry.iter().filter(|t| t.requires_pro).count();
 
@@ -2960,12 +2962,12 @@ mod tests {
             + power_tuning::TWEAKS.iter().filter(|t| t.pro).count()
             + settings.iter().filter(|t| t.requires_pro).count();
 
-        assert_eq!(total, 161, "the catalogue no longer has 161 tweaks after v2.1 Part B additions");
+        assert_eq!(total, 159, "the active catalogue count changed after retiring legacy keyboard controls");
         assert_eq!(
             pro, 0,
             "a control is Pro again: nothing in this build is gated"
         );
-        assert_eq!(total - pro, 161, "every control is free after v2.1 Part B additions");
+        assert_eq!(total - pro, 159, "every active control is free after retiring legacy keyboard controls");
 
         // The composite list must stay in step with what list_tweaks builds,
         // otherwise the totals above would quietly stop covering everything.

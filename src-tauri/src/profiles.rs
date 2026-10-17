@@ -76,12 +76,12 @@ impl ProfileStore {
     }
 }
 
-/// Every tweak id this build knows about. The allowlist an import is checked
-/// against.
+/// Every active tweak id this build can apply. Retired IDs are deliberately
+/// excluded from the allowlist for imported profiles.
 fn known_tweak_ids() -> Vec<String> {
     let mut ids: Vec<String> = crate::tweaks::all_tweaks()
         .iter()
-        .filter(|t| t.id != "disable_copilot")
+        .filter(|t| !crate::tweaks::is_retired_tweak(t.id))
         .map(|t| t.id.to_string())
         .collect();
     ids.extend(
@@ -250,6 +250,33 @@ mod tests {
             loaded.unknown.len(),
             3,
             "unknown ids must be reported, not silently kept"
+        );
+    }
+
+    #[test]
+    fn retired_ids_from_an_old_profile_are_reported_not_reapplied() {
+        let legacy = ["keyboard_delay_zero", "keyboard_speed_fast", "disable_copilot"];
+        let hostile = serde_json::json!({
+            "format": PROFILE_FORMAT,
+            "name": "Older WinCraft profile",
+            "created_at": "1700000000",
+            "tweaks": [
+                "priority_separation",
+                "keyboard_delay_zero",
+                "keyboard_speed_fast",
+                "disable_copilot",
+            ],
+        })
+        .to_string();
+
+        let loaded = import_profile(hostile).unwrap();
+        assert_eq!(
+            loaded.profile.tweaks,
+            vec!["priority_separation".to_string()]
+        );
+        assert_eq!(
+            loaded.unknown,
+            legacy.into_iter().map(str::to_string).collect::<Vec<_>>()
         );
     }
 

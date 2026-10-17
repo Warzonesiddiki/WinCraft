@@ -20,7 +20,7 @@ use std::path::PathBuf;
 use std::rc::Rc;
 
 use crate::power_tuning::{self, PowerBackend, PowerTweak};
-use crate::rollback::{RegValue, RollbackStore, SnapshotEntry};
+use crate::rollback::{RegValue, RegistrySnapshot, RollbackStore, SnapshotEntry};
 use crate::tweaks::windows_impl::{hive_str, set_test_backend};
 use crate::tweaks::{self, Hive, RegistryBackend};
 
@@ -354,7 +354,7 @@ fn registry_ids() -> Vec<&'static str> {
     let mut ids: Vec<_> = tweaks::all_tweaks()
         .into_iter()
         .map(|t| t.id)
-        .filter(|id| *id != "disable_copilot")
+        .filter(|id| !tweaks::is_retired_tweak(id))
         .collect();
     ids.extend(REGISTRY_COMPOSITES);
     ids.extend(crate::settings_tweaks::TWEAKS.iter().map(|t| t.id));
@@ -450,6 +450,101 @@ fn discover(id: &str) -> Vec<((Hive, String, String), Stored)> {
     found
 }
 
+/// The Browser Only pack distinguishes researched effects from current writes.
+/// Pin actual ownership across the table, including Ads values handled by the
+/// broader suggestions composite and Start values handled by separate controls.
+#[test]
+fn browser_only_documented_controls_match_their_registry_write_scopes() {
+    let cdm = r"SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager";
+    let explorer = r"Software\Microsoft\Windows\CurrentVersion\Explorer";
+    let advanced = r"SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced";
+    let profile_engagement =
+        r"SOFTWARE\Microsoft\Windows\CurrentVersion\UserProfileEngagement";
+    let suggested_notifications =
+        r"SOFTWARE\Microsoft\Windows\CurrentVersion\Notifications\Settings\Windows.SystemToast.Suggested";
+    let suggestion_writes = [
+        (Hive::Hkcu, cdm, "SubscribedContent-338389Enabled"),
+        (Hive::Hkcu, cdm, "SubscribedContent-310093Enabled"),
+        (Hive::Hkcu, cdm, "SubscribedContent-353694Enabled"),
+        (Hive::Hkcu, cdm, "SubscribedContent-353696Enabled"),
+        (Hive::Hkcu, cdm, "SoftLandingEnabled"),
+        (Hive::Hkcu, profile_engagement, "ScoobeSystemSettingEnabled"),
+        (Hive::Hkcu, suggested_notifications, "Enabled"),
+        (Hive::Hkcu, advanced, "ShowSyncProviderNotifications"),
+        (Hive::Hkcu, advanced, "Start_IrisRecommendations"),
+        (Hive::Hkcu, advanced, "Start_AccountNotifications"),
+    ];
+    let cases: [(&str, &[(Hive, &str, &str)]); 7] = [
+        (
+            "ads_in_settings",
+            &[(Hive::Hkcu, cdm, "SubscribedContent-338393Enabled")],
+        ),
+        (
+            "quick_access_no_cloud",
+            &[(Hive::Hkcu, explorer, "ShowCloudFilesInQuickAccess")],
+        ),
+        (
+            "snap_assist_off",
+            &[(Hive::Hkcu, explorer, "SnapAssist")],
+        ),
+        (
+            "explorer_open_this_pc",
+            &[(Hive::Hkcu, advanced, "LaunchTo")],
+        ),
+        (
+            "disable_start_suggestions",
+            &[(Hive::Hkcu, cdm, "SubscribedContent-338388Enabled")],
+        ),
+        (
+            "disable_app_suggestions_start",
+            &[(Hive::Hkcu, cdm, "SystemPaneSuggestionsEnabled")],
+        ),
+        ("disable_windows_suggestions", &suggestion_writes),
+    ];
+
+    for (id, expected) in cases {
+        let actual: Vec<_> = discover(id)
+            .into_iter()
+            .map(|((hive, path, name), _)| (hive, path, name))
+            .collect();
+        let expected: Vec<_> = expected
+            .iter()
+            .map(|(hive, path, name)| (*hive, (*path).to_string(), (*name).to_string()))
+            .collect();
+        assert_eq!(actual, expected, "{id}: registry write scope changed");
+    }
+
+    for (id, disclosed_scope) in [
+        (
+            "ads_in_settings",
+            "Other Windows suggestion surfaces are not changed by this control.",
+        ),
+        (
+            "quick_access_no_cloud",
+            "Recent and Frequent items are separate settings and remain unchanged.",
+        ),
+        (
+            "snap_assist_off",
+            "separate Snap Layouts flyout setting",
+        ),
+    ] {
+        assert!(
+            tweaks::find_tweak(id)
+                .unwrap_or_else(|| panic!("{id}: missing from the catalogue"))
+                .description
+                .contains(disclosed_scope),
+            "{id}: partial scope disclosure changed"
+        );
+    }
+    assert!(
+        crate::settings_tweaks::find("explorer_open_this_pc")
+            .unwrap()
+            .description
+            .contains("the Home entry remains in the navigation pane"),
+        "opening on This PC must not claim to hide the Home node"
+    );
+}
+
 #[test]
 fn every_registry_tweak_restores_an_absent_original_by_deleting_it() {
     for id in registry_ids() {
@@ -465,6 +560,63 @@ fn every_registry_tweak_restores_an_absent_original_by_deleting_it() {
             registry.dump()
         );
         assert!(!fixture.store.is_applied(id), "{id}: journal not cleared");
+    }
+}
+
+#[test]
+fn retired_keyboard_snapshots_cannot_be_reapplied_but_remain_restorable() {
+    for (id, original) in [
+        ("keyboard_delay_zero", "1"),
+        ("keyboard_speed_fast", "21"),
+    ] {
+        let registry = install();
+        let fixture = Fixture::new();
+        let tweak = tweaks::find_tweak(id).expect("retired metadata must remain for rollback");
+        let original = RegValue::Str(original.to_string());
+        registry.set(
+            tweak.hive,
+            tweak.key_path,
+            tweak.value_name,
+            Stored::Value(original.clone()),
+        );
+        fixture
+            .store
+            .transaction()
+            .unwrap()
+            .save_entry(
+                id,
+                SnapshotEntry::Registry(RegistrySnapshot {
+                    hive: hive_str(&tweak.hive).to_string(),
+                    path: tweak.key_path.to_string(),
+                    name: tweak.value_name.to_string(),
+                    original_value: Some(original.clone()),
+                }),
+            )
+            .unwrap();
+        registry.set(
+            tweak.hive,
+            tweak.key_path,
+            tweak.value_name,
+            Stored::Value(tweak.on_value.clone()),
+        );
+
+        let error = apply_direct(&fixture.store, id).unwrap_err();
+        assert!(error.contains("retired"), "{id}: {error}");
+        assert_eq!(
+            registry.get(tweak.hive, tweak.key_path, tweak.value_name),
+            Some(Stored::Value(tweak.on_value.clone())),
+            "{id}: rejected apply changed the registry",
+        );
+        rollback_direct(&fixture.store, id).unwrap_or_else(|error| panic!("{id}: {error}"));
+        assert_eq!(
+            registry.get(tweak.hive, tweak.key_path, tweak.value_name),
+            Some(Stored::Value(original)),
+            "{id}: legacy snapshot did not restore the original value",
+        );
+        assert!(
+            !fixture.store.is_applied(id),
+            "{id}: restore left its snapshot behind"
+        );
     }
 }
 

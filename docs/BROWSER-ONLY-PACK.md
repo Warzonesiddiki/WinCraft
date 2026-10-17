@@ -15,7 +15,7 @@ Two rules apply throughout, and they are the reason this list is trustworthy:
    codecs, WebView2, Defender, and the certificate/DNS stack stay untouched. A pack that breaks
    YouTube playback or TLS to win a synthetic number is a worse browser machine, not a better one.
 
-Legend for each row: **Ships** = already in WinCraft today · **Add** = not implemented yet.
+Legend: **Ships** = present in the current app/profile · **Restore-only** = an older saved change can be undone, but new applications are blocked · **Add** = not available as described · **Partial** = only some proposed values are written · **In catalog** = a source entry exists, but Windows runtime behavior has not been verified.
 
 ---
 
@@ -72,20 +72,20 @@ search phoning Bing, building suggestion feeds and logging what was typed is pur
 | `disable_sticky_keys_prompt` | The 5×Shift Sticky Keys pop-up cannot steal focus | ✅ |
 | `disable_aero_shake` | Accidental window-minimising shake is off | ✅ |
 
-### A.6 Collection surfaces a browser-only user does not feed (4)
+### A.6 Collection surfaces a browser-only user does not feed (3 active; 1 legacy restore-only)
 
 | ID | Effect | Ships |
 | --- | --- | --- |
 | `disable_typing_insights` | No keystroke/typing-pattern collection | ✅ |
 | `disable_online_speech_privacy` | No cloud speech samples | ✅ |
-| `disable_copilot` | Copilot off for this user | ✅ |
+| `disable_copilot` | Retired policy does not control current Copilot; old snapshots can be restored | Restore-only |
 | `disable_device_history` | No cross-device activity history | ✅ |
 
 ### A.7 Downloads-folder hygiene (1) and taskbar (shown, not preselected) (5)
 
 | ID | Effect | Preselected | Ships |
 | --- | --- | --- | --- |
-| `show_file_extensions` | File extensions visible — you can see what you actually downloaded | ✅ yes | ✅ |
+| `show*file*extensions` | File extensions visible — you can see what you actually downloaded | ✅ yes | ✅ |
 | `hide_taskbar_widgets` | Widgets/feed off the taskbar | ✅ yes | ✅ |
 | `hide_taskbar_search` | Taskbar search box hidden (frees taskbar space and the search host) | opt-in | ✅ |
 | `hide_taskbar_chat` | Chat/Meet Now off the taskbar | opt-in | ✅ |
@@ -95,31 +95,37 @@ search phoning Bing, building suggestion feeds and logging what was typed is pur
 
 **Total: 30 controls, 25 preselected, 5 shown for review.**
 
-(`disable_copilot` used to be in this set and is gone: it is a retired policy — the
-backend refuses to apply it and only restores existing snapshots — so a profile that still
-named it failed on apply. The count is measured from
+(`disable_copilot` is retired and excluded from this set; the backend refuses new applications
+but keeps old snapshots restorable. The same rollback-only rule applies to the historical
+`keyboard_delay_zero` and `keyboard_speed_fast` IDs, which wrote to the wrong registry key.
+The count is measured from
 `src/components/starter-presets.mjs`, not copied by hand.)
 
 ---
 
 ## Part B — Add: registry and UI controls a browser-only user benefits from
 
-| Control | Path / value | Effect | Scope | Add |
+This table is a research target, not a guarantee that each proposed value is already written. Ownership is split across current controls: `ads_in_settings` writes `SubscribedContent-338393Enabled`, while `disable_windows_suggestions` writes the `353694` and `353696` Settings-content values; it also writes the Windows Welcome value `SubscribedContent-310093Enabled`, the finish-setup value `ScoobeSystemSettingEnabled`, and the tips value `SubscribedContent-338389Enabled`. Start-menu suggestion values are separate: `disable_start_suggestions` writes `SubscribedContent-338388Enabled`, and `disable_app_suggestions_start` writes `SystemPaneSuggestionsEnabled`. These names and labels are community-derived, not Microsoft policy documentation; see [Win11Debloat’s Windows-suggestions registry file](https://github.com/Raphire/Win11Debloat/blob/master/Regfiles/Disable_Windows_Suggestions.reg), and treat Windows behavior as build-dependent until tested. `quick_access_no_cloud` is intentionally limited to `ShowCloudFilesInQuickAccess`: `ShowRecent` and `ShowFrequent` are separate history/folder-visibility preferences, not additional cloud-content switches ([Winhelponline](https://www.winhelponline.com/blog/show-recently-used-files-in-quick-access-unchecked-automatically/), [Stack Overflow](https://stackoverflow.com/questions/76435309/disable-quick-access-folder-options-using-powershell)). Likewise, opening File Explorer to This PC (`LaunchTo = 1`) and hiding the Home navigation node are separate behaviors. `snap_assist_off` writes only `SnapAssist`; sources describe a separate Snap Layouts flyout using either `SnapAssistFlyout` ([NinjaOne](https://www.ninjaone.com/blog/enable-or-disable-snap-assist-in-windows-11/)) or `EnableSnapAssistFlyout` ([NinjaOne](https://www.ninjaone.com/blog/how-to-enable-or-disable-windows-11-snap-layouts/)). Treat the flyout as a separate, unresolved control and do not add a value until its exact behavior is verified on Windows. Keyboard repeat is owned by the combined `reduce_keyboard_delay` control, so it must not be added as independent current controls. The two historical wrong-key IDs are retained only for snapshot rollback and excluded from the live catalogue.
+
+| Control | Path / value | Effect | Scope | Status |
 | --- | --- | --- | --- | --- |
-| Ads in Settings | `SubscribedContent-338393Enabled = 0`, `SubscribedContent-353694/353696Enabled = 0` (ContentDeliveryManager) | Settings stops advertising Microsoft services | HKCU | **Add** |
-| "Finish setting up your device" | `SubscribedContent-310093Enabled = 0` | No post-login upsell screens | HKCU | **Add** |
-| Windows Welcome / "Get even more out of Windows" | `SubscribedContent-338388Enabled = 0`, `-338389Enabled = 0` | No welcome/tips screens | HKCU | **Add** |
-| Explorer Home page | Hide the Explorer **Home** node, open to This PC (`LaunchTo = 1`) | Removes the Office.com/cloud recommendations pane a browser user never uses | HKCU | **Add** |
-| Quick Access cloud files | `ShowCloudFilesInQuickAccess = 0`, `ShowRecent = 0`, `ShowFrequent = 0` | No cloud/Office entries in the shell | HKCU | **Add** |
-| Gallery in Explorer | Hide the Windows 11 **Gallery** node | One less shell surface with its own background work | HKCU | **Add** |
-| Snap Assist suggestions | `SnapAssist = 0`, `SnapAssistFlyout = 0` | No flyout panels on snap — relevant for side-by-side browsing | HKCU | **Add** |
-| Alt+Tab tab strip | `MultiTaskingAltTabFilter = 3` (windows only, not Edge tabs) | Alt+Tab stops restoring browser tabs as separate entries (fewer re-renders) | HKCU | **Add** |
-| Taskbar "Search highlights" | covered by `disable_search_highlights` | ✅ already | HKCU | — |
-| Taskbar button combining | `TaskbarGlomLevel = 0` | More taskbar room for browser windows | HKCU | **Add** |
-| Notification toasts during fullscreen video | `NOC_GLOBAL_SETTING_TOASTS_ENABLED = 0` | Nothing pops over fullscreen video | HKCU | **Add** |
-| Window snap on drag | `WindowArrangementActive = 0` | No accidental snap while moving a browser window | HKCU | **Add** |
-| Menu/keyboard delay | `MenuShowDelay` (✅), `KeyboardDelay = 0`, `KeyboardSpeed = 31` | Snappier typing navigation on slow shells | HKCU | **Add** |
-| "Show more options" context menu | Classic Win32 context menu (catalog: `ui_classic_context_menu`) | Instant right-click in Explorer | HKCU | **Add** (verify present) |
+| Ads in Settings | `SubscribedContent-338393Enabled = 0`, `SubscribedContent-353694/353696Enabled = 0` (ContentDeliveryManager) | Settings stops advertising Microsoft services | HKCU | **Split across controls:** `ads_in_settings` writes `338393Enabled`; `disable_windows_suggestions` writes `353694Enabled` and `353696Enabled`. |
+| Windows Welcome experience | `SubscribedContent-310093Enabled = 0` (ContentDeliveryManager) | Turns off the welcome experience after updates and sign-in | HKCU | Covered by `disable_windows_suggestions`; no separate control is needed. |
+| "Finish setting up your device" | `ScoobeSystemSettingEnabled = 0` (UserProfileEngagement) | Stops the finish-setup prompt | HKCU | Covered by `disable_windows_suggestions`; no separate control is needed. |
+| Tips and suggestions while using Windows | `SubscribedContent-338389Enabled = 0`, `SoftLandingEnabled = 0` (ContentDeliveryManager) | Turns off Windows tips, tricks and suggestions | HKCU | Covered by `disable_windows_suggestions`; no separate control is needed. |
+| Occasional Start-menu suggestions | `SubscribedContent-338388Enabled = 0`, `SystemPaneSuggestionsEnabled = 0` (ContentDeliveryManager) | Stops suggested apps and promotional tips in Start | HKCU | In catalog: `disable_start_suggestions` and `disable_app_suggestions_start` write these values; Windows behavior is not runtime-verified. |
+| File Explorer start page / Home node | `LaunchTo = 1` opens to This PC; hiding Home is a separate shell change | Opens on This PC; the Home navigation entry remains available | HKCU | **Split:** `explorer_open_this_pc` sets the starting page. Hiding Home is separate and not implemented or Windows-validated. |
+| Quick Access cloud files | `ShowCloudFilesInQuickAccess = 0` | Hides cloud/account-based content in Quick Access | HKCU | **In catalog:** `quick_access_no_cloud` writes this value. `ShowRecent` and `ShowFrequent` are independent history/folder preferences and are intentionally unchanged. |
+| Snap Assist suggestions | `SnapAssist = 0` | Limits suggestions after snapping a window | HKCU | **In catalog:** `snap_assist_off` writes this setting; it does not change the separate Snap Layouts flyout. |
+| Snap Layouts flyout | `SnapAssistFlyout` or `EnableSnapAssistFlyout` (name/behavior not settled) | Show or hide the maximize-button layout flyout | HKCU | **Unresolved:** separate from post-snap suggestions; do not add until the exact value and effect are validated on Windows. |
+| Gallery in Explorer | Hide the Windows 11 **Gallery** node | One less shell surface with its own background work | HKCU | **In catalog:** `hide_gallery_explorer`; Windows behavior is not runtime-verified. |
+| Alt+Tab tab strip | `MultiTaskingAltTabFilter = 3` (windows only, not Edge tabs) | Alt+Tab stops restoring browser tabs as separate entries | HKCU | **In catalog:** `alt_tab_no_browser_tabs`; Windows behavior is not runtime-verified. |
+| Taskbar "Search highlights" | covered by `disable_search_highlights` | ✅ already | HKCU | Ships. |
+| Taskbar button combining | `TaskbarGlomLevel = 0` | More taskbar room for browser windows | HKCU | **In catalog:** `taskbar_button_combining`; Windows behavior is not runtime-verified. |
+| Notification toasts during fullscreen video | `NOC_GLOBAL_SETTING_TOASTS_ENABLED = 0` | Nothing pops over fullscreen video | HKCU | **In catalog:** `no_toasts_fullscreen_video`; the setting may affect other toast contexts too. |
+| Window snap on drag | `WindowArrangementActive = 0` | No accidental snap while moving a browser window | HKCU | **In catalog:** `no_window_snap_drag`; Windows behavior is not runtime-verified. |
+| Menu/keyboard delay | `MenuShowDelay` (`menu_show_delay`); `KeyboardDelay = 0` and `KeyboardSpeed = 31` (`reduce_keyboard_delay`) | Snappier menu and keyboard response | HKCU | Already covered by existing controls; no duplicate keyboard controls should be added. |
+| "Show more options" context menu | Classic Win32 context menu (catalog: `ui_classic_context_menu`) | Instant right-click in Explorer | HKCU | **In catalog:** Windows behavior is not runtime-verified. |
 | Startup Boost for the shell | — | n/a — see Part J for browser-side | — | — |
 
 ---

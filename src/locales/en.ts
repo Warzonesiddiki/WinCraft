@@ -1171,6 +1171,8 @@ export const en: Strings = {
     unavailableEnterpriseEdition:
       "Not available on this PC: it needs Windows Enterprise or Education.",
     notPresent: "This PC does not have this feature, so there is nothing to turn off.",
+    retired:
+      "Retired: this legacy control cannot be applied again. Its previously saved state can still be restored.",
     windowsProtected:
       "Windows protects this switch on this PC and refuses changes from other apps. Turn Widgets off in Settings > Personalization > Taskbar.",
   },
@@ -1193,16 +1195,19 @@ export const en: Strings = {
     high: "High",
   },
   skinpacks: {
-    title: "Skinpacks",
-    description: "Skinpacks management",
-    packName: "Pack name",
-    packBody: "Pack body",
-    scope: "Scope",
-    apply: "Apply",
-    restore: "Restore",
-    active: "Active",
-    applying: "Applying",
-    valuesSummary: "Values summary", // uses {count}
+    title: "Windows appearance",
+    description: "Apply a reversible, per-user shell look.",
+    packName: "COSMIC-inspired dark look",
+    packBody:
+      "Sets dark mode, a teal accent, reduced transparency, flat window borders and a left-aligned taskbar. All nine registry values are saved before they are changed.",
+    scope:
+      "Changes the look of the Windows shell only. It does not install COSMIC or replace the Windows desktop environment.",
+    apply: "Apply look",
+    restore: "Restore previous look",
+    active: "Look active",
+    applying: "Applying…",
+    valuesSummary:
+      "This look uses {count} registry values; applying it saves the originals for restore.", // uses {count}
   },
   tweaks: {
     disable_click_to_do: {
@@ -1248,7 +1253,7 @@ export const en: Strings = {
     explorer_open_this_pc: {
       name: "Open File Explorer to This PC",
       description:
-        "File Explorer opens on This PC, with your drives and folders, instead of Home and its recent files.",
+        "File Explorer opens on This PC, with your drives and folders, instead of opening on Home. This changes the starting page only; the Home entry remains in the navigation pane.",
     },
     block_oem_device_apps: {
       name: "Stop device makers' apps from installing themselves",
@@ -1419,6 +1424,16 @@ export const en: Strings = {
       name: "Legacy Copilot policy (restore only)",
       description:
         "This retired policy does not control the current Copilot app. You can restore its saved registry value here. Manage the separate Copilot app in Debloat; removing it does not prevent future reinstallation.",
+    },
+    keyboard_delay_zero: {
+      name: "Legacy KeyboardDelay value (restore only)",
+      description:
+        "Older versions wrote KeyboardDelay to the mouse settings key instead of the keyboard settings key. This entry only restores that old snapshot; use “Reduce input delay (keyboard)” for keyboard repeat.",
+    },
+    keyboard_speed_fast: {
+      name: "Legacy KeyboardSpeed value (restore only)",
+      description:
+        "Older versions wrote KeyboardSpeed to the mouse settings key instead of the keyboard settings key. This entry only restores that old snapshot; use “Reduce input delay (keyboard)” for keyboard repeat.",
     },
     disable_suggested_apps: {
       name: "Stop Windows installing apps by itself",
@@ -1951,64 +1966,49 @@ export const en: Strings = {
         "Stops the Windows Geolocation Service (lfsvc) and sets it to Manual, preventing continuous background sensor polling.",
     },
     ads_in_settings: {
-      name: "Ads In Settings",
-      description: "Configuration option",
-    },
-    no_post_login_upsell: {
-      name: "No Post Login Upsell",
-      description: "Configuration option",
-    },
-    no_welcome_tips: {
-      name: "No Welcome Tips",
-      description: "Configuration option",
-    },
-    explorer_home_this_pc: {
-      name: "Explorer Home This Pc",
-      description: "Configuration option",
+      name: "Hide promotional content in Settings",
+      description:
+        "Sets the per-user SubscribedContent-338393Enabled value to 0. It does not change the other Windows suggestion surfaces.",
     },
     quick_access_no_cloud: {
-      name: "Quick Access No Cloud",
-      description: "Configuration option",
+      name: "Hide cloud files in Quick Access",
+      description:
+        "Sets ShowCloudFilesInQuickAccess to 0. Recent and Frequent items use separate settings and are not changed.",
     },
     hide_gallery_explorer: {
-      name: "Hide Gallery Explorer",
-      description: "Configuration option",
+      name: "Hide Gallery in File Explorer",
+      description:
+        "Sets the per-user HideGallery value to 1. This hides the Gallery navigation entry; it does not delete or move photos.",
     },
     snap_assist_off: {
-      name: "Snap Assist Off",
-      description: "Configuration option",
+      name: "Limit Snap Assist suggestions",
+      description:
+        "Turns off the Snap Assist suggestions setting. It does not change the separate Snap Layouts flyout setting, so some snap-related prompts may remain.",
     },
     alt_tab_no_browser_tabs: {
-      name: "Alt Tab No Browser Tabs",
-      description: "Configuration option",
+      name: "Show windows, not Edge tabs, in Alt+Tab",
+      description:
+        "Stops Microsoft Edge tabs from appearing as separate Alt+Tab entries. Open tabs remain open; only the task switcher changes.",
     },
     taskbar_button_combining: {
-      name: "Taskbar Button Combining",
-      description: "Configuration option",
+      name: "Combine taskbar buttons",
+      description:
+        "Sets TaskbarGlomLevel to 0, grouping windows from the same app under one taskbar button. Individual windows may be less visible.",
     },
     no_toasts_fullscreen_video: {
-      name: "No Toasts Fullscreen Video",
-      description: "Configuration option",
+      name: "Turn off notification toasts",
+      description:
+        "Sets NOC_GLOBAL_SETTING_TOASTS_ENABLED to 0. This may suppress notification toasts outside full-screen video too.",
     },
     no_window_snap_drag: {
-      name: "No Window Snap Drag",
-      description: "Configuration option",
-    },
-    menu_show_delay_minimal: {
-      name: "Menu Show Delay Minimal",
-      description: "Configuration option",
-    },
-    keyboard_delay_zero: {
-      name: "Keyboard Delay Zero",
-      description: "Configuration option",
-    },
-    keyboard_speed_fast: {
-      name: "Keyboard Speed Fast",
-      description: "Configuration option",
+      name: "Turn off snap while dragging windows",
+      description:
+        "Sets WindowArrangementActive to 0 to disable snap arrangements triggered by dragging a window. Other window-management shortcuts may still work.",
     },
     ui_classic_context_menu: {
-      name: "Ui Classic Context Menu",
-      description: "Configuration option",
+      name: "Show the classic right-click menu",
+      description:
+        "Creates a per-user Explorer override for the classic context menu instead of the compact Windows 11 menu. Restarting Explorer or signing out may be needed.",
     },
   },
   cleanup: {
