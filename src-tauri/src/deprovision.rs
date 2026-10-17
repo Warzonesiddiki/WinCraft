@@ -1,84 +1,14 @@
-pub const FORBIDDEN_DEPROVISION_SUBSTRINGS: &[&str] = &[
-    "windowsstore",
-    "desktopappinstaller",
-    "windowsterminal",
-    "ui.xaml",
-    "vclibs",
-    "net.native.runtime",
-    "net.native.framework",
-    "shellexperiencehost",
-    "startmenuexperiencehost",
-    "sechealthui",
-    "gamingservices",
-    "xboxidentityprovider",
-];
+//! Machine-wide package deprovisioning is intentionally disabled.
+//!
+//! The previous implementation used substring filtering and parsed human-readable
+//! DISM table output, while providing no journal or supported reinstall/rollback path.
+//! Keep this command unavailable until package identity, consent, and recovery are
+//! implemented and exercised on supported Windows builds.
 
-pub fn is_deprovision_allowed(package_family_name: &str) -> bool {
-    let lower = package_family_name.to_lowercase();
-    !FORBIDDEN_DEPROVISION_SUBSTRINGS.iter().any(|&forbidden| {
-        lower.contains(forbidden)
-    })
-}
+const DISABLED_REASON: &str = "Machine-wide package deprovisioning is disabled until exact package allowlisting and a tested recovery path are available";
 
-#[cfg(windows)]
-pub fn deprovision_machine_package(package_family_name: &str) -> Result<(), String> {
-    if !is_deprovision_allowed(package_family_name) {
-        return Err(format!("Package {package_family_name} is protected system infrastructure"));
-    }
-
-    if !crate::elevation::is_elevated() {
-        return Err("Machine-wide deprovisioning requires elevated administrator rights".into());
-    }
-
-    dism_deprovision(package_family_name)
-}
-
-#[cfg(windows)]
-fn dism_deprovision(package_family_name: &str) -> Result<(), String> {
-    // 1. Resolve exact ProvisionedPackageName using DISM query
-    let output = crate::system_tools::run("dism", |cmd| {
-        cmd.args(["/Online", "/NoRestart", "/Get-ProvisionedAppxPackages", "/Format:Table"])
-            .output()
-    })
-    .map_err(|e| format!("Failed to spawn dism.exe: {e}"))?;
-
-    let text = String::from_utf8_lossy(&output.stdout);
-    let full_package_name = text
-        .lines()
-        .find(|line| line.contains(package_family_name))
-        .and_then(|line| line.split_whitespace().next())
-        .ok_or_else(|| format!("Package {package_family_name} not provisioned in image"))?;
-
-    // 2. Execute /Remove-ProvisionedAppxPackage
-    let remove_output = crate::system_tools::run("dism", |cmd| {
-        cmd.args([
-            "/Online",
-            "/NoRestart",
-            "/Remove-ProvisionedAppxPackage",
-            &format!("/PackageName:{}", full_package_name),
-        ])
-        .output()
-    })
-    .map_err(|e| format!("Failed to execute dism removal: {e}"))?;
-
-    if remove_output.status.success() {
-        Ok(())
-    } else {
-        Err(format!(
-            "DISM exited with code {:?}",
-            remove_output.status.code()
-        ))
-    }
-}
-
-#[cfg(not(windows))]
 pub fn deprovision_machine_package(_package_family_name: &str) -> Result<(), String> {
-    Err("not supported on this platform".into())
-}
-
-#[tauri::command(async)]
-pub fn deprovision_package(package_family_name: String) -> Result<(), String> {
-    deprovision_machine_package(&package_family_name)
+    Err(DISABLED_REASON.to_string())
 }
 
 #[cfg(test)]
@@ -86,11 +16,16 @@ mod tests {
     use super::*;
 
     #[test]
-    fn safety_boundary_blocks_critical_infrastructure() {
-        assert!(!is_deprovision_allowed("Microsoft.WindowsStore_8wekyb3d8bbwe"));
-        assert!(!is_deprovision_allowed("Microsoft.SecHealthUI"));
-        assert!(!is_deprovision_allowed("Microsoft.GamingServices"));
-        assert!(is_deprovision_allowed("Microsoft.BingNews"));
-        assert!(is_deprovision_allowed("Microsoft.ZuneVideo"));
+    fn deprovisioning_is_blocked_for_every_package_until_recovery_is_ready() {
+        for package in [
+            "Microsoft.BingNews_8wekyb3d8bbwe",
+            "Microsoft.WindowsStore_8wekyb3d8bbwe",
+            "Microsoft.SecHealthUI_8wekyb3d8bbwe",
+            "arbitrary-input",
+        ] {
+            let error = deprovision_machine_package(package).unwrap_err();
+            assert!(error.contains("disabled"));
+            assert!(error.contains("recovery path"));
+        }
     }
 }

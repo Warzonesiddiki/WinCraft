@@ -4,7 +4,7 @@
 
 <h1 align="center">WinCraft — free Windows debloat, optimizer and tuning tool</h1>
 
-<p align="center"><strong>Tune Windows with every change in plain sight — and nothing held back.</strong><br>159 controls for Windows 11 and Windows 10: debloat, optimize, turn tracking off and tune for gaming, with restore tools for supported settings. Free and open source, no account required.</p>
+<p align="center"><strong>Tune Windows with every change in plain sight — and nothing held back.</strong><br>163 controls for Windows 11 and Windows 10: debloat, optimize, turn tracking off and tune for gaming, with restore tools for supported settings. Free and open source, no account required.</p>
 
 <p align="center">
   <a href="#reviews-and-distribution"><img src="https://img.shields.io/badge/Total_downloads-120k%2B-2E7D32?style=for-the-badge" alt="120,000+ total downloads across distribution channels"></a>
@@ -28,7 +28,7 @@
 
 <p align="center"><img src="docs/screenshots/pc-tweaker-1.16-overview.png" alt="WinCraft 1.16 Overview in the default Graphite Ember theme, showing live CPU, memory and applied settings" width="85%"></p>
 
-If you searched for how to **debloat Windows 11**, how to **remove bloatware** from Windows 10, the best **free Windows optimizer**, how to **turn off telemetry in Windows**, how to **reduce input lag** for gaming, or a **Windows tweaking tool that shows what it changes before it changes it** — this page is that answer, with the trade-offs written down. WinCraft is a native Windows 10/11 x64 app that reads the value a setting has now, shows the value it would write, records the original first, and puts it back on request. It is free and open source under the MIT license: all 159 controls, nothing withheld, no account needed.
+If you searched for how to **debloat Windows 11**, how to **remove bloatware** from Windows 10, the best **free Windows optimizer**, how to **turn off telemetry in Windows**, how to **reduce input lag** for gaming, or a **Windows tweaking tool that shows what it changes before it changes it** — this page is that answer, with the trade-offs written down. WinCraft is a native Windows 10/11 x64 app that reads the value a setting has now, shows the value it would write, records the original first, and puts it back on request. It is free and open source under the MIT license: all 163 controls, nothing withheld, no account needed.
 
 **Start with one task:** review a setting, read its trade-offs, apply it if appropriate, and use its restore control when supported. See [what changes on your system](#what-changes-on-your-system) before tuning, or jump straight to [the task you came for](#find-your-task).
 
@@ -36,7 +36,7 @@ If you searched for how to **debloat Windows 11**, how to **remove bloatware** f
 
 Most Windows "optimizers" ask you to trade something away: a paywall in the middle of the feature you came for, an offer in the installer, a background service reporting back, a change you cannot undo, or an FPS number nobody measured. WinCraft does not make those trades, and every claim below is checkable in this repository.
 
-- **Every feature is free, permanently.** All 159 controls, every panel, every tool, in this version and the next: no subscription, no licence key, no expiring trial. The desktop app has no licence check left to run, and its Plans & pricing page states the one plan there is. The build fails if public copy ever splits the catalog into paid and free again.
+- **Every feature is free, permanently.** All 163 controls, every panel, every tool, in this version and the next: no subscription, no licence key, no expiring trial. The desktop app has no licence check left to run, and its Plans & pricing page states the one plan there is. The build fails if public copy ever splits the catalog into paid and free again.
 - **No account required.** Tuning, scanning, cleanup, gaming profiles and reports work signed out. An account is optional, for the account-based features: support, ratings, the newsletter, and the licence of the separate WinCraft Uninstaller product.
 - **Nothing bundled, nothing paid to be there.** The installer installs WinCraft and nothing else: no ads, no sponsored entries in the Debloat list, no offer or discount screen. Three cards inside the app introduce tools from the same publisher — the WinCraft Uninstaller, Tweaky Driver and Redaxa — each of which opens its page only when you click it, with a campaign or referral tag on the link so the publisher can see WinCraft sent you.
 - **No telemetry by default.** Monitoring, scans, history and reports are read and kept on this PC. Anonymous error reporting is off unless you switch it on yourself, and there are no advertising trackers or behavioral analytics in the app or on the website. See [PRIVACY.md](PRIVACY.md).
@@ -83,12 +83,15 @@ Closing the window keeps WinCraft running in the Windows notification area. Clic
 
 ## What's new in 2.0
 
-- **159 controls across Windows 11 and 10.** Major catalog expansion including SvcHost process consolidation (`SvcHostSplitThresholdInKB`), NTFS 8.3 name and last access updates disablement, ETW Autologger session teardowns (`AutoLogger-Diagtrack-Listener`, `SQMLogger`, `AITEventLog`, `DiagLog`, `WiFiSession`), and background service startup management (`WerSvc`, `MapsBroker`, `lfsvc`).
+- **163 controls across Windows 11 and 10.** Major catalog expansion including SvcHost process consolidation (`SvcHostSplitThresholdInKB`), NTFS 8.3 name and last access updates disablement, ETW Autologger session teardowns (`AutoLogger-Diagtrack-Listener`, `SQMLogger`, `AITEventLog`, `DiagLog`, `WiFiSession`), background service startup management (`WerSvc`, `MapsBroker`, `lfsvc`), and reversible Windows Update policies.
+- **Scheduled update restarts, on your terms (Pro+).** Updates still download and install; restart-required security fixes are not fully active until reboot, so restart promptly.
+- **Bounded Windows Update deferrals (Pro+).** Delay quality updates by 7 days (which also delays security fixes) or feature-update offers by 30 days (monthly quality/security updates continue). Both settings are reversible; neither pauses or disables Windows Update, and feature deferral is not a version pin.
+- **Driver-update policy (Pro+).** Optionally withhold standalone driver-classified offers from Windows Update's normal quality-update cycle. Drivers bundled into security/critical updates or dynamically installed during feature updates can still arrive. Manage standalone drivers yourself; this is not a performance tweak.
 - **40 allowlisted telemetry scheduled tasks.** Startup Manager includes curated background telemetry scheduled tasks across CEIP, Application Experience, Disk Diagnostic, Autochk, and Edge Update with rollback snapshots.
 - **Tier-3 consent modal and execution gate.** Explicit acknowledgement dialog and persistent consent journal before applying high-impact or machine-wide settings.
 - **Evidence & effect tags.** Every control documents empirical evidence (`Measured`, `Modest`, `Neutral`) and taking-effect indicator (`Immediate`, `Sign-out`, `Restart`, `Reboot`).
 - **One re-theme of the Windows shell, described as what it is.** Interface → Desktop look applies a named look (`COSMIC Dark`): dark surfaces, an accent colour on title bars and the taskbar, flat window borders and no minimise animation — nine per-user values, each recorded before it is written and reversible in one click. It re-themes Windows; it does not install the COSMIC desktop environment, GNOME, KDE or macOS, and it patches no system file.
-- **Complete 6-locale parity.** 1,780 keys synchronized with 100% parity across English, Italian, German, Spanish, French, and European Portuguese.
+- **Complete 6-locale parity.** 1,812 keys synchronized with 100% parity across English, Italian, German, Spanish, French, and European Portuguese.
 
 See the [changelog](CHANGELOG.md) for every release.
 
@@ -137,7 +140,7 @@ Read the effect and trade-offs before applying a setting. A disabled tweak is no
 
 ### Native power controls
 
-The catalog contains **159 controls**. The five power-policy controls change only mains-power policy in the selected Windows plan. They record the original plan and value before writing, verify the result, and leave battery policy unchanged.
+The catalog contains **163 controls**. The five power-policy controls change only mains-power policy in the selected Windows plan. They record the original plan and value before writing, verify the result, and leave battery policy unchanged.
 
 | Control                            | Purpose and limits                                                                                                              |
 | ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
@@ -187,7 +190,7 @@ For useful comparisons, keep the game build, scene, settings, drivers, power sou
 
 ## Free for Everyone
 
-WinCraft is completely free and open source under the MIT license. All 159 controls, every tool and every panel — no subscription, no paywall, no licence key, and no account required. Download it and start optimizing.
+WinCraft is completely free and open source under the MIT license. All 163 controls, every tool and every panel — no subscription, no paywall, no licence key, and no account required. Download it and start optimizing.
 
 Every capability that used to be an extra is part of the same free app today:
 
@@ -205,7 +208,7 @@ Existing supporters who previously purchased a licence — thank you for making 
 
 ### Is WinCraft really free?
 
-Yes, permanently, under the MIT license. Every one of the 159 controls is unlocked for every user, there is no tier to buy, and the desktop app no longer checks a licence at all. You can also read and build the source yourself.
+Yes, permanently, under the MIT license. Every one of the 163 controls is unlocked for every user, there is no tier to buy, and the desktop app no longer checks a licence at all. You can also read and build the source yourself.
 
 ### Is it safe to debloat and tweak Windows with it?
 

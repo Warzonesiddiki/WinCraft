@@ -295,10 +295,13 @@ export type BareboneTaskEntry = {
 
 /** Mirrors Rust `scheduledtasks::BatchTaskOutcome`. */
 export type BatchTaskOutcome = {
-  restorePoint: unknown;
+  restorePoint: RestorePointOutcome;
   total: number;
   modified: number;
   failed: number;
+  failedTasks: string[];
+  unavailableTasks: string[];
+  executionError: string | null;
 };
 
 /** Mirrors Rust `scheduledtasks::ProcessStats`. */

@@ -281,7 +281,7 @@ export const PRACTICAL_GUIDES = {
       },
       {
         heading: "Free features and signed installers",
-        body: "The current release includes all 159 controls in the catalogue, plus editable starter profiles, with no account required and no paid tier. Official Windows installers are digitally signed. Signing identifies the publisher and protects file integrity; it does not guarantee that SmartScreen or antivirus warnings will never appear.",
+        body: "The current release includes all 163 controls in the catalogue, plus editable starter profiles, with no account required and no paid tier. Pro-or-higher users can also reversibly defer quality updates for 7 days (which delays security fixes) or feature updates for 30 days (monthly quality and security updates continue). These settings do not pause or disable Windows Update, and feature deferral does not pin a version. A separate opt-in policy can exclude standalone driver-classified offers from Windows Update's normal quality-update cycle; bundled security/critical and feature-update drivers may still arrive, so manage standalone drivers yourself. Official Windows installers are digitally signed. Signing identifies the publisher and protects file integrity; it does not guarantee that SmartScreen or antivirus warnings will never appear.",
       },
       {
         heading: "Inspect the implementation",

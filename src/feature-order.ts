@@ -44,6 +44,10 @@ const SECTION_ORDER: Record<string, readonly string[]> = {
     "block_oem_device_apps",
     "disable_storage_sense",
     "disable_delivery_optimization",
+    "prevent_auto_restart_while_logged_on",
+    "defer_quality_updates_7_days",
+    "defer_feature_updates_30_days",
+    "exclude_windows_update_drivers",
     "auto_end_frozen_tasks",
   ],
 };

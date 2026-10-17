@@ -387,6 +387,9 @@ pub fn apply_from_payload(payload: &str) -> Result<(), String> {
 #[cfg(windows)]
 pub fn apply_barebone_from_payload(payload: &str) -> Result<(), String> {
     let (path, enabled) = parse_barebone_task_payload(payload)?;
+    if !enabled {
+        crate::barebone::assert_consented(&crate::dirs_app_data_dir(), &path)?;
+    }
     imp::set_enabled(&path, enabled)
 }
 
@@ -407,6 +410,9 @@ pub struct BatchTaskOutcome {
     pub total: usize,
     pub modified: usize,
     pub failed: usize,
+    pub failed_tasks: Vec<String>,
+    pub unavailable_tasks: Vec<String>,
+    pub execution_error: Option<String>,
 }
 
 #[derive(serde::Serialize, Clone, Debug, PartialEq, Eq)]
@@ -450,9 +456,10 @@ pub fn list_barebone_tasks() -> Result<Vec<BareboneTaskEntry>, String> {
     Ok(Vec::new())
 }
 /// Phase B4 command: disable or re-enable one allowlisted Barebone task.
-/// Blocked without a recorded Tier 3 consent. Attempts a restore point first
-/// (best-effort, reported in the outcome), then tries directly and spends one
-/// UAC prompt on the administrator retry only if the direct write was denied.
+/// Disabling requires recorded Tier 3 consent; re-enabling remains available
+/// without new consent so recovery is never gated. Attempts a restore point
+/// first (best-effort, reported in the outcome), then tries directly and spends
+/// one UAC prompt on the administrator retry only if the direct write was denied.
 #[cfg(windows)]
 #[tauri::command(async)]
 pub fn set_barebone_task(
@@ -461,7 +468,9 @@ pub fn set_barebone_task(
     enabled: bool,
 ) -> Result<BareboneTaskOutcome, String> {
     let dir = crate::store_for_dir(&app)?;
-    crate::barebone::assert_consented(&dir, &path)?;
+    if !enabled {
+        crate::barebone::assert_consented(&dir, &path)?;
+    }
     let restore_point = crate::barebone::restore_point_for_barebone();
     let store = crate::rollback::RollbackStore::new(dir);
     let result = if crate::elevation::is_elevated() {
@@ -480,9 +489,8 @@ pub fn set_barebone_task(
 }
 
 /// Phase B4 command: restore one Barebone task to its snapshotted state.
-/// Same consent and elevation routing as the apply command. The elevated
-/// retry re-reads the snapshot on the privileged side, so the payload carries
-/// only the path.
+/// Recovery is allowed without new consent. The elevated retry re-reads the
+/// snapshot on the privileged side, so the payload carries only the path.
 #[cfg(windows)]
 #[tauri::command(async)]
 pub fn rollback_barebone_task(
@@ -490,7 +498,6 @@ pub fn rollback_barebone_task(
     path: String,
 ) -> Result<BareboneTaskOutcome, String> {
     let dir = crate::store_for_dir(&app)?;
-    crate::barebone::assert_consented(&dir, &path)?;
     let restore_point = crate::barebone::restore_point_for_barebone();
     let store = crate::rollback::RollbackStore::new(dir);
     let result = if crate::elevation::is_elevated() {
@@ -507,40 +514,44 @@ pub fn rollback_barebone_task(
     result.map(|()| BareboneTaskOutcome { restore_point })
 }
 
-/// Batch disable all allowlisted telemetry tasks in a single action.
-/// Attempts directly first; if denied, spends one UAC prompt for the entire batch.
+/// Batch disable all allowlisted Windows tasks in a single action.
+/// Attempts directly first; if needed, spends one UAC prompt for the batch.
 #[cfg(windows)]
 #[tauri::command(async)]
 pub fn disable_all_barebone_tasks(
     app: tauri::AppHandle,
 ) -> Result<BatchTaskOutcome, String> {
-    let _ = crate::recovery_script::generate_winre_recovery_script();
     let dir = crate::store_for_dir(&app)?;
+    crate::barebone::assert_consented(&dir, crate::barebone::BAREBONE_BATCH_CONSENT_ID)?;
+    let _ = crate::recovery_script::generate_winre_recovery_script();
     let restore_point = crate::barebone::restore_point_for_barebone();
     let store = crate::rollback::RollbackStore::new(dir);
-    let (modified, failed) = if crate::elevation::is_elevated() {
-        disable_all_barebone_tasks_inner(&store)
-    } else {
-        let (m, f) = disable_all_barebone_tasks_inner(&store);
-        if f > 0 || m == 0 {
-            crate::elevation::run_elevated_action("--elevated-barebone-batch-disable", "all")
-                .map_err(|e| format!("administrator batch execution failed: {e}"))?;
-            let tasks = list_barebone_tasks()?;
-            let disabled = tasks.iter().filter(|t| t.present && !t.enabled).count();
-            (disabled, 0)
-        } else {
-            (m, f)
-        }
-    };
+    let before = list_barebone_tasks()?;
+    let (_, direct_failures) = disable_all_barebone_tasks_inner(&store);
+    let mut execution_error = None;
+    // A missing/unreadable task or an already-disabled set is not a reason to
+    // prompt for elevation. Retry only after an actual direct write failed.
+    if !crate::elevation::is_elevated() && !direct_failures.is_empty() {
+        execution_error = crate::elevation::run_elevated_action(
+            "--elevated-barebone-batch-disable",
+            "all",
+        )
+        .err();
+    }
+    let after = list_barebone_tasks()?;
+    let (modified, failed_tasks, unavailable_tasks) = summarize_disable_attempt(&before, &after);
     Ok(BatchTaskOutcome {
         restore_point,
         total: crate::barebone::BAREBONE_TASKS.len(),
         modified,
-        failed,
+        failed: failed_tasks.len(),
+        failed_tasks,
+        unavailable_tasks,
+        execution_error,
     })
 }
 
-/// Batch rollback all allowlisted telemetry tasks to their snapshotted states.
+/// Batch rollback all allowlisted Windows tasks to their snapshotted states.
 #[cfg(windows)]
 #[tauri::command(async)]
 pub fn rollback_all_barebone_tasks(
@@ -549,49 +560,81 @@ pub fn rollback_all_barebone_tasks(
     let dir = crate::store_for_dir(&app)?;
     let restore_point = crate::barebone::restore_point_for_barebone();
     let store = crate::rollback::RollbackStore::new(dir);
-    let (modified, failed) = if crate::elevation::is_elevated() {
-        rollback_all_barebone_tasks_inner(&store)
-    } else {
-        let (m, f) = rollback_all_barebone_tasks_inner(&store);
-        if f > 0 {
-            crate::elevation::run_elevated_action("--elevated-barebone-batch-rollback", "all")
-                .map_err(|e| format!("administrator batch rollback failed: {e}"))?;
-            let tasks = list_barebone_tasks()?;
-            let enabled = tasks.iter().filter(|t| t.present && t.enabled).count();
-            (enabled, 0)
-        } else {
-            (m, f)
-        }
-    };
+    let pending = pending_barebone_rollback_paths(&store);
+    let (_, direct_failures) = rollback_all_barebone_tasks_inner(&store);
+    let mut execution_error = None;
+    if !crate::elevation::is_elevated() && !direct_failures.is_empty() {
+        execution_error = crate::elevation::run_elevated_action(
+            "--elevated-barebone-batch-rollback",
+            "all",
+        )
+        .err();
+    }
+    let (modified, failed_tasks) = summarize_rollback_attempt(&store, &pending);
+    let after = list_barebone_tasks()?;
+    let unavailable_tasks = after
+        .into_iter()
+        .filter(|task| !task.present && pending.iter().any(|path| path == &task.path))
+        .map(|task| task.path)
+        .collect();
     Ok(BatchTaskOutcome {
         restore_point,
         total: crate::barebone::BAREBONE_TASKS.len(),
         modified,
-        failed,
+        failed: failed_tasks.len(),
+        failed_tasks,
+        unavailable_tasks,
+        execution_error,
     })
 }
 
 #[cfg(windows)]
-pub fn disable_all_barebone_tasks_inner(store: &crate::rollback::RollbackStore) -> (usize, usize) {
+pub fn disable_all_barebone_tasks_inner(
+    store: &crate::rollback::RollbackStore,
+) -> (usize, Vec<String>) {
     let mut modified = 0;
-    let mut failed = 0;
+    let mut failed_tasks = Vec::new();
     for &path in crate::barebone::BAREBONE_TASKS {
         match barebone_task_enabled(path) {
-            Ok(true) => {
-                match set_barebone_task_enabled(store, path, false) {
-                    Ok(()) => modified += 1,
-                    Err(_) => failed += 1,
-                }
-            }
+            Ok(true) => match set_barebone_task_enabled(store, path, false) {
+                Ok(()) => modified += 1,
+                Err(_) => failed_tasks.push(path.to_string()),
+            },
             Ok(false) => {
-                // Already disabled
+                // Already disabled.
             }
             Err(_) => {
-                // Not present on this machine, ignore
+                // Missing or unreadable; no state is changed without a verified read.
             }
         }
     }
-    (modified, failed)
+    (modified, failed_tasks)
+}
+
+fn summarize_disable_attempt(
+    before: &[BareboneTaskEntry],
+    after: &[BareboneTaskEntry],
+) -> (usize, Vec<String>, Vec<String>) {
+    let mut modified = 0;
+    let mut failed_tasks = Vec::new();
+    let mut unavailable_tasks = Vec::new();
+    for task in before.iter().chain(after).filter(|task| !task.present) {
+        if !unavailable_tasks.iter().any(|path| path == &task.path) {
+            unavailable_tasks.push(task.path.clone());
+        }
+    }
+    for task in before.iter().filter(|task| task.present && task.enabled) {
+        match after.iter().find(|current| current.path == task.path) {
+            Some(current) if current.present && !current.enabled => modified += 1,
+            _ => failed_tasks.push(task.path.clone()),
+        }
+    }
+    for task in after.iter().filter(|task| task.present && task.enabled) {
+        if !failed_tasks.iter().any(|path| path == &task.path) {
+            failed_tasks.push(task.path.clone());
+        }
+    }
+    (modified, failed_tasks, unavailable_tasks)
 }
 
 #[derive(Serialize)]
@@ -617,18 +660,53 @@ pub fn get_process_stats(_app: tauri::AppHandle) -> Result<ProcessStats, String>
 }
 
 #[cfg(windows)]
-pub fn rollback_all_barebone_tasks_inner(store: &crate::rollback::RollbackStore) -> (usize, usize) {
+pub fn rollback_all_barebone_tasks_inner(
+    store: &crate::rollback::RollbackStore,
+) -> (usize, Vec<String>) {
     let mut modified = 0;
-    let failed = 0;
+    let mut failed_tasks = Vec::new();
     for &path in crate::barebone::BAREBONE_TASKS {
+        match store.is_applied_checked(path) {
+            Ok(false) => continue,
+            Err(_) => {
+                failed_tasks.push(path.to_string());
+                continue;
+            }
+            Ok(true) => {}
+        }
         match restore_barebone_task(store, path) {
             Ok(()) => modified += 1,
-            Err(_) => {
-                // If it wasn't modified or had no snapshot, that's not a failure
-            }
+            Err(_) => failed_tasks.push(path.to_string()),
         }
     }
-    (modified, failed)
+    (modified, failed_tasks)
+}
+
+#[cfg(windows)]
+fn pending_barebone_rollback_paths(store: &crate::rollback::RollbackStore) -> Vec<String> {
+    let mut pending = Vec::new();
+    for &path in crate::barebone::BAREBONE_TASKS {
+        if !matches!(store.is_applied_checked(path), Ok(false)) {
+            pending.push(path.to_string());
+        }
+    }
+    pending
+}
+
+#[cfg(windows)]
+fn summarize_rollback_attempt(
+    store: &crate::rollback::RollbackStore,
+    pending: &[String],
+) -> (usize, Vec<String>) {
+    let mut modified = 0;
+    let mut failed_tasks = Vec::new();
+    for path in pending {
+        match store.is_applied_checked(path) {
+            Ok(false) => modified += 1,
+            Ok(true) | Err(_) => failed_tasks.push(path.clone()),
+        }
+    }
+    (modified, failed_tasks)
 }
 
 /// Elevated-helper entry point for Barebone task rollback. Re-validates the
@@ -780,6 +858,74 @@ pub fn get_process_stats(_app: tauri::AppHandle) -> Result<ProcessStats, String>
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn batch_disable_summary_reports_paths_that_remain_unavailable_or_enabled() {
+        let before = vec![
+            BareboneTaskEntry {
+                path: "\\Microsoft\\A".into(),
+                name: "A".into(),
+                enabled: true,
+                present: true,
+            },
+            BareboneTaskEntry {
+                path: "\\Microsoft\\B".into(),
+                name: "B".into(),
+                enabled: true,
+                present: true,
+            },
+            BareboneTaskEntry {
+                path: "\\Microsoft\\AlreadyOff".into(),
+                name: "AlreadyOff".into(),
+                enabled: false,
+                present: true,
+            },
+            BareboneTaskEntry {
+                path: "\\Microsoft\\Unavailable".into(),
+                name: "Unavailable".into(),
+                enabled: false,
+                present: false,
+            },
+        ];
+        let after = vec![
+            BareboneTaskEntry {
+                path: "\\Microsoft\\A".into(),
+                name: "A".into(),
+                enabled: false,
+                present: true,
+            },
+            BareboneTaskEntry {
+                path: "\\Microsoft\\B".into(),
+                name: "B".into(),
+                enabled: true,
+                present: true,
+            },
+            BareboneTaskEntry {
+                path: "\\Microsoft\\AlreadyOff".into(),
+                name: "AlreadyOff".into(),
+                enabled: true,
+                present: true,
+            },
+            BareboneTaskEntry {
+                path: "\\Microsoft\\Unavailable".into(),
+                name: "Unavailable".into(),
+                enabled: false,
+                present: false,
+            },
+        ];
+
+        assert_eq!(
+            summarize_disable_attempt(&before, &after),
+            (
+                1,
+                vec![
+                    "\\Microsoft\\B".to_string(),
+                    "\\Microsoft\\AlreadyOff".to_string(),
+                ],
+                vec!["\\Microsoft\\Unavailable".to_string()],
+            )
+        );
+    }
 
     /// Barebone payloads round-trip through the allowlist gate: exact listed
     /// paths pass, everything else — including prefix extensions and the

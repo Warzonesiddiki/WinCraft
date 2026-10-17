@@ -473,6 +473,63 @@ fn registry_bundle(entry: &SnapshotEntry, hive: &str, path: &str, names: &[&str]
     })
 }
 
+fn valid_svchost_snapshot(
+    entry: &SnapshotEntry,
+    tweak: &crate::tweaks::RegistryTweak,
+) -> bool {
+    let SnapshotEntry::Composite { entries } = entry else {
+        return false;
+    };
+    if entries.is_empty()
+        || entries.len() > crate::services::MAX_SVC_HOST_FANOUT_SNAPSHOTS + 1
+    {
+        return false;
+    }
+
+    let hive = match tweak.hive {
+        crate::tweaks::Hive::Hkcu => "HKCU",
+        crate::tweaks::Hive::Hklm => "HKLM",
+    };
+    let mut main_values = 0;
+    let mut service_targets = std::collections::HashSet::new();
+    for entry in entries {
+        let SnapshotEntry::Registry(snapshot) = entry else {
+            return false;
+        };
+        if registry_matches(snapshot, hive, tweak.key_path, tweak.value_name) {
+            main_values += 1;
+            if !matches!(
+                &snapshot.original_value,
+                None | Some(RegValue::Dword(_))
+            ) {
+                return false;
+            }
+            continue;
+        }
+
+        let Some(service) = crate::services::svchost_service_name_from_path(&snapshot.path)
+        else {
+            return false;
+        };
+        let original_is_restorable = match &snapshot.original_value {
+            None => true,
+            Some(RegValue::Dword(value)) => *value != 1,
+            Some(_) => false,
+        };
+        if !snapshot.hive.eq_ignore_ascii_case("HKLM")
+            || !snapshot
+                .name
+                .eq_ignore_ascii_case(crate::services::SVC_HOST_SPLIT_DISABLE_VALUE)
+            || crate::services::is_svchost_fanout_excluded(service)
+            || !original_is_restorable
+            || !service_targets.insert(service.to_ascii_lowercase())
+        {
+            return false;
+        }
+    }
+    main_values == 1
+}
+
 fn power_index(entry: &SnapshotEntry, allowed: &[&str]) -> bool {
     matches!(entry, SnapshotEntry::PowerSettingIndex { scheme_guid, subgroup_guid, setting_guid, .. }
         if valid_guid(scheme_guid) && subgroup_guid.eq_ignore_ascii_case(crate::gaming::SUB_PROCESSOR_GUID)
@@ -496,6 +553,24 @@ pub(crate) fn validate_snapshot(id: &str, entry: &SnapshotEntry) -> Result<(), S
         matches!(entry, SnapshotEntry::Service { name, previous_start_type, .. }
             if name == tweak.service && previous_start_type.len() < 256
                 && ["AUTO_START", "DEMAND_START", "DISABLED"].iter().any(|v| previous_start_type.contains(v)))
+    } else if id == "svchost_split_threshold" {
+        let Some(tweak) = crate::tweaks::find_tweak(id) else {
+            return Err("SvcHost tweak definition is missing".into());
+        };
+        match entry {
+            // Backward compatibility for snapshots written before per-service
+            // values were journaled. These are rollback-only; apply refuses to
+            // fan out again until this ambiguous state has been reviewed.
+            SnapshotEntry::Registry(snapshot) => {
+                let hive = match tweak.hive {
+                    crate::tweaks::Hive::Hkcu => "HKCU",
+                    crate::tweaks::Hive::Hklm => "HKLM",
+                };
+                registry_matches(snapshot, hive, tweak.key_path, tweak.value_name)
+            }
+            SnapshotEntry::Composite { .. } => valid_svchost_snapshot(entry, tweak),
+            _ => false,
+        }
     } else if let Some(tweak) = crate::tweaks::find_tweak(id) {
         let hive = match tweak.hive {
             crate::tweaks::Hive::Hkcu => "HKCU",
@@ -766,6 +841,79 @@ mod tests {
             ],
         }
     }
+
+    fn svchost_snapshot() -> SnapshotEntry {
+        SnapshotEntry::Composite {
+            entries: vec![
+                SnapshotEntry::Registry(RegistrySnapshot {
+                    hive: "HKLM".into(),
+                    path: r"SYSTEM\CurrentControlSet\Control".into(),
+                    name: "SvcHostSplitThresholdInKB".into(),
+                    original_value: Some(RegValue::Dword(3_670_016)),
+                }),
+                SnapshotEntry::Registry(RegistrySnapshot {
+                    hive: "HKLM".into(),
+                    path: r"SYSTEM\CurrentControlSet\Services\W32Time".into(),
+                    name: "SvcHostSplitDisable".into(),
+                    original_value: None,
+                }),
+                SnapshotEntry::Registry(RegistrySnapshot {
+                    hive: "HKLM".into(),
+                    path: r"SYSTEM\CurrentControlSet\Services\BITS".into(),
+                    name: "SvcHostSplitDisable".into(),
+                    original_value: Some(RegValue::Dword(0)),
+                }),
+            ],
+        }
+    }
+    #[test]
+    fn svchost_snapshot_is_exactly_scoped_to_the_threshold_and_service_values() {
+        let id = "svchost_split_threshold";
+        let snapshot = svchost_snapshot();
+        assert!(validate_snapshot(id, &snapshot).is_ok());
+        assert_eq!(snapshot_targets(&snapshot).len(), 3);
+
+        let mut nested_target = svchost_snapshot();
+        if let SnapshotEntry::Composite { entries } = &mut nested_target {
+            if let SnapshotEntry::Registry(snapshot) = &mut entries[1] {
+                snapshot.path.push_str(r"\Parameters");
+            }
+        }
+        assert!(validate_snapshot(id, &nested_target).is_err());
+
+        let mut wrong_service_type = svchost_snapshot();
+        if let SnapshotEntry::Composite { entries } = &mut wrong_service_type {
+            if let SnapshotEntry::Registry(snapshot) = &mut entries[1] {
+                snapshot.original_value = Some(RegValue::Str("1".into()));
+            }
+        }
+        assert!(validate_snapshot(id, &wrong_service_type).is_err());
+
+        let mut wrong_threshold_type = svchost_snapshot();
+        if let SnapshotEntry::Composite { entries } = &mut wrong_threshold_type {
+            if let SnapshotEntry::Registry(snapshot) = &mut entries[0] {
+                snapshot.original_value = Some(RegValue::Str("threshold".into()));
+            }
+        }
+        assert!(validate_snapshot(id, &wrong_threshold_type).is_err());
+
+        let mut protected_service = svchost_snapshot();
+        if let SnapshotEntry::Composite { entries } = &mut protected_service {
+            if let SnapshotEntry::Registry(snapshot) = &mut entries[1] {
+                snapshot.path = r"SYSTEM\CurrentControlSet\Services\RpcSs".into();
+            }
+        }
+        assert!(validate_snapshot(id, &protected_service).is_err());
+
+        let legacy = SnapshotEntry::Registry(RegistrySnapshot {
+            hive: "HKLM".into(),
+            path: r"SYSTEM\CurrentControlSet\Control".into(),
+            name: "SvcHostSplitThresholdInKB".into(),
+            original_value: None,
+        });
+        assert!(validate_snapshot(id, &legacy).is_ok());
+    }
+
     #[test]
     fn missing_store_is_empty_but_corruption_fails_closed_without_replacing_it() {
         let temp = TempDir::new();

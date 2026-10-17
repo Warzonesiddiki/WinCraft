@@ -30,6 +30,13 @@ fn every_registered_application_command_has_an_explicit_permission() {
 }
 
 #[test]
+fn machine_wide_deprovisioning_is_not_ipc_reachable_or_granted() {
+    assert!(!APP_COMMANDS.contains(&"deprovision_package"));
+    let desktop_permissions = include_str!("../permissions/desktop.toml");
+    assert!(!desktop_permissions.contains("allow-deprovision-package"));
+}
+
+#[test]
 fn actual_capabilities_restrict_hud_before_any_handler_runs() {
     // Use the real generated application ACL and Tauri's IPC dispatcher. The
     // handler is deliberately a harmless echo: no native operation, startup

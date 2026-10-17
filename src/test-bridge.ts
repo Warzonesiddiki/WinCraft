@@ -124,24 +124,30 @@ export const openerModule = () => ({ openUrl: vi.fn(async () => {}) });
 
 /**
  * `vi.mock("@tauri-apps/plugin-dialog", ...)` target. The native file dialogs
- * return a path or null, and a test sets the answer per call with
- * `setDialog("open", ...)` / `setDialog("save", ...)`; the queue behaviour is
- * the same as `reply`, so a cancelled dialog (null) is expressible.
+ * return a path or null; `ask` returns a boolean. Tests set answers per call
+ * with `setDialog("open", ...)`, `setDialog("save", ...)`, or
+ * `setDialog("ask", ...)`; omitted answers safely cancel.
  */
-const dialogReplies = { open: [] as unknown[], save: [] as unknown[] };
-async function takeDialog(kind: "open" | "save"): Promise<unknown> {
+const dialogReplies = {
+  open: [] as unknown[],
+  save: [] as unknown[],
+  ask: [] as unknown[],
+};
+async function takeDialog(kind: "open" | "save" | "ask"): Promise<unknown> {
   const queued = dialogReplies[kind].shift();
   if (queued instanceof Error) throw queued;
-  return queued ?? null;
+  return queued ?? (kind === "ask" ? false : null);
 }
 export const dialogModule = () => ({
   open: vi.fn(async () => takeDialog("open")),
   save: vi.fn(async () => takeDialog("save")),
+  ask: vi.fn(async () => Boolean(await takeDialog("ask"))),
 });
-export const setDialog = (kind: "open" | "save", ...values: unknown[]) => {
+export const setDialog = (kind: "open" | "save" | "ask", ...values: unknown[]) => {
   dialogReplies[kind].push(...values);
 };
 export const resetDialogs = () => {
   dialogReplies.open.length = 0;
   dialogReplies.save.length = 0;
+  dialogReplies.ask.length = 0;
 };

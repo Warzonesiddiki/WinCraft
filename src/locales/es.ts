@@ -1438,9 +1438,29 @@ export const es: Strings = {
         "Impide que las aplicaciones de la Store se ejecuten, se actualicen y consulten la red mientras no las usas. Es CPU, RAM y bateria reales gastadas en aplicaciones que no has abierto.",
     },
     disable_delivery_optimization: {
-      name: "Dejar de compartir las actualizaciones de Windows",
+      name: "Desactivar el intercambio entre equipos de Windows Update",
       description:
-        "De forma predeterminada Windows sube los archivos de actualizacion descargados a otros PC usando tu conexion. Esto limita Delivery Optimization a tu propio equipo, para que esa subida no consuma ancho de banda mientras juegas.",
+        "Configura Delivery Optimization en modo solo HTTP, para que este PC no descargue contenido de actualizaciones de otros PC ni lo suba a ellos. Windows Update sigue descargando desde Microsoft; esto no desactiva el servicio Delivery Optimization ni Windows Update.",
+    },
+    prevent_auto_restart_while_logged_on: {
+      name: "Evitar los reinicios programados de Windows Update con la sesión iniciada",
+      description:
+        "Impide que Windows Update reinicie automáticamente el PC por una actualización programada mientras alguien tenga la sesión iniciada. Las actualizaciones pueden seguir descargándose e instalándose; esto no bloquea un reinicio que inicies tú. Una actualización de seguridad que requiere reiniciar no está plenamente activa hasta que se reinicie el PC, así que mantener la sesión abierta puede retrasar la protección. Mantén Windows Update activado y reinicia pronto.",
+    },
+    defer_quality_updates_7_days: {
+      name: "Retrasar 7 días las actualizaciones de calidad",
+      description:
+        "Aplaza 7 días desde su publicación las actualizaciones de calidad de Windows, incluidos los parches de seguridad mensuales. Windows Update sigue activado: es un aplazamiento breve, no una pausa ni un bloqueo. Los parches de seguridad no se aplican durante la espera; instala pronto las actualizaciones urgentes y reinicia cuando Windows lo solicite. Restaurar este ajuste elimina el aplazamiento.",
+    },
+    defer_feature_updates_30_days: {
+      name: "Retrasar 30 días las actualizaciones de características",
+      description:
+        "Aplaza 30 días desde su publicación las ofertas de actualizaciones de características de Windows. Las actualizaciones mensuales de calidad y seguridad continúan con su calendario habitual. No fija una versión ni amplía el soporte de la versión actual de Windows; restaurar este ajuste elimina el aplazamiento.",
+    },
+    exclude_windows_update_drivers: {
+      name: "Excluir los controladores independientes de Windows Update",
+      description:
+        "Indica a Windows Update que excluya las actualizaciones independientes de controladores de su ciclo normal de actualizaciones de calidad. Windows Update y las actualizaciones de calidad y seguridad siguen activadas. Los controladores incluidos en actualizaciones de seguridad o críticas, y los instalados dinámicamente durante las actualizaciones de características, aún pueden llegar. Las herramientas de los fabricantes y las instalaciones manuales no se bloquean. Tendrás que gestionar los controladores independientes por tu cuenta; mientras este ajuste esté activo, el catálogo de controladores de Windows Update puede ofrecer menos actualizaciones o ninguna. Restaurarlo permite de nuevo que Windows Update ofrezca controladores.",
     },
     disable_copilot: {
       name: "Directiva antigua de Copilot (solo restauración)",

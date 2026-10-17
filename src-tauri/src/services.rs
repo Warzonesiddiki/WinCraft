@@ -11,6 +11,68 @@ pub const SVC_HOST_FANOUT_EXCLUSIONS: &[&str] = &[
     "XboxNetApiSvc",
 ];
 
+pub const SVC_HOST_SERVICES_PATH: &str = r"SYSTEM\CurrentControlSet\Services";
+pub const SVC_HOST_SPLIT_DISABLE_VALUE: &str = "SvcHostSplitDisable";
+pub const MAX_SVC_HOST_FANOUT_SNAPSHOTS: usize = 8192;
+
+/// Keep the machine-wide COM/RPC services and Xbox services out of process
+/// consolidation. Service names are case-insensitive in Windows.
+pub fn is_svchost_fanout_excluded(name: &str) -> bool {
+    SVC_HOST_FANOUT_EXCLUSIONS.iter().any(|excluded| {
+        name.eq_ignore_ascii_case(excluded)
+            || name
+                .get(..excluded.len())
+                .is_some_and(|prefix| prefix.eq_ignore_ascii_case(excluded))
+    }) || name
+        .get(..3)
+        .is_some_and(|prefix| prefix.eq_ignore_ascii_case("Xbl"))
+        || name
+            .get(..4)
+            .is_some_and(|prefix| prefix.eq_ignore_ascii_case("Xbox"))
+}
+
+/// Extract one service leaf from a journaled SvcHost fan-out registry path.
+/// Reject nested or malformed paths so an elevated rollback can only touch
+/// `SvcHostSplitDisable` under a direct child of the Services key.
+pub fn svchost_service_name_from_path(path: &str) -> Option<&str> {
+    let prefix = format!("{}\\", SVC_HOST_SERVICES_PATH);
+    let service = path.get(prefix.len()..)?;
+    if !path
+        .get(..prefix.len())
+        .is_some_and(|value| value.eq_ignore_ascii_case(&prefix))
+        || service.is_empty()
+        || service == "."
+        || service == ".."
+        || service.len() > 256
+        || service
+            .chars()
+            .any(|character| matches!(character, '\\' | '/' | ':' | '\0'))
+    {
+        return None;
+    }
+    Some(service)
+}
+
+/// Classify the executable token, not arbitrary arguments that happen to
+/// contain `svchost.exe`. Registry ImagePath values commonly use quoted paths
+/// and environment-variable prefixes, both of which this basename check handles.
+pub fn is_svchost_image_path(image_path: &str) -> bool {
+    let command = image_path.trim_start();
+    let executable = if let Some(quoted) = command.strip_prefix('"') {
+        let Some((executable, _)) = quoted.split_once('"') else {
+            return false;
+        };
+        executable
+    } else {
+        command.split_whitespace().next().unwrap_or_default()
+    };
+    let basename = executable
+        .rsplit(|character| matches!(character, '\\' | '/'))
+        .next()
+        .unwrap_or(executable);
+    basename.eq_ignore_ascii_case("svchost.exe")
+}
+
 pub const AI_FABRIC_ID: &str = "disable_ai_fabric_service";
 pub(crate) const AI_FABRIC_SERVICE: &str = "WSAIFabricSvc";
 pub const DMWAP_PUSH_ID: &str = "disable_dmwappush_service";
@@ -680,135 +742,6 @@ pub fn rollback_service(store: &RollbackStore, tweak: &ServiceTweak) -> Result<(
     })
 }
 
-#[cfg(windows)]
-pub fn apply_svchost_split_fanout() -> Result<usize, String> {
-    use winreg::enums::{HKEY_LOCAL_MACHINE, KEY_READ, KEY_SET_VALUE};
-    use winreg::RegKey;
-
-    let hklm = RegKey::predef(HKEY_LOCAL_MACHINE);
-    let services_key = match hklm.open_subkey_with_flags(r"SYSTEM\CurrentControlSet\Services", KEY_READ) {
-        Ok(k) => k,
-        Err(e) => {
-            if e.kind() == std::io::ErrorKind::PermissionDenied {
-                return Err("access denied: opening Services registry hive requires administrative privileges".into());
-            }
-            return Err(format!("Failed to open Services hive: {e}"));
-        }
-    };
-
-    let mut modified_count = 0;
-    let mut permission_denied_count = 0;
-
-    for name in services_key.enum_keys().filter_map(Result::ok) {
-        // These must never be split: doing so breaks RPC/locator dependency chains
-        // and can take out the machine-wide COM infrastructure. Xbox-live services are
-        // also excluded because splitting them is the one change most commonly reported
-        // as breaking sign-in and game-services telemetry — not a latency win.
-        if SVC_HOST_FANOUT_EXCLUSIONS
-            .iter()
-            .any(|ex| name == *ex || name.starts_with(ex))
-        {
-            continue;
-        }
-
-        // Any service whose name starts with "Xbl" or "Xbox" is excluded.
-        // This is defensive in addition to the named list above.
-        if name.starts_with("Xbl") || name.starts_with("Xbox") {
-            continue;
-        }
-
-        let subkey_path = format!(r"SYSTEM\CurrentControlSet\Services\{}", name);
-        let subkey = match hklm.open_subkey_with_flags(&subkey_path, KEY_READ | KEY_SET_VALUE) {
-            Ok(k) => k,
-            Err(e) if e.kind() == std::io::ErrorKind::PermissionDenied => {
-                permission_denied_count += 1;
-                continue;
-            }
-            Err(_) => continue,
-        };
-
-        let image_path: String = subkey.get_value("ImagePath").unwrap_or_default();
-        if !image_path.to_lowercase().contains("svchost.exe") {
-            continue;
-        }
-
-        let original_val: Option<u32> = subkey.get_value("SvcHostSplitDisable").ok();
-        if original_val == Some(1) {
-            continue;
-        }
-
-        match subkey.set_value("SvcHostSplitDisable", &1u32) {
-            Ok(_) => modified_count += 1,
-            Err(e) if e.kind() == std::io::ErrorKind::PermissionDenied => {
-                permission_denied_count += 1;
-            }
-            Err(_) => {}
-        }
-    }
-
-    if modified_count == 0 && permission_denied_count > 0 {
-        return Err("access denied: modifying svchost split configuration requires administrative privileges".into());
-    }
-
-    Ok(modified_count)
-}
-
-#[cfg(windows)]
-pub fn rollback_svchost_split_fanout() -> Result<usize, String> {
-    use winreg::enums::{HKEY_LOCAL_MACHINE, KEY_READ, KEY_SET_VALUE};
-    use winreg::RegKey;
-
-    let hklm = RegKey::predef(HKEY_LOCAL_MACHINE);
-    let services_key = match hklm.open_subkey_with_flags(r"SYSTEM\CurrentControlSet\Services", KEY_READ) {
-        Ok(k) => k,
-        Err(e) => {
-            if e.kind() == std::io::ErrorKind::PermissionDenied {
-                return Err("access denied: opening Services registry hive requires administrative privileges".into());
-            }
-            return Ok(0);
-        }
-    };
-
-    let mut restored_count = 0;
-    let mut permission_denied_count = 0;
-
-    for name in services_key.enum_keys().filter_map(Result::ok) {
-        let path = format!(r"SYSTEM\CurrentControlSet\Services\{}", name);
-        let subkey = match hklm.open_subkey_with_flags(&path, KEY_SET_VALUE) {
-            Ok(k) => k,
-            Err(e) if e.kind() == std::io::ErrorKind::PermissionDenied => {
-                permission_denied_count += 1;
-                continue;
-            }
-            Err(_) => continue,
-        };
-
-        match subkey.delete_value("SvcHostSplitDisable") {
-            Ok(_) => restored_count += 1,
-            Err(e) if e.kind() == std::io::ErrorKind::PermissionDenied => {
-                permission_denied_count += 1;
-            }
-            Err(_) => {}
-        }
-    }
-
-    if restored_count == 0 && permission_denied_count > 0 {
-        return Err("access denied: restoring svchost split configuration requires administrative privileges".into());
-    }
-
-    Ok(restored_count)
-}
-
-#[cfg(not(windows))]
-pub fn apply_svchost_split_fanout() -> Result<usize, String> {
-    Ok(0)
-}
-
-#[cfg(not(windows))]
-pub fn rollback_svchost_split_fanout() -> Result<usize, String> {
-    Ok(0)
-}
-
 #[cfg(not(windows))]
 pub fn apply_service(_store: &RollbackStore, _tweak: &ServiceTweak) -> Result<(), String> {
     Err("not supported on this platform".to_string())
@@ -816,6 +749,53 @@ pub fn apply_service(_store: &RollbackStore, _tweak: &ServiceTweak) -> Result<()
 #[cfg(not(windows))]
 pub fn rollback_service(_store: &RollbackStore, _tweak: &ServiceTweak) -> Result<(), String> {
     Err("not supported on this platform".to_string())
+}
+
+#[cfg(test)]
+mod svchost_path_tests {
+    use super::*;
+
+    #[test]
+    fn fanout_exclusions_are_case_insensitive_and_cover_xbox_prefixes() {
+        for name in ["RpcSs", "rpcss", "DcomLaunch", "XblAuthManager", "XboxNetApiSvc"] {
+            assert!(is_svchost_fanout_excluded(name), "{name}");
+        }
+        assert!(is_svchost_fanout_excluded("XblUserService_123"));
+        assert!(is_svchost_fanout_excluded("XboxGipSvc"));
+        assert!(!is_svchost_fanout_excluded("W32Time"));
+    }
+
+    #[test]
+    fn image_path_classification_checks_only_the_executable_token() {
+        assert!(is_svchost_image_path(
+            r#""%SystemRoot%\system32\svchost.exe" -k netsvcs"#
+        ));
+        assert!(is_svchost_image_path(r"%SystemRoot%\system32\svchost.exe -k netsvcs"));
+        assert!(!is_svchost_image_path(
+            r"C:\Tools\service.exe -note=svchost.exe"
+        ));
+        assert!(!is_svchost_image_path(r"C:\Windows\svchost.exe.backup -k group"));
+    }
+
+    #[test]
+    fn rollback_path_accepts_only_a_direct_service_child() {
+        assert_eq!(
+            svchost_service_name_from_path(r"SYSTEM\CurrentControlSet\Services\W32Time"),
+            Some("W32Time")
+        );
+        assert_eq!(
+            svchost_service_name_from_path(r"system\currentcontrolset\services\W32Time"),
+            Some("W32Time")
+        );
+        for invalid in [
+            r"SYSTEM\CurrentControlSet\Services",
+            r"SYSTEM\CurrentControlSet\Services\W32Time\Parameters",
+            r"SYSTEM\CurrentControlSet\Services\..\Control",
+            r"SOFTWARE\Unrelated\W32Time",
+        ] {
+            assert_eq!(svchost_service_name_from_path(invalid), None, "{invalid}");
+        }
+    }
 }
 
 #[cfg(all(test, windows))]

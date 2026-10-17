@@ -1,8 +1,42 @@
 import { useState } from "react";
 import { invoke } from "@tauri-apps/api/core";
+import { ask } from "@tauri-apps/plugin-dialog";
 import { BatchTaskOutcome, TweakInfo } from "../types";
 import { Badge } from "./ui";
 import { BoltIcon, UndoIcon } from "./icons";
+
+function batchTaskFailureDetails(outcome: BatchTaskOutcome): string {
+  const failedTasks = outcome.failedTasks.filter(
+    (path) => !outcome.unavailableTasks.includes(path),
+  );
+  const names = failedTasks
+    .slice(0, 3)
+    .map((path) => path.split("\\").filter(Boolean).pop() ?? path);
+  const remaining = failedTasks.length - names.length;
+  const affected = names.length
+    ? ` Affected: ${names.join(", ")}${remaining > 0 ? `, and ${remaining} more` : ""}.`
+    : "";
+  const retry = outcome.executionError
+    ? ` Elevated retry: ${outcome.executionError.slice(0, 180)}${outcome.executionError.length > 180 ? "…" : ""}.`
+    : "";
+  const unavailable = outcome.unavailableTasks;
+  const unavailableNames = unavailable
+    .slice(0, 3)
+    .map((path) => path.split("\\").filter(Boolean).pop() ?? path);
+  const unavailableRemaining = unavailable.length - unavailableNames.length;
+  const unverified = unavailable.length
+    ? ` Could not verify ${unavailableNames.join(", ")}${unavailableRemaining > 0 ? `, and ${unavailableRemaining} more` : ""}; those tasks may be absent or unreadable.`
+    : "";
+  return `${affected}${retry}${unverified}`;
+}
+
+function tweakBatchFailureDetails(failures: string[]): string {
+  const details = failures
+    .slice(0, 3)
+    .map((failure) => failure.slice(0, 180) + (failure.length > 180 ? "…" : ""));
+  const remaining = failures.length - details.length;
+  return ` Failed tweaks: ${details.join("; ")}${remaining > 0 ? `; and ${remaining} more` : ""}.`;
+}
 
 const ATLAS_TWEAK_IDS = [
   "svchost_split_threshold",
@@ -32,28 +66,61 @@ export function CommandDeckHero({
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
   const [rebootNeeded, setRebootNeeded] = useState(false);
 
+  const profileTweaks = tweaks.filter((t) => ATLAS_TWEAK_IDS.includes(t.id));
   const isOptimized =
-    tweaks.length > 0 &&
-    tweaks.filter((t) => ATLAS_TWEAK_IDS.includes(t.id)).every((t) => t.applied);
+    profileTweaks.length === ATLAS_TWEAK_IDS.length && profileTweaks.every((t) => t.applied);
 
   async function handleApplyAtlasOS() {
     setBusy(true);
-    setStatusMessage("Applying AtlasOS-grade optimization...");
+    setStatusMessage("Reviewing the Windows 11 profile...");
     try {
-      // 1. Batch disable all allowlisted telemetry tasks
-      await invoke<BatchTaskOutcome>("disable_all_barebone_tasks");
-
-      // 2. Apply SvcHost consolidation, ETW teardown, and lean settings
-      await invoke<string[]>("apply_tweaks", {
-        ids: ATLAS_TWEAK_IDS,
-        source: "atlasos_deck",
+      const approved = await ask(
+        "This profile changes SvcHost grouping and several Windows privacy, startup, and file-system settings, then disables allowlisted scheduled tasks. Effects vary by Windows build and hardware. Some changes affect crash isolation or background features. Review the profile details before continuing; a restart may be required.",
+        { title: "Review Windows 11 lightweight profile", kind: "warning" },
+      );
+      if (!approved) {
+        setStatusMessage("No changes were made.");
+        return;
+      }
+      await invoke("record_barebone_consent", {
+        id: "barebone_tasks_batch",
+        text: "I reviewed the Windows 11 profile warning and consent to its scheduled-task batch.",
       });
 
-      setStatusMessage("Optimization applied. SvcHost grouping and ETW teardown active.");
+      const taskOutcome = await invoke<BatchTaskOutcome>("disable_all_barebone_tasks");
+      if (
+        taskOutcome.failed > 0 ||
+        taskOutcome.executionError ||
+        taskOutcome.unavailableTasks.length > 0
+      ) {
+        setStatusMessage(
+          `Scheduled-task changes were partial (${taskOutcome.modified} succeeded, ${taskOutcome.failed} failed).${batchTaskFailureDetails(taskOutcome)} The remaining profile changes were not started.`,
+        );
+        onRefresh();
+        return;
+      }
+
+      const tweakFailures = await invoke<string[]>("apply_tweaks", {
+        ids: ATLAS_TWEAK_IDS,
+        source: "windows11_light_profile",
+      });
+      if (tweakFailures.length > 0) {
+        setStatusMessage(
+          `Profile was only partially applied (${tweakFailures.length} tweaks failed).${tweakBatchFailureDetails(tweakFailures)} Other changes may have succeeded; review Change history and restart if required.`,
+        );
+        setRebootNeeded(true);
+        onRefresh();
+        return;
+      }
+
+      setStatusMessage(
+        "Profile applied. Restart may be needed; compare measured results after reboot.",
+      );
       setRebootNeeded(true);
       onRefresh();
     } catch (e) {
-      setStatusMessage(`Optimization note: ${String(e)}`);
+      setStatusMessage(`Profile was not fully applied: ${String(e)}`);
+      onRefresh();
     } finally {
       setBusy(false);
     }
@@ -61,22 +128,38 @@ export function CommandDeckHero({
 
   async function handleRestoreStock() {
     setBusy(true);
-    setStatusMessage("Restoring Windows stock configuration...");
+    setStatusMessage("Restoring saved profile state...");
+    const failures: string[] = [];
     try {
-      // 1. Batch rollback all barebone tasks
-      await invoke<BatchTaskOutcome>("rollback_all_barebone_tasks");
-
-      // 2. Rollback tweaks
-      await invoke<string[]>("rollback_tweaks", { ids: ATLAS_TWEAK_IDS });
-
-      setStatusMessage("Windows stock configuration restored.");
-      setRebootNeeded(false);
-      onRefresh();
-    } catch (e) {
-      setStatusMessage(`Restoration note: ${String(e)}`);
-    } finally {
-      setBusy(false);
+      const taskOutcome = await invoke<BatchTaskOutcome>("rollback_all_barebone_tasks");
+      if (
+        taskOutcome.failed > 0 ||
+        taskOutcome.executionError ||
+        taskOutcome.unavailableTasks.length > 0
+      ) {
+        failures.push(
+          `${taskOutcome.failed} scheduled tasks could not be restored.${batchTaskFailureDetails(taskOutcome)}`,
+        );
+      }
+    } catch (error) {
+      failures.push(`scheduled-task rollback: ${String(error)}`);
     }
+    try {
+      const tweakFailures = await invoke<string[]>("rollback_tweaks", { ids: ATLAS_TWEAK_IDS });
+      if (tweakFailures.length > 0) {
+        failures.push(`tweak rollback${tweakBatchFailureDetails(tweakFailures)}`);
+      }
+    } catch (error) {
+      failures.push(`tweak rollback: ${String(error)}`);
+    }
+    setStatusMessage(
+      failures.length === 0
+        ? "Saved profile settings were restored. Restart may be needed."
+        : `Profile restore was partial: ${failures.join("; ")}`,
+    );
+    setRebootNeeded(failures.length > 0);
+    onRefresh();
+    setBusy(false);
   }
 
   return (
@@ -88,19 +171,18 @@ export function CommandDeckHero({
               <BoltIcon className="w-4 h-4" />
             </span>
             <span className="text-[11px] font-semibold text-accent uppercase tracking-wider">
-              1-Click Command Deck
+              Windows 11 Lightweight Profile
             </span>
-            <Badge kind="ok">AtlasOS Target: ~85 Processes</Badge>
+            <Badge kind="caution">Review before applying</Badge>
           </div>
           <h3 className="text-lg font-bold text-ink">
-            {isOptimized
-              ? "Extreme Optimization Active"
-              : "Extreme Debloat & Process Consolidation"}
+            {isOptimized ? "Lightweight Profile Active" : "Review and Apply a Lean Windows Setup"}
           </h3>
           <p className="text-xs text-ink-2 mt-1 leading-relaxed">
-            Consolidate 80+ isolated SvcHost instances into shared hosts, silence 40 background
-            telemetry tasks, and stop live ETW disk tracing. Zero servicing corruption, 100%
-            reversible.
+            Applies a selected set of service-host, privacy, startup, and file-system settings and
+            allowlisted scheduled-task changes. Effects depend on Windows build and hardware. Some
+            changes affect crash isolation or background features; rollback is available for
+            journaled settings, but runtime effects may require a restart or separate recovery.
           </p>
         </div>
 
@@ -112,7 +194,7 @@ export function CommandDeckHero({
             className="flex items-center gap-1.5 rounded-xl bg-accent px-4 py-2 text-xs font-semibold text-surface-base hover:bg-accent/90 transition-all shadow-sm active:scale-95 disabled:opacity-50"
           >
             <BoltIcon className="w-3.5 h-3.5" />
-            {isOptimized ? "Re-apply AtlasOS Optimization" : "Apply AtlasOS Optimization"}
+            {isOptimized ? "Verify / Re-apply Profile" : "Apply Lightweight Profile"}
           </button>
           <button
             type="button"
@@ -121,7 +203,7 @@ export function CommandDeckHero({
             className="flex items-center gap-1.5 rounded-xl border border-border bg-surface-2 px-3 py-2 text-xs font-medium text-ink-2 hover:bg-surface-3 transition-colors active:scale-95 disabled:opacity-50"
           >
             <UndoIcon className="w-3.5 h-3.5" />
-            Restore Stock
+            Restore Profile Changes
           </button>
         </div>
       </div>
@@ -131,7 +213,7 @@ export function CommandDeckHero({
           <span className="text-ink-2">{statusMessage}</span>
           {rebootNeeded && (
             <span className="text-warn font-medium flex items-center gap-1">
-              ● Restart PC to fully collapse SvcHost process trees into ~85 processes
+              ● Restart Windows to apply settings marked as reboot-required
             </span>
           )}
         </div>

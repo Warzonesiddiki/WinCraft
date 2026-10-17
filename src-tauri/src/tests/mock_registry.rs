@@ -564,6 +564,135 @@ fn every_registry_tweak_restores_an_absent_original_by_deleting_it() {
 }
 
 #[test]
+fn svchost_split_journals_and_restores_only_values_it_changes() {
+    let registry = install();
+    let fixture = Fixture::new();
+    let services = crate::services::SVC_HOST_SERVICES_PATH;
+    let threshold = tweaks::find_tweak("svchost_split_threshold").unwrap();
+    let original_threshold = RegValue::Dword(3_670_016);
+    registry.set(
+        Hive::Hklm,
+        threshold.key_path,
+        threshold.value_name,
+        Stored::Value(original_threshold.clone()),
+    );
+
+    let set_service = |name: &str, image: &str, split: Option<u32>| {
+        let path = format!("{services}\\{name}");
+        registry.set(
+            Hive::Hklm,
+            &path,
+            "ImagePath",
+            Stored::Value(RegValue::Str(image.into())),
+        );
+        if let Some(value) = split {
+            registry.set(
+                Hive::Hklm,
+                &path,
+                crate::services::SVC_HOST_SPLIT_DISABLE_VALUE,
+                Stored::Value(RegValue::Dword(value)),
+            );
+        }
+        path
+    };
+
+    let w32time = set_service(
+        "W32Time",
+        r"%SystemRoot%\system32\svchost.exe -k LocalService",
+        Some(0),
+    );
+    let bits = set_service(
+        "BITS",
+        r"%SystemRoot%\system32\svchost.exe -k netsvcs",
+        None,
+    );
+    let preset = set_service(
+        "Preset",
+        r"%SystemRoot%\system32\svchost.exe -k LocalService",
+        Some(1),
+    );
+    let rpc = set_service(
+        "RpcSs",
+        r"%SystemRoot%\system32\svchost.exe -k rpcss",
+        Some(0),
+    );
+    let xbox = set_service(
+        "XblAuthManager",
+        r"%SystemRoot%\system32\svchost.exe -k netsvcs",
+        Some(0),
+    );
+    let vendor = set_service("VendorSvc", r"C:\Vendor\service.exe", Some(0));
+    let before = registry.dump();
+
+    apply_direct(&fixture.store, "svchost_split_threshold").unwrap();
+    assert_eq!(
+        registry.get(Hive::Hklm, &w32time, "SvcHostSplitDisable"),
+        Some(Stored::Value(RegValue::Dword(1)))
+    );
+    assert_eq!(
+        registry.get(Hive::Hklm, &bits, "SvcHostSplitDisable"),
+        Some(Stored::Value(RegValue::Dword(1)))
+    );
+    for path in [&preset, &rpc, &xbox, &vendor] {
+        assert_eq!(
+            registry.get(Hive::Hklm, path, "SvcHostSplitDisable"),
+            before.get(&("HKLM", path.to_ascii_lowercase(), "svchostsplitdisable".into())).cloned(),
+            "unexpected fan-out mutation at {path}"
+        );
+    }
+
+    let snapshot = fixture.snapshot("svchost_split_threshold").unwrap();
+    assert_eq!(targets(&snapshot).len(), 3, "only the threshold and two changed service values are owned");
+    rollback_direct(&fixture.store, "svchost_split_threshold").unwrap();
+    assert_eq!(registry.dump(), before, "rollback must restore exact originals and preserve unrelated values");
+    assert!(!fixture.store.is_applied("svchost_split_threshold"));
+    assert_eq!(
+        registry.get(Hive::Hklm, threshold.key_path, threshold.value_name),
+        Some(Stored::Value(original_threshold))
+    );
+}
+
+#[test]
+fn svchost_partial_apply_keeps_a_complete_rollback_record() {
+    let registry = install();
+    let fixture = Fixture::new();
+    let threshold = tweaks::find_tweak("svchost_split_threshold").unwrap();
+    registry.set(
+        Hive::Hklm,
+        threshold.key_path,
+        threshold.value_name,
+        Stored::Value(RegValue::Dword(3_670_016)),
+    );
+    for service in ["BITS", "W32Time"] {
+        let path = format!("{}\\{service}", crate::services::SVC_HOST_SERVICES_PATH);
+        registry.set(
+            Hive::Hklm,
+            &path,
+            "ImagePath",
+            Stored::Value(RegValue::Str(
+                r"%SystemRoot%\system32\svchost.exe -k netsvcs".into(),
+            )),
+        );
+        registry.set(
+            Hive::Hklm,
+            &path,
+            crate::services::SVC_HOST_SPLIT_DISABLE_VALUE,
+            Stored::Value(RegValue::Dword(0)),
+        );
+    }
+    let before = registry.dump();
+    // Primary threshold + one child write succeed; the next child write fails.
+    registry.fail_after.set(Some(2));
+
+    let error = apply_direct(&fixture.store, "svchost_split_threshold").unwrap_err();
+    assert!(error.contains("applied to 1 services"), "{error}");
+    assert!(fixture.store.is_applied("svchost_split_threshold"));
+    rollback_direct(&fixture.store, "svchost_split_threshold").unwrap();
+    assert_eq!(registry.dump(), before);
+    assert!(!fixture.store.is_applied("svchost_split_threshold"));
+}
+
+#[test]
 fn retired_keyboard_snapshots_cannot_be_reapplied_but_remain_restorable() {
     for (id, original) in [
         ("keyboard_delay_zero", "1"),
@@ -633,7 +762,10 @@ fn every_registry_tweak_puts_back_the_exact_value_the_user_had() {
 
 #[test]
 fn reapplying_after_drift_still_restores_the_first_original() {
-    for id in registry_ids() {
+    for id in registry_ids()
+        .into_iter()
+        .filter(|id| *id != "svchost_split_threshold")
+    {
         let touched = discover(id);
         let registry = install();
         let fixture = Fixture::new();
@@ -647,6 +779,212 @@ fn reapplying_after_drift_still_restores_the_first_original() {
         rollback_direct(&fixture.store, id).unwrap();
         assert_eq!(registry.dump(), before, "{id}");
     }
+}
+
+#[test]
+fn svchost_reapply_refuses_to_overwrite_external_drift() {
+    let registry = install();
+    let fixture = Fixture::new();
+    let tweak = tweaks::find_tweak("svchost_split_threshold").unwrap();
+    let original = RegValue::Dword(3_670_016);
+    registry.set(
+        Hive::Hklm,
+        tweak.key_path,
+        tweak.value_name,
+        Stored::Value(original.clone()),
+    );
+    let service = format!(
+        "{}\\W32Time",
+        crate::services::SVC_HOST_SERVICES_PATH
+    );
+    registry.set(
+        Hive::Hklm,
+        &service,
+        "ImagePath",
+        Stored::Value(RegValue::Str(
+            r"%SystemRoot%\system32\svchost.exe -k LocalService".into(),
+        )),
+    );
+    registry.set(
+        Hive::Hklm,
+        &service,
+        crate::services::SVC_HOST_SPLIT_DISABLE_VALUE,
+        Stored::Value(RegValue::Dword(0)),
+    );
+
+    apply_direct(&fixture.store, tweak.id).unwrap();
+    let external = RegValue::Dword(1234);
+    registry.set(
+        Hive::Hklm,
+        tweak.key_path,
+        tweak.value_name,
+        Stored::Value(external.clone()),
+    );
+    assert!(apply_direct(&fixture.store, tweak.id).is_err());
+    assert_eq!(
+        registry.get(Hive::Hklm, tweak.key_path, tweak.value_name),
+        Some(Stored::Value(external)),
+        "reapply must not overwrite a value changed by another actor"
+    );
+    assert_eq!(
+        registry.get(
+            Hive::Hklm,
+            &service,
+            crate::services::SVC_HOST_SPLIT_DISABLE_VALUE
+        ),
+        Some(Stored::Value(RegValue::Dword(1)))
+    );
+
+    // Restore the target state only to let the exact rollback run; the guard
+    // above proves the user's external value was not overwritten by reapply.
+    registry.set(
+        Hive::Hklm,
+        tweak.key_path,
+        tweak.value_name,
+        Stored::Value(tweak.on_value.clone()),
+    );
+    rollback_direct(&fixture.store, tweak.id).unwrap();
+    assert_eq!(
+        registry.get(Hive::Hklm, tweak.key_path, tweak.value_name),
+        Some(Stored::Value(original))
+    );
+    assert_eq!(
+        registry.get(
+            Hive::Hklm,
+            &service,
+            crate::services::SVC_HOST_SPLIT_DISABLE_VALUE
+        ),
+        Some(Stored::Value(RegValue::Dword(0)))
+    );
+}
+
+#[test]
+fn svchost_rollback_preserves_external_service_drift_and_keeps_its_journal() {
+    let registry = install();
+    let fixture = Fixture::new();
+    let tweak = tweaks::find_tweak("svchost_split_threshold").unwrap();
+    let original_threshold = RegValue::Dword(3_670_016);
+    registry.set(
+        Hive::Hklm,
+        tweak.key_path,
+        tweak.value_name,
+        Stored::Value(original_threshold.clone()),
+    );
+    let service = format!("{}\\W32Time", crate::services::SVC_HOST_SERVICES_PATH);
+    registry.set(
+        Hive::Hklm,
+        &service,
+        "ImagePath",
+        Stored::Value(RegValue::Str(
+            r"%SystemRoot%\system32\svchost.exe -k LocalService".into(),
+        )),
+    );
+    registry.set(
+        Hive::Hklm,
+        &service,
+        crate::services::SVC_HOST_SPLIT_DISABLE_VALUE,
+        Stored::Value(RegValue::Dword(0)),
+    );
+
+    apply_direct(&fixture.store, tweak.id).unwrap();
+    let external_service_value = RegValue::Dword(7);
+    registry.set(
+        Hive::Hklm,
+        &service,
+        crate::services::SVC_HOST_SPLIT_DISABLE_VALUE,
+        Stored::Value(external_service_value.clone()),
+    );
+
+    let error = rollback_direct(&fixture.store, tweak.id).unwrap_err();
+    assert!(error.contains("changed after WinCraft applied it"), "{error}");
+    assert_eq!(
+        registry.get(Hive::Hklm, &service, crate::services::SVC_HOST_SPLIT_DISABLE_VALUE),
+        Some(Stored::Value(external_service_value)),
+        "rollback must not overwrite an external service change"
+    );
+    assert_eq!(
+        registry.get(Hive::Hklm, tweak.key_path, tweak.value_name),
+        Some(Stored::Value(original_threshold.clone())),
+        "independent values should still be restored"
+    );
+    assert!(fixture.store.is_applied(tweak.id), "keep the retryable journal");
+
+    // When the conflicting value is resolved to the captured original, the
+    // remaining snapshot can be safely cleared without touching other state.
+    registry.set(
+        Hive::Hklm,
+        &service,
+        crate::services::SVC_HOST_SPLIT_DISABLE_VALUE,
+        Stored::Value(RegValue::Dword(0)),
+    );
+    rollback_direct(&fixture.store, tweak.id).unwrap();
+    assert!(!fixture.store.is_applied(tweak.id));
+    assert_eq!(
+        registry.get(Hive::Hklm, tweak.key_path, tweak.value_name),
+        Some(Stored::Value(original_threshold))
+    );
+}
+
+#[test]
+fn svchost_rollback_keeps_the_service_value_if_its_image_path_stops_being_svchost() {
+    let registry = install();
+    let fixture = Fixture::new();
+    let tweak = tweaks::find_tweak("svchost_split_threshold").unwrap();
+    let original_threshold = RegValue::Dword(3_670_016);
+    registry.set(
+        Hive::Hklm,
+        tweak.key_path,
+        tweak.value_name,
+        Stored::Value(original_threshold.clone()),
+    );
+    let service = format!("{}\\W32Time", crate::services::SVC_HOST_SERVICES_PATH);
+    let original_image_path = r"%SystemRoot%\system32\svchost.exe -k LocalService";
+    registry.set(
+        Hive::Hklm,
+        &service,
+        "ImagePath",
+        Stored::Value(RegValue::Str(original_image_path.into())),
+    );
+    registry.set(
+        Hive::Hklm,
+        &service,
+        crate::services::SVC_HOST_SPLIT_DISABLE_VALUE,
+        Stored::Value(RegValue::Dword(0)),
+    );
+
+    apply_direct(&fixture.store, tweak.id).unwrap();
+    registry.set(
+        Hive::Hklm,
+        &service,
+        "ImagePath",
+        Stored::Value(RegValue::Str(r"C:\Vendor\service.exe".into())),
+    );
+
+    let error = rollback_direct(&fixture.store, tweak.id).unwrap_err();
+    assert!(error.contains("no longer has a SvcHost ImagePath"), "{error}");
+    assert_eq!(
+        registry.get(Hive::Hklm, &service, crate::services::SVC_HOST_SPLIT_DISABLE_VALUE),
+        Some(Stored::Value(RegValue::Dword(1))),
+        "do not restore a service value after its executable identity changes"
+    );
+    assert_eq!(
+        registry.get(Hive::Hklm, tweak.key_path, tweak.value_name),
+        Some(Stored::Value(original_threshold.clone()))
+    );
+    assert!(fixture.store.is_applied(tweak.id));
+
+    registry.set(
+        Hive::Hklm,
+        &service,
+        "ImagePath",
+        Stored::Value(RegValue::Str(original_image_path.into())),
+    );
+    rollback_direct(&fixture.store, tweak.id).unwrap();
+    assert_eq!(
+        registry.get(Hive::Hklm, &service, crate::services::SVC_HOST_SPLIT_DISABLE_VALUE),
+        Some(Stored::Value(RegValue::Dword(0)))
+    );
+    assert!(!fixture.store.is_applied(tweak.id));
 }
 
 #[test]

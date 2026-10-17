@@ -465,7 +465,7 @@ it("mounts restore confirmation dialog and executes restore-all", async () => {
   expect(screen.queryByRole("heading", { name: s.restore.title })).toBeNull();
 });
 
-it("mounts barebone consent dialog for dangerous tweaks and applies on confirmation", async () => {
+it("requires acknowledgement for manual high-risk tweaks before applying", async () => {
   render(<App />);
 
   fireEvent.click(screen.getByRole("button", { name: s.tabs.performance }));
@@ -487,10 +487,11 @@ it("mounts barebone consent dialog for dangerous tweaks and applies on confirmat
   await act(async () => {
     await Promise.resolve();
   });
-  expect(native.invoke).toHaveBeenCalledWith("record_barebone_consent", {
-    id: "barebone_edge",
-    text: "Acknowledged",
-  });
+  expect(native.invoke).toHaveBeenCalledWith("apply_tweak", { id: "barebone_edge" });
+  expect(native.invoke).not.toHaveBeenCalledWith(
+    "record_barebone_consent",
+    expect.objectContaining({ id: "barebone_edge" }),
+  );
   expect(screen.queryByRole("heading", { name: "Edge Removal" })).toBeNull();
 });
 

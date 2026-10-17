@@ -688,8 +688,8 @@ pub fn all_tweaks() -> Vec<RegistryTweak> {
         },
         RegistryTweak {
             id: "disable_delivery_optimization",
-            name: "Stop sharing Windows updates with strangers",
-            description: "Windows uploads downloaded update files to other PCs over your connection by default. This limits Delivery Optimization to your own machine, which stops that upload eating bandwidth mid-game.",
+            name: "Disable peer-to-peer Windows Update sharing",
+            description: "Sets Delivery Optimization to HTTP-only mode, stopping this PC from downloading update content from or uploading it to other PCs. Windows Update still downloads from Microsoft; this does not turn off the Delivery Optimization service or Windows Update.",
             category: Category::Maintenance,
             hive: Hive::Hklm,
             key_path: r"SOFTWARE\Policies\Microsoft\Windows\DeliveryOptimization",
@@ -2355,6 +2355,273 @@ pub mod windows_impl {
         Ok(())
     }
 
+    /// Capture every SvcHost fan-out value this tweak may change. The full set
+    /// is committed to the rollback journal before either the threshold or any
+    /// service value is written.
+    fn capture_svchost_split_fanout() -> Result<Vec<RegistrySnapshot>, String> {
+        use crate::services::{
+            is_svchost_fanout_excluded, MAX_SVC_HOST_FANOUT_SNAPSHOTS,
+            SVC_HOST_SERVICES_PATH, SVC_HOST_SPLIT_DISABLE_VALUE,
+        };
+
+        let service_names = names(Hive::Hklm, SVC_HOST_SERVICES_PATH)
+            .map_err(|e| format!("could not enumerate Windows services: {e}"))?;
+        if service_names.len() > MAX_SVC_HOST_FANOUT_SNAPSHOTS {
+            return Err(format!(
+                "refusing to snapshot {} service entries; the safety limit is {}",
+                service_names.len(),
+                MAX_SVC_HOST_FANOUT_SNAPSHOTS
+            ));
+        }
+
+        let mut snapshots = Vec::new();
+        for service in service_names {
+            if is_svchost_fanout_excluded(&service) {
+                continue;
+            }
+            let path = format!("{SVC_HOST_SERVICES_PATH}\\{service}");
+            let image_path = match read_value(
+                Hive::Hklm,
+                &path,
+                "ImagePath",
+                &RegValue::Str(String::new()),
+            ) {
+                Ok(Some(RegValue::Str(value) | RegValue::ExpandStr(value))) => value,
+                Ok(None) | Ok(Some(_)) => continue,
+                Err(error) if error.kind() == std::io::ErrorKind::InvalidData => continue,
+                Err(error) => {
+                    return Err(format!(
+                        "could not inspect the ImagePath for service {service}: {error}"
+                    ));
+                }
+            };
+            if !crate::services::is_svchost_image_path(&image_path) {
+                continue;
+            }
+
+            let original_value = read_value(
+                Hive::Hklm,
+                &path,
+                SVC_HOST_SPLIT_DISABLE_VALUE,
+                &RegValue::Dword(0),
+            )
+            .map_err(|error| {
+                format!("could not snapshot {SVC_HOST_SPLIT_DISABLE_VALUE} for {service}: {error}")
+            })?;
+            match &original_value {
+                Some(RegValue::Dword(1)) => continue,
+                Some(RegValue::Dword(_)) | None => {}
+                Some(_) => {
+                    return Err(format!(
+                        "{SVC_HOST_SPLIT_DISABLE_VALUE} for {service} is not a DWORD; it was not changed"
+                    ));
+                }
+            }
+            snapshots.push(RegistrySnapshot {
+                hive: "HKLM".to_string(),
+                path,
+                name: SVC_HOST_SPLIT_DISABLE_VALUE.to_string(),
+                original_value,
+            });
+        }
+        Ok(snapshots)
+    }
+
+    /// Apply only the values in the persisted snapshot. Each target must still
+    /// match its captured pre-state, so a concurrent external change is never
+    /// overwritten silently.
+    fn apply_svchost_split_fanout(snapshots: &[RegistrySnapshot]) -> Result<usize, String> {
+        use crate::services::{
+            is_svchost_fanout_excluded, svchost_service_name_from_path,
+            SVC_HOST_SPLIT_DISABLE_VALUE,
+        };
+
+        let target = RegValue::Dword(1);
+        let mut modified = 0;
+        for snapshot in snapshots {
+            let service = svchost_service_name_from_path(&snapshot.path)
+                .filter(|name| !is_svchost_fanout_excluded(name))
+                .ok_or_else(|| "invalid SvcHost service target in rollback snapshot".to_string())?;
+            if !snapshot.hive.eq_ignore_ascii_case("HKLM")
+                || !snapshot.name.eq_ignore_ascii_case(SVC_HOST_SPLIT_DISABLE_VALUE)
+            {
+                return Err("invalid SvcHost registry value in rollback snapshot".into());
+            }
+            let image_path = read_value(
+                Hive::Hklm,
+                &snapshot.path,
+                "ImagePath",
+                &RegValue::Str(String::new()),
+            )
+            .map_err(|error| {
+                format!("could not verify the ImagePath for service {service}: {error}")
+            })?;
+            let still_svchost = match image_path {
+                Some(RegValue::Str(value) | RegValue::ExpandStr(value)) => {
+                    crate::services::is_svchost_image_path(&value)
+                }
+                _ => false,
+            };
+            if !still_svchost {
+                return Err(format!(
+                    "service {service} no longer has a SvcHost ImagePath; no further service values were written"
+                ));
+            }
+            let current = read_value(Hive::Hklm, &snapshot.path, &snapshot.name, &target)
+                .map_err(|error| format!("could not read SvcHost setting for {service}: {error}"))?;
+            if current.as_ref() != snapshot.original_value.as_ref() {
+                return Err(format!(
+                    "SvcHost fan-out was applied to {modified} services before {service} changed after snapshot; no further service values were written"
+                ));
+            }
+            if let Err(error) = write_value(Hive::Hklm, &snapshot.path, &snapshot.name, &target) {
+                return Err(format!(
+                    "SvcHost fan-out was applied to {modified} services before {service} failed: {error}"
+                ));
+            }
+            modified += 1;
+        }
+        Ok(modified)
+    }
+
+    fn restore_svchost_value(
+        snapshot: &RegistrySnapshot,
+        applied_value: &RegValue,
+    ) -> Result<(), String> {
+        let hive = match snapshot.hive.as_str() {
+            value if value.eq_ignore_ascii_case("HKLM") => Hive::Hklm,
+            _ => return Err("invalid registry hive in SvcHost rollback snapshot".into()),
+        };
+        let current = read_value(hive, &snapshot.path, &snapshot.name, applied_value)
+            .map_err(|error| format!("could not inspect {} during rollback: {error}", snapshot.name))?;
+        if current.as_ref() == snapshot.original_value.as_ref() {
+            return Ok(());
+        }
+        if current.as_ref() != Some(applied_value) {
+            return Err(format!(
+                "{} at {} changed after WinCraft applied it; the external value was left untouched",
+                snapshot.name, snapshot.path
+            ));
+        }
+        if snapshot
+            .name
+            .eq_ignore_ascii_case(crate::services::SVC_HOST_SPLIT_DISABLE_VALUE)
+        {
+            let service = crate::services::svchost_service_name_from_path(&snapshot.path)
+                .filter(|name| !crate::services::is_svchost_fanout_excluded(name))
+                .ok_or_else(|| "invalid SvcHost service target in rollback snapshot".to_string())?;
+            let image_path = read_value(
+                Hive::Hklm,
+                &snapshot.path,
+                "ImagePath",
+                &RegValue::Str(String::new()),
+            )
+            .map_err(|error| {
+                format!("could not verify the ImagePath for service {service}: {error}")
+            })?;
+            let still_svchost = match image_path {
+                Some(RegValue::Str(value) | RegValue::ExpandStr(value)) => {
+                    crate::services::is_svchost_image_path(&value)
+                }
+                _ => false,
+            };
+            if !still_svchost {
+                return Err(format!(
+                    "service {service} no longer has a SvcHost ImagePath; its value was left untouched"
+                ));
+            }
+        }
+        restore_value(snapshot)
+    }
+
+    fn restore_svchost_entry(entry: SnapshotEntry, target: &RegValue) -> Result<(), String> {
+        let snapshots = match entry {
+            // Older releases saved only the threshold and then changed service
+            // values without journaling them. Restore only what is known; never
+            // sweep or delete values whose original state is unknowable.
+            SnapshotEntry::Registry(snapshot) => {
+                restore_svchost_value(&snapshot, target)?;
+                return Err("the legacy SvcHost snapshot did not record per-service values; the threshold was restored, but service settings were left untouched to avoid deleting pre-existing data".into());
+            }
+            SnapshotEntry::Composite { entries } => entries,
+            _ => return Err("unexpected snapshot type for the SvcHost tweak".into()),
+        };
+
+        let mut errors = Vec::new();
+        // Apply writes the threshold first and then the service fan-out; undo in
+        // reverse order. Try every target so one denied key does not prevent the
+        // remaining original values from being restored.
+        for entry in entries.iter().rev() {
+            let SnapshotEntry::Registry(snapshot) = entry else {
+                errors.push("unexpected entry in the SvcHost rollback snapshot".to_string());
+                continue;
+            };
+            let applied_value = if snapshot.name.eq_ignore_ascii_case("SvcHostSplitDisable") {
+                RegValue::Dword(1)
+            } else {
+                target.clone()
+            };
+            if let Err(error) = restore_svchost_value(snapshot, &applied_value) {
+                errors.push(error);
+            }
+        }
+        if errors.is_empty() {
+            Ok(())
+        } else {
+            Err(format!(
+                "{} SvcHost value(s) could not be restored; the rollback snapshot was retained: {}",
+                errors.len(),
+                errors.join("; ")
+            ))
+        }
+    }
+
+    fn svchost_fanout_snapshots(entry: &SnapshotEntry) -> Result<Vec<RegistrySnapshot>, String> {
+        let SnapshotEntry::Composite { entries } = entry else {
+            return Err("the SvcHost rollback snapshot does not include service values".into());
+        };
+        Ok(entries
+            .iter()
+            .filter_map(|entry| match entry {
+                SnapshotEntry::Registry(snapshot)
+                    if snapshot.name.eq_ignore_ascii_case("SvcHostSplitDisable") =>
+                {
+                    Some(snapshot.clone())
+                }
+                _ => None,
+            })
+            .collect())
+    }
+
+    fn ensure_svchost_snapshot_applied(
+        entry: &SnapshotEntry,
+        tweak: &RegistryTweak,
+    ) -> Result<(), String> {
+        let SnapshotEntry::Composite { entries } = entry else {
+            return Err("the SvcHost rollback snapshot is incomplete".into());
+        };
+        for entry in entries {
+            let SnapshotEntry::Registry(snapshot) = entry else {
+                return Err("unexpected entry in the SvcHost rollback snapshot".into());
+            };
+            let expected = if snapshot.name.eq_ignore_ascii_case("SvcHostSplitDisable") {
+                RegValue::Dword(1)
+            } else {
+                tweak.on_value.clone()
+            };
+            let hive = match snapshot.hive.as_str() {
+                value if value.eq_ignore_ascii_case("HKLM") => Hive::Hklm,
+                _ => return Err("invalid registry hive in SvcHost rollback snapshot".into()),
+            };
+            let current = read_value(hive, &snapshot.path, &snapshot.name, &expected)
+                .map_err(|error| format!("could not verify {}: {error}", snapshot.name))?;
+            if current != Some(expected) {
+                return Err("SvcHost has a saved rollback snapshot but is only partially applied; roll it back before retrying".into());
+            }
+        }
+        Ok(())
+    }
+
     fn stop_autologger_session(id: &str) {
         let session = match id {
             "disable_autologger_diagtrack" => "AutoLogger-Diagtrack-Listener",
@@ -2379,42 +2646,101 @@ pub mod windows_impl {
         pub fn apply(&self, store: &RollbackStore) -> Result<(), String> {
             require_active_policy(self.id)?;
             let mut transaction = store.transaction()?;
-            let original = self.read_current().map_err(|e| e.to_string())?;
+            let svchost = self.id == "svchost_split_threshold";
+
+            let entry = if svchost {
+                match transaction.entry(self.id) {
+                    Some(entry @ SnapshotEntry::Composite { .. }) => {
+                        ensure_svchost_snapshot_applied(&entry, self)?;
+                        return Ok(());
+                    }
+                    Some(SnapshotEntry::Registry(_)) => {
+                        return Err("this SvcHost tweak has a legacy snapshot without per-service originals; roll it back before applying the new journaled version".into());
+                    }
+                    Some(_) => {
+                        return Err("unexpected snapshot type for the SvcHost tweak".into());
+                    }
+                    None => {
+                        let original = self.read_current().map_err(|e| e.to_string())?;
+                        let mut entries = vec![SnapshotEntry::Registry(RegistrySnapshot {
+                            hive: hive_str(&self.hive).to_string(),
+                            path: self.key_path.to_string(),
+                            name: self.value_name.to_string(),
+                            original_value: original,
+                        })];
+                        entries.extend(
+                            capture_svchost_split_fanout()?
+                                .into_iter()
+                                .map(SnapshotEntry::Registry),
+                        );
+                        SnapshotEntry::Composite { entries }
+                    }
+                }
+            } else {
+                let original = self.read_current().map_err(|e| e.to_string())?;
+                SnapshotEntry::Registry(RegistrySnapshot {
+                    hive: hive_str(&self.hive).to_string(),
+                    path: self.key_path.to_string(),
+                    name: self.value_name.to_string(),
+                    original_value: original,
+                })
+            };
+
             transaction
-                .save_entry(
-                    self.id,
-                    SnapshotEntry::Registry(RegistrySnapshot {
-                        hive: hive_str(&self.hive).to_string(),
-                        path: self.key_path.to_string(),
-                        name: self.value_name.to_string(),
-                        original_value: original,
-                    }),
-                )
+                .save_entry(self.id, entry.clone())
                 .map_err(|e| e.to_string())?;
-            let res = write_value(self.hive, self.key_path, self.value_name, &self.on_value);
-            if res.is_ok() {
-                stop_autologger_session(self.id);
-                if self.id == "svchost_split_threshold" {
-                    let _ = crate::services::apply_svchost_split_fanout();
+
+            // For SvcHost, the complete primary + fan-out snapshot is now on
+            // disk before the first system write. Re-read the primary value so
+            // a change between capture and apply is not silently overwritten.
+            if svchost {
+                let SnapshotEntry::Composite { entries } = &entry else {
+                    return Err("the SvcHost rollback snapshot is incomplete".into());
+                };
+                let primary = entries
+                    .iter()
+                    .find_map(|entry| match entry {
+                        SnapshotEntry::Registry(snapshot)
+                            if snapshot.hive.eq_ignore_ascii_case(hive_str(&self.hive))
+                                && snapshot.path.eq_ignore_ascii_case(self.key_path)
+                                && snapshot.name.eq_ignore_ascii_case(self.value_name) =>
+                        {
+                            Some(snapshot)
+                        }
+                        _ => None,
+                    })
+                    .ok_or("the SvcHost threshold is missing from its rollback snapshot")?;
+                let current = self.read_current().map_err(|e| e.to_string())?;
+                if current.as_ref() != primary.original_value.as_ref() {
+                    return Err("the SvcHost threshold changed after it was snapshotted; no values were overwritten and the rollback record was retained".into());
                 }
             }
-            res
+
+            // Any partial fan-out failure leaves the complete journal intact for
+            // an explicit rollback.
+            write_value(self.hive, self.key_path, self.value_name, &self.on_value)?;
+            stop_autologger_session(self.id);
+            if svchost {
+                let snapshots = svchost_fanout_snapshots(&entry)?;
+                apply_svchost_split_fanout(&snapshots)?;
+            }
+            Ok(())
         }
 
         /// Restores the value captured before `apply`, or removes it if it
-        /// did not exist beforehand.
+        /// did not exist beforehand. SvcHost fan-out rollback is limited to the
+        /// exact service values in its original snapshot.
         pub fn rollback(&self, store: &RollbackStore) -> Result<(), String> {
-            let res = store.restore_entry(self.id, |entry| {
-                let SnapshotEntry::Registry(snapshot) = entry else {
-                    return Err("unexpected snapshot type for a registry tweak".to_string());
-                };
-
-                restore_value(&snapshot)
-            });
-            if res.is_ok() && self.id == "svchost_split_threshold" {
-                let _ = crate::services::rollback_svchost_split_fanout();
-            }
-            res
+            store.restore_entry(self.id, |entry| {
+                if self.id == "svchost_split_threshold" {
+                    restore_svchost_entry(entry, &self.on_value)
+                } else {
+                    let SnapshotEntry::Registry(snapshot) = entry else {
+                        return Err("unexpected snapshot type for a registry tweak".to_string());
+                    };
+                    restore_value(&snapshot)
+                }
+            })
         }
     }
 }

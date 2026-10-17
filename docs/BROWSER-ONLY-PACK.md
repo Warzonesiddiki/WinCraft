@@ -222,7 +222,7 @@ account can re-provision removed apps.
 | Telemetry autologger registry `Start = 0` (5 sessions) | ✅ | Registry-level; the live ETW teardown is **not** implemented |
 | Advertising ID off | ✅ | |
 | Activity feed / publish / upload user activities | ✅ (HKLM) | Not per-user, so not in the profile |
-| Delivery Optimization off | ⚠️ partial | Only a background-download limit exists; full off is **Add** |
+| Delivery Optimization peer sharing | ✅ partial | `DODownloadMode = 0` prevents peer-to-peer exchange; HTTP downloads from Microsoft and the service remain available. This is not a full service shutdown. |
 | Block telemetry IPs (firewall rules) | ❌ **Add** | The one measure registry policies cannot make. Must be off by default and labelled bypassable |
 | Hosts-based blocking | ❌ **Add** | Same caveat |
 | SmartScreen / Defender | leave ON | A browser-only user is exactly who needs them |
@@ -242,8 +242,10 @@ account can re-provision removed apps.
 | NIC **power management off** ("Allow the computer to turn off this device") | Prevents the adapter sleeping between page loads / while streaming | ❌ **Add** |
 | NIC interrupt moderation / RSS / checksum offload | Jitter on some NICs | ❌ **Add** |
 | Metered-connection awareness | Avoids surprise background downloads over a hotspot | ❌ **Add** |
-| Windows Update **deferral + no auto-restart while signed in** | The single biggest disruption to a browsing session is a forced restart | ❌ **Add — see `docs/2.0-FEATURE-ROADMAP.md` T1.1** |
-| Delivery Optimization fully off | Stops upload of updates to other PCs | ❌ **Add** |
+| Windows Update deferral | Reversible 7-day quality and 30-day feature deferrals; quality deferral delays security fixes | ✅ partial — Pro-or-higher only; pause, Active Hours, and version targeting remain unimplemented |
+| Windows Update driver offers | Withhold standalone driver-classified updates from the normal quality-update cycle; bundled/feature-update drivers may still arrive | ✅ `exclude_windows_update_drivers`; Pro-or-higher, not a performance tweak; manage standalone drivers yourself |
+| No scheduled auto-restart while signed in | Avoids a scheduled Windows Update restart during a signed-in session | ✅ `prevent_auto_restart_while_logged_on`; updates still install, and reboot-required security fixes wait for restart |
+| Delivery Optimization fully off | Stops peer-to-peer exchange; Microsoft-hosted HTTP downloads must remain available | ⚠️ peer sharing is already off with `DODownloadMode = 0`; do not disable the service without Windows servicing tests |
 
 ---
 
@@ -323,5 +325,5 @@ Claim no more than what those numbers show. This is the same rule the rest of th
 2. **Part B registry controls** as catalog entries (HKCU only; each reversible) — highest value per unit of work.
 3. **Part J browser-posture report** — read-only, no risk, unique to WinCraft.
 4. **Part C/D service-and-task expansion** — needs the same journalling the other controls have.
-5. **Part F/G** (telemetry IP blocking, DoH set, NIC power management, Delivery Optimization off, Update deferral) — the last two are Windows Update control, the biggest single win.
+5. **Part F/G** (telemetry IP blocking, DoH set, NIC power management, metered-connection awareness and the remaining Windows Update controls). Peer-sharing, signed-in restart protection, bounded 7-/30-day deferrals and the standalone driver-offer policy already ship; pause, Active Hours and version targeting remain open. A full Delivery Optimization shutdown is not the goal.
 6. **Part E deprovision fix** — so removals survive a feature update.

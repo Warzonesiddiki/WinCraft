@@ -145,7 +145,6 @@ permissions = [
     "allow-apply-skinpack",
     "allow-rollback-skinpack",
     "allow-export-recovery-script",
-    "allow-deprovision-package",
     "allow-barebone-preflight",
     "allow-record-barebone-consent",
     "allow-flush-dns-cache",

@@ -139,7 +139,6 @@ pub const APP_COMMANDS: &[&str] = &[
     "apply_skinpack",
     "rollback_skinpack",
     "export_recovery_script",
-    "deprovision_package",
     "barebone_preflight",
     "record_barebone_consent",
     "flush_dns_cache",

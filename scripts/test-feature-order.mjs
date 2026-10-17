@@ -52,6 +52,32 @@ assert.deepEqual(
     "disable_memory_integrity",
   ],
 );
+const maintenance = orderSectionTweaks(
+  [
+    "auto_end_frozen_tasks",
+    "defer_feature_updates_30_days",
+    "exclude_windows_update_drivers",
+    "prevent_auto_restart_while_logged_on",
+    "defer_quality_updates_7_days",
+    "disable_delivery_optimization",
+    "disable_fast_startup",
+    "block_oem_device_apps",
+  ].map((id) => ({ id })),
+  "maintenance",
+);
+assert.deepEqual(
+  maintenance.map((t) => t.id),
+  [
+    "disable_fast_startup",
+    "block_oem_device_apps",
+    "disable_delivery_optimization",
+    "prevent_auto_restart_while_logged_on",
+    "defer_quality_updates_7_days",
+    "defer_feature_updates_30_days",
+    "exclude_windows_update_drivers",
+    "auto_end_frozen_tasks",
+  ],
+);
 console.log(
-  "PASS: relevance order, mixed tiers, stable unknowns, unchanged catalog, security tradeoff last.",
+  "PASS: relevance order, mixed tiers, stable unknowns, unchanged catalog, Windows Update controls grouped.",
 );

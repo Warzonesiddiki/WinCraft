@@ -69,6 +69,7 @@ const ADVANCED: &str = r"SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Adva
 const CDM: &str = r"SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager";
 const EDGE: &str = r"SOFTWARE\Policies\Microsoft\Edge";
 const PAINT: &str = r"SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Paint";
+const WINDOWS_UPDATE: &str = r"SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate";
 
 /// Windows 11 builds the catalogue refers to.
 pub const BUILD_WIN11: u32 = 22000;
@@ -76,7 +77,7 @@ pub const BUILD_22H2: u32 = 22621;
 pub const BUILD_23H2: u32 = 22631;
 pub const BUILD_24H2: u32 = 26100;
 
-pub static TWEAKS: [SettingsTweak; 14] = [
+pub static TWEAKS: [SettingsTweak; 18] = [
     SettingsTweak {
         id: "disable_click_to_do",
         name: "Turn off Click to Do",
@@ -318,6 +319,72 @@ pub static TWEAKS: [SettingsTweak; 14] = [
         effect: crate::tweaks::Effect::SignOut,
         risk: None,
         group: Some("gaming"),
+    },
+    SettingsTweak {
+        id: "prevent_auto_restart_while_logged_on",
+        name: "Prevent scheduled Windows Update restarts while signed in",
+        description: "Prevents Windows Update from automatically restarting the PC for a scheduled update while someone is signed in. Updates can still download and install; this does not block a restart you request yourself. A security update that needs a restart is not fully active until the PC restarts, so staying signed in can delay protection. Keep Windows Update enabled and restart promptly.",
+        category: Category::Maintenance,
+        hive: Hive::Hklm,
+        writes: &[Write { path: r"SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU", name: "NoAutoRebootWithLoggedOnUsers", value: RegValue::Dword(1) }],
+        requires_pro: false,
+        min_build: 0,
+        edition: Edition::ProOrHigher,
+        evidence: crate::tweaks::Evidence::Neutral,
+        effect: crate::tweaks::Effect::Immediate,
+        risk: None,
+        group: Some("updates"),
+    },
+    SettingsTweak {
+        id: "defer_quality_updates_7_days",
+        name: "Delay quality updates by 7 days",
+        description: "Defers Windows quality updates, including monthly security fixes, for 7 days after release. Windows Update stays enabled; this is a short delay, not a pause or a block. Security fixes remain unapplied during the delay, so install urgent updates promptly and restart when Windows asks. Restoring this setting removes the deferral.",
+        category: Category::Maintenance,
+        hive: Hive::Hklm,
+        writes: &[
+            Write { path: WINDOWS_UPDATE, name: "DeferQualityUpdates", value: RegValue::Dword(1) },
+            Write { path: WINDOWS_UPDATE, name: "DeferQualityUpdatesPeriodInDays", value: RegValue::Dword(7) },
+        ],
+        requires_pro: false,
+        min_build: 14393, // Windows 10, version 1607; Windows 11 is newer.
+        edition: Edition::ProOrHigher,
+        evidence: crate::tweaks::Evidence::Neutral,
+        effect: crate::tweaks::Effect::Immediate,
+        risk: None,
+        group: Some("updates"),
+    },
+    SettingsTweak {
+        id: "defer_feature_updates_30_days",
+        name: "Delay feature updates by 30 days",
+        description: "Defers offers of Windows feature updates by 30 days after release. Monthly quality and security updates continue on their normal schedule. This is not a version pin and does not extend support for the current Windows release; restoring this setting removes the deferral.",
+        category: Category::Maintenance,
+        hive: Hive::Hklm,
+        writes: &[
+            Write { path: WINDOWS_UPDATE, name: "DeferFeatureUpdates", value: RegValue::Dword(1) },
+            Write { path: WINDOWS_UPDATE, name: "DeferFeatureUpdatesPeriodInDays", value: RegValue::Dword(30) },
+        ],
+        requires_pro: false,
+        min_build: 14393, // Windows 10, version 1607; Windows 11 is newer.
+        edition: Edition::ProOrHigher,
+        evidence: crate::tweaks::Evidence::Neutral,
+        effect: crate::tweaks::Effect::Immediate,
+        risk: None,
+        group: Some("updates"),
+    },
+    SettingsTweak {
+        id: "exclude_windows_update_drivers",
+        name: "Exclude standalone driver updates from Windows Update",
+        description: "Tells Windows Update to exclude standalone driver-classified updates from its normal quality-update cycle. Windows Update and security/quality updates remain enabled. Drivers bundled into security or critical updates, and drivers installed dynamically during feature updates, can still arrive. Vendor tools and manual installs are unaffected. You must manage standalone drivers yourself; while this is active, the Windows Update driver catalogue may show fewer or no offers. Restoring this setting allows Windows Update to offer drivers again.",
+        category: Category::Maintenance,
+        hive: Hive::Hklm,
+        writes: &[Write { path: WINDOWS_UPDATE, name: "ExcludeWUDriversInQualityUpdate", value: RegValue::Dword(1) }],
+        requires_pro: false,
+        min_build: 14393, // Windows 10, version 1607; Windows 11 is newer.
+        edition: Edition::ProOrHigher,
+        evidence: crate::tweaks::Evidence::Neutral,
+        effect: crate::tweaks::Effect::Immediate,
+        risk: None,
+        group: Some("updates"),
     },
 ];
 
@@ -658,6 +725,150 @@ mod tests {
     }
 
     #[test]
+    fn scheduled_update_restart_policy_is_machine_scoped_and_edition_gated() {
+        let tweak = find("prevent_auto_restart_while_logged_on").unwrap();
+        assert_eq!(tweak.category, Category::Maintenance);
+        assert!(tweak.requires_admin());
+        assert_eq!(tweak.edition, Edition::ProOrHigher);
+        assert_eq!(tweak.min_build, 0);
+        assert_eq!(tweak.writes.len(), 1);
+        assert_eq!(tweak.writes[0].path, r"SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU");
+        assert_eq!(tweak.writes[0].name, "NoAutoRebootWithLoggedOnUsers");
+        assert_eq!(tweak.writes[0].value, RegValue::Dword(1));
+        assert!(tweak.description.contains("security update"));
+        assert_eq!(
+            availability(tweak, Some(26100), Some("Professional")),
+            Ok(())
+        );
+        assert_eq!(
+            availability(tweak, Some(26100), Some("Core")),
+            Err(Unavailable::Edition)
+        );
+    }
+
+    #[test]
+    fn update_deferrals_are_bounded_machine_policies_with_security_copy() {
+        for (id, enabled_name, days_name, days) in [
+            (
+                "defer_quality_updates_7_days",
+                "DeferQualityUpdates",
+                "DeferQualityUpdatesPeriodInDays",
+                7,
+            ),
+            (
+                "defer_feature_updates_30_days",
+                "DeferFeatureUpdates",
+                "DeferFeatureUpdatesPeriodInDays",
+                30,
+            ),
+        ] {
+            let tweak = find(id).unwrap();
+            assert_eq!(tweak.category, Category::Maintenance);
+            assert!(tweak.requires_admin());
+            assert_eq!(tweak.edition, Edition::ProOrHigher);
+            assert_eq!(tweak.min_build, 14393);
+            assert_eq!(tweak.writes.len(), 2);
+            assert_eq!(tweak.writes[0].path, WINDOWS_UPDATE);
+            assert_eq!(tweak.writes[0].name, enabled_name);
+            assert_eq!(tweak.writes[0].value, RegValue::Dword(1));
+            assert_eq!(tweak.writes[1].path, WINDOWS_UPDATE);
+            assert_eq!(tweak.writes[1].name, days_name);
+            assert_eq!(tweak.writes[1].value, RegValue::Dword(days));
+            assert_eq!(
+                availability(tweak, Some(26100), Some("Professional")),
+                Ok(())
+            );
+            assert_eq!(
+                availability(tweak, Some(19045), Some("Professional")),
+                Ok(())
+            );
+            assert_eq!(
+                availability(tweak, Some(10240), Some("Professional")),
+                Err(Unavailable::Version)
+            );
+            assert_eq!(
+                availability(tweak, Some(26100), Some("Core")),
+                Err(Unavailable::Edition)
+            );
+
+            let complete = SnapshotEntry::Composite {
+                entries: tweak
+                    .writes
+                    .iter()
+                    .map(|write| {
+                        SnapshotEntry::Registry(RegistrySnapshot {
+                            hive: "HKLM".to_string(),
+                            path: write.path.to_string(),
+                            name: write.name.to_string(),
+                            original_value: None,
+                        })
+                    })
+                    .collect(),
+            };
+            assert!(valid_snapshot(tweak, &complete));
+            let SnapshotEntry::Composite { mut entries } = complete else {
+                unreachable!();
+            };
+            entries.truncate(1);
+            assert!(!valid_snapshot(
+                tweak,
+                &SnapshotEntry::Composite { entries }
+            ));
+        }
+
+        assert!(find("defer_quality_updates_7_days")
+            .unwrap()
+            .description
+            .contains("Security fixes remain unapplied"));
+        assert!(find("defer_feature_updates_30_days")
+            .unwrap()
+            .description
+            .contains("Monthly quality and security updates continue"));
+    }
+
+    #[test]
+    fn windows_update_driver_exclusion_is_scoped_and_reversible() {
+        let tweak = find("exclude_windows_update_drivers").unwrap();
+        assert_eq!(tweak.category, Category::Maintenance);
+        assert!(tweak.requires_admin());
+        assert_eq!(tweak.edition, Edition::ProOrHigher);
+        assert_eq!(tweak.min_build, 14393);
+        assert_eq!(tweak.writes.len(), 1);
+        assert_eq!(tweak.writes[0].path, WINDOWS_UPDATE);
+        assert_eq!(tweak.writes[0].name, "ExcludeWUDriversInQualityUpdate");
+        assert_eq!(tweak.writes[0].value, RegValue::Dword(1));
+        assert_eq!(
+            availability(tweak, Some(26100), Some("Professional")),
+            Ok(())
+        );
+        assert_eq!(
+            availability(tweak, Some(19045), Some("Professional")),
+            Ok(())
+        );
+        assert_eq!(
+            availability(tweak, Some(10240), Some("Professional")),
+            Err(Unavailable::Version)
+        );
+        assert_eq!(
+            availability(tweak, Some(26100), Some("Core")),
+            Err(Unavailable::Edition)
+        );
+        assert!(tweak.description.contains("security or critical updates"));
+        assert!(tweak.description.contains("dynamically during feature updates"));
+        assert!(tweak.description.contains("manage standalone drivers yourself"));
+
+        let snapshot = SnapshotEntry::Composite {
+            entries: vec![SnapshotEntry::Registry(RegistrySnapshot {
+                hive: "HKLM".to_string(),
+                path: WINDOWS_UPDATE.to_string(),
+                name: "ExcludeWUDriversInQualityUpdate".to_string(),
+                original_value: None,
+            })],
+        };
+        assert!(valid_snapshot(tweak, &snapshot));
+    }
+
+    #[test]
     fn snapshots_must_cover_exactly_the_declared_values() {
         let t = find("disable_paint_ai").unwrap();
         let snap = |names: &[&str], hive: &str| SnapshotEntry::Composite {
@@ -698,7 +909,7 @@ mod tests {
         assert!(crate::rollback::validate_snapshot(t.id, &snap(&all, "HKLM")).is_ok());
     }
 
-    /// The Windows versions the 1.18 controls are verified on in a VM, as
+    /// Windows versions and editions covered by the settings-policy VM matrix, as
     /// (label, CurrentBuild, EditionID).
     const VM_TARGETS: [(&str, u32, &str); 4] = [
         ("win11-pro-24h2", 26100, "Professional"),

@@ -1441,9 +1441,29 @@ export const fr: Strings = {
         "Empêche les applications du Store de s'exécuter, de s'actualiser et d'interroger le réseau pendant que vous ne les utilisez pas. C'est du processeur, de la mémoire et de la batterie dépensés pour des applications que vous n'avez pas ouvertes.",
     },
     disable_delivery_optimization: {
-      name: "Ne plus partager les mises a jour Windows",
+      name: "Désactiver le partage pair-à-pair des mises à jour Windows",
       description:
-        "Par defaut, Windows envoie les fichiers de mise a jour telecharges vers d'autres PC via votre connexion. Ceci limite Delivery Optimization a votre seule machine, pour que cet envoi ne consomme plus votre bande passante en pleine partie.",
+        "Configure Delivery Optimization en mode HTTP uniquement, afin que ce PC ne télécharge pas le contenu des mises à jour depuis d'autres PC et ne leur en envoie pas. Windows Update continue de télécharger les mises à jour depuis Microsoft ; le service Delivery Optimization et Windows Update restent activés.",
+    },
+    prevent_auto_restart_while_logged_on: {
+      name: "Éviter les redémarrages planifiés de Windows Update pendant une session ouverte",
+      description:
+        "Empêche Windows Update de redémarrer automatiquement le PC pour une mise à jour planifiée tant qu’une personne est connectée. Les mises à jour peuvent toujours être téléchargées et installées ; cela ne bloque pas un redémarrage que vous lancez vous-même. Une mise à jour de sécurité qui nécessite un redémarrage n’est pleinement active qu’après celui-ci : une session prolongée peut donc retarder la protection. Laissez Windows Update activé et redémarrez rapidement.",
+    },
+    defer_quality_updates_7_days: {
+      name: "Retarder les mises à jour de qualité de 7 jours",
+      description:
+        "Diffère de 7 jours après leur publication les mises à jour de qualité de Windows, y compris les correctifs de sécurité mensuels. Windows Update reste activé : il s'agit d'un court délai, pas d'une pause ni d'un blocage. Les correctifs de sécurité ne sont pas appliqués pendant ce délai ; installez rapidement les mises à jour urgentes et redémarrez lorsque Windows le demande. Restaurer ce réglage supprime le report.",
+    },
+    defer_feature_updates_30_days: {
+      name: "Retarder les mises à jour de fonctionnalités de 30 jours",
+      description:
+        "Diffère de 30 jours après leur publication la proposition des mises à jour de fonctionnalités de Windows. Les mises à jour mensuelles de qualité et de sécurité continuent selon leur calendrier habituel. Ce réglage ne fixe pas une version et ne prolonge pas la prise en charge de votre version actuelle de Windows ; le restaurer supprime ce report.",
+    },
+    exclude_windows_update_drivers: {
+      name: "Exclure les pilotes autonomes de Windows Update",
+      description:
+        "Demande à Windows Update d'exclure les mises à jour de pilotes autonomes de son cycle normal de mises à jour de qualité. Windows Update et les mises à jour de qualité et de sécurité restent activés. Les pilotes inclus dans des mises à jour de sécurité ou critiques, ainsi que ceux installés dynamiquement lors des mises à jour de fonctionnalités, peuvent toujours arriver. Les outils des fabricants et les installations manuelles ne sont pas bloqués. Vous devrez gérer vous-même les pilotes autonomes ; tant que ce réglage est actif, le catalogue de pilotes de Windows Update peut proposer moins de mises à jour, voire aucune. Restaurer ce réglage réautorise les offres de pilotes par Windows Update.",
     },
     disable_copilot: {
       name: "Ancienne stratégie Copilot (restauration uniquement)",

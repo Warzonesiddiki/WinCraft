@@ -1448,9 +1448,29 @@ export const de: Strings = {
         "Verhindert, dass Store-Apps laufen, sich aktualisieren und das Netzwerk abfragen, waehrend Sie sie nicht nutzen. Das sind echte CPU-, RAM- und Akkuressourcen fuer Apps, die Sie nie geoeffnet haben.",
     },
     disable_delivery_optimization: {
-      name: "Windows-Updates nicht mehr mit Fremden teilen",
+      name: "Peer-to-Peer-Freigabe von Windows-Updates deaktivieren",
       description:
-        "Windows laedt heruntergeladene Updatedateien standardmaessig ueber Ihre Verbindung zu anderen PCs hoch. Dies beschraenkt die Uebermittlungsoptimierung auf Ihren eigenen Rechner, damit dieser Upload nicht mitten im Spiel Bandbreite frisst.",
+        "Stellt die Übermittlungsoptimierung auf den reinen HTTP-Modus, damit dieser PC keine Update-Inhalte von anderen PCs lädt oder an sie überträgt. Windows Update lädt weiterhin von Microsoft herunter; der Dienst für die Übermittlungsoptimierung und Windows Update bleiben aktiv.",
+    },
+    prevent_auto_restart_while_logged_on: {
+      name: "Geplante Windows-Update-Neustarts bei angemeldeten Nutzern verhindern",
+      description:
+        "Verhindert, dass Windows Update den PC für ein geplantes Update automatisch neu startet, solange jemand angemeldet ist. Updates können weiterhin heruntergeladen und installiert werden; ein von dir selbst gestarteter Neustart wird nicht blockiert. Ein Sicherheitsupdate, das einen Neustart erfordert, ist erst danach vollständig wirksam. Eine lange Sitzung kann den Schutz daher verzögern. Lass Windows Update eingeschaltet und starte den PC zeitnah neu.",
+    },
+    defer_quality_updates_7_days: {
+      name: "Qualitätsupdates um 7 Tage verzögern",
+      description:
+        "Verzögert Windows-Qualitätsupdates einschließlich monatlicher Sicherheitsupdates um 7 Tage nach ihrer Veröffentlichung. Windows Update bleibt aktiviert: Das ist ein kurzer Aufschub, keine Pause und keine Sperre. Sicherheitspatches bleiben während der Wartezeit unappliziert. Installiere dringende Updates zeitnah und starte neu, wenn Windows dazu auffordert. Durch Wiederherstellen dieser Einstellung wird der Aufschub entfernt.",
+    },
+    defer_feature_updates_30_days: {
+      name: "Funktionsupdates um 30 Tage verzögern",
+      description:
+        "Verzögert das Angebot von Windows-Funktionsupdates um 30 Tage nach ihrer Veröffentlichung. Monatliche Qualitäts- und Sicherheitsupdates laufen planmäßig weiter. Dies ist keine Versionssperre und verlängert den Support für deine aktuelle Windows-Version nicht; durch Wiederherstellen wird der Aufschub entfernt.",
+    },
+    exclude_windows_update_drivers: {
+      name: "Eigenständige Treiberupdates aus Windows Update ausschließen",
+      description:
+        "Weist Windows Update an, eigenständige Treiberupdates aus dem normalen Qualitätsupdate-Zyklus auszuschließen. Windows Update sowie Qualitäts- und Sicherheitsupdates bleiben aktiviert. Treiber in Sicherheits- oder kritischen Updates und Treiber, die während Funktionsupdates dynamisch installiert werden, können weiterhin kommen. Herstellertools und manuelle Installationen bleiben möglich. Du musst eigenständige Treiber selbst verwalten; solange diese Einstellung aktiv ist, zeigt der Windows-Update-Treiberkatalog möglicherweise weniger oder keine Angebote. Durch Wiederherstellen werden Treiberangebote wieder zugelassen.",
     },
     disable_copilot: {
       name: "Alte Copilot-Richtlinie (nur Wiederherstellung)",

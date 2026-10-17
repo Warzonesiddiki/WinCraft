@@ -3,13 +3,14 @@ import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/re
 import { axe } from "jest-axe";
 import { format } from "../i18n";
 import { STRINGS } from "../i18n-tables";
-import type { ScheduledTaskEntry, StartupEntry } from "../types";
+import type { BareboneTaskEntry, ScheduledTaskEntry, StartupEntry } from "../types";
 import { ScheduledTaskManager, StartupManager } from "./startup";
 
 vi.mock("@tauri-apps/api/core", async () => (await import("../test-bridge")).coreModule());
 vi.mock("@tauri-apps/api/event", async () => (await import("../test-bridge")).eventModule());
+vi.mock("@tauri-apps/plugin-dialog", async () => (await import("../test-bridge")).dialogModule());
 
-const { bridge } = await import("../test-bridge");
+const { bridge, setDialog } = await import("../test-bridge");
 
 const s = STRINGS.en;
 const pushToast = vi.fn();
@@ -39,6 +40,14 @@ const task = (extra: Partial<ScheduledTaskEntry> = {}): ScheduledTaskEntry => ({
   enabled: true,
   trigger: "logon",
   requires_admin: false,
+  ...extra,
+});
+
+const bareboneTask = (extra: Partial<BareboneTaskEntry> = {}): BareboneTaskEntry => ({
+  name: "UsbCeip",
+  path: "\\Microsoft\\Windows\\Customer Experience Improvement Program\\UsbCeip",
+  enabled: true,
+  present: true,
   ...extra,
 });
 
@@ -185,6 +194,90 @@ describe("StartupManager", () => {
 });
 
 describe("ScheduledTaskManager", () => {
+  it("requires explicit consent before disabling one allowlisted task", async () => {
+    const listed = bareboneTask();
+    bridge.reply("list_scheduled_tasks", [], []);
+    bridge.reply("list_barebone_tasks", [listed], [bareboneTask({ enabled: false })]);
+    bridge.reply("record_barebone_consent", undefined);
+    bridge.reply("set_barebone_task", { restorePoint: { kind: "created" } });
+    setDialog("ask", true);
+    render(<ScheduledTaskManager s={s} pushToast={pushToast} />);
+
+    fireEvent.click(await screen.findByRole("button", { name: listed.name }));
+
+    await waitFor(() =>
+      expect(bridge.argsOf("record_barebone_consent")).toEqual({
+        id: listed.path,
+        text: "I reviewed the warning and consent to disable this allowlisted Windows task.",
+      }),
+    );
+    expect(bridge.argsOf("set_barebone_task")).toEqual({ path: listed.path, enabled: false });
+    expect(
+      bridge.calls().findIndex((call) => call.command === "record_barebone_consent"),
+    ).toBeLessThan(bridge.calls().findIndex((call) => call.command === "set_barebone_task"));
+  });
+
+  it("records batch consent and reports partial task changes as an error", async () => {
+    const listed = bareboneTask();
+    bridge.reply("list_scheduled_tasks", [], []);
+    bridge.reply("list_barebone_tasks", [listed], [bareboneTask({ enabled: false })]);
+    bridge.reply("record_barebone_consent", undefined);
+    bridge.reply("disable_all_barebone_tasks", {
+      restorePoint: { kind: "created" },
+      total: 1,
+      modified: 1,
+      failed: 1,
+      failedTasks: [listed.path],
+      unavailableTasks: ["\\Microsoft\\Windows\\Maps\\MapsUpdateTask"],
+      executionError: null,
+    });
+    setDialog("ask", true);
+    render(<ScheduledTaskManager s={s} pushToast={pushToast} />);
+
+    fireEvent.click(await screen.findByRole("button", { name: "Disable All (1)" }));
+
+    await waitFor(() =>
+      expect(pushToast).toHaveBeenCalledWith("error", expect.stringContaining("1 failed")),
+    );
+    expect(pushToast).toHaveBeenCalledWith("error", expect.stringContaining("Affected: UsbCeip"));
+    expect(pushToast).toHaveBeenCalledWith(
+      "error",
+      expect.stringContaining("Could not verify MapsUpdateTask"),
+    );
+    expect(bridge.argsOf("record_barebone_consent")).toEqual({
+      id: "barebone_tasks_batch",
+      text: "I reviewed the batch warning and consent to disable the allowlisted Windows task set.",
+    });
+  });
+
+  it("does not claim batch success when an allowlisted task state is unavailable", async () => {
+    const listed = bareboneTask();
+    bridge.reply("list_scheduled_tasks", [], []);
+    bridge.reply("list_barebone_tasks", [listed], [listed]);
+    bridge.reply("record_barebone_consent", undefined);
+    bridge.reply("disable_all_barebone_tasks", {
+      restorePoint: { kind: "created" },
+      total: 1,
+      modified: 0,
+      failed: 0,
+      failedTasks: [],
+      unavailableTasks: ["\\Microsoft\\Windows\\Maps\\MapsUpdateTask"],
+      executionError: null,
+    });
+    setDialog("ask", true);
+    render(<ScheduledTaskManager s={s} pushToast={pushToast} />);
+
+    fireEvent.click(await screen.findByRole("button", { name: "Disable All (1)" }));
+
+    await waitFor(() =>
+      expect(pushToast).toHaveBeenCalledWith(
+        "error",
+        expect.stringContaining("Could not verify MapsUpdateTask"),
+      ),
+    );
+    expect(pushToast).not.toHaveBeenCalledWith("success", expect.any(String));
+  });
+
   it("lists third-party tasks and toggles one by its path", async () => {
     bridge.reply("list_scheduled_tasks", [task()], [task({ enabled: false })]);
     bridge.reply("set_scheduled_task_enabled", undefined);
